@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nEmpowering Preschools.  \nEnriching Childhoods.  \n\nAI GROWTH ENGINE ✨  \nFrom Every Observation to Lifelong Impact  \n\nObserve • Analyze • Understand • Guide • Grow  \n\n\n### 1 TEACHER OBSERVATION  \nCapture Moments, Add Insights  \n← Add Observation  \n- Aarav Sharma  \n  3.6 Yrs • Nursery A  \n- Activity  \n  🎨 Drawing & Coloring  \n- Observation  \n  Aarav showed great interest in coloring the picture. He chose bright colors and was very focused. He shared his crayons with a friend.  \n- Mood  \n  😊 Happy  \n- Skills Observed  \n  Creativity • Focus • Sharing  \n- Media  \n  [Photos] [Videos] [Notes] [Voice]  \n- Save Observation  \n\n\n### 2 AI PROCESSING LAYER  \nUnderstand • Analyze • Detect  \nPreOne AI Brain  \n- Natural Language Processing  \n  Understand teacher notes  \n- Image Recognition  \n  Analyze child activities  \n- Emotion Detection  \n  Detect mood & engagement  \n- Pattern Recognition  \n  Identify growth patterns  \n- Behavioral Analysis  \n  Evaluate development areas  \nMulti-Model AI Engine  \n\n\n### 3 GROWTH ENGINE  \nCalculate • Score • Track  \nAI Growth Score  \n82  \nGreat Progress! 🎉  \n- Creativity  \n  92%  \n- Communication  \n  76%  \n- Social Skills  \n  84%  \n- Confidence  \n  76%  \n- Cognitive Skills  \n  80%  \n- Focus & Attention  \n  88%  \nScores updated in real-time  \n\n\n### 4 PARENT INSIGHTS  \nClear • Simple • Actionable  \nAarav’s AI Summary  \nAarav is showing strong creative abilities and enjoys hands-on activities. He is building good focus and sharing skills.  \n\nStrengths  \n- Very creative and imaginative  \n- Good focus on preferred tasks  \n- Shares and cooperates well  \n\nAreas to Support  \n- Group communication  \n- Expressing in group activities  \n- Building confidence to speak  \nEasy to understand for parents  \n\n\n### 5 PERSONALIZED RECOMMENDATIONS  \nAI Suggested Next Steps  \nFor School  \n- Group Storytelling Activity  \n  Encourage Aarav to speak in small group.  \n- Show & Tell Session  \n  Help Aarav build confidence by sharing his work.  \n- Team Play Activity  \n  Improve social interaction through fun group games.  \n\nFor Parents (At Home)  \n- Daily Talk Time  \n  Spend 10 mins talking about his day.  \n- Creative Time  \n  Encourage drawing, DIY and storytelling.  \n- Play Dates  \n  Arrange playtime with peers to build confidence.  \nPersonalized for every child  \n\n\n### 6 CHILDHOOD PASSPORT™ UPDATE  \nStore • Track • Treasure  \nChildhood Passport™  \nAarav Sharma  \n3.6 Yrs • Nursery A  \n\nMilestone Unlocked  \nCreative Explorer  \nAarav shows creativity and imagination in art activities.  \n\nGrowth Snapshot  \n- Overall Score  \n  82 ↑ 6  \n- Date  \n  24 May 2024  \n- View Full Passport  \nMemories. Milestones. Forever.  \n\n\n### GROWTH TREND OVER TIME  \nTrack every step of your child’s beautiful journey.  \n- Overall Score  \n- Creativity  \n- Communication  \n[Line graph: Dec → Jan → Feb → Mar → Apr → May]  \n\n\n### DEVELOPMENT DOMAINS  \nCreativity • Focus • Cognitive Skills • Confidence • Social Skills • Communication  \n[Hexagon chart with current/last month/age average]  \n\n\n### AI COMPARISON  \nCompared to Age Group (3-4 Years)  \n- Overall  \n  82 Above Average  \n- Creativity  \n  92 Excellent  \n- Communication  \n  76 Average  \n- Social Skills  \n  84 Above Average  \n- Confidence  \n  76 Average  \n- Cognitive Skills  \n  80 Above Average  \n- Focus  \n  88 Excellent  \nAI benchmarked with 1000+ children data  \n\n\n### MILESTONES ACHIEVED  \n- Color Explorer  \n  Explores colors and shades  \n  10 Apr 2024  \n- Sharing Star  \n  Shares materials and toys  \n  25 Apr 2024  \n- Focus Champ  \n  Focuses on activity >10 mins  \n  08 May 2024  \n- Creative Explorer  \n  Shows creativity in art  \n  24 May 2024  \n- Confident Communicator  \n  Expresses in small group  \n  Upcoming  \n\n\n### HOW AI HELPS EVERYONE  \n- For Teachers  \n  Saves time, reduces paperwork, and gives smart insights.  \n- For Parents  \n  Understands child better, tracking real growth.  \n- For Admin  \n  Data-driven decisions, better outcomes.  \n- For Children  \n  Personalized care for holistic development.  \n\n\nEvery Observation Matters.  \nEvery Child Grows.  \nObserve every moment → AI analyzes instantly → Understand deeply → Guide better → Grow confidently → Remember forever  \n\nPreOne AI is not just technology,  \nit’s a partner in your child’s beautiful journey. ✨",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210446,
+  "id": "20260531145338f58540020ced4266",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260531145338f58540020ced4266",
+  "usage": {
+    "completion_tokens": 1057,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 48
+    },
+    "total_tokens": 3147
+  }
+}

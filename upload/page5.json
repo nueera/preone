@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nOperating System for Modern Preschools  \n\nTEACHER COMPLETE JOURNEY MAP  \nSimplify Teaching. Save Time. Track Every Child’s Growth.  \n\nTEACHER PROMISE  \n- Less Manual Work  \n- More Time for Children  \n- AI Assistance at Every Step  \n- Stronger Parent Connection  \n\n\n### 1. START OF DAY  \nPlan your day and prepare your class  \n\n1. Login & Dashboard  \n   - Quick overview of today  \n   - Classes & schedules  \n   - Pending tasks  \n\n2. Attendance  \n   - One tap attendance  \n   - Manual / QR / RFID  \n   - Instantly synced  \n\n3. Activity Planner  \n   - Plan activities in seconds  \n   - Age-wise suggestions  \n   - Learning objectives ready  \n\n4. Capture & Upload  \n   - Capture photos / videos  \n   - Add notes & tags  \n   - Auto sync to parents  \n\n5. Observation & Notes  \n   - Quick observations  \n   - Track skills & behavior  \n   - Build child profile  \n\n6. AI Report Generator  \n   - AI creates smart reports  \n   - Saves 70% of time  \n   - Personalized insights  \n\n7. Parent Communication  \n   - Share updates instantly  \n   - Photos, videos & notes  \n   - Two-way chat  \n\n8. Announcements  \n   - School announcements  \n   - Events & reminders  \n   - Targeted audience  \n\nDaily for Tomorrow  \n   - Auto daily summary  \n   - Plan next day easily  \n   - All tasks in one place  \n   - Activity suggestions  \n   - Share with one click  \n   - Be always prepared  \n\n\n### DURING CLASS  \nEngage children and capture every moment  \n\n\n### CHILD TRACKING  \nTrack progress and development  \n\n\n### COMMUNICATION  \nConnect with parents and share updates  \n\n\n### END OF DAY  \nFinish reports and plan tomorrow better  \n\n\n### AI TEACHER ASSISTANT – YOUR SMART COACH  \n- Activity Ideas: Get age-appropriate activity suggestions  \n- Behavior Tips: Handle classroom situations better  \n- Report Writer: Create professional reports in seconds  \n- Parent Reply Helper: Smart replies for parent messages  \n\n\n### STUDENT PROGRESS OVERVIEW  \nAarav Sharma  \nPlaygroup A  \n\nSkill Progress  \n- Communication: 85%  \n- Creativity: 92%  \n- Social Skills: 78%  \n- Fine Motor: 80%  \n- Cognitive: 75%  \n\nView Detailed Report →  \n\n\n### ACTIVITY IDEAS (AI SUGGESTED)  \n- Color Mixing Activity: Enhances creativity & observation skills. Age: 2.5 – 4 Years | Creative  \n- Story & Role Play: Improves imagination & communication. Age: 2.5 – 4 Years | Language  \n- Nature Walk: Builds curiosity & environment awareness. Age: 2.5 – 4 Years | Outdoor  \n\nView All Ideas →  \n\n\n### TEACHER BENEFITS  \n- Save 5+ Hours Every Week  \n- Reduce Manual Work by 70%  \n- Stronger Parent Satisfaction  \n- Better Student Outcomes  \n- AI Assistance at Every Step  \n- All-in-One Teaching Companion  \n\n\n### SUPPORTED IN EVERY WAY  \n- Offline Mode  \n- Multi-language  \n- Voice Notes  \n- Quick Tutorials  \n- Help & Support  \n\n\n### END OF DAY FLOW  \n- Complete Reports  \n- Share with Parents  \n- Sync All Data  \n- Backup to Cloud  \n- Relax, You Did Great!  \n\n\n“PreOne makes teaching joyful and meaningful. I spend less time on paperwork and more time with my little stars.  \n– Neha Teacher, Little Stars Preschool”  \n\n\nPreOne  \nEmpowering Teachers. Enriching Childhoods.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210297,
+  "id": "202605311451163467ee456ea24f79",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202605311451163467ee456ea24f79",
+  "usage": {
+    "completion_tokens": 738,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2828
+  }
+}

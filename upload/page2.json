@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nThe Operating System for Modern Preschools  \n\nPARENT COMPLETE JOURNEY MAP  \nEvery Moment. Every Memory. Every Milestone.  \n\nPARENT VALUE  \n- Stay Connected  \n- Build Trust  \n- Be Informed  \n- Peace of Mind  \n- See Growth  \n- Preserve Memories  \n\n\n### 1 SCHOOL DISCOVERY & ADMISSION  \nParent inquires, visits & takes admission for the child.  \n*Mobile screen: School Details (Little Stars Preschool, Programs: Play Group, Nursery, LKG, Timings: 9:00 AM – 1:00 PM, Admission Open 2024-25, Inquiry Now button)*  \n\n\n### 2 PARENT REGISTRATION & CHILD PROFILE  \nParent registers, adds child & family details.  \n*Mobile screen: Welcome to PreOne (Create your account, Enter OTP, Add Your Child, Continue button)*  \n\n\n### 3 CHILD SELECTION  \nIf parent has multiple children, select the child to view details.  \n*Mobile screen: Select Child (Aarav Sharma, Siya Sharma, + Add New Child button)*  \n\n\n### 4 PARENT DASHBOARD  \nGet a summary of today’s updates at a glance.  \n*Mobile screen: Hi Priya, Aarav Sharma (Today at a Glance: Attendance, Meals, Mood, Sleep, Potty, Home, Memories, Chat, Growth, More icons)*  \n\n\n### 5 DAILY UPDATES  \nView real-time activities, food, sleep, mood & more through the day.  \n*Mobile screen: Today’s Timeline (Free Play, Drawing Activity, Lunch Time, Nap Time, Outdoor Play)*  \n\n\n### 6 PHOTOS & VIDEOS  \nBeautiful moments captured and shared instantly.  \n*Mobile screen: Memories (Today, Yesterday, Photos, Videos, Albums tabs)*  \n\n\n### 7 CHAT WITH TEACHER  \nTwo-way communication with teacher & school.  \n*Mobile screen: Chat (Neha Teacher, Aarav was very active in today’s drawing activity. Well done! ❤️, That’s great to hear! He loves drawing. ❤️, Yes, he did amazing! 🎉)*  \n\n\n### 8 FEE PAYMENT  \nSecure & easy fee payment with multiple options.  \n*Mobile screen: Fee Details (April 2024, Due, ₹4,500, Due Date: 10 Apr 2024, Pay Now button, Recent Payments: ₹4,500)*  \n\n\n### 9 CHILD GROWTH REPORTS  \nTrack overall development across key areas with AI insights.  \n*Mobile screen: Growth Overview (Overall Progress: 85%, Great Progress! 🎉, Communication 90%, Social Skills 80%, Creativity 85%, Cognitive 88%, Physical 78%, View Detailed Report button)*  \n\n\n### 10 AI PARENT COACH  \nGet AI-powered suggestions & guidance personalized for your child.  \n*Mobile screen: AI Parent Coach (How can AI help you today? My child is shy in front of others. AI Suggestion: Encourage small group activities, storytelling & role play at home. Praise every small interaction to build confidence. View More Tips button)*  \n\n\n### 11 CHILDHOOD PASSPORT  \nA digital portfolio of all memories, achievements & milestones.  \n*Mobile screen: Childhood Passport (Photos & Videos 245 items, Achievements 12 badges, Certificates 8 Certificates, Milestones 15 Moments, View Timeline button)*  \n\n\n### 12 NOTIFICATIONS  \nStay informed with important updates & announcements.  \n*Mobile screen: Notifications (All, Unread, Important tabs, Holiday Notice, Fee Reminder, Annual Day, View All Notifications button)*  \n\n\n### 13 GRADUATION & BEYOND  \nCelebrate every milestone and preserve memories for a lifetime.  \n*Mobile screen: Milestone (Congratulations Aarav! You have completed Play Group. Share the Moment button)*  \n\n\n### A LIFELONG JOURNEY  \nFrom First Day to Graduation and Beyond...  \n- 2024 First Day at School  \n- 2024 First Friend  \n- 2024 First Drawing  \n- 2025 First Achievement  \n- 2026 Annual Day  \n- 2027 Graduation Day  \nAll memories. One place. Forever with PreOne. ❤️  \n\n\n### OUR PROMISE TO PARENTS  \nWe don’t just manage school operations, we become a part of your child’s journey and help you cherish every moment.  \n\n\n### THE EMOTIONAL JOURNEY  \nYou Trust Us With Your Child → We Care Every Day → We Capture Every Moment → We Track Every Growth → We Celebrate Every Success → We Preserve Every Memory → You Cherish Forever  \n\n\n### PARENT BENEFITS  \n- Real-time Updates  \n- Transparency & Trust  \n- Easy Communication  \n- Track Growth & Milestones  \n- Secure & Safe Platform  \n- Peace of Mind",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210328,
+  "id": "202605311451469900e322b44b4755",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202605311451469900e322b44b4755",
+  "usage": {
+    "completion_tokens": 999,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 5
+    },
+    "total_tokens": 3089
+  }
+}

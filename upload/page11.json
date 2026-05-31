@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "# PREONE – COMPLETE ERP ARCHITECTURE  \n\nOne Platform. Every Module. All Stakeholders. Unlimited Impact.  \n\n\n## Our Mission  \nEmpower preschools to deliver exceptional childhood experiences with technology, data & love. ♥  \n\n\n## STAKEHOLDERS  \n- **Parents**  \n  Stay Connected  \n- **Children**  \n  Happy & Safe  \n- **Teachers**  \n  Teach & Nurture  \n- **Admin / Principal**  \n  Manage Efficiently  \n- **School Owner**  \n  Grow & Scale  \n- **Investors**  \n  Monitor Returns  \n\n\n## ERP MODULES  \n1. **Student Management**  \n   - Student Profiles  \n   - Enrollment  \n   - Documents  \n   - Medical Records  \n   - Sibling Management  \n   - Student Progress  \n\n2. **Parent Management**  \n   - Parent Profiles  \n   - Multiple Guardians  \n   - Communication Pref.  \n   - KYC & Verification  \n   - Parent Portal Access  \n\n3. **Teacher Management**  \n   - Teacher Profiles  \n   - Qualifications  \n   - Experience  \n   - Work Schedule  \n   - Performance Reviews  \n   - Attendance & Leaves  \n\n4. **Academics & Curriculum**  \n   - Curriculum Management  \n   - Lesson Plans  \n   - Daily Activities  \n   - Learning Goals  \n   - Milestones  \n   - Class Plans  \n\n5. **Attendance Management**  \n   - Daily Attendance  \n   - Real-time Tracking  \n   - Absentees Alert  \n   - Monthly Reports  \n   - Attendance Analytics  \n\n6. **Fee Management**  \n   - Fee Structures  \n   - Invoices  \n   - Online Payments  \n   - Receipts  \n   - Refunds  \n   - Fee Reports  \n\n7. **Transport Management**  \n   - Route Management  \n   - Vehicle Tracking  \n   - Driver Details  \n   - Pickup/Drop Alerts  \n   - Transport Attendance  \n   - Safety Alerts  \n\n8. **Communication Center**  \n   - SMS / WhatsApp  \n   - Push Notifications  \n   - Email  \n   - Notices & Announcements  \n   - Event Invitations  \n   - Two-way Chat  \n\n9. **Events & Calendar**  \n   - Event Management  \n   - School Calendar  \n   - Holidays  \n   - Reminders  \n   - RSVP & Participation  \n\n10. **Activities & Observations**  \n    - Activity Planning  \n    - Photo & Video Upload  \n    - Classroom Moments  \n    - Teacher Observations  \n    - Daily Reports  \n\n11. **AI Growth Engine**  \n    - Observation Analysis  \n    - Growth Scores  \n    - Development Insights  \n    - Recommendations  \n    - AI Reports for Parents  \n\n12. **Reports & Analytics**  \n    - Student Reports  \n    - Teacher Reports  \n    - Attendance Reports  \n    - Fee Reports  \n    - Custom Analytics  \n    - Export & Share  \n\n\n## KEY BENEFITS  \n- All-in-One Platform  \n- Saves Time & Effort  \n- Improves Communication  \n- Data-Driven Decisions  \n- Enhances Child Development  \n- Boosts Admissions & Revenue  \n- Scalable & Future-Ready  \n\n\n## SYSTEM HIGHLIGHTS  \n- Cloud-Based & Secure  \n- Mobile First Design  \n- Real-time Updates  \n- AI-Powered Insights  \n- Easy to Use  \n- Customizable  \n- Scalable for Growth  \n\n\n## SYSTEM INTEGRATION LAYER  \n- Payment Gateway (Razorpay / Stripe)  \n- SMS Gateway (Twilio / MSG91)  \n- WhatsApp API (Meta Business)  \n- Email Service (AWS SES / SendGrid)  \n- Cloud Storage (AWS S3 / Firebase)  \n- Video Streaming (AWS CloudFront)  \n- Maps & Location (Google Maps)  \n- AI Services (OpenAI / Custom)  \n\n\n## DATA FLOW ARCHITECTURE  \n- **Mobile Apps**  \n  Parent App  \n  Teacher App  \n- **Web Portal**  \n  Admin Portal  \n  Teacher Portal  \n- **API Gateway**  \n  Secure REST APIs  \n  Authentication  \n  Rate Limiting  \n- **Application Services**  \n  Business Logic  \n  Microservices  \n  Background Jobs  \n- **Database Layer**  \n  PostgreSQL (Primary)  \n  Redis (Cache)  \n  File Storage  \n- **Analytics & AI**  \n  Data Processing  \n  AI/ML Models  \n  Insights Engine  \n\n\n## MULTI-BRANCH ARCHITECTURE  \n- **Head Office (Central System)**  \n  Centralized Control • Policies • Templates • Reports • Analytics  \n- **Branch - Pune**  \n  Independent Operations  \n  Local Data & Settings  \n- **Branch - Mumbai**  \n  Independent Operations  \n  Local Data & Settings  \n- **Branch - Nashik**  \n  Independent Operations  \n  Local Data & Settings  \n- **Branch - Nagpur**  \n  Independent Operations  \n  Local Data & Settings  \n- **More Branches...**  \n  Unlimited Scalability  \n\n\n## SECURITY & COMPLIANCE  \n- Role Based Access Control (RBAC)  \n- Data Encryption (At Rest & In Transit)  \n- Regular Backups (Automated)  \n- Audit Logs (Track Everything)  \n- Secure Authentication (2FA / OTP)  \n- Compliance Ready (GDPR / DPDP Act)  \n- High Availability (99.9% Uptime)  \n\n\n## TECHNOLOGY STACK  \n- **Frontend**  \n  Flutter (Mobile)  \n  React.js (Web)  \n- **Backend**  \n  Node.js / NestJS  \n- **Database**  \n  PostgreSQL  \n- **Cloud**  \n  AWS / Firebase  \n- **DevOps**  \n  Docker, CI/CD, Nginx",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210515,
+  "id": "20260531145433bf00f3a31a8148c9",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260531145433bf00f3a31a8148c9",
+  "usage": {
+    "completion_tokens": 1135,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 48
+    },
+    "total_tokens": 3225
+  }
+}

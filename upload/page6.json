@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "TEACHER DASHBOARD  \nEverything you need to teach, track & nurture – in one place.  \n\n9:41  \nGood Morning, Neha! 🌟  \nLittle Stars Preschool • Main Branch  \nTeacher  \n\nStudents  \nToday  \n28  \nTotal Students  \n\nPresent  \n25  \n89%  \n\nAbsent  \n3  \n11%  \n\nPending  \nReports  \n4  \nReports  \n\nQuick Actions  \nView All  \n\nMark  \nAttendance  \n\nUpload  \nPhotos  \n\nCreate  \nActivity  \n\nAdd  \nObservation  \n\nAI Report  \n\nSend  \nMessage  \n\nDaily  \nReport  \n\nParent  \nCommunication  \n\nNotices &  \nAnnouncements  \n\nMore  \nActions  \n\nToday’s Schedule  \nView Full Schedule  \n\nClass Overview  \nView All  \n\n09:00 AM  \nStory Time  \nPlaygroup A  \n✓  \n\nPlaygroup A  \n14 Students  \nPresent 12 • Absent 2  \n\n10:00 AM  \nColor Activity  \nPlaygroup A  \n✓  \n\nPlaygroup B  \n12 Students  \nPresent 11 • Absent 1  \n\n11:00 AM  \nOutdoor Play  \nPlaygroup A  \n✓  \n\nNursery  \n15 Students  \nPresent 13 • Absent 2  \n\n12:00 PM  \nLunch Time  \nPlaygroup A  \n✓  \n\nLKG  \n18 Students  \nPresent 16 • Absent 2  \n\n01:00 PM  \nNap Time  \nPlaygroup A  \n○  \n\n02:30 PM  \nMusic & Movement  \nPlaygroup A  \n○  \n\nToday’s Progress  \nView Details  \n\nAI Teacher Assistant  \nTry Now  \n\n75%  \nDay Progress  \n\nActivities Completed  \n2/3  \n\nGet smart suggestions, activity ideas  \n& reports in seconds.  \n\nReports Done  \n1/4  \n\nSuggested Activity  \nBubble Painting  \n\nPhotos Uploaded  \n23  \n\nAge: 2.5 – 4 Years | Skills: Creativity, Motor Skills  \n\nObservations  \n5  \n\nStudent Alerts  \nView All  \n\nEnd of Day Summary  \nLet’s wrap up your day!  \n\nFee Pending  \n3 students have pending fees  \n\nReports  \n1/4  \nPending  \n\nActivities  \n2/3  \nCompleted  \n\nPhotos  \n23  \nUploaded  \n\nMedical Note  \n2 students have medical notes  \n\nObservations  \n5  \nAdded  \n\nAttendance Alert  \n3 students absent today  \n\nComplete Day & Sync  \n\nHome  \nClasses  \nStudents  \nReports  \nSchedule  \nMore",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210417,
+  "id": "20260531145326e37c9f88124c454e",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260531145326e37c9f88124c454e",
+  "usage": {
+    "completion_tokens": 467,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2070,
+    "prompt_tokens_details": {
+      "cached_tokens": 48
+    },
+    "total_tokens": 2537
+  }
+}

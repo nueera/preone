@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nThe Operating System for Modern Preschools  \n\nCHILDHOOD PASSPORT™  \nA Digital Lifetime Portfolio of Every Child’s Journey  \n\nEvery Memory  \nCaptured  \n\nEvery Milestone  \nCelebrated  \n\nEvery Growth  \nTracked  \n\nEvery Achievement  \nPreserved Forever  \n\n\nOUR PROMISE  \nWe don’t just store data,  \nWe preserve childhood.  \nFor today, tomorrow and forever.  \n\n\nCHILD PROFILE  \nAarav Sharma  \nPlaygroup A  \nLittle Stars Preschool  \nDOB: 20 Jan 2021  \nAge: 3 Years 4 Months  \n\nOverview  \nMilestones  \nPhotos & Videos  \nActivities  \nAchievements  \nReports  \nCertificates  \nMemories  \nGrowth Journey  \nHealth & Wellness  \nFamily & Contacts  \n\nTotal Memories  \n1,248  \n\nPhotos  \n892  \n\nVideos  \n213  \n\nDocuments  \n143  \n\n\nCHILDHOOD JOURNEY TIMELINE  \nFrom First Day to Graduation and Beyond...  \n\n15 Jun 2023  \nFirst Day at School  \nAarav’s first step towards his learning journey.  \n\n12 Aug 2023  \nFirst Drawing  \nExplored colors and created his first beautiful drawing.  \n\n24 Nov 2023  \nFirst Performance  \nParticipated in rhyme recitation and won everyone’s hearts.  \n\n26 Jan 2024  \nFirst Achievement  \nReceived a medal for good participation.  \n\n10 Apr 2024  \nCertificate Earned  \nCompleted “Art & Craft” activity program.  \n\n20 Dec 2024  \nAnnual Day  \nConfident performance on the big stage.  \n\n15 Jun 2026  \nGraduation Day  \nA proud moment as Aarav steps into a new chapter.  \n\nAnd Many More Beautiful Memories to Create... ❤️  \n\n\nTimeline View  \nGallery View  \n\n\nMEMORY VAULT  \nAll  \nPhotos  \nVideos  \nDocuments  \nCertificates  \n\n[Image grid of photos, videos, documents, certificates]  \n\n\nAI GENERATED MILESTONES  \nAarav showed great curiosity in art activities.  \n12 Aug 2023  \n\nLeadership behavior detected during group play.  \n24 Nov 2023  \n\nCommunication skills have improved by 18%.  \nBased on observations till 26 Jan 2024  \n\nAarav is showing strong confidence on stage.  \n20 Dec 2024  \n\nView All AI Insights  \n\n\nGROWTH JOURNEY  \nTrack Progress in Key Development Areas  \n\n6M  \n1Y  \n2Y  \nAll  \n\nCommunication  \n85%  \n\nCreativity  \n92%  \n\nConfidence  \n78%  \n\nSocial Skills  \n88%  \n\nCognitive Skills  \n80%  \n\nPhysical Development  \n75%  \n\nView Detailed Growth Report →  \n\n\nAI GROWTH SUMMARY  \nAarav is growing strong in creativity and social skills. Keep encouraging group activities and storytelling at home.  \n\nView Full Report  \n\n\nEXPORT & SHARE  \nPreserve memories forever.  \n\nMemory Book (PDF)  \nHigh quality book with all memories  \n\nGraduation Album  \nCustom album with milestones  \n\nComplete Portfolio (ZIP)  \nAll photos, videos, reports & certificates  \n\nShare with Family  \nInvite family to view & contribute  \n\n\nWHY PARENTS LOVE CHILDHOOD PASSPORT™  \n\nLifetime Digital  \nPortfolio  \n\nSafe & Secure  \nCloud Storage  \n\nEasy to Access  \nAnytime, Anywhere  \n\nBeautiful Timeline  \nof Memories  \n\nAI Powered  \nGrowth Insights  \n\nShare & Celebrate  \nEvery Moment  \n\n\n“Childhood is a journey.  \nPreOne makes sure you never miss a single memory. ❤️”",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210325,
+  "id": "2026053114513153683903c6964110",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026053114513153683903c6964110",
+  "usage": {
+    "completion_tokens": 699,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2789
+  }
+}

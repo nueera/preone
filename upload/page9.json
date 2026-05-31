@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne\nADMISSION CRM – FROM INQUIRY TO ADMISSION\nSmart Follow-ups. Better Conversion. Higher Admissions.\nMay 24, 2024 - May 24, 2024\nExport Report\nSchool CRM\nConvert More Inquiries.\nEnroll More Children.\nCRM Dashboard\nLeads / Inquiries\nPipeline\nFollow-ups\nVisitors / Tours\nAdmissions\nStudents\nCommunication\nReports & Analytics\nSettings\nAI CRM Assistant\nHi Admin! 👋\nI’m here to help you convert\nmore inquiries into\nadmissions.\nAsk AI Assistant\nLEAD SOURCES\nWebsite / Enquiry Form 128\nFacebook / Instagram 96\nPhone Call 64\nWalk-in 48\nReferral / Existing Parents 32\nTotal Inquiries 368\nADMISSION PIPELINE\nThis Month\n1\nNEW INQUIRY\nLeads Received\n128\n(100%)\nAarav Singh\n2 mins ago\nMyra Joshi\n5 mins ago\nKabir Mehta\n10 mins ago\nView All\n2\nVISIT SCHEDULED\nInterested Parents\n68\n(53%)\nRiya Sharma\nToday, 11:00 AM\nVihan Patel\nToday, 04:00 PM\nDiya Malhotra\nTomorrow, 10:30 AM\nView All\n3\nSCHOOL TOUR\nVisited School\n42\n(33%)\nArjun Verma\nVisited Today\nIra Kapoor\nVisited Yesterday\nVivaan Khandewal\nVisited 2 days ago\nView All\n4\nDEMO GIVEN\nDemo / Interaction\n28\n(22%)\nAdvik Nair\nDemo Today\nKiara Shah\nVamo Yesterday\nReyansh Gupta\nDemo 2 days ago\nView All\n5\nFOLLOW-UP\nUnder Follow-up\n16\n(13%)\nTara Singh\nFollow-up Today\nAayan Khan\nFollow-up Tomorrow\nMeher Bansal\nFollow-up Tomorrow\nView All\n6\nADMISSION CONFIRMED\nFee Paid\n12\n(9%)\nZara Ali\nFee Paid Today\nRudra Joshi\nFee Paid Yesterday\nIshaan Purohit\nFee Paid 2 days ago\nView All\n7\nSTUDENT ENROLLED\nActive Student\n9\n(7%)\nAaradhya P.\nEnrolled\nShaurya R.\nEnrolled\nAnaya T.\nEnrolled\nView All\nAI CRM INSIGHTS\nHigh Intent Leads\n12 leads are highly likely\nto convert. Follow up today!\nPending Follow-ups\n16 leads have no activity\nin last 2 days.\nBest Source\nFacebook leads have the\nhighest conversion (18%)\nConversion Prediction\n32% of current leads likely\nto convert.\nSuggested Action\nSend admission brochure to\n20 pending leads.\nView All Insights →\nKEY METRICS (THIS MONTH)\nConversion Rate\n7%\n(From Inquiry to Admission)\n↑ 1.8% from last month\nTotal Inquiries\n368\n↑ 18% from last month\nAdmissions Confirmed\n12\n↑ 20% from last month\nRevenue Generated\n₹1,92,000\n↑ 22% from last month\nAvg. Admission Value\n₹21,333\n↑ 3% from last month\nPending Follow-ups\n16\nAction Required\nADMISSION TARGET\nThis Month\n60%\n12 / 20\nAdmissions\nTarget: 20 Admissions\nView Target vs Actual\nINQUIRY & CONVERSION TREND\nThis Month\nInquiries\nVisits\nAdmissions\n100\n80\n60\n40\n20\n0\n1 May\n6 May\n11 May\n16 May\n21 May\n24 May\nFOLLOW-UP ACTIVITY\n48\nTotal Follow-ups\nToday\n12 (25%)\nThis Week\n20 (42%)\nThis Month\n10 (21%)\nOverdue\n6 (12%)\nView Follow-up List\nLEAD SOURCE PERFORMANCE\nFacebook / Instagram\n18%\nWebsite\n14%\nWalk-in\n10%\nReferral\n9%\nPhone Call\n6%\nView Detailed Report\nRECENT INQUIRIES\nView All\nAarav Singh\n2 mins ago\nWebsite\nMyra Joshi\n5 mins ago\nFacebook\nKabir Mehta\n10 mins ago\nWalk-in\nDiya Malhotra\n15 mins ago\nInstagram\nVivaan Kapoor\n20 mins ago\nPhone Call\nAUTOMATION & REMINDERS\nAuto Email / SMS\nInstant response\nSmart Follow-up\nAI powered reminders\nTask & Reminders\nNever miss a follow-up\nActivity Tracking\nTrack every interaction\nTurn every inquiry into an admission with PreOne CRM\nMore Follow-ups. Better Relationships. Higher Admissions.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210418,
+  "id": "2026053114525591514a5a058843ea",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026053114525591514a5a058843ea",
+  "usage": {
+    "completion_tokens": 1000,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 3090
+  }
+}

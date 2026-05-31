@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne™\n\nEmpowering Preschools.  \nEnriching Childhoods.\n\nThe Operating System  \nfor Modern Preschools  \n\nCONNECT • AUTOMATE • EMPOWER • GROW  \n\nA unified intelligent platform to streamline operations,  \nenhance communication and accelerate  \nevery child’s growth journey.  \n\n\n[Image of a child with circular icons around: Happy Parents, Empowered Teachers, Efficient Admins, Smart Decisions, Confident Children]  \n\n\n[Device screenshots showing:  \n- Parent App (left): “Hello, Neha”, “Overall Growth: Excellent 8.7/10”, “Today’s Highlights”  \n- Admin Dashboard (center): “Total Students 780”, “Total Teachers 68”, “Attendance 92%”, “Revenue This Month ₹11,25,000”, “Attendance Overview”, “Admissions Overview 82%”, “Recent Activities”, “AI Insights”  \n- Teacher App (right): “Today’s Class Overview: 20, 2, 3”, “Today’s Activities”  \n- Owner Dashboard (far right): “All Branches Overview: ₹49.8L, 96, 2,450”, “Revenue Trend”, “Branch Performance”]  \n\n\nAI Powered  \nGrowth Engine  \n\nSecure &  \nReliable  \n\nCloud Based  \n& Scalable  \n\nData Driven  \nInsights  \n\nMobile First  \nExperience  \n\n\nDesigned & Developed By  \n\nNueEra  \nwww.nueera.com  \nhello@nueera.com  \n+91 7066607424  \n\nNueEra Technologies  \nPune, Maharashtra, India  \n\n\nEvery Child is Unique.  \nEvery Moment is Precious.  \n\nPreOne helps you capture, nurture  \nand celebrate the beautiful journey  \nof childhood.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210498,
+  "id": "202605311454484d1c3d7ae63a4086",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202605311454484d1c3d7ae63a4086",
+  "usage": {
+    "completion_tokens": 360,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2083,
+    "prompt_tokens_details": {
+      "cached_tokens": 48
+    },
+    "total_tokens": 2443
+  }
+}

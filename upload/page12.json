@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "# PreOne – Database, API & Cloud Architecture  \n*Scalable • Secure • Reliable • Future Ready*  \n\n---  \n\n## CLIENT LAYER  \n- **Parent App** (iOS / Android)  \n- **Teacher App** (iOS / Android)  \n- **Admin Panel** (Web)  \n- **Owner Dashboard** (Web)  \n- **Third Party Integrations**  \n\n*HTTPS / SSL*  \n*JSON Requests*  \n\n---  \n\n## API GATEWAY  \n- Authentication (JWT / OAuth 2.0)  \n- Authorization (RBAC)  \n- Rate Limiting & Throttling  \n- Request Routing  \n- Logging & Monitoring  \n\n---  \n\n## BACKEND MICRO-SERVICES  \n- **User Service**  \n  - Parents  \n  - Teachers  \n  - Students  \n  - Admins  \n  - Roles & Permissions  \n- **Student Service**  \n  - Student Profile  \n  - Enrollment  \n  - Documents  \n  - Medical Records  \n  - Sibling Management  \n- **Attendance Service**  \n  - Daily Attendance  \n  - QR / Face Recognition  \n  - Late / Early Checkout  \n  - Attendance Reports  \n  - Analytics  \n- **Academic Service**  \n  - Curriculum  \n  - Lesson Plans  \n  - Activities  \n  - Assessments  \n  - Learning Goals  \n- **Growth & AI Service**  \n  - Observation Analysis  \n  - AI Growth Score  \n  - AI Reports  \n  - Recommendations  \n  - AI Parent Coach  \n  - AI Teacher Assistant  \n- **Fee & Billing Service**  \n  - Fee Structure  \n  - Invoices  \n  - Payments  \n  - Receipts  \n  - Refunds  \n  - Financial Reports  \n- **Communication Service**  \n  - SMS / WhatsApp  \n  - Push Notifications  \n  - Email  \n  - In-App Chat  \n  - Announcements  \n- **Activity Service**  \n  - Activity Planning  \n  - Photo / Video Upload  \n  - Observations  \n  - Classroom Moments  \n  - Daily Reports  \n- **Transport Service**  \n  - Route Management  \n  - Vehicle Tracking  \n  - Driver Management  \n  - Pickup / Drop  \n  - Transport Attendance  \n- **Document Service**  \n  - File Upload  \n  - Document Storage  \n  - Certificates  \n  - ID Cards  \n  - Backups  \n- **Report & Analytics Service**  \n  - Custom Reports  \n  - Dashboards  \n  - Data Analytics  \n  - Export (Excel / PDF)  \n  - Insights  \n\n*All services communicate via secure APIs (REST / gRPC)*  \n\n---  \n\n## DATA & STORAGE LAYER  \n### PRIMARY DATABASE  \n- PostgreSQL (Primary)  \n  - Users  \n  - Parents  \n  - Students  \n  - Teachers  \n  - Classes  \n  - Enrollments  \n  - Attendance  \n  - Activities  \n  - Photos  \n  - Videos  \n  - Fees  \n  - Invoices  \n  - Payments  \n  - Receipts  \n  - Refunds  \n  - Reports  \n  - Observations  \n  - Growth Records  \n  - Milestones  \n  - Goals  \n  - Notifications  \n  - Announcements  \n  - Documents  \n  - Transport  \n  - Audit Logs  \n\n### CACHE  \n- Redis  \n  - Sessions  \n  - Cache Data  \n  - Real-time Data  \n  - Leaderboards  \n\n### FILE STORAGE  \n- AWS S3  \n  - Photos  \n  - Videos  \n  - Documents  \n  - Certificates  \n  - Backups  \n\n### CDN  \n- AWS CloudFront  \n  - Fast content delivery for images, videos, documents  \n\n---  \n\n## EXTERNAL INTEGRATIONS  \n- Payment Gateway: Razorpay / Stripe  \n- SMS Gateway: Twilio / MSG91  \n- WhatsApp Business API: Meta  \n- Email Service: AWS SES / SendGrid  \n- Video Streaming: AWS CloudFront  \n- Maps & Location: Google Maps API  \n- AI / ML Services: OpenAI / Custom Models  \n- Calendar Integration: Google Calendar  \n- Cloud Storage: AWS S3  \n\n---  \n\n## NOTIFICATION LAYER  \n- Firebase Cloud Messaging  \n  - Push Notifications  \n  - In-App Notifications  \n  - Topic Management  \n  - Real-time Updates  \n\n---  \n\n## SECURITY LAYER  \n- JWT Authentication  \n- OTP Verification  \n- 2FA Support  \n- Data Encryption (At Rest & In Transit)  \n- Role Based Access Control (RBAC)  \n- Audit Logs & Monitoring  \n- Regular Backups  \n- Compliance Ready (GDPR, DPD)  \n\n---  \n\n## INFRASTRUCTURE LAYER (CLOUD - AWS)  \n- EC2 (Compute)  \n- ECS / Docker (Containers)  \n- RDS (PostgreSQL)  \n- ElastiCache (Redis)  \n- S3 (Storage)  \n- CloudFront (CDN)  \n- Route 53 (DNS)  \n- CloudWatch (Monitoring)  \n- AWS Backup (Backup)  \n\n---  \n\n## DEVOPS & OPERATIONS  \n- GitHub (Code Repository)  \n- CI / CD Pipeline (GitHub Actions)  \n- Docker (Containerization)  \n- Nginx (Load Balancer)  \n- Monitoring (CloudWatch)  \n- Logging (CloudWatch Logs)  \n- Alerts (SNS / Email)  \n\n---  \n\n## DATA FLOW  \n1. Client sends request to API Gateway  \n2. Gateway validates & routes to appropriate microservice  \n3. Service processes request & interacts with database / cache / storage  \n4. Response returned to client in JSON format  \n5. Real-time updates via WebSocket / FCM Notifications  \n\n---  \n\n## KEY HIGHLIGHTS  \n- Microservices Architecture  \n- Scalable & Modular  \n- Secure by Design  \n- High Availability (99.9%)  \n- Real-time Communication  \n- AI-Powered Insights  \n- Cloud Native (AWS)  \n- Future Ready",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210504,
+  "id": "202605311454186da78faf8c3548b8",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202605311454186da78faf8c3548b8",
+  "usage": {
+    "completion_tokens": 1191,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 3281
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nThe Operating System for Modern Preschools  \n\nPREONE ECOSYSTEM ARCHITECTURE  \nOne Platform. Many Users. Endless Possibilities.  \n\n\n### PARENT APP  \nStay Connected. Stay Informed.  \n- Daily Updates  \n  Activities, Food, Sleep, Mood & More  \n- Photos & Videos  \n  All Memories, Albums & Timeline  \n- Chat & Announcements  \n  Two-way Communication  \n- Fee & Payments  \n  Pay Fees, View History, Invoices  \n- Growth Reports  \n  AI Powered Insights & Progress  \n- Childhood Passport  \n  Milestones, Certificates, Achievements  \n\n\n### TEACHER APP  \nTeach Smart. Track Growth. Save Time.  \n- Attendance  \n  Mark Attendance (Manual/QR/Face/RFID)  \n- Activities  \n  Plan, Add & Share Class Activities  \n- AI Report Generator  \n  Generate Smart Reports in 1 Click  \n- Student Progress  \n  Track Individual Growth & Observations  \n- Communication  \n  Send Updates to Parents  \n- AI Teacher Assistant  \n  Get Activity Ideas, Tips, & Suggestions  \n\n\n### ADMIN PANEL  \nManage School Operations Efficiently.  \n- Dashboard  \n- Admission CRM  \n  Leads, Follow-ups, Admissions  \n- Student Management  \n  Profiles, Records, Documents  \n- Fee Management  \n  Invoices, Payments, Reminders  \n- Staff Management  \n  Teachers, Salaries, Leaves  \n- Reports & Analytics  \n  Attendance, Fees, Performance  \n- Communication  \n  Notices, SMS, Email, Announcements  \n\n\n### OWNER DASHBOARD  \nGrow Your Business. Make Smarter Decisions.  \n- Business Overview  \n  Revenue, Students, Occupancy  \n- Branch Management  \n  All Branches & Centers Performance  \n- AI Insights  \n  Smart Reports & Recommendations  \n- Fee & Collections  \n  Overview & Analytics  \n- Staff & HR Analytics  \n  Performance, Leaves, Attendance  \n- Growth Analytics  \n  Trends, Comparisons, Forecasting  \n\n\n### KEY HIGHLIGHTS  \n- All-in-One Platform  \n  Everything you need in one place  \n- Mobile First  \n  Designed for Modern Parents & Teachers  \n- AI Powered  \n  Smarter Insights, Better Decisions  \n- Secure & Compliant  \n  Data Privacy & Child Safety First  \n- Scalable  \n  Built to grow with your Preschool  \n- Easy to Use  \n  Simple, Intuitive & User Friendly  \n- Lifetime Memories  \n  Preserve Every Precious Moment  \n- Business Growth  \n  Increase Admissions, Retention & Revenue  \n\n\n### CLOUD INFRASTRUCTURE LAYER (Secure • Scalable • Reliable)  \n- Database  \n  PostgreSQL  \n  Secure & Scalable  \n- File Storage  \n  AWS S3  \n  Photos, Videos, Documents  \n- Authentication  \n  AWS Cognito  \n  Secure Login & Access  \n- Real-time Sync  \n  WebSocket  \n  Live Updates Everywhere  \n- Notifications  \n  FCM / SMS  \n  Push, SMS, Email  \n- Payment Gateway  \n  Razorpay / Stripe  \n  Secure Payments & Refunds  \n- Backup & Security  \n  Daily Backup  \n  SSL, Encryption, Compliance  \n- APIs & Integrations  \n  Third Party APIs  \n  (SMS, Email, Maps, WhatsApp)  \n\n\n### DATA FLOW OVERVIEW  \nData Created (Teachers / Admin) → Processed by AI Engine → Smart Insights Generated → Real-time Sync to Apps → Parents Stay Informed → Better Engagement & Growth  \n\n\n### PLATFORM ACCESS  \n- iOS App  \n  (iPhone & iPad)  \n- Android App  \n  (Phones & Tablets)  \n- Web Dashboard  \n  Admin & Owner  \n- Teacher App  \n  Android  \n- Multi-Branch  \n  Support  \n\n\n### OUR VISION  \nPreserve Every Childhood Memory,  \nTrack Every Child’s Growth,  \nEmpower Every Parent,  \nRun Every Preschool.  \n\n\n### AI ENGINE  \nMake Every Interaction Intelligent.  \n- AI Report Generator  \n- AI Parent Coach  \n- AI Growth Analysis  \n- AI Activity Suggestions  \n- AI Insights & Predictions  \n\n\n### PREONE CORE PLATFORM  \n- Real Time Data Sync  \n- Secure Access  \n- Smart Automation  \n- Central Intelligence  \n  - Secure • Scalable • Smart  \n- AI Powered Insights  \n\n\nPreOne  \nEmpowering Preschools. Enriching Childhoods.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210349,
+  "id": "20260531145201816ea95308844693",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260531145201816ea95308844693",
+  "usage": {
+    "completion_tokens": 865,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2955
+  }
+}

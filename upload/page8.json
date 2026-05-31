@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Edupone\nOperating System for\nModern Preschools\n\nOwner Dashboard 👑\nEnterprise Overview • Multi-Branch Performance\nMay 1 - May 24, 2024\nFilters\n16\nRohit Sharma\nOwner / Director\n\nOverview\nBranch Performance\nFinance & Revenue\nStudents Overview\nAdmissions Analytics\nStaff Performance\nParent Satisfaction\nAI Business Insights\nReports & Analytics\nFranchise Expansion\nCommunication Center\nSettings\n\nAI Business Assistant\nAsk anything about your\nbusiness performance.\nAsk Now →\n\nTotal Revenue\n₹11,25,000\n↑ 18.6% from last month\nTotal Students\n780\n↑ 14.2% from last month\nTotal Branches\n5\n↑ 1 new this month\nTotal Teachers\n68\n↑ 8 new this month\nOccupancy Rate\n82%\n↑ 6% from last month\nAdmissions This Month\n96\n↑ 22% from last month\n\nMulti-Branch Performance\nView All Branches →\nRevenue Overview\nThis Month →\nAI Business Insights\nSee All\n\nBranch\tStudents\tTeachers\tRevenue (May)\tOccupancy\tTrend\nLittle Stars - Pune\nPune, Maharashtra\t320\t28\t₹4,75,000\t92%\t\nLittle Stars - Mumbai\nMumbai, Maharashtra\t280\t24\t₹4,10,000\t85%\t\nLittle Stars - Nashik\nNashik, Maharashtra\t180\t12\t₹2,20,000\t65%\t\nLittle Stars - Nagpur\nNagpur, Maharashtra\t120\t10\t₹1,45,000\t75%\t\nLittle Stars - Kolhapur\nKolhapur, Maharashtra\t100\t8\t₹75,000\t70%\t\n\n₹11,25,000 ↑ 18.6%\nTotal Revenue\n12L\n9L\n6L\n3L\n0\n1 May\t8 May\t15 May\t22 May\t31 May\nLast Month\t₹9,48,000\nThis Month\t₹11,25,000\nGrowth\t↑ 18.6%\n\nPune branch is performing the best!\nRevenue up by 22% this month.\nMumbai branch admissions dropped by 10%.\nReview marketing & follow-ups.\nNashik branch occupancy is only 65%.\nFocus on admissions.\nFee collection efficiency is at 91%.\nGreat job! Aim for 95%+\nParent engagement increased by 14% overall.\nKeep up the good work!\n\nAdmissions Trend\nThis Year →\nRevenue Trend\nThis Year →\nParent Satisfaction (NPS)\nThis Month →\nFee Collection Overview\nThis Month →\n\nTotal Admissions\n426 ↑ 24%\n100\n75\n50\n25\n0\nJan\tFeb\tMar\tApr\tMay\tJun\tJul\tAug\tSep\tOct\tNov\tDec\nTotal Revenue\n₹1,23,75,000 ↑ 20.8%\n150L\n120L\n90L\n60L\n30L\n0\nJan\tFeb\tMar\tApr\tMay\tJun\tJul\tAug\tSep\tOct\tNov\tDec\n4.7/5\nExcellent\n68%\n22%\n7%\n2%\n1%\nTotal Responses: 312\n91%\nCollection Efficiency\nCollected\n₹10,23,000 (91%)\nPending\n₹72,000 (6%)\nOverdue\n₹30,000 (3%)\nTotal Due: ₹11,25,000\n\nStaff Performance Overview\nView Report\nTop Performing Branches\nThis Month →\nFranchise / Expansion\nView Opportunities\n\nAverage Teacher Rating\t4.6/5\nAttendance\t96%\nRetention Rate\t89%\nTraining Completed\t92%\nPune\nRevenue\n₹4,75,000\nGrowth ↑ 22%\nMumbai\nRevenue\n₹4,10,000\nGrowth ↑ 12%\nNashik\nRevenue\n₹2,20,000\nGrowth ↑ 8%\nExisting Branches\t5\nActive Branches\nUpcoming Branches\t2\nOpening Soon\nNew Opportunities\t7\nLocations\n\nYour Vision. Our Technology. Better Childhoods. Stronger Businesses.\nTotal Impact\t780+ Students\t68+ Teachers\t5 Branches\tCountless Smiles 😊",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210386,
+  "id": "2026053114524098ff17b1cc284eb1",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026053114524098ff17b1cc284eb1",
+  "usage": {
+    "completion_tokens": 909,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2999
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Admin Dashboard\nSchool Command Center\nSearch students, parents, staff, invoices...\nAdmin User\nLittle Stars Preschool\nMay 24, 2024\nThis Month\nDashboard\nTotal Students\n320\n↑ 12 this month\nTotal Teachers\n28\n↑ 2 this month\nMonthly Revenue\n₹4,75,000\n↑ 18.6% from last month\nAdmissions This Month\n45\n↑ 20% from last month\nParent Satisfaction\n4.8/5\n↑ 12% from last month\nOccupancy Rate\n87%\n↑ 5% from last month\nAdmission CRM Pipeline\nFee Collection Overview\nAI Admin Insights\nSmart insights for better decisions\nRevenue Overview\nThis Month\nNew Inquiry\n25\n↑ 5\nThis Stage\nCollected Fees\n₹4,75,000\nAdmissions dropped by 8% compared to last month. Take action to improve inquiries.\n₹4,75,000\n↑ 18.6%\nSchool Visit\n18\n↑ 3\nPending Fees\n₹1,25,000\n15 fee payments are pending. Send reminders to parents.\n5L\nFollow-up\n12\n↓ 2\nOverdue Fees\n₹75,000\nParent engagement increased by 12%. Great job! Keep it up.\n4L\nAdmission Confirmed\n9\n↑ 4\n3L\nNursery A class is almost full (28/30 seats). Consider opening a new batch.\n2L\n1L\n0\nView Full CRM →\nView Fee Reports →\nView All Insights →\nView Financial Reports →\n1 May\n8 May\n15 May\n22 May\n31 May\nStudent Overview\nView All\nStaff Overview\nView All\nTop Fee Dues\nView All\nUpcoming Events\nView Calendar\nTotal Students\n320\nTotal Staff\n28\nRohan Mehta\nOverdue by 15 days\n₹18,000\n28\nMAY\nFancy Dress Competition\nAll Classes\n10:00 AM\nBoys\n168\nTeachers\n20\nAnanya Sharma\nOverdue by 10 days\n₹12,500\n05\nJUN\nEnvironment Day\nAll Classes\n09:30 AM\nGirls\n152\nSupport Staff\n8\nVihaan Patel\nOverdue by 7 days\n₹11,000\n15\nJUN\nGraduation Day\nGraduation Batch\n04:00 PM\nPresent Today\n295 (92%)\nPresent Today\n26\nIra Singh\nOverdue by 5 days\n₹9,500\nView All Events →\nAbsent Today\n25 (8%)\nOn Leave\n2\nRecent Inquiries\nView All\nCommunication Center\nQuick Actions\nName\nParent Name\nSource\nInquiry Date\nStatus\nSMS\n120\nSent this month\nWhatsApp\n86\nSent this month\nPush Notifications\n62\nSent this month\nEmails\n45\nSent this month\nAarav Joshi\nRahul Joshi\nWebsite\n24 May, 2024\nNew\nAdd Student\nAdd Staff\nCreate Invoice\nSend Notice\nAdd Event\nGenerate Report\nMyra Singh\nPooja Singh\nFacebook\n24 May, 2024\nVisit Scheduled\nKabir Mehta\nNeha Mehta\nWalk-in\n23 May, 2024\nFollow-up\nAnaya Verma\nAmit Verma\nGoogle\n23 May, 2024\nNew\nView Communication Logs →\nAsk Now →",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210426,
+  "id": "202605311453104720908f1ed04a8a",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202605311453104720908f1ed04a8a",
+  "usage": {
+    "completion_tokens": 742,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2832
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "PreOne  \nEmpowering System for Modern Preschools  \n\nPARENT DASHBOARD  \nEverything you need. At a glance.  \n\nOur Promise  \nEvery Moment. Every Memory.  \nEvery Milestone.  \n\n\n1 CHILD PROFILE  \nQuick access to child profile, class, school and today’s attendance status.  \n\nAarav Sharma  \nPlaygroup A  \nPresent Today  \n\n\n2 TODAY’S SUMMARY  \nQuick snapshot of your child’s day in key areas.  \n\nFood  \nAte Well  \n\nSleep  \n1.5 Hours  \n\nActivity  \nDrawing  \n\nMood  \nHappy  \n\nPotty  \n2 Times  \n\nWater  \n4 Glasses  \n\n\n3 QUICK ACTIONS  \nAll important actions in one tap.  \n\nMemories  \nChat  \nFees  \nGrowth  \nAttendance  \nEvents  \n\n\n4 TODAY’S TIMELINE  \nReal-time timeline of today’s activities and updates.  \n\n09:00 AM  \nArrival at School  \n\n10:30 AM  \nDrawing Activity  \n\n12:00 PM  \nLunch Time  \n\n01:30 PM  \nNap Time  \n\n03:00 PM  \nOutdoor Play  \n\n\n5 GROWTH SNAPSHOT  \nTrack your child’s overall development in key areas.  \n\n85%  \nCommunication  \n\n92%  \nCreativity  \n\n78%  \nConfidence  \n\n88%  \nSocial Skills  \n\n\n6 AI INSIGHT  \nAI analyzes activities and provides smart insights & suggestions.  \n\nAI Insight  \nAarav showed strong creativity today and actively participated in group activities. Keep encouraging his imagination!  \n\n\n7 CHILDHOOD PASSPORT  \nA digital timeline of your child’s precious memories & milestones.  \n\nFirst Day  \n15 Jun 2023  \n\nFirst Drawing  \n12 Aug 2023  \n\nFirst Prize  \n10 Jan 2024  \n\n\n8 UPCOMING EVENTS  \nNever miss an important event.  \n\nFancy Dress  \n24 May 2024  \n\nGraduation Day  \n15 Jun 2024  \n\nSports Day  \n28 Jun 2024  \n\n\n9 BOTTOM NAVIGATION  \nEasy navigation across all sections.  \n\nHome  \nMemories  \nChat  \nGrowth  \nProfile  \n\n\nWHY PARENTS LOVE PREONE  \n\nReal-time updates from school  \nTransparent communication  \nTrack growth & milestones  \nDigital memories in one place  \nEasy fee payments  \nAI powered suggestions  \n\n\nEVERY MOMENT CAPTURED. EVERY MEMORY PRESERVED.  \n\nFirst Day  \n15 Jun 2023  \n\nFirst Friend  \n30 Jun 2023  \n\nFirst Drawing  \n12 Aug 2023  \n\nFirst Prize  \n10 Jan 2024  \n\nAnnual Day  \n20 Dec 2024  \n\nGraduation  \n15 Jun 2025  \n\n\nSecure & Private  \nYour child’s data is safe with enterprise grade security.  \n\nTrusted by Schools  \nDesigned for preschools. Loved by parents.  \n\nMade for India  \nLocal support, local needs, local language.  \n\nAvailable Everywhere  \niOS, Android & Web  \nAccess anytime, anywhere.  \n\nPreOne  \nEmpowering Preschools.  \nEnriching Childhoods.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780210275,
+  "id": "2026053114510204e9be6b9a0e492c",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026053114510204e9be6b9a0e492c",
+  "usage": {
+    "completion_tokens": 588,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2090,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2678
+  }
+}
