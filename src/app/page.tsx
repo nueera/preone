@@ -13,7 +13,7 @@ import {
   Bot, FileText, Image as ImageIcon, Video, MapPin, Zap, CircleDot, UserCheck,
   UserX, Timer, TrendingDown, Award, ChevronDown, Edit, Trash2,
   ExternalLink, Home, Building2, Smile, Frown, Meh, X, Check,
-  LogOut, Loader2
+  LogOut, Loader2, Menu
 } from 'lucide-react';
 
 // Dynamic imports for role-based portals (code splitting)
@@ -45,6 +45,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, PieChart,
@@ -436,6 +438,8 @@ export default function PreOneDashboard() {
   // Navigation
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Data states
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
@@ -881,7 +885,7 @@ export default function PreOneDashboard() {
     return (
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {[
             { label: 'Total Students', value: stats.totalStudents, icon: GraduationCap, change: `+${stats.newAdmissions}`, up: true, color: 'bg-violet-50 text-violet-600', iconBg: 'bg-violet-100' },
             { label: 'Total Teachers', value: stats.totalTeachers, icon: Users, change: '', up: true, color: 'bg-emerald-50 text-emerald-600', iconBg: 'bg-emerald-100' },
@@ -910,8 +914,8 @@ export default function PreOneDashboard() {
         </div>
 
         {/* Revenue Chart + Admission Pipeline */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="text-base">Revenue Overview</CardTitle>
               <CardDescription>Monthly revenue vs collections</CardDescription>
@@ -1130,6 +1134,7 @@ export default function PreOneDashboard() {
       {loading.students ? <TableSkeleton rows={6} cols={6} /> : (
         <Card>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -1184,6 +1189,7 @@ export default function PreOneDashboard() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -1419,6 +1425,7 @@ export default function PreOneDashboard() {
               <CardTitle className="text-base">Class-wise Attendance</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1448,6 +1455,7 @@ export default function PreOneDashboard() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -1531,6 +1539,7 @@ export default function PreOneDashboard() {
               <CardDescription>Academic Year 2024-2025</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1553,6 +1562,7 @@ export default function PreOneDashboard() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -1563,6 +1573,7 @@ export default function PreOneDashboard() {
             <CardTitle className="text-base">Recent Invoices</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -1594,6 +1605,7 @@ export default function PreOneDashboard() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -1751,6 +1763,7 @@ export default function PreOneDashboard() {
             <CardTitle className="text-base">Lead List</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -1795,6 +1808,7 @@ export default function PreOneDashboard() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -2327,103 +2341,128 @@ export default function PreOneDashboard() {
   // Default: Admin — render the admin dashboard
   const userName = user?.email ? (user.email as string).split('@')[0] : 'Admin';
 
+  // Sidebar content (shared between desktop and mobile)
+  const sidebarContent = (
+    <>
+      {/* Logo */}
+      <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
+        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
+          <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
+        </div>
+        {(!sidebarCollapsed || isMobile) && (
+          <div className="overflow-hidden">
+            <h1 className="text-lg font-bold tracking-tight text-white">PreOne</h1>
+            <p className="text-[10px] text-sky-300/70 -mt-0.5">Preschool OS</p>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 py-3">
+        <nav className="space-y-1 px-2">
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <Tooltip key={item.id} delayDuration={sidebarCollapsed && !isMobile ? 0 : 1000}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => { setActiveSection(item.id); if (isMobile) setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                      isActive
+                        ? 'nav-active-pill font-medium shadow-sm'
+                        : 'text-white/60 hover:bg-white/8 hover:text-white/90'
+                    }`}
+                  >
+                    <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-white' : ''}`} />
+                    {(!sidebarCollapsed || isMobile) && <span className="truncate">{item.label}</span>}
+                    {isActive && !sidebarCollapsed && !isMobile && (
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-400" />
+                    )}
+                  </button>
+                </TooltipTrigger>
+                {sidebarCollapsed && !isMobile && (
+                  <TooltipContent side="right" className="font-medium">
+                    {item.label}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            );
+          })}
+        </nav>
+      </ScrollArea>
+
+      {/* Sidebar Toggle (desktop only) */}
+      {!isMobile && (
+        <div className="px-2 py-2 border-t border-white/10">
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
+          >
+            {sidebarCollapsed ? <ChevronRight className="h-4 w-4 shrink-0" /> : <ChevronLeft className="h-4 w-4 shrink-0" />}
+            {!sidebarCollapsed && <span>Collapse</span>}
+          </button>
+        </div>
+      )}
+
+      {/* User Profile */}
+      <div className="px-3 py-3 border-t border-white/10">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 shrink-0">
+            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
+              {userName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {(!sidebarCollapsed || isMobile) && (
+            <div className="overflow-hidden flex-1">
+              <p className="text-sm font-medium text-white truncate capitalize">{userName}</p>
+              <p className="text-xs text-white/40 truncate capitalize">{(user?.role as string) || 'Admin'}</p>
+            </div>
+          )}
+          {(!sidebarCollapsed || isMobile) && (
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white hover:bg-white/10" onClick={handleLogout}>
+              <LogOut className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <TooltipProvider>
       <div className="flex h-screen bg-background overflow-hidden">
-        {/* Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-[76px]' : 'w-[280px]'} bg-sidebar-gradient text-white flex flex-col transition-all duration-300 shrink-0`}>
-          {/* Logo */}
-          <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
-              <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
-            </div>
-            {!sidebarCollapsed && (
-              <div className="overflow-hidden">
-                <h1 className="text-lg font-bold tracking-tight text-white">PreOne</h1>
-                <p className="text-[10px] text-sky-300/70 -mt-0.5">Preschool OS</p>
-              </div>
-            )}
-          </div>
+        {/* Desktop Sidebar */}
+        {!isMobile && (
+          <aside className={`${sidebarCollapsed ? 'w-[76px]' : 'w-[280px]'} bg-sidebar-gradient text-white flex flex-col transition-all duration-300 shrink-0`}>
+            {sidebarContent}
+          </aside>
+        )}
 
-          {/* Navigation */}
-          <ScrollArea className="flex-1 py-3">
-            <nav className="space-y-1 px-2">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeSection === item.id;
-                return (
-                  <Tooltip key={item.id} delayDuration={sidebarCollapsed ? 0 : 1000}>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => setActiveSection(item.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
-                          isActive
-                            ? 'nav-active-pill font-medium shadow-sm'
-                            : 'text-white/60 hover:bg-white/8 hover:text-white/90'
-                        }`}
-                      >
-                        <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-white' : ''}`} />
-                        {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
-                        {isActive && !sidebarCollapsed && (
-                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-400" />
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    {sidebarCollapsed && (
-                      <TooltipContent side="right" className="font-medium">
-                        {item.label}
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                );
-              })}
-            </nav>
-          </ScrollArea>
-
-          {/* Sidebar Toggle */}
-          <div className="px-2 py-2 border-t border-white/10">
-            <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4 shrink-0" /> : <ChevronLeft className="h-4 w-4 shrink-0" />}
-              {!sidebarCollapsed && <span>Collapse</span>}
-            </button>
-          </div>
-
-          {/* User Profile */}
-          <div className="px-3 py-3 border-t border-white/10">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 shrink-0">
-                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
-                  {userName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {!sidebarCollapsed && (
-                <div className="overflow-hidden flex-1">
-                  <p className="text-sm font-medium text-white truncate capitalize">{userName}</p>
-                  <p className="text-xs text-white/40 truncate capitalize">{(user?.role as string) || 'Admin'}</p>
-                </div>
-              )}
-              {!sidebarCollapsed && (
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white hover:bg-white/10" onClick={handleLogout}>
-                  <LogOut className="h-3.5 w-3.5" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </aside>
+        {/* Mobile Sidebar */}
+        {isMobile && (
+          <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+            <SheetContent side="left" className="p-0 w-[280px] bg-sidebar-gradient text-white border-none">
+              {sidebarContent}
+            </SheetContent>
+          </Sheet>
+        )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 overflow-y-auto custom-scrollbar min-w-0">
           {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b px-6 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Home className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">/</span>
-              <span className="text-sm font-medium capitalize">{activeSection === 'crm' ? 'Admission CRM' : activeSection}</span>
+          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b px-4 md:px-6 h-14 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              {isMobile && (
+                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => setMobileSidebarOpen(true)}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+              )}
+              <Home className="h-4 w-4 text-muted-foreground hidden sm:block shrink-0" />
+              <span className="text-sm text-muted-foreground hidden sm:inline">/</span>
+              <span className="text-sm font-medium capitalize truncate">{activeSection === 'crm' ? 'Admission CRM' : activeSection}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative hidden sm:block">
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search anything..." className="pl-9 w-[240px] h-9 text-sm" />
               </div>
@@ -2431,11 +2470,16 @@ export default function PreOneDashboard() {
                 <Bell className="h-4 w-4" />
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-bold">{recentActivities.length > 0 ? Math.min(recentActivities.length, 9) : 0}</span>
               </Button>
+              {isMobile && (
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-rose-600" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </header>
 
           {/* Content Area */}
-          <div className="p-6 max-w-[1400px]">
+          <div className="p-4 md:p-6 max-w-[1400px]">
             {sectionRenderers[activeSection]?.()}
           </div>
         </main>

@@ -12,6 +12,7 @@ import {
   Trophy, FileText, Send, Megaphone, ChevronDown, ExternalLink,
   Coffee, Apple, Sandwich, Cake, Zap, Shield, Brain, Palette,
   Users, Baby as BabyIcon, Activity, MapPin, Home, GraduationCap,
+  Menu,
 } from 'lucide-react';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
@@ -2133,7 +2134,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <header className="h-14 border-b bg-white flex items-center px-4 gap-3 shrink-0">
           {isMobile && (
             <Button variant="ghost" size="sm" className="p-1" onClick={() => setMobileMenuOpen(true)}>
-              <ChevronRight className="h-5 w-5" />
+              <Menu className="h-5 w-5" />
             </Button>
           )}
           <h2 className="font-semibold text-lg capitalize">

@@ -498,3 +498,89 @@
   outline: 2px solid #7C3AED;
   outline-offset: 2px;
 }
+
+/* ============================================================
+   RESPONSIVE UTILITIES — PreOne
+   ============================================================ */
+
+/* ── Mobile-first touch targets (min 44px for accessibility) ── */
+@media (max-width: 767px) {
+  /* Ensure buttons have adequate touch targets on mobile */
+  button, [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Smaller stat card text on mobile */
+  .stat-card-mobile {
+    padding: 12px;
+  }
+
+  .stat-card-mobile p:last-child {
+    font-size: 11px;
+  }
+
+  /* Reduce card border radius on mobile for more content space */
+  .card-mobile-sm {
+    border-radius: 16px;
+  }
+
+  /* Full-width inputs on mobile */
+  .input-mobile-full {
+    width: 100%;
+  }
+
+  /* Reduce heading sizes on mobile */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+
+  /* Prevent horizontal overflow */
+  .overflow-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Tablet adjustments (768px–1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Comfortable spacing for tablets */
+  .tablet-spacing {
+    padding: 20px;
+  }
+}
+
+/* ── Prevent layout shift when sidebar opens/closes ── */
+.sidebar-transition {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Mobile sheet overlay adjustments ── */
+@media (max-width: 767px) {
+  /* Make dialogs full-screen on mobile */
+  [role="dialog"] {
+    max-height: 90vh;
+    margin: auto 0;
+  }
+}
+
+/* ── Responsive chart containers ── */
+.responsive-chart {
+  width: 100%;
+  min-height: 200px;
+}
+
+@media (max-width: 767px) {
+  .responsive-chart {
+    min-height: 180px;
+  }
+}
+
+/* ── Safe area insets for notched devices ── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}

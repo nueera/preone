@@ -2413,7 +2413,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     <TooltipProvider>
       <div className="flex h-screen bg-background overflow-hidden">
         {/* Desktop Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[280px]'} bg-sidebar-gradient text-[oklch(0.92_0.01_80)] flex-col transition-all duration-300 shrink-0 hidden lg:flex`}>
+        <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[280px]'} bg-sidebar-gradient text-[oklch(0.92_0.01_80)] flex-col transition-all duration-300 shrink-0 hidden md:flex`}>
           {renderSidebarContent()}
         </aside>
 
@@ -2429,16 +2429,19 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           {/* Top Bar */}
           <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b px-4 sm:px-6 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8" onClick={() => setMobileSidebarOpen(true)}>
+              <Button variant="ghost" size="icon" className="md:hidden h-8 w-8" onClick={() => setMobileSidebarOpen(true)}>
                 <Menu className="h-5 w-5" />
               </Button>
               <Home className="h-4 w-4 text-muted-foreground hidden sm:block" />
               <span className="text-sm text-muted-foreground hidden sm:inline">/</span>
               <span className="text-sm font-medium">{sectionLabel}</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button variant="ghost" size="icon" className="relative h-9 w-9">
                 <Bell className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-rose-600 md:hidden" onClick={onLogout}>
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </header>
