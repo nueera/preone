@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   keywords: ["PreOne", "Preschool ERP", "Preschool Management", "Education", "Student Management", "Fee Management", "Attendance", "Admission CRM"],
   authors: [{ name: "PreOne Team" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/preonelogo.png",
   },
   openGraph: {
     title: "PreOne - Operating System for Modern Preschools",

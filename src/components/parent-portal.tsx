@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import {
   LayoutDashboard, Baby, ClipboardCheck, Receipt, Sun, Eye,
   TrendingUp, MessageSquare, Settings, ChevronLeft, ChevronRight,
@@ -2013,8 +2014,8 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
-          <Baby className="h-5 w-5 text-white" />
+        <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-amber-500/30 shrink-0">
+          <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
         </div>
         {!sidebarCollapsed && (
           <div>

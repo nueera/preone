@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import {
   LayoutDashboard, GraduationCap, ClipboardCheck, Sun, Eye, Palette,
   TrendingUp, Calendar, MessageSquare, Settings, ChevronLeft, ChevronRight,
@@ -640,8 +641,8 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
-          <Baby className="h-5 w-5 text-white" />
+        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-amber-500/20">
+          <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
         </div>
         {!sidebarCollapsed && (
           <div className="overflow-hidden">

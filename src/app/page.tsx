@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {
   LayoutDashboard, Users, GraduationCap, ClipboardCheck, Receipt,
@@ -354,8 +355,8 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-emerald-50 p-4">
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-            <Baby className="h-8 w-8 text-white" />
+          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-amber-500/30">
+            <Image src="/preonelogo.png" alt="PreOne" width={64} height={64} className="w-full h-full object-cover" />
           </div>
           <CardTitle className="text-2xl font-bold">PreOne</CardTitle>
           <CardDescription>Preschool ERP System</CardDescription>
@@ -2333,8 +2334,8 @@ export default function PreOneDashboard() {
         <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[260px]'} bg-[oklch(0.22_0.03_50)] text-[oklch(0.92_0.01_80)] flex flex-col transition-all duration-300 shrink-0`}>
           {/* Logo */}
           <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
-              <Baby className="h-5 w-5 text-white" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-amber-500/20">
+              <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
             </div>
             {!sidebarCollapsed && (
               <div className="overflow-hidden">
