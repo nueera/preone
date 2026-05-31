@@ -113,3 +113,33 @@ Stage Summary:
 - Code splitting via dynamic imports for performance
 - Same amber/emerald theme across all portals
 - Mobile responsive with Sheet/drawer sidebar on mobile
+
+---
+Task ID: design-system-global
+Agent: Main Agent
+Task: Implement PreOne global design system based on brand vision document
+
+Work Log:
+- Analyzed current project structure (3 monolithic portal files: 2445 + 2168 + 2454 lines)
+- Replaced globals.css with complete PreOne design token system (Purple → Sky Blue gradient)
+- Changed font from Geist to Inter in layout.tsx
+- Updated tailwind.config.ts with proper content paths and brand theme
+- Restyled Admin Portal (page.tsx): login screen, sidebar, stat cards, buttons, charts, CRM, growth, avatars
+- Restyled Parent Portal (parent-portal.tsx): sidebar, avatars, cards, charts, milestones, achievements
+- Restyled Teacher Portal (teacher-portal.tsx): sidebar, avatars, cards, charts, schedule, attendance
+- Added CSS utility classes: bg-brand-gradient, bg-sidebar-gradient, bg-login-gradient, card-preone, btn-brand, nav-active-pill, stat-card-*, space-dots, animations
+- Added space-themed animations: twinkle, float, orbit
+- Added dark mode CSS variables
+- Verified build compiles with zero errors
+- Verified API login works correctly
+
+Stage Summary:
+- All amber/oklch brand references replaced with purple (#7C3AED) → sky blue (#0EA5E9) gradient
+- Sidebar now uses bg-sidebar-gradient (purple-to-blue gradient)
+- Login screen uses bg-login-gradient (violet-50 → sky-50 → green-50)
+- All primary buttons use brand gradient (from-violet-600 to-sky-500)
+- Cards use rounded-3xl (24px radius per brand spec)
+- Sidebar width increased from 260px to 280px per brand spec
+- Semantic status colors preserved (amber=pending, green=present, red=absent, emerald=paid)
+- Font changed from Geist to Inter per brand spec
+- Screenshots saved to /home/z/my-project/download/

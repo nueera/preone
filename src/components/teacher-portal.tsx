@@ -641,13 +641,13 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-amber-500/20">
+        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
           <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
         </div>
         {!sidebarCollapsed && (
           <div className="overflow-hidden">
             <h1 className="text-lg font-bold tracking-tight text-white">PreOne</h1>
-            <p className="text-[10px] text-amber-300/70 -mt-0.5">Teacher Portal</p>
+            <p className="text-[10px] text-sky-300/70 -mt-0.5">Teacher Portal</p>
           </div>
         )}
       </div>
@@ -662,16 +662,16 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => { setActiveSection(item.id); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-300 ${
                       isActive
-                        ? 'bg-amber-500/20 text-amber-300 font-medium shadow-sm'
+                        ? 'bg-white/15 text-white font-medium shadow-sm'
                         : 'text-white/60 hover:bg-white/8 hover:text-white/90'
                     }`}
                   >
-                    <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-amber-400' : ''}`} />
+                    <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-white' : ''}`} />
                     {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                     {isActive && !sidebarCollapsed && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-400" />
                     )}
                   </button>
                 </TooltipTrigger>
@@ -699,7 +699,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
       <div className="px-3 py-3 border-t border-white/10">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 shrink-0">
-            <AvatarFallback className="bg-emerald-500 text-white text-xs font-semibold">
+            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
               {teacherName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -754,7 +754,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             <h2 className="text-2xl font-bold tracking-tight">Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, {teacherName}! 👋</h2>
             <p className="text-muted-foreground mt-1">Here&apos;s what&apos;s happening with your class today.</p>
           </div>
-          <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 px-3 py-1">
+          <Badge variant="outline" className="text-violet-600 border-violet-300 bg-violet-50 px-3 py-1">
             <Clock className="h-3 w-3 mr-1" /> {new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })}
           </Badge>
         </div>
@@ -762,16 +762,16 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Class', value: className, icon: GraduationCap, color: 'bg-amber-50 text-amber-600', iconBg: 'bg-amber-100' },
-            { label: 'Program', value: program, icon: BookOpen, color: 'bg-emerald-50 text-emerald-600', iconBg: 'bg-emerald-100' },
-            { label: 'Students', value: `${studentCount}${capacity ? `/${capacity}` : ''}`, icon: Users, color: 'bg-teal-50 text-teal-600', iconBg: 'bg-teal-100' },
-            { label: 'Pending Updates', value: pendingUpdates, icon: Sun, color: 'bg-orange-50 text-orange-600', iconBg: 'bg-orange-100' },
+            { label: 'Class', value: className, icon: GraduationCap, textColor: 'text-violet-600', cardBg: 'bg-gradient-to-br from-violet-50 to-sky-50', iconBg: 'bg-gradient-to-br from-violet-100 to-sky-100' },
+            { label: 'Program', value: program, icon: BookOpen, textColor: 'text-sky-600', cardBg: 'bg-gradient-to-br from-sky-50 to-violet-50', iconBg: 'bg-gradient-to-br from-sky-100 to-violet-100' },
+            { label: 'Students', value: `${studentCount}${capacity ? `/${capacity}` : ''}`, icon: Users, textColor: 'text-violet-600', cardBg: 'bg-gradient-to-br from-violet-50 to-teal-50', iconBg: 'bg-gradient-to-br from-violet-100 to-teal-100' },
+            { label: 'Pending Updates', value: pendingUpdates, icon: Sun, textColor: 'text-sky-600', cardBg: 'bg-gradient-to-br from-sky-50 to-orange-50', iconBg: 'bg-gradient-to-br from-sky-100 to-orange-100' },
           ].map((stat) => (
-            <Card key={stat.label} className="relative overflow-hidden">
-              <CardContent className="p-4">
+            <Card key={stat.label} className="relative overflow-hidden rounded-3xl border-0 shadow-sm">
+              <CardContent className={`p-4 ${stat.cardBg}`}>
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${stat.iconBg}`}>
-                    <stat.icon className={`h-4 w-4 ${stat.color.split(' ')[1]}`} />
+                  <div className={`p-2 rounded-xl ${stat.iconBg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.textColor}`} />
                   </div>
                 </div>
                 <p className="text-xl font-bold tracking-tight">{stat.value}</p>
@@ -783,7 +783,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Today's Schedule */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">Today&apos;s Schedule</CardTitle>
             </CardHeader>
@@ -792,7 +792,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <div className="space-y-3">
                   {todaySchedule.map((slot, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                      <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                      <div className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{slot.subject || slot.title || 'Activity'}</p>
                         <p className="text-xs text-muted-foreground">{slot.startTime || ''}{slot.endTime ? ` - ${slot.endTime}` : ''}</p>
@@ -810,7 +810,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           </Card>
 
           {/* Attendance Summary */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">Today&apos;s Attendance</CardTitle>
             </CardHeader>
@@ -852,12 +852,12 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           </Card>
 
           {/* Quick Actions */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start bg-amber-500 hover:bg-amber-600 text-white" onClick={() => setActiveSection('attendance')}>
+              <Button className="w-full justify-start bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={() => setActiveSection('attendance')}>
                 <ClipboardCheck className="h-4 w-4 mr-2" /> Mark Attendance
               </Button>
               <Button className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => setActiveSection('daily-updates')}>
@@ -871,7 +871,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
         </div>
 
         {/* Recent Activities */}
-        <Card>
+        <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="text-base">Recent Activities</CardTitle>
           </CardHeader>
@@ -880,8 +880,8 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="space-y-3">
                 {recentActivitiesList.slice(0, 5).map((act, i) => (
                   <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="p-2 rounded-lg bg-amber-50">
-                      <Activity className="h-3.5 w-3.5 text-amber-600" />
+                    <div className="p-2 rounded-lg bg-violet-50">
+                      <Activity className="h-3.5 w-3.5 text-violet-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{act.title || act.type || 'Activity'}</p>
@@ -922,7 +922,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     return (
       <div className="space-y-6">
         {/* Class Header */}
-        <Card className="bg-gradient-to-r from-amber-500/10 to-emerald-500/10 border-amber-200/50">
+        <Card className="rounded-3xl bg-gradient-to-r from-violet-500/10 to-sky-500/10 border-violet-200/50">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -939,7 +939,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
         </Card>
 
         {/* Student List */}
-        <Card>
+        <Card className="rounded-3xl">
           <CardHeader>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
@@ -971,13 +971,13 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     {students.map((s) => (
                       <TableRow
                         key={s.id}
-                        className="cursor-pointer hover:bg-amber-50/50"
+                        className="cursor-pointer hover:bg-violet-50/50"
                         onClick={() => { setSelectedStudent(s); setStudentDetailOpen(true); }}
                       >
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">
+                              <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
                                 {s.firstName[0]}{s.lastName[0]}
                               </AvatarFallback>
                             </Avatar>
@@ -1028,7 +1028,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-amber-100 text-amber-700 text-xl">
+                    <AvatarFallback className="bg-violet-100 text-violet-700 text-xl">
                       {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -1091,7 +1091,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                       </div>
                       <div className="mt-2 text-center">
                         <p className="text-xs text-muted-foreground">Overall</p>
-                        <p className="text-xl font-bold text-amber-600">{Math.round(selectedStudent.growthScore.overall)}</p>
+                        <p className="text-xl font-bold text-violet-600">{Math.round(selectedStudent.growthScore.overall)}</p>
                       </div>
                     </div>
                   </>
@@ -1133,7 +1133,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             { label: 'Late', value: attendanceSummary.late, color: 'text-amber-600', bg: 'bg-amber-50' },
             { label: 'Unmarked', value: attendanceSummary.unmarked, color: 'text-gray-600', bg: 'bg-gray-50' },
           ].map((s) => (
-            <Card key={s.label} className={`${s.bg} border-0`}>
+            <Card key={s.label} className={`${s.bg} border-0 rounded-3xl shadow-sm transition-all duration-300`}>
               <CardContent className="p-4 text-center">
                 <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
@@ -1143,7 +1143,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
         </div>
 
         {/* Bulk Actions */}
-        <Card>
+        <Card className="rounded-3xl">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium mr-2">Bulk Mark:</span>
@@ -1154,7 +1154,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <XCircle className="h-3.5 w-3.5 mr-1" /> All Absent
               </Button>
               <div className="flex-1" />
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white" onClick={handleMarkAttendance} disabled={attendanceSummary.unmarked === attendanceSummary.total}>
+              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleMarkAttendance} disabled={attendanceSummary.unmarked === attendanceSummary.total}>
                 <CheckCircle2 className="h-4 w-4 mr-2" /> Save Attendance
               </Button>
             </div>
@@ -1163,7 +1163,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         {/* Student Cards */}
         {students.length === 0 ? (
-          <Card>
+          <Card className="rounded-3xl">
             <CardContent className="p-12 text-center text-muted-foreground">
               <GraduationCap className="h-10 w-10 mx-auto mb-3 opacity-40" />
               <p className="font-medium">No students in your class</p>
@@ -1179,7 +1179,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <button
                   key={student.id}
                   onClick={() => toggleAttendance(student.id)}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${ATTENDANCE_COLORS[status]} hover:shadow-md active:scale-[0.98]`}
+                  className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${ATTENDANCE_COLORS[status]} hover:shadow-md active:scale-[0.98]`}
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
@@ -1243,7 +1243,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         {/* Student selector or update form */}
         {dailyUpdateStudentId ? (
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -1262,7 +1262,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <>
                   {/* Food Section */}
                   <div>
-                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2"><Utensils className="h-4 w-4 text-amber-500" /> Food</h4>
+                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2"><Utensils className="h-4 w-4 text-violet-500" /> Food</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(['breakfast', 'lunch', 'snacks'] as const).map(meal => (
                         <div key={meal} className="space-y-2">
@@ -1347,7 +1347,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                               onClick={() => setCurrentDailyUpdate(prev => prev ? { ...prev, morningMood: m } : prev)}
                               className={`px-2.5 py-1.5 rounded-lg text-xs border transition-all ${
                                 currentDailyUpdate.morningMood === m
-                                  ? 'bg-amber-100 border-amber-400 text-amber-700 font-medium'
+                                  ? 'bg-violet-100 border-violet-400 text-violet-700 font-medium'
                                   : 'bg-background border-muted hover:bg-muted/50'
                               }`}
                             >
@@ -1428,7 +1428,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           <>
             {/* Existing updates */}
             {dailyUpdates.length > 0 && (
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader>
                   <CardTitle className="text-base">Today&apos;s Updates ({dailyUpdates.length})</CardTitle>
                 </CardHeader>
@@ -1440,7 +1440,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         <div key={u.id || u.studentId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">
+                              <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
                                 {student?.firstName[0] || '?'}{student?.lastName[0] || ''}
                               </AvatarFallback>
                             </Avatar>
@@ -1464,7 +1464,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             )}
 
             {/* Student picker */}
-            <Card>
+            <Card className="rounded-3xl">
               <CardHeader>
                 <CardTitle className="text-base">Fill Update for Student</CardTitle>
                 <CardDescription>Click on a student to fill their daily update</CardDescription>
@@ -1491,14 +1491,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                               morningMood: '', afternoonMood: '', waterGlasses: 0, highlights: '', notes: '', status: 'DRAFT',
                             });
                           }}
-                          className={`p-3 rounded-xl border-2 text-center transition-all hover:shadow-md ${
+                          className={`p-3 rounded-xl border-2 text-center transition-all duration-300 hover:shadow-md ${
                             existing?.status === 'PUBLISHED' ? 'border-emerald-300 bg-emerald-50' :
                             existing?.status === 'DRAFT' ? 'border-amber-300 bg-amber-50' :
-                            'border-muted hover:border-amber-300'
+                            'border-muted hover:border-violet-300'
                           }`}
                         >
                           <Avatar className="h-10 w-10 mx-auto mb-1.5">
-                            <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">
+                            <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
                               {student.firstName[0]}{student.lastName[0]}
                             </AvatarFallback>
                           </Avatar>
@@ -1552,7 +1552,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* New Observation Form */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">New Observation</CardTitle>
             </CardHeader>
@@ -1600,14 +1600,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 />
                 <Label className="text-xs">Share with parent</Label>
               </div>
-              <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddObservation} disabled={!newObservation.studentId || !newObservation.content}>
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddObservation} disabled={!newObservation.studentId || !newObservation.content}>
                 <Plus className="h-4 w-4 mr-2" /> Add Observation
               </Button>
             </CardContent>
           </Card>
 
           {/* Observations List */}
-          <Card className="lg:col-span-2">
+          <Card className="rounded-3xl lg:col-span-2">
             <CardHeader>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <CardTitle className="text-base">All Observations ({filteredObservations.length})</CardTitle>
@@ -1645,7 +1645,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <Badge variant="outline" className={`text-[10px] ${
-                                obs.category === 'Behavior' ? 'border-amber-300 text-amber-600' :
+                                obs.category === 'Behavior' ? 'border-violet-300 text-violet-600' :
                                 obs.category === 'Academic' ? 'border-emerald-300 text-emerald-600' :
                                 obs.category === 'Social' ? 'border-blue-300 text-blue-600' :
                                 obs.category === 'Emotional' ? 'border-rose-300 text-rose-600' :
@@ -1720,7 +1720,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* New Activity Form */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">New Activity</CardTitle>
             </CardHeader>
@@ -1758,7 +1758,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                   </div>
                 </div>
               </div>
-              <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddActivity} disabled={!newActivity.title}>
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddActivity} disabled={!newActivity.title}>
                 <Plus className="h-4 w-4 mr-2" /> Add Activity
               </Button>
             </CardContent>
@@ -1767,7 +1767,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           {/* Activity Cards */}
           <div className="lg:col-span-2">
             {filteredActivities.length === 0 ? (
-              <Card>
+              <Card className="rounded-3xl">
                 <CardContent className="p-12 text-center text-muted-foreground">
                   <Palette className="h-10 w-10 mx-auto mb-3 opacity-40" />
                   <p className="font-medium">No activities planned</p>
@@ -1778,13 +1778,13 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {filteredActivities.map((act, i) => {
                   const typeColors: Record<string, string> = {
-                    Art: 'bg-amber-100 text-amber-700', Music: 'bg-purple-100 text-purple-700',
+                    Art: 'bg-violet-100 text-violet-700', Music: 'bg-purple-100 text-purple-700',
                     Dance: 'bg-pink-100 text-pink-700', Sports: 'bg-emerald-100 text-emerald-700',
                     Story: 'bg-blue-100 text-blue-700', Science: 'bg-teal-100 text-teal-700',
                     Celebration: 'bg-orange-100 text-orange-700', Other: 'bg-gray-100 text-gray-700',
                   };
                   return (
-                    <Card key={act.id || i} className="hover:shadow-md transition-shadow">
+                    <Card key={act.id || i} className="hover:shadow-md transition-shadow rounded-3xl">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <Badge className={`text-[10px] border-0 ${typeColors[act.type] || typeColors.Other}`}>
@@ -1793,7 +1793,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                           <Badge variant="outline" className={`text-[10px] ${
                             act.status === 'Completed' ? 'text-emerald-600 border-emerald-300' :
                             act.status === 'Scheduled' ? 'text-blue-600 border-blue-300' :
-                            'text-amber-600 border-amber-300'
+                            'text-violet-600 border-violet-300'
                           }`}>
                             {act.status || 'Planned'}
                           </Badge>
@@ -1853,7 +1853,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Radar Chart */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">
                 {selectedGrowthStudent
@@ -1867,7 +1867,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                   <PolarGrid stroke="#e5e7eb" />
                   <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <Radar name="Class Avg" dataKey="Class" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={2} />
+                  <Radar name="Class Avg" dataKey="Class" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.2} strokeWidth={2} />
                   {selectedGrowthStudent && (
                     <Radar name="Student" dataKey="Student" stroke="#10b981" fill="#10b981" fillOpacity={0.2} strokeWidth={2} />
                   )}
@@ -1878,7 +1878,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           </Card>
 
           {/* Growth Entry Form */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">Enter Growth Score</CardTitle>
             </CardHeader>
@@ -1912,7 +1912,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                   />
                 </div>
               ))}
-              <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" onClick={handleSaveGrowth} disabled={!growthEntry.studentId || !growthEntry.period}>
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleSaveGrowth} disabled={!growthEntry.studentId || !growthEntry.period}>
                 <Target className="h-4 w-4 mr-2" /> Save Growth Score
               </Button>
             </CardContent>
@@ -1921,22 +1921,22 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Needs Attention */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-500" /> Needs Attention</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-violet-500" /> Needs Attention</CardTitle>
             </CardHeader>
             <CardContent>
               {growthData?.needsAttention && growthData.needsAttention.length > 0 ? (
                 <div className="space-y-2">
                   {growthData.needsAttention.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-200">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-violet-50 border border-violet-200">
                       <div>
                         <p className="text-sm font-medium">{s.name}</p>
-                        <p className="text-xs text-amber-600">Weak: {s.weakestArea}</p>
+                        <p className="text-xs text-violet-600">Weak: {s.weakestArea}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-amber-600">{Math.round(s.overall)}</p>
-                        <p className="text-[10px] text-amber-500">overall</p>
+                        <p className="text-lg font-bold text-violet-600">{Math.round(s.overall)}</p>
+                        <p className="text-[10px] text-violet-500">overall</p>
                       </div>
                     </div>
                   ))}
@@ -1951,9 +1951,9 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           </Card>
 
           {/* Top Performers */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2"><Award className="h-4 w-4 text-amber-500" /> Top Performers</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><Award className="h-4 w-4 text-violet-500" /> Top Performers</CardTitle>
             </CardHeader>
             <CardContent>
               {growthData?.topPerformers && growthData.topPerformers.length > 0 ? (
@@ -2007,7 +2007,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             {scheduleLoading ? (
               <CardSkeleton />
             ) : schedule.length > 0 ? (
-              <Card>
+              <Card className="rounded-3xl">
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <Table>
@@ -2033,7 +2033,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               </Card>
             ) : (
               /* Show default weekly schedule */
-              <Card>
+              <Card className="rounded-3xl">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {DAYS.map(day => (
@@ -2041,7 +2041,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         <p className="font-medium text-sm mb-2">{day}</p>
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
                             09:00 - 10:30 • Circle Time & Learning
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -2072,7 +2072,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           <TabsContent value="leave" className="space-y-6 mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Apply Leave */}
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader>
                   <CardTitle className="text-base">Apply for Leave</CardTitle>
                 </CardHeader>
@@ -2100,14 +2100,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     <Label className="text-xs">Reason</Label>
                     <Textarea placeholder="Reason for leave..." className="min-h-[80px] text-sm" value={newLeave.reason} onChange={e => setNewLeave(prev => ({ ...prev, reason: e.target.value }))} />
                   </div>
-                  <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" onClick={handleApplyLeave} disabled={!newLeave.reason}>
+                  <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleApplyLeave} disabled={!newLeave.reason}>
                     <Send className="h-4 w-4 mr-2" /> Apply Leave
                   </Button>
                 </CardContent>
               </Card>
 
               {/* Leave Balance */}
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader>
                   <CardTitle className="text-base">Leave Balance</CardTitle>
                 </CardHeader>
@@ -2145,7 +2145,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             </div>
 
             {/* Leave History */}
-            <Card>
+            <Card className="rounded-3xl">
               <CardHeader>
                 <CardTitle className="text-base">Leave History</CardTitle>
               </CardHeader>
@@ -2224,14 +2224,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             ) : announcements.length > 0 ? (
               <div className="space-y-3">
                 {announcements.map((a) => (
-                  <Card key={a.id} className="hover:shadow-md transition-shadow">
+                  <Card key={a.id} className="hover:shadow-md transition-shadow rounded-3xl">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-sm">{a.title}</h3>
                         <Badge variant="outline" className={`text-[10px] shrink-0 ml-2 ${
                           a.priority === 'Urgent' ? 'text-rose-600 border-rose-300' :
                           a.priority === 'High' ? 'text-orange-600 border-orange-300' :
-                          'text-amber-600 border-amber-300'
+                          'text-violet-600 border-violet-300'
                         }`}>{a.priority}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{a.content}</p>
@@ -2244,7 +2244,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 ))}
               </div>
             ) : (
-              <Card>
+              <Card className="rounded-3xl">
                 <CardContent className="p-12 text-center text-muted-foreground">
                   <Bell className="h-10 w-10 mx-auto mb-3 opacity-40" />
                   <p className="font-medium">No announcements</p>
@@ -2255,7 +2255,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           </TabsContent>
 
           <TabsContent value="chat" className="mt-4">
-            <Card>
+            <Card className="rounded-3xl">
               <CardContent className="p-12 text-center text-muted-foreground">
                 <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-40" />
                 <p className="font-medium">Parent Chat</p>
@@ -2295,14 +2295,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Profile */}
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarFallback className="bg-emerald-100 text-emerald-700 text-xl">
+                  <AvatarFallback className="bg-violet-100 text-violet-700 text-xl">
                     {teacherName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -2328,7 +2328,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <Label className="text-xs">Qualification</Label>
                 <Input className="h-9 text-sm" placeholder="e.g., B.Ed, Montessori Certified" value={profileForm.qualification} onChange={e => setProfileForm(prev => ({ ...prev, qualification: e.target.value }))} />
               </div>
-              <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
                 <Edit className="h-4 w-4 mr-2" /> Update Profile
               </Button>
             </CardContent>
@@ -2336,7 +2336,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
 
           <div className="space-y-6">
             {/* Change Password */}
-            <Card>
+            <Card className="rounded-3xl">
               <CardHeader>
                 <CardTitle className="text-base">Change Password</CardTitle>
               </CardHeader>
@@ -2360,7 +2360,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             </Card>
 
             {/* Notification Preferences */}
-            <Card>
+            <Card className="rounded-3xl">
               <CardHeader>
                 <CardTitle className="text-base">Notification Preferences</CardTitle>
               </CardHeader>
@@ -2413,13 +2413,13 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     <TooltipProvider>
       <div className="flex h-screen bg-background overflow-hidden">
         {/* Desktop Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[260px]'} bg-[oklch(0.22_0.03_50)] text-[oklch(0.92_0.01_80)] flex-col transition-all duration-300 shrink-0 hidden lg:flex`}>
+        <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[280px]'} bg-sidebar-gradient text-[oklch(0.92_0.01_80)] flex-col transition-all duration-300 shrink-0 hidden lg:flex`}>
           {renderSidebarContent()}
         </aside>
 
         {/* Mobile Sidebar */}
         <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-[260px] bg-[oklch(0.22_0.03_50)] text-[oklch(0.92_0.01_80)] border-0">
+          <SheetContent side="left" className="p-0 w-[280px] bg-sidebar-gradient text-[oklch(0.92_0.01_80)] border-0">
             {renderSidebarContent()}
           </SheetContent>
         </Sheet>

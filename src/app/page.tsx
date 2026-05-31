@@ -246,7 +246,7 @@ const stageLabels: Record<string, string> = {
 };
 
 const stageColors: Record<string, string> = {
-  NewInquiry: '#f59e0b', Visit: '#fb923c', Tour: '#f97316', Demo: '#ea580c',
+  NewInquiry: '#7C3AED', Visit: '#0EA5E9', Tour: '#f97316', Demo: '#ea580c',
   FollowUp: '#10b981', Confirmed: '#059669', Enrolled: '#047857', Lost: '#94a3b8',
 };
 
@@ -315,7 +315,7 @@ function getActivityIcon(type: string) {
 function getActivityColor(type: string) {
   switch (type) {
     case 'student_enrollment': return 'text-emerald-500';
-    case 'payment_received': return 'text-amber-500';
+    case 'payment_received': return 'text-sky-500';
     case 'attendance_marked': return 'text-blue-500';
     case 'new_lead': return 'text-orange-500';
     case 'announcement': return 'text-rose-500';
@@ -352,10 +352,10 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-emerald-50 p-4">
-      <Card className="w-full max-w-md shadow-xl border-0">
+    <div className="min-h-screen flex items-center justify-center bg-login-gradient space-dots p-4">
+      <Card className="w-full max-w-md shadow-xl border-0 rounded-3xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-amber-500/30">
+          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-violet-500/25">
             <Image src="/preonelogo.png" alt="PreOne" width={64} height={64} className="w-full h-full object-cover" />
           </div>
           <CardTitle className="text-2xl font-bold">PreOne</CardTitle>
@@ -374,7 +374,7 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="password123" required />
             </div>
-            <Button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-white" disabled={loading}>
+            <Button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" disabled={loading}>
               {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Signing in...</> : 'Sign In'}
             </Button>
             <div className="text-xs text-center text-muted-foreground space-y-1">
@@ -883,14 +883,14 @@ export default function PreOneDashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { label: 'Total Students', value: stats.totalStudents, icon: GraduationCap, change: `+${stats.newAdmissions}`, up: true, color: 'bg-amber-50 text-amber-600', iconBg: 'bg-amber-100' },
+            { label: 'Total Students', value: stats.totalStudents, icon: GraduationCap, change: `+${stats.newAdmissions}`, up: true, color: 'bg-violet-50 text-violet-600', iconBg: 'bg-violet-100' },
             { label: 'Total Teachers', value: stats.totalTeachers, icon: Users, change: '', up: true, color: 'bg-emerald-50 text-emerald-600', iconBg: 'bg-emerald-100' },
-            { label: 'Monthly Revenue', value: formatCurrency(stats.thisMonthRevenue), icon: IndianRupee, change: '', up: true, color: 'bg-orange-50 text-orange-600', iconBg: 'bg-orange-100' },
+            { label: 'Monthly Revenue', value: formatCurrency(stats.thisMonthRevenue), icon: IndianRupee, change: '', up: true, color: 'bg-sky-50 text-sky-600', iconBg: 'bg-sky-100' },
             { label: 'Admissions', value: stats.newAdmissions, icon: UserPlus, change: '', up: true, color: 'bg-rose-50 text-rose-600', iconBg: 'bg-rose-100' },
-            { label: 'Occupancy', value: `${stats.occupancyRate}%`, icon: Building2, change: '', up: true, color: 'bg-teal-50 text-teal-600', iconBg: 'bg-teal-100' },
+            { label: 'Occupancy', value: `${stats.occupancyRate}%`, icon: Building2, change: '', up: true, color: 'bg-indigo-50 text-indigo-600', iconBg: 'bg-indigo-100' },
             { label: 'Attendance', value: `${stats.attendanceRate}%`, icon: ClipboardCheck, change: '', up: true, color: 'bg-yellow-50 text-yellow-600', iconBg: 'bg-yellow-100' },
           ].map((stat) => (
-            <Card key={stat.label} className="relative overflow-hidden">
+            <Card key={stat.label} className="relative overflow-hidden rounded-3xl">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className={`p-2 rounded-lg ${stat.iconBg}`}>
@@ -922,8 +922,8 @@ export default function PreOneDashboard() {
                   <AreaChart data={revenueData.monthly.filter(m => m.revenue > 0 || m.collections > 0)}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorCollections" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -934,7 +934,7 @@ export default function PreOneDashboard() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(1)}L`} />
                     <RTooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, '']} />
-                    <Area type="monotone" dataKey="revenue" stroke="#f59e0b" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={2} name="Revenue" />
+                    <Area type="monotone" dataKey="revenue" stroke="#7C3AED" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={2} name="Revenue" />
                     <Area type="monotone" dataKey="collections" stroke="#10b981" fillOpacity={1} fill="url(#colorCollections)" strokeWidth={2} name="Collections" />
                     <Legend />
                   </AreaChart>
@@ -1047,8 +1047,8 @@ export default function PreOneDashboard() {
                 { label: 'Send Message', icon: Send, action: () => setActiveSection('communication') },
                 { label: 'Add Activity', icon: Plus, action: () => { setActiveSection('activities'); setAddActivityOpen(true); } },
               ].map((item) => (
-                <Button key={item.label} variant="outline" className="h-auto py-3 flex flex-col items-center gap-2 hover:bg-amber-50 hover:border-amber-200 transition-all" onClick={item.action}>
-                  <item.icon className="h-5 w-5 text-amber-600" />
+                <Button key={item.label} variant="outline" className="h-auto py-3 flex flex-col items-center gap-2 hover:bg-violet-50 hover:border-violet-200 transition-all" onClick={item.action}>
+                  <item.icon className="h-5 w-5 text-violet-600" />
                   <span className="text-xs font-medium">{item.label}</span>
                 </Button>
               ))}
@@ -1071,7 +1071,7 @@ export default function PreOneDashboard() {
         </div>
         <Dialog open={addStudentOpen} onOpenChange={setAddStudentOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
               <Plus className="h-4 w-4 mr-2" /> Add Student
             </Button>
           </DialogTrigger>
@@ -1104,7 +1104,7 @@ export default function PreOneDashboard() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setAddStudentOpen(false)}>Cancel</Button>
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddStudent} disabled={!newStudent.firstName || !newStudent.lastName}>Enroll Student</Button>
+              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddStudent} disabled={!newStudent.firstName || !newStudent.lastName}>Enroll Student</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -1152,7 +1152,7 @@ export default function PreOneDashboard() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-amber-100 text-amber-700 text-xs font-semibold">
+                            <AvatarFallback className="bg-violet-100 text-violet-700 text-xs font-semibold">
                               {student.firstName[0]}{student.lastName[0]}
                             </AvatarFallback>
                           </Avatar>
@@ -1200,7 +1200,7 @@ export default function PreOneDashboard() {
                 <DialogHeader>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12">
-                      <AvatarFallback className="bg-amber-100 text-amber-700 text-lg font-semibold">
+                      <AvatarFallback className="bg-violet-100 text-violet-700 text-lg font-semibold">
                         {s.firstName[0]}{s.lastName[0]}
                       </AvatarFallback>
                     </Avatar>
@@ -1246,7 +1246,7 @@ export default function PreOneDashboard() {
         </div>
         <Dialog open={addTeacherOpen} onOpenChange={setAddTeacherOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
               <Plus className="h-4 w-4 mr-2" /> Add Teacher
             </Button>
           </DialogTrigger>
@@ -1272,7 +1272,7 @@ export default function PreOneDashboard() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setAddTeacherOpen(false)}>Cancel</Button>
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddTeacher} disabled={!newTeacher.firstName || !newTeacher.lastName}>Add Teacher</Button>
+              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddTeacher} disabled={!newTeacher.firstName || !newTeacher.lastName}>Add Teacher</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -1306,7 +1306,7 @@ export default function PreOneDashboard() {
                       <p className="font-semibold text-sm truncate">{name}</p>
                       <p className="text-xs text-muted-foreground">{teacher.qualification || 'No qualification'}</p>
                     </div>
-                    <Badge className={teacher.status === 'Active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-amber-100 text-amber-700 hover:bg-amber-100'}>
+                    <Badge className={teacher.status === 'Active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-violet-100 text-violet-700 hover:bg-violet-100'}>
                       {teacher.status}
                     </Badge>
                   </div>
@@ -1366,7 +1366,7 @@ export default function PreOneDashboard() {
         {loading.attendance ? <StatsSkeleton count={4} /> : stats ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Students', value: stats.students.total, icon: GraduationCap, color: 'bg-amber-100 text-amber-600' },
+              { label: 'Total Students', value: stats.students.total, icon: GraduationCap, color: 'bg-violet-100 text-violet-600' },
               { label: 'Present Today', value: stats.students.present, icon: UserCheck, color: 'bg-emerald-100 text-emerald-600' },
               { label: 'Absent Today', value: stats.students.absent, icon: UserX, color: 'bg-rose-100 text-rose-600' },
               { label: 'Late Arrivals', value: stats.students.late, icon: Timer, color: 'bg-orange-100 text-orange-600' },
@@ -1482,7 +1482,7 @@ export default function PreOneDashboard() {
                 <p className="text-xs text-emerald-600 flex items-center gap-1 mt-1"><CheckCircle2 className="h-3 w-3" /> {overview.collectionRate}% collection rate</p>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-amber-500">
+            <Card className="border-l-4 border-l-violet-500">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Pending Payments</p>
                 <p className="text-2xl font-bold text-amber-600">{formatCurrency(overview.totalPending)}</p>
@@ -1515,7 +1515,7 @@ export default function PreOneDashboard() {
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(1)}L`} />
                   <RTooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, '']} />
                   <Bar dataKey="collections" fill="#10b981" name="Collected" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="revenue" fill="#f59e0b" name="Expected" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#7C3AED" name="Expected" radius={[6, 6, 0, 0]} />
                   <Legend />
                 </BarChart>
               </ResponsiveContainer>
@@ -1606,7 +1606,7 @@ export default function PreOneDashboard() {
   const renderCRM = () => {
     const hotLeads = leads.filter(l => l.priority === 'Hot').length;
     const crmStats = [
-      { label: 'Total Leads', value: crmPipeline?.totalLeads || leads.length, icon: Megaphone, color: 'text-amber-600' },
+      { label: 'Total Leads', value: crmPipeline?.totalLeads || leads.length, icon: Megaphone, color: 'text-violet-600' },
       { label: 'Conversion Rate', value: `${crmPipeline?.conversionRate || 0}%`, icon: Target, color: 'text-emerald-600' },
       { label: 'Active Leads', value: crmPipeline?.pipeline?.filter(s => !['Enrolled', 'Lost'].includes(s.stage)).reduce((sum, s) => sum + s.count, 0) || leads.filter(l => !['Enrolled', 'Lost'].includes(l.stage)).length, icon: Activity, color: 'text-orange-600' },
       { label: 'Hot Leads', value: hotLeads, icon: Zap, color: 'text-rose-600' },
@@ -1621,7 +1621,7 @@ export default function PreOneDashboard() {
           </div>
           <Dialog open={addLeadOpen} onOpenChange={setAddLeadOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
                 <Plus className="h-4 w-4 mr-2" /> Add Lead
               </Button>
             </DialogTrigger>
@@ -1663,7 +1663,7 @@ export default function PreOneDashboard() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setAddLeadOpen(false)}>Cancel</Button>
-                <Button className="bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddLead} disabled={!newLead.parentName || !newLead.childName}>Add Lead</Button>
+                <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddLead} disabled={!newLead.parentName || !newLead.childName}>Add Lead</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -1720,17 +1720,17 @@ export default function PreOneDashboard() {
         )}
 
         {/* AI Insights */}
-        <Card className="border-amber-200 bg-gradient-to-r from-amber-50/50 to-orange-50/50">
+        <Card className="border-violet-200 bg-gradient-to-r from-violet-50/50 to-sky-50/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-amber-500" />
+              <Sparkles className="h-5 w-5 text-violet-500" />
               AI CRM Insights
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-white rounded-lg border border-amber-100">
-                <div className="flex items-center gap-2 mb-2"><Bot className="h-4 w-4 text-amber-500" /><span className="text-xs font-semibold text-amber-700">Lead Scoring</span></div>
+              <div className="p-4 bg-white rounded-lg border border-violet-100">
+                <div className="flex items-center gap-2 mb-2"><Bot className="h-4 w-4 text-violet-500" /><span className="text-xs font-semibold text-violet-700">Lead Scoring</span></div>
                 <p className="text-sm">{hotLeads > 0 ? `${hotLeads} hot lead${hotLeads > 1 ? 's' : ''} detected with high conversion probability. Prioritize immediate follow-ups.` : 'No hot leads currently. Focus on nurturing existing leads through the pipeline.'}</p>
               </div>
               <div className="p-4 bg-white rounded-lg border border-emerald-100">
@@ -1816,7 +1816,7 @@ export default function PreOneDashboard() {
       {/* Activity Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Events', value: recentActivities.length + activitiesDB.length, icon: Calendar, color: 'text-amber-600' },
+          { label: 'Total Events', value: recentActivities.length + activitiesDB.length, icon: Calendar, color: 'text-violet-600' },
           { label: 'Enrollments', value: recentActivities.filter(a => a.type === 'student_enrollment').length, icon: CheckCircle2, color: 'text-emerald-600' },
           { label: 'Payments', value: recentActivities.filter(a => a.type === 'payment_received').length, icon: IndianRupee, color: 'text-orange-600' },
           { label: 'Announcements', value: recentActivities.filter(a => a.type === 'announcement').length, icon: Bell, color: 'text-rose-600' },
@@ -1878,8 +1878,8 @@ export default function PreOneDashboard() {
         <CardContent>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 border border-amber-200/50 flex items-center justify-center">
-                <ImageIcon className="h-8 w-8 text-amber-400" />
+              <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-violet-100 to-sky-100 border border-violet-200/50 flex items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-violet-400" />
               </div>
             ))}
           </div>
@@ -1913,7 +1913,7 @@ export default function PreOneDashboard() {
                 <YAxis type="category" dataKey="class" tick={{ fontSize: 11 }} width={80} />
                 <RTooltip />
                 <Legend />
-                <Bar dataKey="creativity" fill="#f59e0b" name="Creativity" />
+                <Bar dataKey="creativity" fill="#7C3AED" name="Creativity" />
                 <Bar dataKey="communication" fill="#10b981" name="Communication" />
                 <Bar dataKey="socialSkills" fill="#f97316" name="Social" />
                 <Bar dataKey="cognitive" fill="#fb7185" name="Cognitive" />
@@ -1944,7 +1944,7 @@ export default function PreOneDashboard() {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
                 <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <Radar name="Student" dataKey="A" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} strokeWidth={2} />
+                <Radar name="Student" dataKey="A" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.2} strokeWidth={2} />
                 <Radar name="Class Avg" dataKey="B" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
                 <Legend />
                 <RTooltip />
@@ -1971,7 +1971,7 @@ export default function PreOneDashboard() {
                 <XAxis dataKey="range" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <RTooltip />
-                <Bar dataKey="count" fill="#f59e0b" radius={[6, 6, 0, 0]} name="Students" />
+                <Bar dataKey="count" fill="#7C3AED" radius={[6, 6, 0, 0]} name="Students" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -1995,8 +1995,8 @@ export default function PreOneDashboard() {
               </div>
             )}
             {growthData.some(g => g.needsAttention.length > 0) && (
-              <div className="p-4 bg-white rounded-lg border border-amber-100">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-amber-500" /><span className="text-xs font-semibold text-amber-700">Attention Needed</span></div>
+              <div className="p-4 bg-white rounded-lg border border-violet-100">
+                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-violet-500" /><span className="text-xs font-semibold text-violet-700">Attention Needed</span></div>
                 <p className="text-sm">{growthData.flatMap(g => g.needsAttention).slice(0, 3).map(n => `${n.name} - weak in ${n.weakestArea}`).join(', ') || 'No students needing attention.'}</p>
               </div>
             )}
@@ -2026,7 +2026,7 @@ export default function PreOneDashboard() {
         </div>
         <Dialog open={addAnnouncementOpen} onOpenChange={setAddAnnouncementOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
               <Plus className="h-4 w-4 mr-2" /> New Announcement
             </Button>
           </DialogTrigger>
@@ -2060,7 +2060,7 @@ export default function PreOneDashboard() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setAddAnnouncementOpen(false)}>Cancel</Button>
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white" onClick={handleAddAnnouncement} disabled={!newAnnouncement.title || !newAnnouncement.content}>
+              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddAnnouncement} disabled={!newAnnouncement.title || !newAnnouncement.content}>
                 <Send className="h-4 w-4 mr-2" /> Publish
               </Button>
             </DialogFooter>
@@ -2109,8 +2109,8 @@ export default function PreOneDashboard() {
           ) : (
             announcements.map((ann) => (
               <div key={ann.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                <div className={`p-2 rounded-lg shrink-0 ${ann.priority === 'Urgent' ? 'bg-rose-100' : ann.priority === 'High' ? 'bg-amber-100' : 'bg-muted'}`}>
-                  <Bell className={`h-4 w-4 ${ann.priority === 'Urgent' ? 'text-rose-600' : ann.priority === 'High' ? 'text-amber-600' : 'text-muted-foreground'}`} />
+                <div className={`p-2 rounded-lg shrink-0 ${ann.priority === 'Urgent' ? 'bg-rose-100' : ann.priority === 'High' ? 'bg-violet-100' : 'bg-muted'}`}>
+                  <Bell className={`h-4 w-4 ${ann.priority === 'Urgent' ? 'text-rose-600' : ann.priority === 'High' ? 'text-violet-600' : 'text-muted-foreground'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
@@ -2148,7 +2148,7 @@ export default function PreOneDashboard() {
             return (
               <div key={student.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
                 <Avatar className="h-9 w-9">
-                  <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">{parent.firstName[0]}{parent.lastName[0]}</AvatarFallback>
+                  <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">{parent.firstName[0]}{parent.lastName[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -2195,7 +2195,7 @@ export default function PreOneDashboard() {
               <div className="space-y-2"><Label>Email</Label><Input defaultValue="hello@preone.edu" /></div>
             </div>
             <div className="space-y-2"><Label>Address</Label><Textarea defaultValue="123, Learning Lane, Knowledge Park, New Delhi - 110001" /></div>
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white">Save Changes</Button>
+            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">Save Changes</Button>
           </CardContent>
         </Card>
 
@@ -2207,7 +2207,7 @@ export default function PreOneDashboard() {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-14 w-14">
-                <AvatarFallback className="bg-amber-500 text-white text-lg">
+                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-lg">
                   {user?.email ? (user.email as string).slice(0, 2).toUpperCase() : 'AD'}
                 </AvatarFallback>
               </Avatar>
@@ -2290,7 +2290,7 @@ export default function PreOneDashboard() {
 
   // Show login screen if not authenticated
   if (!authChecked) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-amber-500" /></div>;
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-violet-500" /></div>;
   }
 
   if (!token) {
@@ -2331,16 +2331,16 @@ export default function PreOneDashboard() {
     <TooltipProvider>
       <div className="flex h-screen bg-background overflow-hidden">
         {/* Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[260px]'} bg-[oklch(0.22_0.03_50)] text-[oklch(0.92_0.01_80)] flex flex-col transition-all duration-300 shrink-0`}>
+        <aside className={`${sidebarCollapsed ? 'w-[76px]' : 'w-[280px]'} bg-sidebar-gradient text-white flex flex-col transition-all duration-300 shrink-0`}>
           {/* Logo */}
           <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-amber-500/20">
+            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
               <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
             </div>
             {!sidebarCollapsed && (
               <div className="overflow-hidden">
                 <h1 className="text-lg font-bold tracking-tight text-white">PreOne</h1>
-                <p className="text-[10px] text-amber-300/70 -mt-0.5">Preschool OS</p>
+                <p className="text-[10px] text-sky-300/70 -mt-0.5">Preschool OS</p>
               </div>
             )}
           </div>
@@ -2357,14 +2357,14 @@ export default function PreOneDashboard() {
                         onClick={() => setActiveSection(item.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
                           isActive
-                            ? 'bg-amber-500/20 text-amber-300 font-medium shadow-sm'
+                            ? 'nav-active-pill font-medium shadow-sm'
                             : 'text-white/60 hover:bg-white/8 hover:text-white/90'
                         }`}
                       >
-                        <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-amber-400' : ''}`} />
+                        <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-white' : ''}`} />
                         {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                         {isActive && !sidebarCollapsed && (
-                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-400" />
                         )}
                       </button>
                     </TooltipTrigger>
@@ -2394,7 +2394,7 @@ export default function PreOneDashboard() {
           <div className="px-3 py-3 border-t border-white/10">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9 shrink-0">
-                <AvatarFallback className="bg-amber-500 text-white text-xs font-semibold">
+                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
                   {userName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
