@@ -1,0 +1,1400 @@
+// ============================================================
+// PreOne — Preschool ERP System
+// Complete Prisma Schema (SQLite)
+// Modules: Users & Auth, School/Branches, Students, Parents,
+// Teachers/Staff, Programs/Classes/Sections, Attendance,
+// Fee Management, Activities & Observations, Communication,
+// Daily Updates, Growth & AI, Childhood Passport, Admission CRM,
+// Transport, Events & Calendar, Notifications, Reports
+// ============================================================
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================================
+// 1. USERS & AUTHENTICATION
+// ============================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         String   // SuperAdmin, Owner, Admin, Teacher, Parent
+  isActive     Boolean  @default(true)
+  isVerified   Boolean  @default(false)
+  lastLoginAt  DateTime?
+  branchId     String?
+  branch       Branch?  @relation(fields: [branchId], references: [id])
+
+  // Profile links — one-to-one optional
+  teacher         Teacher?
+  parent          Parent?
+  otps            Otp[]
+  sentMessages    Message[]         @relation("MessageSender")
+  chatParticipants ChatParticipant[]
+  notifications   Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role])
+  @@index([branchId])
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  code      String
+  purpose   String   // login, verify_email, reset_password
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([code, purpose])
+}
+
+// ============================================================
+// 2. SCHOOL & BRANCHES
+// ============================================================
+
+model School {
+  id          String   @id @default(cuid())
+  name        String
+  logo        String?
+  tagline     String?
+  description String?
+  ownerName   String?
+  ownerEmail  String?
+  ownerPhone  String?
+  address     String?
+  isActive    Boolean  @default(true)
+
+  branches    Branch[]
+  settings    SchoolSetting[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
+  code      String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  pincode   String?
+  phone     String?
+  email     String?
+  latitude  Float?
+  longitude Float?
+  isActive  Boolean  @default(true)
+
+  // Back-relations
+  users         User[]
+  students      Student[]
+  teachers      Teacher[]
+  programs      Program[]
+  classes       Class[]
+  feeStructures FeeStructure[]
+  routes        Route[]
+  vehicles      Vehicle[]
+  events        Event[]
+  holidays      Holiday[]
+  announcements Announcement[]
+  leads         Lead[]
+  activities    Activity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([schoolId])
+}
+
+model SchoolSetting {
+  id       String  @id @default(cuid())
+  schoolId String
+  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  key      String
+  value    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([schoolId, key])
+}
+
+// ============================================================
+// 3. STUDENTS
+// ============================================================
+
+model Student {
+  id             String   @id @default(cuid())
+  branchId       String
+  branch         Branch   @relation(fields: [branchId], references: [id])
+  admissionNo    String?  @unique
+  firstName      String
+  lastName       String
+  dob            DateTime
+  gender         String?  // Male, Female, Other
+  bloodGroup     String?  // A+, A-, B+, B-, O+, O-, AB+, AB-
+  photo          String?
+  address        String?
+  emergencyContact String?
+  enrollmentDate DateTime @default(now())
+  status         String   @default("Active") // Active, Inactive, Graduated, Transferred
+
+  // Class / section assignment
+  classId   String?
+  class     Class?   @relation(fields: [classId], references: [id])
+  sectionId String?
+  section   Section? @relation(fields: [sectionId], references: [id])
+
+  // Back-relations
+  parents        StudentParent[]
+  medicalRecords MedicalRecord[]
+  siblings       Sibling[]          @relation("StudentSiblings")
+  siblingOf      Sibling[]          @relation("SiblingOf")
+  attendance     StudentAttendance[]
+  invoices       Invoice[]
+  dailyUpdates   DailyUpdate[]
+  growthScores   GrowthScore[]
+  aiObservations AIObservation[]
+  memories       Memory[]
+  achievements   Achievement[]
+  certificates   Certificate[]
+  milestones     MilestoneTimeline[]
+  observations   Observation[]
+  pickupDrops    PickupDrop[]
+  notifications  Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([classId])
+  @@index([sectionId])
+  @@index([status])
+}
+
+// ============================================================
+// 4. PARENTS / GUARDIANS
+// ============================================================
+
+model Parent {
+  id          String  @id @default(cuid())
+  userId      String? @unique
+  user        User?   @relation(fields: [userId], references: [id])
+  firstName   String
+  lastName    String
+  phone       String
+  alternatePhone String?
+  email       String?
+  relation    String  // Father, Mother, Guardian, Grandfather, Grandmother, Other
+  occupation  String?
+  company     String?
+  photo       String?
+  address     String?
+  isPrimary   Boolean @default(false)
+
+  // KYC
+  kycStatus     String   @default("Pending") // Pending, Verified, Rejected
+  kycDocType    String?  // Aadhaar, PAN, Passport, VoterID, DrivingLicense
+  kycDocNumber  String?
+  kycDocImage   String?
+  kycVerifiedAt DateTime?
+
+  students StudentParent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([phone])
+  @@index([kycStatus])
+}
+
+model StudentParent {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parentId  String
+  parent    Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, parentId])
+  @@index([studentId])
+  @@index([parentId])
+}
+
+// ============================================================
+// 5. SIBLINGS
+// ============================================================
+
+model Sibling {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation("StudentSiblings", fields: [studentId], references: [id], onDelete: Cascade)
+  siblingId String
+  siblingOf Student @relation("SiblingOf", fields: [siblingId], references: [id], onDelete: Cascade)
+  relation  String? // Brother, Sister, Step-Brother, Step-Sister
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, siblingId])
+}
+
+// ============================================================
+// 6. MEDICAL RECORDS
+// ============================================================
+
+model MedicalRecord {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  recordType  String   // Allergy, Condition, Vaccination, Medication, Emergency, Surgery
+  title       String
+  description String?
+  date        DateTime?
+  doctorName  String?
+  hospital    String?
+  attachments String?  // JSON array of file URLs
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([recordType])
+}
+
+// ============================================================
+// 7. TEACHERS / STAFF
+// ============================================================
+
+model Teacher {
+  id             String   @id @default(cuid())
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id])
+  branchId       String
+  branch         Branch   @relation(fields: [branchId], references: [id])
+  employeeId     String?  @unique
+  firstName      String
+  lastName       String
+  phone          String?
+  email          String?
+  dob            DateTime?
+  gender         String?  // Male, Female, Other
+  photo          String?
+  address        String?
+  qualification  String?
+  specialization String?
+  experience     Int?     // total years of experience
+  joinDate       DateTime @default(now())
+  endDate        DateTime?
+  status         String   @default("Active") // Active, OnLeave, Resigned, Terminated
+  staffType      String   @default("Teaching") // Teaching, NonTeaching, Admin, Support
+
+  // Class teacher assignment — virtual navigation from Class.teacherId
+  class Class? @relation("ClassTeacher")
+
+  // Back-relations
+  qualifications TeacherQualification[]
+  schedules      WorkSchedule[]
+  performances   PerformanceReview[]
+  salaryRecords  SalaryRecord[]
+  leaves         Leave[]
+  attendance     StaffAttendance[]
+  activities     Activity[]
+  observations   Observation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([status])
+  @@index([staffType])
+}
+
+model TeacherQualification {
+  id          String  @id @default(cuid())
+  teacherId   String
+  teacher     Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  degree      String
+  institution String?
+  year        Int?
+  certificate String? // file URL
+  grade       String? // GPA / percentage
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId])
+}
+
+model WorkSchedule {
+  id        String  @id @default(cuid())
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  dayOfWeek Int     // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime String  // "08:00"
+  endTime   String  // "15:00"
+  isOff     Boolean @default(false) // day off flag
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teacherId, dayOfWeek])
+}
+
+model PerformanceReview {
+  id             String   @id @default(cuid())
+  teacherId      String
+  teacher        Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  reviewerId     String   // User ID of the reviewer
+  period         String   // "2024-Q1", "2024-Annual"
+  rating         Float    // 1-5
+  teachingQuality Float?  @default(0)
+  studentEngagement Float? @default(0)
+  communication  Float?   @default(0)
+  professionalism Float?  @default(0)
+  comments       String?
+  strengths      String?
+  areasOfImprovement String?
+  goals          String?
+  status         String   @default("Draft") // Draft, Submitted, Acknowledged
+  reviewedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId])
+  @@index([period])
+}
+
+model SalaryRecord {
+  id            String   @id @default(cuid())
+  teacherId     String
+  teacher       Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  month         String   // "2024-01"
+  basicPay      Float
+  hra           Float    @default(0)
+  da            Float    @default(0)
+  transportAllowance Float @default(0)
+  otherAllowances Float  @default(0)
+  totalAllowances Float  @default(0)
+  pfDeduction   Float    @default(0)
+  esiDeduction  Float    @default(0)
+  taxDeduction  Float    @default(0)
+  otherDeductions Float  @default(0)
+  totalDeductions Float  @default(0)
+  grossPay      Float    @default(0)
+  netPay        Float    @default(0)
+  paidOn        DateTime?
+  paymentMethod String?  // BankTransfer, Cash, Cheque
+  transactionRef String?
+  status        String   @default("Pending") // Pending, Paid, Hold, Cancelled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teacherId, month])
+  @@index([teacherId])
+  @@index([status])
+}
+
+model Leave {
+  id            String   @id @default(cuid())
+  teacherId     String
+  teacher       Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  leaveType     String   // Sick, Casual, Earned, Maternity, Paternity, CompOff, LossOfPay
+  startDate     DateTime
+  endDate       DateTime
+  totalDays     Float    @default(1)
+  reason        String?
+  status        String   @default("Pending") // Pending, Approved, Rejected, Cancelled
+  approvedBy    String?  // User ID
+  approvedAt    DateTime?
+  rejectionReason String?
+  document      String?  // medical certificate URL etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId])
+  @@index([status])
+  @@index([startDate])
+}
+
+// ============================================================
+// 8. PROGRAMS, CLASSES & SECTIONS
+// ============================================================
+
+model Program {
+  id          String   @id @default(cuid())
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  name        String   // PlayGroup, Nursery, LKG, UKG, PreNursery, DayCare
+  code        String?
+  description String?
+  minAge      Int?     // minimum age in months
+  maxAge      Int?     // maximum age in months
+  sortOrder   Int      @default(0)
+  color       String?  // UI theme color hex
+  icon        String?  // icon identifier
+  isActive    Boolean  @default(true)
+
+  classes Class[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([sortOrder])
+}
+
+model Class {
+  id          String    @id @default(cuid())
+  branchId    String
+  branch      Branch    @relation(fields: [branchId], references: [id])
+  programId   String
+  program     Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+  name        String    // "Nursery-A", "LKG-B"
+  capacity    Int       @default(30)
+  roomNo      String?
+  floor       String?
+  teacherId   String?   @unique // Class teacher FK — one teacher per class
+  teacher     Teacher?  @relation("ClassTeacher", fields: [teacherId], references: [id])
+  academicYear String?  // "2024-2025"
+  isActive    Boolean   @default(true)
+
+  sections      Section[]
+  students      Student[]
+  feeStructures FeeStructure[]
+  activities    Activity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([programId])
+  @@index([teacherId])
+}
+
+model Section {
+  id        String  @id @default(cuid())
+  classId   String
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name      String  // "A", "B", "C"
+  capacity  Int     @default(30)
+  teacherId String? // Section teacher (User ID stored as plain string)
+  isActive  Boolean @default(true)
+
+  students Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([classId, name])
+  @@index([classId])
+}
+
+// ============================================================
+// 9. ATTENDANCE
+// ============================================================
+
+model StudentAttendance {
+  id           String   @id @default(cuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date         DateTime
+  status       String   // Present, Absent, Late, HalfDay, Excused
+  method       String?  // Manual, QR, Face, RFID, Biometric
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  checkInLat   Float?
+  checkInLng   Float?
+  checkOutLat  Float?
+  checkOutLng  Float?
+  markedBy     String?  // User ID
+  remarks      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, date])
+  @@index([date])
+  @@index([status])
+}
+
+model StaffAttendance {
+  id           String   @id @default(cuid())
+  teacherId    String
+  teacher      Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  date         DateTime
+  status       String   // Present, Absent, Late, HalfDay, OnLeave, Holiday
+  method       String?  // Manual, QR, Face, RFID, Biometric
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  checkInLat   Float?
+  checkInLng   Float?
+  checkOutLat  Float?
+  checkOutLng  Float?
+  markedBy     String?  // User ID
+  remarks      String?
+  workingHours Float?   // computed hours worked
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teacherId, date])
+  @@index([date])
+  @@index([status])
+}
+
+// ============================================================
+// 10. FEE MANAGEMENT
+// ============================================================
+
+model FeeStructure {
+  id           String   @id @default(cuid())
+  branchId     String
+  branch       Branch   @relation(fields: [branchId], references: [id])
+  classId      String?
+  class        Class?   @relation(fields: [classId], references: [id])
+  programId    String?
+  name         String   // "Tuition Fee", "Transport Fee", "Activity Fee", "Exam Fee"
+  feeType      String   // Tuition, Transport, Activity, Exam, Lab, Library, Sports, Misc
+  amount       Float
+  frequency    String   // Monthly, Quarterly, HalfYearly, Annual, OneTime
+  academicYear String   // "2024-2025"
+  dueDay       Int?     // Day of month when fee is due
+  lateFeePerDay Float   @default(0)
+  lateFeeMax   Float    @default(0)
+  discountPercent Float @default(0)
+  isActive     Boolean  @default(true)
+  description  String?
+
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([classId])
+  @@index([academicYear])
+  @@index([feeType])
+}
+
+model Invoice {
+  id              String       @id @default(cuid())
+  invoiceNo       String       @unique
+  studentId       String
+  student         Student      @relation(fields: [studentId], references: [id])
+  branchId        String
+  feeStructureId  String?
+  feeStructure    FeeStructure? @relation(fields: [feeStructureId], references: [id])
+  academicYear    String?      // "2024-2025"
+  period          String?      // "2024-01" (month/quarter the fee is for)
+  amount          Float
+  discount        Float        @default(0)
+  discountReason  String?
+  lateFee         Float        @default(0)
+  totalAmount     Float
+  paidAmount      Float        @default(0)
+  dueDate         DateTime
+  status          String       @default("Pending") // Pending, Partial, Paid, Overdue, Cancelled, WrittenOff
+  issuedAt        DateTime     @default(now())
+  cancelledAt     DateTime?
+  cancellationReason String?
+  notes           String?
+
+  payments  Payment[]
+  reminders FeeReminder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([branchId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([academicYear])
+}
+
+model Payment {
+  id             String    @id @default(cuid())
+  invoiceId      String
+  invoice        Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount         Float
+  paymentMethod  String    // Cash, UPI, Card, BankTransfer, Cheque, Online
+  transactionRef String?
+  bankName       String?
+  chequeNo       String?
+  chequeDate     DateTime?
+  status         String    @default("Success") // Success, Failed, Pending, Refunded
+  paidBy         String?   // Parent ID
+  paidByName     String?   // denormalized parent name for quick reference
+  paidAt         DateTime  @default(now())
+  receivedBy     String?   // User ID who received the payment
+  notes          String?
+
+  receipt Receipt?
+  refunds Refund[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+  @@index([status])
+  @@index([paidAt])
+}
+
+model Receipt {
+  id        String   @id @default(cuid())
+  paymentId String   @unique
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  receiptNo String   @unique
+  amount    Float
+  issuedAt  DateTime @default(now())
+  issuedBy  String?  // User ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Refund {
+  id            String   @id @default(cuid())
+  paymentId     String
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  amount        Float
+  reason        String?
+  status        String   @default("Pending") // Pending, Approved, Processed, Rejected
+  processedAt   DateTime?
+  processedBy   String?  // User ID
+  transactionRef String?
+  notes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+model FeeReminder {
+  id           String   @id @default(cuid())
+  invoiceId    String
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  reminderType String   // SMS, Email, Push, InApp, WhatsApp
+  message      String?
+  sentAt       DateTime @default(now())
+  status       String   @default("Sent") // Sent, Delivered, Failed, Read
+  deliveredAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+  @@index([reminderType])
+}
+
+// ============================================================
+// 11. ACTIVITIES & OBSERVATIONS
+// ============================================================
+
+model Activity {
+  id          String   @id @default(cuid())
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  classId     String?
+  class       Class?   @relation(fields: [classId], references: [id])
+  teacherId   String?
+  teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  title       String
+  description String?
+  type        String   // Art, Music, Dance, Sports, Academic, Outdoor, Indoor, Craft, Story, Rhyme
+  subject     String?  // Math, Language, Science, Social, Creative
+  date        DateTime
+  startTime   String?  // "09:00"
+  endTime     String?  // "10:00"
+  media       String?  // JSON array of photo/video URLs
+  learningOutcomes String? // JSON array of learning goals
+  status      String   @default("Planned") // Planned, InProgress, Completed, Cancelled
+  isPublished Boolean  @default(false) // visible to parents
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([classId])
+  @@index([teacherId])
+  @@index([date])
+  @@index([status])
+}
+
+model Observation {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  category    String   // Behavioral, Academic, Social, Emotional, Physical, Cognitive
+  content     String
+  media       String?  // JSON array of photo/video URLs
+  date        DateTime @default(now())
+  isShared    Boolean  @default(false) // shared with parent
+  sharedAt    DateTime?
+  parentAcknowledged Boolean @default(false)
+  parentComment String?
+  priority    String   @default("Normal") // Low, Normal, High, Concern
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([teacherId])
+  @@index([date])
+  @@index([category])
+}
+
+// ============================================================
+// 12. DAILY UPDATES (Food, Sleep, Mood, Potty, Water)
+// ============================================================
+
+model DailyUpdate {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime
+  teacherId String?  // User ID of the teacher who filled the update
+
+  // Food tracking
+  breakfast    String?  // Eaten, Partial, NotEaten, Skipped, NotApplicable
+  breakfastMenu String?
+  lunch        String?
+  lunchMenu    String?
+  snacks       String?
+  snacksMenu   String?
+  foodNotes    String?
+
+  // Sleep tracking
+  sleepStart   DateTime?
+  sleepEnd     DateTime?
+  sleepDuration Int?    // minutes (computed)
+  sleepQuality String?  // Good, Fair, Poor, None, Restless
+  sleepNotes   String?
+
+  // Mood
+  morningMood  String?  // Happy, Sad, Angry, Calm, Excited, Tired, Sick, Fussy
+  afternoonMood String?
+  moodNotes    String?
+
+  // Potty / Diaper
+  pottyCount   Int      @default(0)
+  pottyType    String?  // Dry, Wet, Soiled
+  pottyNotes   String?
+
+  // Water intake
+  waterGlasses Int      @default(0) // number of glasses/bottles
+  waterNotes   String?
+
+  // General notes
+  highlights   String?  // key highlights of the day
+  notes        String?
+  status       String   @default("Draft") // Draft, Published
+  publishedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, date])
+  @@index([date])
+  @@index([status])
+}
+
+// ============================================================
+// 13. COMMUNICATION (Chat, Announcements)
+// ============================================================
+
+model ChatThread {
+  id            String   @id @default(cuid())
+  branchId      String?
+  type          String   // Direct, Group
+  title         String?  // For group chats
+  lastMessageAt DateTime?
+  lastMessage   String?  // denormalized preview
+  isActive      Boolean  @default(true)
+
+  participants ChatParticipant[]
+  messages     Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([lastMessageAt])
+}
+
+model ChatParticipant {
+  id         String     @id @default(cuid())
+  threadId   String
+  thread     ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       String     @default("Member") // Admin, Member
+  lastReadAt DateTime?
+  isMuted    Boolean    @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([threadId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id          String     @id @default(cuid())
+  threadId    String
+  thread      ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User       @relation("MessageSender", fields: [senderId], references: [id])
+  content     String
+  messageType String     @default("Text") // Text, Image, File, Voice, Video, Location, Contact
+  attachment  String?    // URL
+  fileName    String?    // original file name
+  fileSize    Int?       // bytes
+  thumbnail   String?    // thumbnail URL for images/videos
+  isRead      Boolean    @default(false)
+  readAt      DateTime?
+  isDeleted   Boolean    @default(false)
+  deletedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([threadId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model Announcement {
+  id              String    @id @default(cuid())
+  branchId        String
+  branch          Branch    @relation(fields: [branchId], references: [id])
+  title           String
+  content         String
+  type            String    // General, Urgent, Event, Holiday, Academic, Fee, Health, Safety
+  targetAudience  String    // All, Parents, Teachers, SpecificClass, SpecificSection
+  classId         String?   // If targeted to specific class
+  sectionId       String?   // If targeted to specific section
+  priority        String    @default("Normal") // Low, Normal, High, Urgent
+  isActive        Boolean   @default(true)
+  createdBy       String?   // User ID
+  image           String?   // attachment image URL
+  scheduledAt     DateTime? // for scheduled publishing
+  publishedAt     DateTime?
+  expiresAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([type])
+  @@index([targetAudience])
+  @@index([publishedAt])
+}
+
+// ============================================================
+// 14. GROWTH & AI
+// ============================================================
+
+model GrowthScore {
+  id            String   @id @default(cuid())
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  period        String   // "2024-Q1", "2024-Annual", "2024-01"
+  creativity    Float    @default(0)  // 0-100
+  communication Float    @default(0)
+  socialSkills  Float    @default(0)
+  confidence    Float    @default(0)
+  cognitive     Float    @default(0)
+  physical      Float    @default(0)
+  overall       Float    @default(0)
+  assessedBy    String?  // Teacher/User ID
+  assessmentDate DateTime?
+  comments      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, period])
+  @@index([studentId])
+}
+
+model AIObservation {
+  id               String   @id @default(cuid())
+  studentId        String
+  student          Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  observation      String
+  category         String?  // Behavioral, Academic, Social, Emotional, Physical, Cognitive
+  confidence       Float?   // AI confidence score 0-1
+  recommendation   String?
+  actionSuggested  String?
+  sourceData       String?  // JSON — raw data used for AI analysis
+  modelVersion     String?  // AI model version identifier
+  isReviewed       Boolean  @default(false)
+  reviewedBy       String?  // Teacher/User ID
+  reviewedAt       DateTime?
+  teacherFeedback  String?  // teacher's feedback on AI observation
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([category])
+  @@index([isReviewed])
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // Cognitive, Physical, Social, Language, Emotional, SelfHelp
+  ageRange    String?  // "3-4 years", "18-24 months"
+  minAgeMonths Int?
+  maxAgeMonths Int?
+  description String?
+  indicators  String?  // JSON array of milestone indicators
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+
+  timelines MilestoneTimeline[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@index([minAgeMonths])
+}
+
+// ============================================================
+// 15. CHILDHOOD PASSPORT (Digital Portfolio)
+// ============================================================
+
+model Memory {
+  id           String   @id @default(cuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  mediaType    String   // Photo, Video, Audio, Document
+  mediaUrl     String
+  thumbnailUrl String?
+  date         DateTime
+  teacherId    String?  // User ID who uploaded
+  category     String?  // Classroom, Outdoor, Art, Performance, Celebration, FieldTrip, DailyLife
+  isFavorite   Boolean  @default(false)
+  isPublic     Boolean  @default(true) // visible to parent
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([date])
+  @@index([category])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  category    String   // Academic, Sports, Arts, Behavior, Leadership, Creativity, Other
+  date        DateTime
+  awardedBy   String?  // Teacher name or User ID
+  icon        String?  // emoji or icon identifier
+  badgeColor  String?  // hex color for badge
+  mediaUrl    String?  // photo of achievement/moment
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([category])
+  @@index([date])
+}
+
+model Certificate {
+  id             String   @id @default(cuid())
+  studentId      String
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title          String
+  certificateNo  String?
+  issuedBy       String?
+  issuedDate     DateTime
+  expiryDate     DateTime?
+  fileUrl        String?  // PDF/Image URL
+  templateId     String?  // certificate template reference
+  description    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([issuedDate])
+}
+
+model MilestoneTimeline {
+  id            String    @id @default(cuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  milestoneId   String?
+  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
+  title         String
+  description   String?
+  achievedDate  DateTime
+  notes         String?
+  mediaUrl      String?
+  verifiedBy    String?   // Teacher/User ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([achievedDate])
+  @@index([milestoneId])
+}
+
+// ============================================================
+// 16. ADMISSION CRM
+// ============================================================
+
+model Lead {
+  id                String     @id @default(cuid())
+  branchId          String
+  branch            Branch     @relation(fields: [branchId], references: [id])
+  parentName        String
+  parentPhone       String
+  parentEmail       String?
+  parentOccupation  String?
+  parentAddress     String?
+  childName         String
+  childDob          DateTime?
+  childGender       String?
+  programInterest   String?
+  source            String     // WalkIn, Website, Referral, SocialMedia, Call, Ad, WhatsApp, Flyer, Other
+  sourceDetail      String?    // specific referral name / campaign name
+  stage             String     @default("NewInquiry") // NewInquiry, Visit, Tour, Demo, FollowUp, Confirmed, Enrolled, Lost
+  assignedTo        String?    // User ID
+  notes             String?
+  priority          String     @default("Medium") // Low, Medium, High, Hot
+  nextFollowUpDate  DateTime?
+  expectedEnrollmentDate DateTime?
+  convertedStudentId String?  // Student ID if lead converts
+  lostReason        String?   // Price, Distance, Competition, NoResponse, ChangedMind, Other
+  estimatedFee      Float?    // estimated annual fee
+  interactionCount  Int       @default(0)
+
+  followUps FollowUp[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([stage])
+  @@index([source])
+  @@index([assignedTo])
+  @@index([priority])
+  @@index([nextFollowUpDate])
+}
+
+model FollowUp {
+  id            String   @id @default(cuid())
+  leadId        String
+  lead          Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type          String   // Call, Email, Visit, Meeting, Message, WhatsApp, VideoCall
+  notes         String
+  outcome       String?  // Interested, NotInterested, Callback, VisitScheduled, DemoScheduled, Enrolled, Lost
+  followUpDate  DateTime
+  conductedBy   String?  // User ID
+  nextFollowUpDate DateTime?
+  duration      Int?     // duration in minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([followUpDate])
+  @@index([type])
+}
+
+// ============================================================
+// 17. TRANSPORT
+// ============================================================
+
+model Route {
+  id            String   @id @default(cuid())
+  branchId      String
+  branch        Branch   @relation(fields: [branchId], references: [id])
+  name          String   // "Route A — North Sector"
+  description   String?
+  startLocation String?
+  endLocation   String?
+  distance      Float?   // total km
+  estimatedTime Int?     // estimated minutes
+  stops         String?  // JSON array: [{name, lat, lng, time, studentIds}]
+  isActive      Boolean  @default(true)
+  morningStartTime String?
+  eveningStartTime String?
+
+  vehicles Vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+}
+
+model Vehicle {
+  id             String   @id @default(cuid())
+  branchId       String
+  branch         Branch   @relation(fields: [branchId], references: [id])
+  routeId        String?
+  route          Route?   @relation(fields: [routeId], references: [id])
+  registrationNo String   @unique
+  type           String   // Bus, Van, Car, Auto, MiniBus
+  capacity       Int
+  make           String?  // Toyota, Tata, etc.
+  model          String?
+  year           Int?
+  color          String?
+  driverId       String?
+  driver         Driver?  @relation(fields: [driverId], references: [id])
+  helperName     String?
+  helperPhone    String?
+  gpsDeviceId    String?  // GPS tracker device ID
+  isActive       Boolean  @default(true)
+  insuranceExpiry DateTime?
+  fitnessExpiry  DateTime?
+  permitExpiry   DateTime?
+
+  pickupDrops PickupDrop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([routeId])
+  @@index([driverId])
+}
+
+model Driver {
+  id              String    @id @default(cuid())
+  name            String
+  phone           String
+  alternatePhone  String?
+  email           String?
+  licenseNo       String?
+  licenseExpiry   DateTime?
+  address         String?
+  photo           String?
+  bloodGroup      String?
+  dob             DateTime?
+  emergencyContact String?
+  isActive        Boolean   @default(true)
+  backgroundVerified Boolean @default(false)
+  backgroundVerifiedAt DateTime?
+
+  vehicles Vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([phone])
+  @@index([isActive])
+}
+
+model PickupDrop {
+  id              String   @id @default(cuid())
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id])
+  type            String   // Pickup, Drop
+  date            DateTime
+  scheduledTime   String?  // "08:15"
+  actualTime      DateTime?
+  location        String?
+  latitude        Float?
+  longitude       Float?
+  status          String   @default("Scheduled") // Scheduled, InTransit, Completed, Missed, Cancelled, Delayed
+  verifiedBy      String?  // Parent/Guardian name or ID
+  verificationCode String? // OTP/code for verification
+  photo           String?  // pickup/drop photo
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([vehicleId])
+  @@index([date])
+  @@index([status])
+}
+
+// ============================================================
+// 18. EVENTS & CALENDAR
+// ============================================================
+
+model Event {
+  id          String   @id @default(cuid())
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  title       String
+  description String?
+  type        String   // Academic, Cultural, Sports, Holiday, Meeting, Celebration, ParentTeacher, FieldTrip, Workshop
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  organizer   String?  // User ID
+  isAllDay    Boolean  @default(false)
+  isRecurring Boolean  @default(false)
+  recurrencePattern String? // JSON: {frequency, interval, daysOfWeek, endDate}
+  media       String?  // JSON array of file URLs
+  targetAudience String? // All, Parents, Teachers, SpecificClass
+  classId     String?
+  status      String   @default("Scheduled") // Scheduled, InProgress, Completed, Cancelled, Postponed
+  color       String?  // hex color for calendar display
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([startDate])
+  @@index([type])
+  @@index([status])
+}
+
+model Holiday {
+  id          String   @id @default(cuid())
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  name        String
+  description String?
+  date        DateTime
+  endDate     DateTime? // for multi-day holidays
+  type        String    // National, State, School, Local, Bank, Religious
+  isRecurring Boolean   @default(false) // repeats every year
+  isActive    Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([date])
+  @@index([type])
+}
+
+// ============================================================
+// 19. NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentId   String?
+  student     Student? @relation(fields: [studentId], references: [id])
+  title       String
+  message     String
+  type        String   // Info, Warning, Alert, Reminder, Message, Achievement, Fee, Attendance, Transport
+  channel     String   // Push, SMS, Email, InApp, WhatsApp
+  data        String?  // JSON — additional payload / deep link data
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  sentAt      DateTime @default(now())
+  deliveredAt DateTime?
+  status      String   @default("Pending") // Pending, Sent, Delivered, Failed
+  priority    String   @default("Normal") // Low, Normal, High
+  actionUrl   String?  // deep link to relevant screen
+  imageUrl    String?  // notification image
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([channel])
+  @@index([type])
+  @@index([sentAt])
+}
+
+// ============================================================
+// 20. REPORTS & ANALYTICS
+// ============================================================
+
+model Report {
+  id          String   @id @default(cuid())
+  branchId    String?
+  title       String
+  type        String   // Attendance, Fee, Growth, Student, Staff, Financial, Admission, Transport, Daily, Monthly
+  format      String   // PDF, Excel, CSV
+  parameters  String?  // JSON — report generation parameters
+  fileUrl     String?  // generated file URL
+  status      String   @default("Pending") // Pending, Generating, Completed, Failed
+  generatedBy String?  // User ID
+  generatedAt DateTime?
+  fileSize    Int?     // bytes
+  error       String?  // error message if failed
+  isPublic    Boolean  @default(false) // accessible to non-admins
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([type])
+  @@index([status])
+  @@index([generatedBy])
+}
+
+// ============================================================
+// AUDIT LOG (system-wide change tracking)
+// ============================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  // User who performed the action
+  action    String   // Create, Update, Delete, Login, Logout, Export
+  entity    String   // Model name: Student, Invoice, etc.
+  entityId  String?  // Record ID
+  changes   String?  // JSON — before/after diff
+  ipAddress String?
+  userAgent String?
+  branchId  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([action])
+  @@index([createdAt])
+}
