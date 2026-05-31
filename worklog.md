@@ -143,3 +143,41 @@ Stage Summary:
 - Semantic status colors preserved (amber=pending, green=present, red=absent, emerald=paid)
 - Font changed from Geist to Inter per brand spec
 - Screenshots saved to /home/z/my-project/download/
+
+---
+Task ID: 3
+Agent: full-stack-developer subagent
+Task: Update PreOne for new 52-model schema — Seed, Auth, API Routes, Admin UI
+
+Work Log:
+- Updated src/lib/auth.ts: Role enum changed to ADMIN/TEACHER/PARENT/TASK_MASTER (uppercase), password hashing switched from HMAC-SHA256 to bcrypt, token generation still uses HMAC-SHA256 with 24h expiry, added name and schoolId to TokenPayload
+- Rebuilt prisma/seed.ts from scratch for new schema: 1 School, 2 Branches, 1 Admin, 2 Teachers, 2 Parents, 4 Programs, 6 Classes, 15 Students, 8 Parents, Fee Structures, Invoices/Payments (6 months), Attendance (30 days), Growth Scores, Daily Updates, Activities, Observations, Announcements, 8 CRM Leads with follow-ups, Holidays, Events. Uses bcrypt for password hashing.
+- Updated /api/auth/login/route.ts: Uses password field (not passwordHash), returns id/email/name/role/branchId/schoolId in user response, updates lastLogin field
+- Updated /api/auth/me/route.ts: Uses password field (not passwordHash), returns clean user data
+- Updated /api/dashboard/stats/route.ts: Student status ACTIVE (not Active), attendance PRESENT (not Present), invoice PAID/PENDING/OVERDUE (uppercase), removed branchId filter on Invoice
+- Updated /api/dashboard/revenue/route.ts: Uses paymentDate (not paidAt), netAmount (not totalAmount), removed invoice.branchId filter
+- Updated /api/dashboard/activities/route.ts: Removed branchId filter, uses paymentDate, method (not paymentMethod), simpler activity feed
+- Updated /api/students/route.ts: Uses rollNumber (not admissionNo), status ACTIVE (not Active), removed sectionId
+- Updated /api/students/[id]/route.ts: PATCH instead of PUT, status INACTIVE (not Inactive), removed sectionId/address/emergencyContact
+- Updated /api/teachers/route.ts: Creates user account with bcrypt, status ACTIVE, removed employeeId/staffType
+- Updated /api/teachers/[id]/route.ts: PATCH instead of PUT, status INACTIVE, uses assignedClass (not class), workSchedules/reviews/salaries (not schedules/performances/salaryRecords)
+- Updated /api/attendance/stats/route.ts: Attendance PRESENT/ABSENT/LATE (uppercase), removed halfDay/excused/OnLeave status
+- Updated /api/fees/overview/route.ts: Uses netAmount (not totalAmount+paidAmount), status PAID/PENDING/OVERDUE (uppercase), removed branchId/academicYear filter
+- Updated /api/fees/invoices/route.ts: Uses netAmount, status PENDING (not Pending), feeStructure.type (not feeType)
+- Updated /api/fees/structures/route.ts: Uses type (not feeType), frequency enum values
+- Updated /api/crm/leads/route.ts: Source WALK_IN (not WalkIn), stage NEW (not NewInquiry), estimatedValue (not estimatedFee), removed branchId
+- Updated /api/crm/pipeline/route.ts: Stages NEW/CONTACTED/VISITED/APPLIED/ENROLLED/LOST (uppercase), estimatedValue (not estimatedFee)
+- Updated /api/communication/announcements/route.ts: Uses target (not targetAudience), removed branchId/isActive
+- Updated /api/growth/class/[classId]/route.ts: Uses social (not socialSkills), classAverages.social, createdAt (not assessmentDate) for ordering
+- Rebuilt src/app/page.tsx (Admin Portal UI): Clean rebuild with PreOne brand design (Violet→Sky Blue gradient sidebar, rounded-3xl cards, Inter font), 10 sections (Dashboard, Students, Teachers, Attendance, Fees, Admission CRM, Activities, Growth, Communication, Settings), mobile responsive with Sheet sidebar, Recharts for charts (AreaChart, PieChart, RadarChart, BarChart), all sections connected to real API endpoints, add dialogs for students/teachers/leads/announcements
+- Installed bcrypt and @types/bcrypt packages
+- ESLint passes with 0 errors
+- Seed runs successfully with all data created
+
+Stage Summary:
+- Complete schema migration: all 14+ API route files updated for new 52-model schema
+- Auth system: bcrypt password hashing + HMAC-SHA256 token generation
+- Seed data: 5 users, 15 students, 2 teachers, 8 parents, 6 classes, 8 leads, 6 months of invoices
+- Admin Portal: rebuilt from scratch with PreOne brand, 10 sections, mobile responsive
+- Login: admin@preone.com / password123
+- 0 lint errors

@@ -1,26 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 
 // GET /api/communication/announcements — List announcements
 export async function GET(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || user.branchId || '';
     const type = searchParams.get('type') || '';
-    const targetAudience = searchParams.get('targetAudience') || '';
+    const target = searchParams.get('target') || '';
     const priority = searchParams.get('priority') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    // Build where clause with branch isolation
-    const where: Record<string, unknown> = { isActive: true, ...branchFilter(user) };
-    if (branchId) where.branchId = branchId;
+    const where: Record<string, unknown> = {};
     if (type) where.type = type;
-    if (targetAudience) where.targetAudience = targetAudience;
+    if (target) where.target = target;
     if (priority) where.priority = priority;
 
     const skip = (page - 1) * limit;
@@ -31,9 +28,6 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: {
-          branch: { select: { id: true, name: true } },
-        },
       }),
       db.announcement.count({ where }),
     ]);
@@ -51,43 +45,32 @@ export async function GET(request: NextRequest) {
 // POST /api/communication/announcements — Create announcement
 export async function POST(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json();
     const {
-      branchId, title, content, type, targetAudience, classId,
-      sectionId, priority, image, scheduledAt, expiresAt,
+      title, content, type, target, priority, scheduledAt,
     } = body;
 
-    // Use user's branchId for branch isolation
-    const effectiveBranchId = user.branchId || branchId;
-
-    if (!effectiveBranchId || !title || !content || !type || !targetAudience) {
+    if (!title || !content || !type) {
       return NextResponse.json(
-        { error: 'branchId, title, content, type, and targetAudience are required' },
+        { error: 'title, content, and type are required' },
         { status: 400 }
       );
     }
 
     const announcement = await db.announcement.create({
       data: {
-        branchId: effectiveBranchId,
         title,
         content,
         type,
-        targetAudience,
-        classId,
-        sectionId,
-        priority: priority || 'Normal',
-        image,
+        target: target || 'All',
+        priority: priority || 'NORMAL',
+        status: 'Published',
+        publishedAt: !scheduledAt ? new Date() : null,
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         createdBy: user.userId,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-        publishedAt: !scheduledAt ? new Date() : undefined,
-        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
-      },
-      include: {
-        branch: { select: { id: true, name: true } },
       },
     });
 

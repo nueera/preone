@@ -1,47 +1,45 @@
-import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcrypt';
 
 // ============================================================
-// ROLE SYSTEM — 3 Core Roles
+// ROLE SYSTEM — 4 Core Roles (Uppercase, matching Prisma enum)
 // ============================================================
 
 export enum Role {
-  Admin = 'Admin',
-  Teacher = 'Teacher',
-  Parent = 'Parent',
+  ADMIN = 'ADMIN',
+  TEACHER = 'TEACHER',
+  PARENT = 'PARENT',
+  TASK_MASTER = 'TASK_MASTER',
 }
 
-export const ALL_ROLES = [Role.Admin, Role.Teacher, Role.Parent] as const;
+export const ALL_ROLES = [Role.ADMIN, Role.TEACHER, Role.PARENT, Role.TASK_MASTER] as const;
 
-// Permission tiers: Admin > Teacher > Parent
+// Permission tiers: Admin > Task_Master > Teacher > Parent
 export const ROLE_HIERARCHY: Record<Role, number> = {
-  [Role.Admin]: 100,
-  [Role.Parent]: 50,
-  [Role.Teacher]: 50,
+  [Role.ADMIN]: 100,
+  [Role.TASK_MASTER]: 80,
+  [Role.TEACHER]: 50,
+  [Role.PARENT]: 30,
 };
 
 // ============================================================
-// Password Hashing (using Node.js crypto HMAC-SHA256)
+// Password Hashing (using bcrypt)
 // ============================================================
 
-const HASH_ALGORITHM = 'sha256';
-const SALT_LENGTH = 16;
+const SALT_ROUNDS = 10;
 
-export function hashPassword(password: string): string {
-  const salt = randomBytes(SALT_LENGTH).toString('hex');
-  const hash = createHmac(HASH_ALGORITHM, salt)
-    .update(password)
-    .digest('hex');
-  return `${salt}:${hash}`;
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, SALT_ROUNDS);
 }
 
-export function verifyPassword(password: string, storedHash: string): boolean {
-  const [salt, hash] = storedHash.split(':');
-  const computedHash = createHmac(HASH_ALGORITHM, salt)
-    .update(password)
-    .digest('hex');
+export function hashPasswordSync(password: string): string {
+  return bcrypt.hashSync(password, SALT_ROUNDS);
+}
+
+export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   try {
-    return timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(computedHash, 'hex'));
+    return await bcrypt.compare(password, storedHash);
   } catch {
     return false;
   }
@@ -54,8 +52,10 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 export interface TokenPayload {
   userId: string;
   email: string;
+  name: string;
   role: Role;
   branchId?: string | null;
+  schoolId?: string | null;
 }
 
 // Secret key for signing tokens — in production use env var
@@ -98,8 +98,10 @@ export function verifyToken(token: string): TokenPayload | null {
     return {
       userId: payload.userId,
       email: payload.email,
+      name: payload.name || '',
       role: role as Role,
       branchId: payload.branchId,
+      schoolId: payload.schoolId,
     };
   } catch {
     return null;
@@ -125,51 +127,32 @@ export function requireAuth(request: NextRequest): TokenPayload | null {
 // Role-Based Access Control (RBAC)
 // ============================================================
 
-/**
- * Check if a user has one of the allowed roles.
- */
 export function hasRole(user: TokenPayload, ...allowedRoles: Role[]): boolean {
   return allowedRoles.includes(user.role);
 }
 
-/**
- * Check if user is Admin.
- */
 export function isAdmin(user: TokenPayload): boolean {
-  return user.role === Role.Admin;
+  return user.role === Role.ADMIN;
 }
 
-/**
- * Check if user is Teacher.
- */
 export function isTeacher(user: TokenPayload): boolean {
-  return user.role === Role.Teacher;
+  return user.role === Role.TEACHER;
 }
 
-/**
- * Check if user is Parent.
- */
 export function isParent(user: TokenPayload): boolean {
-  return user.role === Role.Parent;
+  return user.role === Role.PARENT;
 }
 
-/**
- * Create a 401 Unauthorized response.
- */
 export function unauthorized(message = 'Authentication required'): NextResponse {
   return NextResponse.json({ error: true, message }, { status: 401 });
 }
 
-/**
- * Create a 403 Forbidden response.
- */
 export function forbidden(message = 'You do not have permission to access this resource'): NextResponse {
   return NextResponse.json({ error: true, message }, { status: 403 });
 }
 
 /**
  * Require auth + specific roles. Returns user if authorized, or NextResponse if not.
- * Usage: const user = requireRole(request, Role.Admin); if (user instanceof NextResponse) return user;
  */
 export function requireRole(request: NextRequest, ...allowedRoles: Role[]): TokenPayload | NextResponse {
   const user = getAuthUser(request);
@@ -178,36 +161,22 @@ export function requireRole(request: NextRequest, ...allowedRoles: Role[]): Toke
   return user;
 }
 
-/**
- * Require auth + Admin role. Returns user if authorized, or NextResponse if not.
- * Usage: const user = requireAdmin(request); if (user instanceof NextResponse) return user;
- */
 export function requireAdmin(request: NextRequest): TokenPayload | NextResponse {
-  return requireRole(request, Role.Admin);
+  return requireRole(request, Role.ADMIN);
 }
 
-/**
- * Require auth + Teacher role.
- */
 export function requireTeacher(request: NextRequest): TokenPayload | NextResponse {
-  return requireRole(request, Role.Teacher);
+  return requireRole(request, Role.TEACHER);
 }
 
-/**
- * Require auth + Parent role.
- */
 export function requireParent(request: NextRequest): TokenPayload | NextResponse {
-  return requireRole(request, Role.Parent);
+  return requireRole(request, Role.PARENT);
 }
 
 // ============================================================
 // Branch Isolation Helper
 // ============================================================
 
-/**
- * Build a Prisma where clause that enforces branch isolation.
- * Admin can optionally see all branches; Teacher/Parent are scoped to their branch.
- */
 export function branchFilter(user: TokenPayload): Record<string, unknown> {
   if (user.branchId) {
     return { branchId: user.branchId };
@@ -215,10 +184,6 @@ export function branchFilter(user: TokenPayload): Record<string, unknown> {
   return {};
 }
 
-/**
- * Enforce that a user can only access data within their branch.
- * Returns the branchId to filter by, or undefined if no restriction (admin without branch).
- */
 export function getBranchScope(user: TokenPayload): string | undefined {
   return user.branchId || undefined;
 }

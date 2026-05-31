@@ -2,56 +2,44 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import {
   LayoutDashboard, Users, GraduationCap, ClipboardCheck, Receipt,
-  Megaphone, Palette, TrendingUp, MessageSquare, Settings, ChevronLeft,
-  ChevronRight, Search, Plus, MoreVertical, Phone, Mail, Star, Clock,
-  CheckCircle2, XCircle, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  IndianRupee, UserPlus, Calendar, Filter, Download, Bell, Send,
-  BarChart3, Activity, Baby, Heart, Eye, BookOpen, Target, Sparkles,
-  Bot, FileText, Image as ImageIcon, Video, MapPin, Zap, CircleDot, UserCheck,
-  UserX, Timer, TrendingDown, Award, ChevronDown, Edit, Trash2,
-  ExternalLink, Home, Building2, Smile, Frown, Meh, X, Check,
-  LogOut, Loader2, Menu
+  Megaphone, Palette, TrendingUp, MessageSquare, Settings,
+  Search, Plus, Phone, Mail, Star, Clock,
+  CheckCircle2, XCircle, AlertTriangle, ArrowUpRight,
+  IndianRupee, UserPlus, Calendar, Bell, Send,
+  BarChart3, Activity, Building2, ChevronDown,
+  LogOut, Loader2, Menu, Edit, Trash2, X, Check,
 } from 'lucide-react';
-
-// Dynamic imports for role-based portals (code splitting)
-const ParentPortal = dynamic(() => import('@/components/parent-portal'), { ssr: false });
-const TeacherPortal = dynamic(() => import('@/components/teacher-portal'), { ssr: false });
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction,
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis,
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, PieChart,
   Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  Radar, Legend,
+  Radar,
 } from 'recharts';
 
 // ============================================================
@@ -59,17 +47,13 @@ import {
 // ============================================================
 type Section = 'dashboard' | 'students' | 'teachers' | 'attendance' | 'fees' | 'crm' | 'activities' | 'growth' | 'communication' | 'settings';
 
-interface NavItem {
-  id: Section;
-  label: string;
-  icon: React.ElementType;
-}
-
 interface AuthUser {
-  userId: string;
+  id: string;
   email: string;
+  name: string;
   role: string;
   branchId?: string | null;
+  schoolId?: string | null;
 }
 
 interface DashboardStats {
@@ -79,7 +63,6 @@ interface DashboardStats {
   thisMonthRevenue: number;
   newAdmissions: number;
   occupancyRate: number;
-  satisfactionRate: number;
   attendanceRate: number;
   feeBreakdown: { collected: number; pending: number; overdue: number };
   activeLeads: number;
@@ -106,10 +89,9 @@ interface StudentData {
   gender?: string;
   bloodGroup?: string;
   status: string;
-  admissionNo?: string;
+  rollNumber?: string;
   class?: { id: string; name: string; program?: { name: string } };
   parents?: { parent: { id: string; firstName: string; lastName: string; phone: string; relation: string } }[];
-  _count?: { attendance: number; invoices: number };
 }
 
 interface TeacherData {
@@ -122,9 +104,7 @@ interface TeacherData {
   phone?: string;
   email?: string;
   status: string;
-  staffType?: string;
-  class?: { id: string; name: string };
-  _count?: { qualifications: number; leaves: number };
+  assignedClass?: { id: string; name: string } | null;
 }
 
 interface LeadData {
@@ -136,28 +116,27 @@ interface LeadData {
   source: string;
   stage: string;
   priority: string;
-  nextFollowUpDate?: string;
+  nextFollowUp?: string;
   programInterest?: string;
   notes?: string;
-  estimatedFee?: number;
+  estimatedValue?: number;
 }
 
 interface InvoiceData {
   id: string;
   invoiceNo: string;
-  totalAmount: number;
-  paidAmount: number;
+  netAmount: number;
   amount: number;
   status: string;
   dueDate: string;
   student: { id: string; firstName: string; lastName: string };
-  feeStructure?: { id: string; name: string; feeType: string };
+  feeStructure?: { id: string; name: string; type: string };
 }
 
 interface AttendanceStatsData {
   date: string;
   students: { total: number; marked: number; present: number; absent: number; late: number; attendanceRate: number };
-  staff: { total: number; present: number; absent: number; onLeave: number; late: number };
+  staff: { total: number; present: number; absent: number; late: number };
   classWise: { classId: string; className: string; totalStudents: number; present: number; absent: number; late: number; attendanceRate: number }[];
 }
 
@@ -166,7 +145,7 @@ interface AnnouncementData {
   title: string;
   content: string;
   type: string;
-  targetAudience: string;
+  target: string;
   priority: string;
   publishedAt?: string;
   createdAt: string;
@@ -190,7 +169,7 @@ interface CRMPipeline {
 interface FeeStructureData {
   id: string;
   name: string;
-  feeType: string;
+  type: string;
   amount: number;
   frequency: string;
   class?: { id: string; name: string; program?: { name: string } };
@@ -205,31 +184,23 @@ interface ActivityDB {
   startTime?: string;
   endTime?: string;
   status: string;
-  teacher?: { id: string; firstName: string; lastName: string };
-  class?: { id: string; name: string };
 }
 
 interface GrowthClassData {
   class: { id: string; name: string; program: { name: string } };
   classAverages?: {
-    creativity: number; communication: number; socialSkills: number;
+    creativity: number; communication: number; social: number;
     confidence: number; cognitive: number; physical: number; overall: number;
   };
-  students: { id: string; firstName: string; lastName: string; growthScore?: { creativity: number; communication: number; socialSkills: number; confidence: number; cognitive: number; physical: number; overall: number } }[];
+  students: { id: string; firstName: string; lastName: string; growthScore?: { creativity: number; communication: number; social: number; confidence: number; cognitive: number; physical: number; overall: number } }[];
   needsAttention: { id: string; name: string; overall: number; weakestArea: string }[];
   topPerformers: { id: string; name: string; overall: number }[];
-}
-
-interface CommStats {
-  announcements: { total: number; publishedThisMonth: number; scheduled: number; byType: Record<string, number> };
-  chat: { activeThreads: number; messagesThisMonth: number };
-  notifications: { feeRemindersSent: number };
 }
 
 // ============================================================
 // CONSTANTS
 // ============================================================
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS: { id: Section; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'students', label: 'Students', icon: GraduationCap },
   { id: 'teachers', label: 'Teachers', icon: Users },
@@ -243,34 +214,47 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const stageLabels: Record<string, string> = {
-  NewInquiry: 'New Inquiry', Visit: 'Visit Scheduled', Tour: 'School Tour',
-  Demo: 'Demo Given', FollowUp: 'Follow-up', Confirmed: 'Confirmed', Enrolled: 'Enrolled', Lost: 'Lost',
+  NEW: 'New', CONTACTED: 'Contacted', VISITED: 'Visited',
+  APPLIED: 'Applied', ENROLLED: 'Enrolled', LOST: 'Lost',
 };
 
 const stageColors: Record<string, string> = {
-  NewInquiry: '#7C3AED', Visit: '#0EA5E9', Tour: '#f97316', Demo: '#ea580c',
-  FollowUp: '#10b981', Confirmed: '#059669', Enrolled: '#047857', Lost: '#94a3b8',
+  NEW: '#7C3AED', CONTACTED: '#0EA5E9', VISITED: '#f97316',
+  APPLIED: '#10b981', ENROLLED: '#059669', LOST: '#94a3b8',
 };
 
-const Globe = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-);
+const priorityColors: Record<string, string> = {
+  LOW: 'bg-slate-100 text-slate-700',
+  NORMAL: 'bg-sky-100 text-sky-700',
+  HIGH: 'bg-orange-100 text-orange-700',
+  CONCERN: 'bg-rose-100 text-rose-700',
+};
 
-const Brain = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
-);
+const statusColors: Record<string, string> = {
+  ACTIVE: 'bg-emerald-100 text-emerald-700',
+  INACTIVE: 'bg-slate-100 text-slate-700',
+  ON_LEAVE: 'bg-amber-100 text-amber-700',
+  GRADUATED: 'bg-violet-100 text-violet-700',
+  TRANSFERRED: 'bg-sky-100 text-sky-700',
+};
+
+const invoiceStatusColors: Record<string, string> = {
+  PAID: 'bg-emerald-100 text-emerald-700',
+  PENDING: 'bg-amber-100 text-amber-700',
+  OVERDUE: 'bg-rose-100 text-rose-700',
+  PARTIAL: 'bg-sky-100 text-sky-700',
+  CANCELLED: 'bg-slate-100 text-slate-700',
+};
 
 // ============================================================
-// HELPER: API fetch with auth
+// HELPERS
 // ============================================================
 async function apiFetch(url: string, token: string | null, options?: RequestInit) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options?.headers as Record<string, string> || {}),
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(url, { ...options, headers });
   if (!res.ok) {
     const data = await res.json().catch(() => ({ error: 'Request failed' }));
@@ -281,7 +265,7 @@ async function apiFetch(url: string, token: string | null, options?: RequestInit
 
 function formatCurrency(value: number) {
   if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
-  return `₹${value.toLocaleString()}`;
+  return `₹${value.toLocaleString('en-IN')}`;
 }
 
 function formatDate(dateStr: string) {
@@ -291,23 +275,19 @@ function formatDate(dateStr: string) {
 }
 
 function timeAgo(dateStr: string) {
-  const now = new Date();
-  const then = new Date(dateStr);
-  const diff = now.getTime() - then.getTime();
+  const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
 function getActivityIcon(type: string) {
   switch (type) {
     case 'student_enrollment': return UserPlus;
     case 'payment_received': return IndianRupee;
-    case 'attendance_marked': return ClipboardCheck;
     case 'new_lead': return Megaphone;
     case 'announcement': return Bell;
     default: return Activity;
@@ -318,17 +298,16 @@ function getActivityColor(type: string) {
   switch (type) {
     case 'student_enrollment': return 'text-emerald-500';
     case 'payment_received': return 'text-sky-500';
-    case 'attendance_marked': return 'text-blue-500';
     case 'new_lead': return 'text-orange-500';
     case 'announcement': return 'text-rose-500';
-    default: return 'text-purple-500';
+    default: return 'text-violet-500';
   }
 }
 
 // ============================================================
-// LOGIN SCREEN COMPONENT
+// LOGIN SCREEN
 // ============================================================
-function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string, unknown>) => void }) {
+function LoginScreen({ onLogin }: { onLogin: (token: string, user: AuthUser) => void }) {
   const [email, setEmail] = useState('admin@preone.com');
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
@@ -354,20 +333,18 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-login-gradient space-dots p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-sky-50 to-emerald-50 p-4">
       <Card className="w-full max-w-md shadow-xl border-0 rounded-3xl">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto mb-4 w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-violet-500/25">
             <Image src="/preonelogo.png" alt="PreOne" width={64} height={64} className="w-full h-full object-cover" />
           </div>
-          <CardTitle className="text-2xl font-bold">PreOne</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-sky-500 bg-clip-text text-transparent">PreOne</CardTitle>
           <CardDescription>Preschool ERP System</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm bg-rose-50 border border-rose-200 text-rose-700 rounded-lg">{error}</div>
-            )}
+            {error && <div className="p-3 text-sm bg-rose-50 border border-rose-200 text-rose-700 rounded-lg">{error}</div>}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@preone.com" required />
@@ -382,9 +359,9 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
             <div className="text-xs text-center text-muted-foreground space-y-1">
               <p>Demo Accounts (password: password123)</p>
               <div className="flex flex-wrap justify-center gap-1 mt-1">
-                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('admin@preone.com'); setPassword('password123'); }}>Admin</Badge>
-                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('kavitha.raman@littlestars.com'); setPassword('password123'); }}>Teacher</Badge>
-                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('rajesh.sharma@email.com'); setPassword('password123'); }}>Parent</Badge>
+                <Badge variant="outline" className="text-[10px] cursor-pointer hover:bg-violet-50" onClick={() => { setEmail('admin@preone.com'); setPassword('password123'); }}>Admin</Badge>
+                <Badge variant="outline" className="text-[10px] cursor-pointer hover:bg-violet-50" onClick={() => { setEmail('kavitha.raman@littlestars.com'); setPassword('password123'); }}>Teacher</Badge>
+                <Badge variant="outline" className="text-[10px] cursor-pointer hover:bg-violet-50" onClick={() => { setEmail('rajesh.sharma@email.com'); setPassword('password123'); }}>Parent</Badge>
               </div>
             </div>
           </form>
@@ -401,7 +378,7 @@ function StatsSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <Card key={i}><CardContent className="p-4"><Skeleton className="h-4 w-20 mb-2" /><Skeleton className="h-8 w-16" /></CardContent></Card>
+        <Card key={i} className="rounded-3xl"><CardContent className="p-4"><Skeleton className="h-4 w-20 mb-2" /><Skeleton className="h-8 w-16" /></CardContent></Card>
       ))}
     </div>
   );
@@ -409,35 +386,26 @@ function StatsSkeleton({ count = 6 }: { count?: number }) {
 
 function TableSkeleton({ rows = 5, cols = 5 }: { rows?: number; cols?: number }) {
   return (
-    <Card>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader><TableRow>{Array.from({ length: cols }).map((_, i) => <TableHead key={i}><Skeleton className="h-4 w-20" /></TableHead>)}</TableRow></TableHeader>
-          <TableBody>{Array.from({ length: rows }).map((_, i) => (
-            <TableRow key={i}>{Array.from({ length: cols }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
-          ))}</TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <Card className="rounded-3xl"><CardContent className="p-0">
+      <Table>
+        <TableHeader><TableRow>{Array.from({ length: cols }).map((_, i) => <TableHead key={i}><Skeleton className="h-4 w-20" /></TableHead>)}</TableRow></TableHeader>
+        <TableBody>{Array.from({ length: rows }).map((_, i) => (
+          <TableRow key={i}>{Array.from({ length: cols }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
+        ))}</TableBody>
+      </Table>
+    </CardContent></Card>
   );
-}
-
-function CardSkeleton() {
-  return <Card><CardHeader><Skeleton className="h-5 w-40" /><Skeleton className="h-3 w-60" /></CardHeader><CardContent><Skeleton className="h-[200px] w-full" /></CardContent></Card>;
 }
 
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
 export default function PreOneDashboard() {
-  // Auth state
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<Record<string, unknown> | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Navigation
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isMobile = useIsMobile();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -454,34 +422,26 @@ export default function PreOneDashboard() {
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStatsData | null>(null);
   const [crmPipeline, setCRMPipeline] = useState<CRMPipeline | null>(null);
   const [announcements, setAnnouncements] = useState<AnnouncementData[]>([]);
-  const [commStats, setCommStats] = useState<CommStats | null>(null);
   const [activitiesDB, setActivitiesDB] = useState<ActivityDB[]>([]);
   const [growthData, setGrowthData] = useState<GrowthClassData[]>([]);
   const [classes, setClasses] = useState<{ id: string; name: string; program: { name: string } }[]>([]);
 
-  // Loading states
   const [loading, setLoading] = useState<Record<string, boolean>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // UI states
   const [studentSearch, setStudentSearch] = useState('');
-  const [studentFilter, setStudentFilter] = useState('all');
   const [teacherSearch, setTeacherSearch] = useState('');
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addTeacherOpen, setAddTeacherOpen] = useState(false);
   const [addLeadOpen, setAddLeadOpen] = useState(false);
-  const [addActivityOpen, setAddActivityOpen] = useState(false);
   const [addAnnouncementOpen, setAddAnnouncementOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
-  const [selectedClass, setSelectedClass] = useState('all');
 
   // Form states
-  const [newStudent, setNewStudent] = useState({ firstName: '', lastName: '', dob: '', gender: 'Male', bloodGroup: '', parentFirstName: '', parentLastName: '', parentPhone: '', address: '' });
+  const [newStudent, setNewStudent] = useState({ firstName: '', lastName: '', dob: '', gender: 'Male', bloodGroup: '', parentFirstName: '', parentLastName: '', parentPhone: '' });
   const [newTeacher, setNewTeacher] = useState({ firstName: '', lastName: '', qualification: '', specialization: '', experience: '', phone: '', email: '' });
-  const [newLead, setNewLead] = useState({ parentName: '', parentPhone: '', childName: '', programInterest: 'Nursery', source: 'WalkIn', priority: 'Medium', notes: '' });
-  const [newActivity, setNewActivity] = useState({ title: '', type: 'Art', description: '', date: '', time: '09:00 - 11:00', classId: 'all' });
-  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', type: 'General', targetAudience: 'All', content: '', priority: 'Normal' });
+  const [newLead, setNewLead] = useState({ parentName: '', parentPhone: '', childName: '', programInterest: 'Nursery', source: 'WALK_IN', priority: 'NORMAL', notes: '' });
+  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', type: 'General', target: 'All', content: '', priority: 'NORMAL' });
 
   // ============================================================
   // AUTH
@@ -491,12 +451,12 @@ export default function PreOneDashboard() {
     const savedUser = localStorage.getItem('preone_user');
     if (savedToken && savedUser) {
       setToken(savedToken);
-      try { setUser(JSON.parse(savedUser)); } catch { setUser({}); }
+      try { setUser(JSON.parse(savedUser)); } catch { setUser(null); }
     }
     setAuthChecked(true);
   }, []);
 
-  const handleLogin = (newToken: string, newUser: Record<string, unknown>) => {
+  const handleLogin = (newToken: string, newUser: AuthUser) => {
     setToken(newToken);
     setUser(newUser);
   };
@@ -511,37 +471,23 @@ export default function PreOneDashboard() {
   // ============================================================
   // DATA FETCHING
   // ============================================================
-  const setLoadingState = useCallback((key: string, val: boolean) => {
-    setLoading(prev => ({ ...prev, [key]: val }));
-  }, []);
-
-  const setErrorState = useCallback((key: string, val: string) => {
-    setErrors(prev => ({ ...prev, [key]: val }));
-  }, []);
-
   const fetchDashboardStats = useCallback(async () => {
-    setLoadingState('dashboard', true);
+    setLoading(l => ({ ...l, dashboard: true }));
     try {
-      const data = await apiFetch('/api/dashboard/stats', null); // No auth for demo
+      const data = await apiFetch('/api/dashboard/stats', token);
       setDashboardStats(data);
-      setErrorState('dashboard', '');
-    } catch (err: unknown) {
-      setErrorState('dashboard', err instanceof Error ? err.message : 'Failed to load dashboard');
-    } finally { setLoadingState('dashboard', false); }
-  }, [setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, dashboard: false })); }
+  }, [token]);
 
   const fetchRevenueData = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('revenue', true);
     try {
       const data = await apiFetch('/api/dashboard/revenue', token);
       setRevenueData(data);
     } catch { /* ignore */ }
-    finally { setLoadingState('revenue', false); }
-  }, [token, setLoadingState]);
+  }, [token]);
 
   const fetchRecentActivities = useCallback(async () => {
-    if (!token) return;
     try {
       const data = await apiFetch('/api/dashboard/activities?limit=10', token);
       setRecentActivities(data.activities || []);
@@ -549,37 +495,33 @@ export default function PreOneDashboard() {
   }, [token]);
 
   const fetchStudents = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('students', true);
+    setLoading(l => ({ ...l, students: true }));
     try {
       const data = await apiFetch(`/api/students?page=1&limit=50&search=${encodeURIComponent(studentSearch)}`, token);
       setStudents(data.students || []);
-    } catch { setErrorState('students', 'Failed to load students'); }
-    finally { setLoadingState('students', false); }
-  }, [token, studentSearch, setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, students: false })); }
+  }, [token, studentSearch]);
 
   const fetchTeachers = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('teachers', true);
+    setLoading(l => ({ ...l, teachers: true }));
     try {
       const data = await apiFetch(`/api/teachers?page=1&limit=50&search=${encodeURIComponent(teacherSearch)}`, token);
       setTeachers(data.teachers || []);
-    } catch { setErrorState('teachers', 'Failed to load teachers'); }
-    finally { setLoadingState('teachers', false); }
-  }, [token, teacherSearch, setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, teachers: false })); }
+  }, [token, teacherSearch]);
 
   const fetchLeads = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('leads', true);
+    setLoading(l => ({ ...l, leads: true }));
     try {
       const data = await apiFetch('/api/crm/leads?page=1&limit=50', token);
       setLeads(data.leads || []);
-    } catch { setErrorState('leads', 'Failed to load leads'); }
-    finally { setLoadingState('leads', false); }
-  }, [token, setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, leads: false })); }
+  }, [token]);
 
   const fetchInvoices = useCallback(async () => {
-    if (!token) return;
     try {
       const data = await apiFetch('/api/fees/invoices?page=1&limit=20', token);
       setInvoices(data.invoices || []);
@@ -587,17 +529,15 @@ export default function PreOneDashboard() {
   }, [token]);
 
   const fetchFeeOverview = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('fees', true);
+    setLoading(l => ({ ...l, fees: true }));
     try {
       const data = await apiFetch('/api/fees/overview', token);
       setFeeOverview(data);
-    } catch { setErrorState('fees', 'Failed to load fees'); }
-    finally { setLoadingState('fees', false); }
-  }, [token, setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, fees: false })); }
+  }, [token]);
 
   const fetchFeeStructures = useCallback(async () => {
-    if (!token) return;
     try {
       const data = await apiFetch('/api/fees/structures', token);
       setFeeStructures(data.feeStructures || []);
@@ -605,17 +545,15 @@ export default function PreOneDashboard() {
   }, [token]);
 
   const fetchAttendanceStats = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('attendance', true);
+    setLoading(l => ({ ...l, attendance: true }));
     try {
       const data = await apiFetch(`/api/attendance/stats?date=${attendanceDate}`, token);
       setAttendanceStats(data);
-    } catch { setErrorState('attendance', 'Failed to load attendance'); }
-    finally { setLoadingState('attendance', false); }
-  }, [token, attendanceDate, setLoadingState, setErrorState]);
+    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, attendance: false })); }
+  }, [token, attendanceDate]);
 
   const fetchCRMPipeline = useCallback(async () => {
-    if (!token) return;
     try {
       const data = await apiFetch('/api/crm/pipeline', token);
       setCRMPipeline(data);
@@ -623,46 +561,28 @@ export default function PreOneDashboard() {
   }, [token]);
 
   const fetchAnnouncements = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('communication', true);
+    setLoading(l => ({ ...l, communication: true }));
     try {
       const data = await apiFetch('/api/communication/announcements?page=1&limit=20', token);
       setAnnouncements(data.announcements || []);
     } catch { /* ignore */ }
-    finally { setLoadingState('communication', false); }
-  }, [token, setLoadingState]);
-
-  const fetchCommStats = useCallback(async () => {
-    if (!token) return;
-    try {
-      const data = await apiFetch('/api/communication/stats', token);
-      setCommStats(data);
-    } catch { /* ignore */ }
+    finally { setLoading(l => ({ ...l, communication: false })); }
   }, [token]);
 
   const fetchActivities = useCallback(async () => {
-    if (!token) return;
-    setLoadingState('activities', true);
+    setLoading(l => ({ ...l, activities: true }));
     try {
-      // Use dashboard activities endpoint as there's no direct activities list endpoint
-      // We'll also fetch from students to have activities data
       const data = await apiFetch('/api/dashboard/activities?limit=20', token);
       setActivitiesDB((data.activities || []).map((a: ActivityItem) => ({
-        id: a.id,
-        title: a.title,
-        description: a.description,
-        type: a.type,
-        date: a.timestamp,
-        status: 'Completed',
+        id: a.id, title: a.title, description: a.description, type: a.type, date: a.timestamp, status: 'COMPLETED',
       })));
     } catch { /* ignore */ }
-    finally { setLoadingState('activities', false); }
-  }, [token, setLoadingState]);
+    finally { setLoading(l => ({ ...l, activities: false })); }
+  }, [token]);
 
   const fetchClasses = useCallback(async () => {
     if (!token) return;
     try {
-      // Fetch students to extract class info
       const data = await apiFetch('/api/students?page=1&limit=50', token);
       const classMap = new Map<string, { id: string; name: string; program: { name: string } }>();
       (data.students || []).forEach((s: StudentData) => {
@@ -673,21 +593,18 @@ export default function PreOneDashboard() {
       const classList = Array.from(classMap.values());
       setClasses(classList);
 
-      // Fetch growth data for each class
       const growthResults: GrowthClassData[] = [];
       for (const cls of classList.slice(0, 6)) {
         try {
-          const growthData = await apiFetch(`/api/growth/class/${cls.id}`, token);
-          growthResults.push(growthData);
+          const gd = await apiFetch(`/api/growth/class/${cls.id}`, token);
+          growthResults.push(gd);
         } catch { /* skip */ }
       }
       setGrowthData(growthResults);
     } catch { /* ignore */ }
   }, [token]);
 
-  // ============================================================
-  // INITIAL DATA LOAD
-  // ============================================================
+  // Initial data load
   useEffect(() => {
     if (token) {
       fetchDashboardStats();
@@ -696,7 +613,7 @@ export default function PreOneDashboard() {
     }
   }, [token, fetchDashboardStats, fetchRevenueData, fetchRecentActivities]);
 
-  // Load section-specific data on navigation
+  // Section-specific data load
   useEffect(() => {
     if (!token) return;
     switch (activeSection) {
@@ -707,110 +624,61 @@ export default function PreOneDashboard() {
       case 'crm': fetchLeads(); fetchCRMPipeline(); break;
       case 'activities': fetchActivities(); break;
       case 'growth': fetchClasses(); break;
-      case 'communication': fetchAnnouncements(); fetchCommStats(); break;
+      case 'communication': fetchAnnouncements(); break;
     }
-  }, [activeSection, token, fetchStudents, fetchTeachers, fetchAttendanceStats, fetchFeeOverview, fetchInvoices, fetchFeeStructures, fetchLeads, fetchCRMPipeline, fetchActivities, fetchClasses, fetchAnnouncements, fetchCommStats]);
+  }, [activeSection, token, fetchStudents, fetchTeachers, fetchAttendanceStats, fetchFeeOverview, fetchInvoices, fetchFeeStructures, fetchLeads, fetchCRMPipeline, fetchActivities, fetchClasses, fetchAnnouncements]);
 
   // ============================================================
-  // COMPUTED DATA
+  // COMPUTED
   // ============================================================
-  const filteredStudents = useMemo(() => {
-    return students.filter(s => {
-      const name = `${s.firstName} ${s.lastName}`.toLowerCase();
-      const parentName = s.parents?.[0]?.parent ? `${s.parents[0].parent.firstName} ${s.parents[0].parent.lastName}`.toLowerCase() : '';
-      const matchesSearch = name.includes(studentSearch.toLowerCase()) || parentName.includes(studentSearch.toLowerCase());
-      const matchesFilter = studentFilter === 'all' || s.class?.name.toLowerCase().replace(/\s+/g, '-').toLowerCase() === studentFilter || s.status.toLowerCase() === studentFilter;
-      return matchesSearch && matchesFilter;
-    });
-  }, [students, studentSearch, studentFilter]);
-
-  const filteredTeachers = useMemo(() => {
-    return teachers.filter(t =>
-      `${t.firstName} ${t.lastName}`.toLowerCase().includes(teacherSearch.toLowerCase()) || (t.qualification || '').toLowerCase().includes(teacherSearch.toLowerCase())
-    );
-  }, [teachers, teacherSearch]);
-
   const feePieData = useMemo(() => {
     if (feeOverview?.statusBreakdown) {
       const sb = feeOverview.statusBreakdown;
       return [
-        { name: 'Collected', value: sb.Paid?.collected || feeOverview.totalCollected, color: '#10b981' },
-        { name: 'Pending', value: sb.Pending?.amount || feeOverview.totalPending, color: '#f59e0b' },
-        { name: 'Overdue', value: sb.Overdue?.amount || 0, color: '#ef4444' },
+        { name: 'Collected', value: sb.PAID?.collected || feeOverview.totalCollected, color: '#10b981' },
+        { name: 'Pending', value: sb.PENDING?.amount || feeOverview.totalPending, color: '#f59e0b' },
+        { name: 'Overdue', value: sb.OVERDUE?.amount || 0, color: '#ef4444' },
       ].filter(d => d.value > 0);
     }
-    if (dashboardStats?.feeBreakdown) {
-      return [
-        { name: 'Collected', value: dashboardStats.feeBreakdown.collected, color: '#10b981' },
-        { name: 'Pending', value: dashboardStats.feeBreakdown.pending, color: '#f59e0b' },
-        { name: 'Overdue', value: dashboardStats.feeBreakdown.overdue, color: '#ef4444' },
-      ].filter(d => d.value > 0);
-    }
-    return [
-      { name: 'Collected', value: 0, color: '#10b981' },
-      { name: 'Pending', value: 0, color: '#f59e0b' },
-      { name: 'Overdue', value: 0, color: '#ef4444' },
-    ];
-  }, [feeOverview, dashboardStats]);
-
-  const growthChartData = useMemo(() => {
-    return growthData.filter(g => g.classAverages).map(g => ({
-      class: g.class.name,
-      creativity: Math.round(g.classAverages!.creativity),
-      communication: Math.round(g.classAverages!.communication),
-      socialSkills: Math.round(g.classAverages!.socialSkills),
-      confidence: Math.round(g.classAverages!.confidence),
-      cognitive: Math.round(g.classAverages!.cognitive),
-      physical: Math.round(g.classAverages!.physical),
-    }));
-  }, [growthData]);
+    return [{ name: 'No Data', value: 1, color: '#e5e7eb' }];
+  }, [feeOverview]);
 
   const growthRadarData = useMemo(() => {
-    if (growthData.length > 0 && growthData[0].students.length > 0) {
+    if (growthData.length > 0 && growthData[0].classAverages) {
+      const c = growthData[0].classAverages;
       const studentWithScore = growthData[0].students.find(s => s.growthScore);
-      if (studentWithScore?.growthScore && growthData[0].classAverages) {
-        const s = studentWithScore.growthScore;
-        const c = growthData[0].classAverages;
-        return [
-          { subject: 'Creativity', A: Math.round(s.creativity), B: Math.round(c.creativity) },
-          { subject: 'Communication', A: Math.round(s.communication), B: Math.round(c.communication) },
-          { subject: 'Social Skills', A: Math.round(s.socialSkills), B: Math.round(c.socialSkills) },
-          { subject: 'Confidence', A: Math.round(s.confidence), B: Math.round(c.confidence) },
-          { subject: 'Cognitive', A: Math.round(s.cognitive), B: Math.round(c.cognitive) },
-          { subject: 'Physical', A: Math.round(s.physical), B: Math.round(c.physical) },
-        ];
-      }
+      const s = studentWithScore?.growthScore;
+      return [
+        { subject: 'Creativity', Class: Math.round(c.creativity), Student: s ? Math.round(s.creativity) : 0 },
+        { subject: 'Communication', Class: Math.round(c.communication), Student: s ? Math.round(s.communication) : 0 },
+        { subject: 'Social', Class: Math.round(c.social), Student: s ? Math.round(s.social) : 0 },
+        { subject: 'Confidence', Class: Math.round(c.confidence), Student: s ? Math.round(s.confidence) : 0 },
+        { subject: 'Cognitive', Class: Math.round(c.cognitive), Student: s ? Math.round(s.cognitive) : 0 },
+        { subject: 'Physical', Class: Math.round(c.physical), Student: s ? Math.round(s.physical) : 0 },
+      ];
     }
     return [
-      { subject: 'Creativity', A: 0, B: 0 },
-      { subject: 'Communication', A: 0, B: 0 },
-      { subject: 'Social Skills', A: 0, B: 0 },
-      { subject: 'Confidence', A: 0, B: 0 },
-      { subject: 'Cognitive', A: 0, B: 0 },
-      { subject: 'Physical', A: 0, B: 0 },
+      { subject: 'Creativity', Class: 0, Student: 0 },
+      { subject: 'Communication', Class: 0, Student: 0 },
+      { subject: 'Social', Class: 0, Student: 0 },
+      { subject: 'Confidence', Class: 0, Student: 0 },
+      { subject: 'Cognitive', Class: 0, Student: 0 },
+      { subject: 'Physical', Class: 0, Student: 0 },
     ];
   }, [growthData]);
 
-  const userBranchId = useMemo(() => {
-    return (user?.branchId as string) || '';
-  }, [user]);
-
   // ============================================================
-  // FORM SUBMISSIONS
+  // FORM HANDLERS
   // ============================================================
   const handleAddStudent = async () => {
     if (!token) return;
     try {
       await apiFetch('/api/students', token, {
         method: 'POST',
-        body: JSON.stringify({
-          ...newStudent,
-          branchId: userBranchId || 'default',
-          experience: parseInt(newTeacher.experience) || 0,
-        }),
+        body: JSON.stringify({ ...newStudent, branchId: user?.branchId }),
       });
       setAddStudentOpen(false);
-      setNewStudent({ firstName: '', lastName: '', dob: '', gender: 'Male', bloodGroup: '', parentFirstName: '', parentLastName: '', parentPhone: '', address: '' });
+      setNewStudent({ firstName: '', lastName: '', dob: '', gender: 'Male', bloodGroup: '', parentFirstName: '', parentLastName: '', parentPhone: '' });
       fetchStudents();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Failed to add student');
@@ -822,11 +690,7 @@ export default function PreOneDashboard() {
     try {
       await apiFetch('/api/teachers', token, {
         method: 'POST',
-        body: JSON.stringify({
-          ...newTeacher,
-          branchId: userBranchId || 'default',
-          experience: parseInt(newTeacher.experience) || 0,
-        }),
+        body: JSON.stringify({ ...newTeacher, branchId: user?.branchId, experience: parseInt(newTeacher.experience) || 0 }),
       });
       setAddTeacherOpen(false);
       setNewTeacher({ firstName: '', lastName: '', qualification: '', specialization: '', experience: '', phone: '', email: '' });
@@ -841,13 +705,10 @@ export default function PreOneDashboard() {
     try {
       await apiFetch('/api/crm/leads', token, {
         method: 'POST',
-        body: JSON.stringify({
-          ...newLead,
-          branchId: userBranchId || 'default',
-        }),
+        body: JSON.stringify(newLead),
       });
       setAddLeadOpen(false);
-      setNewLead({ parentName: '', parentPhone: '', childName: '', programInterest: 'Nursery', source: 'WalkIn', priority: 'Medium', notes: '' });
+      setNewLead({ parentName: '', parentPhone: '', childName: '', programInterest: 'Nursery', source: 'WALK_IN', priority: 'NORMAL', notes: '' });
       fetchLeads();
       fetchCRMPipeline();
     } catch (err: unknown) {
@@ -860,13 +721,10 @@ export default function PreOneDashboard() {
     try {
       await apiFetch('/api/communication/announcements', token, {
         method: 'POST',
-        body: JSON.stringify({
-          ...newAnnouncement,
-          branchId: userBranchId || 'default',
-        }),
+        body: JSON.stringify(newAnnouncement),
       });
       setAddAnnouncementOpen(false);
-      setNewAnnouncement({ title: '', type: 'General', targetAudience: 'All', content: '', priority: 'Normal' });
+      setNewAnnouncement({ title: '', type: 'General', target: 'All', content: '', priority: 'NORMAL' });
       fetchAnnouncements();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Failed to create announcement');
@@ -874,37 +732,72 @@ export default function PreOneDashboard() {
   };
 
   // ============================================================
+  // SIDEBAR
+  // ============================================================
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="p-4 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
+          <Image src="/preonelogo.png" alt="PreOne" width={40} height={40} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h2 className="font-bold text-white text-lg leading-tight">PreOne</h2>
+          <p className="text-violet-200 text-[10px]">Preschool ERP</p>
+        </div>
+      </div>
+      <Separator className="bg-white/10 mx-3" />
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.id}
+            onClick={() => { setActiveSection(item.id); setMobileSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
+              activeSection === item.id
+                ? 'bg-white/20 text-white font-medium shadow-sm'
+                : 'text-violet-200 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            <item.icon className="h-4 w-4 shrink-0" />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+      <div className="p-3">
+        <Separator className="bg-white/10 mb-3" />
+        <div className="flex items-center gap-2 px-3 py-2">
+          <Avatar className="h-8 w-8 bg-white/20"><AvatarFallback className="bg-white/20 text-white text-xs">{user?.name?.charAt(0) || 'A'}</AvatarFallback></Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-xs font-medium truncate">{user?.name || 'Admin'}</p>
+            <p className="text-violet-200 text-[10px] truncate">{user?.role || 'ADMIN'}</p>
+          </div>
+          <button onClick={handleLogout} className="text-violet-200 hover:text-white p-1"><LogOut className="h-4 w-4" /></button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ============================================================
   // RENDER: DASHBOARD
   // ============================================================
   const renderDashboard = () => {
-    if (loading.dashboard && !dashboardStats) return <div className="space-y-6"><StatsSkeleton /><CardSkeleton /><CardSkeleton /></div>;
-    if (errors.dashboard) return <div className="p-8 text-center text-rose-600">{errors.dashboard}</div>;
-
-    const stats = dashboardStats || { totalStudents: 0, totalTeachers: 0, thisMonthRevenue: 0, newAdmissions: 0, occupancyRate: 0, satisfactionRate: 0, attendanceRate: 0, feeBreakdown: { collected: 0, pending: 0, overdue: 0 }, activeLeads: 0 };
+    if (loading.dashboard && !dashboardStats) return <div className="space-y-6"><StatsSkeleton /></div>;
+    const stats = dashboardStats || { totalStudents: 0, totalTeachers: 0, thisMonthRevenue: 0, newAdmissions: 0, occupancyRate: 0, attendanceRate: 0, feeBreakdown: { collected: 0, pending: 0, overdue: 0 }, activeLeads: 0 };
 
     return (
       <div className="space-y-6">
-        {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {[
-            { label: 'Total Students', value: stats.totalStudents, icon: GraduationCap, change: `+${stats.newAdmissions}`, up: true, color: 'bg-violet-50 text-violet-600', iconBg: 'bg-violet-100' },
-            { label: 'Total Teachers', value: stats.totalTeachers, icon: Users, change: '', up: true, color: 'bg-emerald-50 text-emerald-600', iconBg: 'bg-emerald-100' },
-            { label: 'Monthly Revenue', value: formatCurrency(stats.thisMonthRevenue), icon: IndianRupee, change: '', up: true, color: 'bg-sky-50 text-sky-600', iconBg: 'bg-sky-100' },
-            { label: 'Admissions', value: stats.newAdmissions, icon: UserPlus, change: '', up: true, color: 'bg-rose-50 text-rose-600', iconBg: 'bg-rose-100' },
-            { label: 'Occupancy', value: `${stats.occupancyRate}%`, icon: Building2, change: '', up: true, color: 'bg-indigo-50 text-indigo-600', iconBg: 'bg-indigo-100' },
-            { label: 'Attendance', value: `${stats.attendanceRate}%`, icon: ClipboardCheck, change: '', up: true, color: 'bg-yellow-50 text-yellow-600', iconBg: 'bg-yellow-100' },
+            { label: 'Total Students', value: stats.totalStudents, icon: GraduationCap, color: 'bg-violet-50 text-violet-600', iconBg: 'bg-violet-100' },
+            { label: 'Total Teachers', value: stats.totalTeachers, icon: Users, color: 'bg-emerald-50 text-emerald-600', iconBg: 'bg-emerald-100' },
+            { label: 'Monthly Revenue', value: formatCurrency(stats.thisMonthRevenue), icon: IndianRupee, color: 'bg-sky-50 text-sky-600', iconBg: 'bg-sky-100' },
+            { label: 'Admissions', value: stats.newAdmissions, icon: UserPlus, color: 'bg-rose-50 text-rose-600', iconBg: 'bg-rose-100' },
+            { label: 'Occupancy', value: `${stats.occupancyRate}%`, icon: Building2, color: 'bg-amber-50 text-amber-600', iconBg: 'bg-amber-100' },
+            { label: 'Attendance', value: `${stats.attendanceRate}%`, icon: ClipboardCheck, color: 'bg-teal-50 text-teal-600', iconBg: 'bg-teal-100' },
           ].map((stat) => (
             <Card key={stat.label} className="relative overflow-hidden rounded-3xl">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${stat.iconBg}`}>
-                    <stat.icon className={`h-4 w-4 ${stat.color.split(' ')[1]}`} />
-                  </div>
-                  {stat.change && (
-                    <span className="text-xs font-medium flex items-center gap-0.5 text-emerald-600">
-                      <ArrowUpRight className="h-3 w-3" />{stat.change}
-                    </span>
-                  )}
+                  <div className={`p-2 rounded-lg ${stat.iconBg}`}><stat.icon className="h-4 w-4" /></div>
                 </div>
                 <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
@@ -913,152 +806,95 @@ export default function PreOneDashboard() {
           ))}
         </div>
 
-        {/* Revenue Chart + Admission Pipeline */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-base">Revenue Overview</CardTitle>
-              <CardDescription>Monthly revenue vs collections</CardDescription>
-            </CardHeader>
+          <Card className="md:col-span-2 rounded-3xl">
+            <CardHeader><CardTitle className="text-base">Revenue Overview</CardTitle><CardDescription>Monthly revenue vs collections</CardDescription></CardHeader>
             <CardContent>
               {revenueData?.monthly ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={revenueData.monthly.filter(m => m.revenue > 0 || m.collections > 0)}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} /><stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorCollections" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.3} /><stop offset="95%" stopColor="#0EA5E9" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(1)}L`} />
-                    <RTooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, '']} />
-                    <Area type="monotone" dataKey="revenue" stroke="#7C3AED" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={2} name="Revenue" />
-                    <Area type="monotone" dataKey="collections" stroke="#10b981" fillOpacity={1} fill="url(#colorCollections)" strokeWidth={2} name="Collections" />
-                    <Legend />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <RTooltip />
+                    <Area type="monotone" dataKey="invoiced" stroke="#7C3AED" fill="url(#colorRevenue)" name="Invoiced" />
+                    <Area type="monotone" dataKey="collections" stroke="#0EA5E9" fill="url(#colorCollections)" name="Collected" />
                   </AreaChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="h-[280px] flex items-center justify-center text-muted-foreground text-sm">
-                  {loading.revenue ? <Loader2 className="h-6 w-6 animate-spin" /> : 'No revenue data available'}
-                </div>
-              )}
+              ) : <Skeleton className="h-[280px] w-full" />}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Admission Pipeline</CardTitle>
-              <CardDescription>Current lead stages</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {crmPipeline?.pipeline ? (
-                crmPipeline.pipeline.filter(s => s.stage !== 'Lost').map((stage) => (
-                  <div key={stage.stage} className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: stageColors[stage.stage] || '#94a3b8' }} />
-                    <span className="text-sm flex-1 truncate">{stageLabels[stage.stage] || stage.stage}</span>
-                    <span className="text-sm font-semibold">{stage.count}</span>
-                    <div className="w-20 bg-muted rounded-full h-2">
-                      <div className="h-2 rounded-full" style={{ width: `${Math.min((stage.count / Math.max(crmPipeline.totalLeads, 1)) * 100, 100)}%`, backgroundColor: stageColors[stage.stage] || '#94a3b8' }} />
+          <Card className="rounded-3xl">
+            <CardHeader><CardTitle className="text-base">Recent Activity</CardTitle></CardHeader>
+            <CardContent className="space-y-3 max-h-80 overflow-y-auto">
+              {recentActivities.length > 0 ? recentActivities.slice(0, 8).map(a => {
+                const Icon = getActivityIcon(a.type);
+                const color = getActivityColor(a.type);
+                return (
+                  <div key={a.id} className="flex gap-3 items-start">
+                    <div className={`p-1.5 rounded-lg bg-muted ${color}`}><Icon className="h-3.5 w-3.5" /></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{a.title}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{a.description}</p>
+                      <p className="text-[10px] text-muted-foreground">{timeAgo(a.timestamp)}</p>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-sm text-muted-foreground text-center py-4">Loading pipeline...</div>
-              )}
+                );
+              }) : <p className="text-sm text-muted-foreground">No recent activity</p>}
             </CardContent>
           </Card>
         </div>
 
-        {/* Fee Overview + Recent Activities */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Fee Collection</CardTitle>
-              <CardDescription>Current quarter overview</CardDescription>
-            </CardHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="rounded-3xl">
+            <CardHeader><CardTitle className="text-base">Fee Breakdown</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={feePieData} cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={4} dataKey="value">
-                    {feePieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                  <Pie data={feePieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value">
+                    {feePieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <RTooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, '']} />
-                  <Legend />
+                  <RTooltip formatter={(v: number) => formatCurrency(v)} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {feePieData.map((item) => (
-                  <div key={item.name} className="text-center">
-                    <p className="text-xs text-muted-foreground">{item.name}</p>
-                    <p className="text-sm font-semibold">{formatCurrency(item.value)}</p>
-                  </div>
+              <div className="flex justify-center gap-4 mt-2">
+                {feePieData.map(d => (
+                  <div key={d.name} className="flex items-center gap-1.5 text-xs"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />{d.name}</div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-base">Recent Activities</CardTitle>
-              <CardDescription>Latest updates from your preschool</CardDescription>
-            </CardHeader>
+          <Card className="rounded-3xl">
+            <CardHeader><CardTitle className="text-base">Admission Pipeline</CardTitle></CardHeader>
             <CardContent>
-              <ScrollArea className="h-[320px]">
-                <div className="space-y-4">
-                  {recentActivities.length > 0 ? recentActivities.map((activity, idx) => {
-                    const Icon = getActivityIcon(activity.type);
-                    const color = getActivityColor(activity.type);
-                    return (
-                      <div key={activity.id || idx} className="flex items-start gap-3">
-                        <div className={`p-2 rounded-lg bg-muted ${color}`}>
-                          <Icon className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm">{activity.description || activity.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{timeAgo(activity.timestamp)}</p>
-                        </div>
-                      </div>
-                    );
-                  }) : (
-                    <div className="text-sm text-muted-foreground text-center py-8">No recent activities</div>
-                  )}
+              {crmPipeline ? (
+                <div className="space-y-2">
+                  {crmPipeline.pipeline.filter(p => p.count > 0).map(p => (
+                    <div key={p.stage} className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: stageColors[p.stage] || '#94a3b8' }} />
+                      <span className="text-xs w-20">{stageLabels[p.stage] || p.stage}</span>
+                      <div className="flex-1"><Progress value={crmPipeline.totalLeads > 0 ? (p.count / crmPipeline.totalLeads) * 100 : 0} className="h-2" /></div>
+                      <span className="text-xs font-medium w-6 text-right">{p.count}</span>
+                    </div>
+                  ))}
+                  <Separator className="my-2" />
+                  <div className="flex justify-between text-xs"><span className="text-muted-foreground">Total Leads</span><span className="font-medium">{crmPipeline.totalLeads}</span></div>
+                  <div className="flex justify-between text-xs"><span className="text-muted-foreground">Conversion Rate</span><span className="font-medium text-emerald-600">{crmPipeline.conversionRate}%</span></div>
                 </div>
-              </ScrollArea>
+              ) : <Skeleton className="h-[200px] w-full" />}
             </CardContent>
           </Card>
         </div>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-              {[
-                { label: 'Add Student', icon: UserPlus, action: () => { setActiveSection('students'); setAddStudentOpen(true); } },
-                { label: 'Mark Attendance', icon: ClipboardCheck, action: () => setActiveSection('attendance') },
-                { label: 'Collect Fee', icon: IndianRupee, action: () => setActiveSection('fees') },
-                { label: 'New Lead', icon: Megaphone, action: () => { setActiveSection('crm'); setAddLeadOpen(true); } },
-                { label: 'Send Message', icon: Send, action: () => setActiveSection('communication') },
-                { label: 'Add Activity', icon: Plus, action: () => { setActiveSection('activities'); setAddActivityOpen(true); } },
-              ].map((item) => (
-                <Button key={item.label} variant="outline" className="h-auto py-3 flex flex-col items-center gap-2 hover:bg-violet-50 hover:border-violet-200 transition-all" onClick={item.action}>
-                  <item.icon className="h-5 w-5 text-violet-600" />
-                  <span className="text-xs font-medium">{item.label}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   };
@@ -1067,176 +903,81 @@ export default function PreOneDashboard() {
   // RENDER: STUDENTS
   // ============================================================
   const renderStudents = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Students</h2>
-          <p className="text-muted-foreground text-sm">Manage all student records</p>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search students..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} className="pl-9 rounded-xl" />
         </div>
         <Dialog open={addStudentOpen} onOpenChange={setAddStudentOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
-              <Plus className="h-4 w-4 mr-2" /> Add Student
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Student</DialogTitle>
-              <DialogDescription>Enter student details to enroll them</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>First Name</Label><Input placeholder="First name" value={newStudent.firstName} onChange={e => setNewStudent(s => ({ ...s, firstName: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Last Name</Label><Input placeholder="Last name" value={newStudent.lastName} onChange={e => setNewStudent(s => ({ ...s, lastName: e.target.value }))} /></div>
+          <Button onClick={() => setAddStudentOpen(true)} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">
+            <Plus className="h-4 w-4 mr-1" /> Add Student
+          </Button>
+          <DialogContent className="rounded-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>Add New Student</DialogTitle><DialogDescription>Enter student and parent details</DialogDescription></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>First Name</Label><Input value={newStudent.firstName} onChange={e => setNewStudent(s => ({ ...s, firstName: e.target.value }))} /></div>
+                <div><Label>Last Name</Label><Input value={newStudent.lastName} onChange={e => setNewStudent(s => ({ ...s, lastName: e.target.value }))} /></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Date of Birth</Label><Input type="date" value={newStudent.dob} onChange={e => setNewStudent(s => ({ ...s, dob: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Gender</Label><Select value={newStudent.gender} onValueChange={v => setNewStudent(s => ({ ...s, gender: v }))}><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger><SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem></SelectContent></Select></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Date of Birth</Label><Input type="date" value={newStudent.dob} onChange={e => setNewStudent(s => ({ ...s, dob: e.target.value }))} /></div>
+                <div><Label>Gender</Label><Select value={newStudent.gender} onValueChange={v => setNewStudent(s => ({ ...s, gender: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem></SelectContent></Select></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Blood Group</Label><Input placeholder="e.g. A+" value={newStudent.bloodGroup} onChange={e => setNewStudent(s => ({ ...s, bloodGroup: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Admission No</Label><Input placeholder="Auto-generated" disabled /></div>
+              <div><Label>Blood Group</Label><Input value={newStudent.bloodGroup} onChange={e => setNewStudent(s => ({ ...s, bloodGroup: e.target.value }))} placeholder="e.g., B+" /></div>
+              <Separator className="my-1" />
+              <p className="text-sm font-medium text-muted-foreground">Parent Details</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Parent First Name</Label><Input value={newStudent.parentFirstName} onChange={e => setNewStudent(s => ({ ...s, parentFirstName: e.target.value }))} /></div>
+                <div><Label>Parent Last Name</Label><Input value={newStudent.parentLastName} onChange={e => setNewStudent(s => ({ ...s, parentLastName: e.target.value }))} /></div>
               </div>
-              <Separator />
-              <p className="text-sm font-semibold">Parent/Guardian Details</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Parent Name</Label><Input placeholder="Parent first name" value={newStudent.parentFirstName} onChange={e => setNewStudent(s => ({ ...s, parentFirstName: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Parent Last Name</Label><Input placeholder="Parent last name" value={newStudent.parentLastName} onChange={e => setNewStudent(s => ({ ...s, parentLastName: e.target.value }))} /></div>
-              </div>
-              <div className="space-y-2"><Label>Phone</Label><Input placeholder="+91 XXXXX XXXXX" value={newStudent.parentPhone} onChange={e => setNewStudent(s => ({ ...s, parentPhone: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>Address</Label><Textarea placeholder="Full address" value={newStudent.address} onChange={e => setNewStudent(s => ({ ...s, address: e.target.value }))} /></div>
+              <div><Label>Parent Phone</Label><Input value={newStudent.parentPhone} onChange={e => setNewStudent(s => ({ ...s, parentPhone: e.target.value }))} placeholder="+91 98765 43210" /></div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setAddStudentOpen(false)}>Cancel</Button>
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddStudent} disabled={!newStudent.firstName || !newStudent.lastName}>Enroll Student</Button>
+              <Button variant="outline" onClick={() => setAddStudentOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button onClick={handleAddStudent} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">Add Student</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search by name or parent..." className="pl-9" value={studentSearch} onChange={e => setStudentSearch(e.target.value)} />
-        </div>
-        <Select value={studentFilter} onValueChange={setStudentFilter}>
-          <SelectTrigger className="w-[160px]"><SelectValue placeholder="Filter" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Students</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Student Table */}
-      {loading.students ? <TableSkeleton rows={6} cols={6} /> : (
-        <Card>
+      {loading.students ? <TableSkeleton /> : (
+        <Card className="rounded-3xl overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Class</TableHead>
-                  <TableHead className="hidden lg:table-cell">Parent</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredStudents.map((student) => {
-                  const name = `${student.firstName} ${student.lastName}`;
-                  const parent = student.parents?.[0]?.parent;
-                  const parentName = parent ? `${parent.firstName} ${parent.lastName}` : '—';
-                  return (
-                    <TableRow key={student.id} className="cursor-pointer" onClick={() => setSelectedStudent(student)}>
-                      <TableCell className="font-mono text-xs text-muted-foreground">{student.admissionNo || student.id.slice(-5)}</TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Class</TableHead>
+                    <TableHead className="hidden md:table-cell">Roll No</TableHead>
+                    <TableHead className="hidden sm:table-cell">Gender</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {students.length === 0 ? (
+                    <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
+                  ) : students.map(s => (
+                    <TableRow key={s.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-violet-100 text-violet-700 text-xs font-semibold">
-                              {student.firstName[0]}{student.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-sm">{name}</p>
-                            <p className="text-xs text-muted-foreground md:hidden">{student.class?.name || 'Unassigned'}</p>
-                          </div>
+                          <Avatar className="h-8 w-8"><AvatarFallback className="bg-violet-100 text-violet-700 text-xs">{s.firstName[0]}{s.lastName[0]}</AvatarFallback></Avatar>
+                          <div><p className="text-sm font-medium">{s.firstName} {s.lastName}</p><p className="text-[10px] text-muted-foreground">{s.parents?.[0]?.parent ? `${s.parents[0].parent.firstName} ${s.parents[0].parent.lastName}` : ''}</p></div>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <Badge variant="secondary" className="text-xs">{student.class?.name || 'Unassigned'}</Badge>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-sm">{parentName}</TableCell>
-                      <TableCell>
-                        <Badge className={`text-xs ${student.status === 'Active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-100'}`}>
-                          {student.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); setSelectedStudent(student); }}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{s.class?.name || 'Unassigned'}</Badge></TableCell>
+                      <TableCell className="hidden md:table-cell text-sm">{s.rollNumber || '—'}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-sm">{s.gender || '—'}</TableCell>
+                      <TableCell><Badge className={`text-[10px] ${statusColors[s.status] || 'bg-slate-100 text-slate-700'}`}>{s.status}</Badge></TableCell>
                     </TableRow>
-                  );
-                })}
-                {filteredStudents.length === 0 && (
-                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No students found</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
       )}
-
-      {/* Student Detail Dialog */}
-      <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="sm:max-w-lg">
-          {selectedStudent && (() => {
-            const s = selectedStudent;
-            const name = `${s.firstName} ${s.lastName}`;
-            const parent = s.parents?.[0]?.parent;
-            return (
-              <>
-                <DialogHeader>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback className="bg-violet-100 text-violet-700 text-lg font-semibold">
-                        {s.firstName[0]}{s.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <DialogTitle>{name}</DialogTitle>
-                      <DialogDescription>{s.class?.name || 'Unassigned'} • {s.admissionNo || s.id.slice(-5)}</DialogDescription>
-                    </div>
-                  </div>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><p className="text-xs text-muted-foreground">Gender</p><p className="text-sm font-medium">{s.gender || '—'}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Date of Birth</p><p className="text-sm font-medium">{formatDate(s.dob)}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Blood Group</p><p className="text-sm font-medium">{s.bloodGroup || '—'}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Status</p><Badge className={s.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}>{s.status}</Badge></div>
-                  </div>
-                  <Separator />
-                  {parent && (
-                    <div>
-                      <p className="text-xs text-muted-foreground">Parent/Guardian</p>
-                      <p className="text-sm font-medium">{parent.firstName} {parent.lastName} ({parent.relation})</p>
-                      <p className="text-sm text-muted-foreground">{parent.phone}</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 
@@ -1244,109 +985,77 @@ export default function PreOneDashboard() {
   // RENDER: TEACHERS
   // ============================================================
   const renderTeachers = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Teachers</h2>
-          <p className="text-muted-foreground text-sm">Manage teaching staff</p>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search teachers..." value={teacherSearch} onChange={e => setTeacherSearch(e.target.value)} className="pl-9 rounded-xl" />
         </div>
         <Dialog open={addTeacherOpen} onOpenChange={setAddTeacherOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
-              <Plus className="h-4 w-4 mr-2" /> Add Teacher
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Add New Teacher</DialogTitle>
-              <DialogDescription>Enter teacher details</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>First Name</Label><Input placeholder="First name" value={newTeacher.firstName} onChange={e => setNewTeacher(s => ({ ...s, firstName: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Last Name</Label><Input placeholder="Last name" value={newTeacher.lastName} onChange={e => setNewTeacher(s => ({ ...s, lastName: e.target.value }))} /></div>
+          <Button onClick={() => setAddTeacherOpen(true)} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">
+            <Plus className="h-4 w-4 mr-1" /> Add Teacher
+          </Button>
+          <DialogContent className="rounded-3xl">
+            <DialogHeader><DialogTitle>Add New Teacher</DialogTitle></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>First Name</Label><Input value={newTeacher.firstName} onChange={e => setNewTeacher(t => ({ ...t, firstName: e.target.value }))} /></div>
+                <div><Label>Last Name</Label><Input value={newTeacher.lastName} onChange={e => setNewTeacher(t => ({ ...t, lastName: e.target.value }))} /></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Qualification</Label><Input placeholder="e.g. M.Ed" value={newTeacher.qualification} onChange={e => setNewTeacher(s => ({ ...s, qualification: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Specialization</Label><Input placeholder="e.g. Montessori" value={newTeacher.specialization} onChange={e => setNewTeacher(s => ({ ...s, specialization: e.target.value }))} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Phone</Label><Input value={newTeacher.phone} onChange={e => setNewTeacher(t => ({ ...t, phone: e.target.value }))} /></div>
+                <div><Label>Email</Label><Input value={newTeacher.email} onChange={e => setNewTeacher(t => ({ ...t, email: e.target.value }))} /></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Experience (Years)</Label><Input type="number" placeholder="0" value={newTeacher.experience} onChange={e => setNewTeacher(s => ({ ...s, experience: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Phone</Label><Input placeholder="+91 XXXXX XXXXX" value={newTeacher.phone} onChange={e => setNewTeacher(s => ({ ...s, phone: e.target.value }))} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Qualification</Label><Input value={newTeacher.qualification} onChange={e => setNewTeacher(t => ({ ...t, qualification: e.target.value }))} /></div>
+                <div><Label>Experience (yrs)</Label><Input type="number" value={newTeacher.experience} onChange={e => setNewTeacher(t => ({ ...t, experience: e.target.value }))} /></div>
               </div>
-              <div className="space-y-2"><Label>Email</Label><Input type="email" placeholder="email@example.com" value={newTeacher.email} onChange={e => setNewTeacher(s => ({ ...s, email: e.target.value }))} /></div>
+              <div><Label>Specialization</Label><Input value={newTeacher.specialization} onChange={e => setNewTeacher(t => ({ ...t, specialization: e.target.value }))} /></div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setAddTeacherOpen(false)}>Cancel</Button>
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddTeacher} disabled={!newTeacher.firstName || !newTeacher.lastName}>Add Teacher</Button>
+              <Button variant="outline" onClick={() => setAddTeacherOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button onClick={handleAddTeacher} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">Add Teacher</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search teachers..." className="pl-9 max-w-sm" value={teacherSearch} onChange={e => setTeacherSearch(e.target.value)} />
-      </div>
-
-      {loading.teachers ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}><CardContent className="p-5"><Skeleton className="h-6 w-32 mb-2" /><Skeleton className="h-4 w-24 mb-4" /><Skeleton className="h-4 w-full" /></CardContent></Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTeachers.map((teacher) => {
-            const name = `${teacher.firstName} ${teacher.lastName}`;
-            return (
-              <Card key={teacher.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-3 mb-4">
-                    <Avatar className="h-11 w-11">
-                      <AvatarFallback className="bg-emerald-100 text-emerald-700 font-semibold">
-                        {teacher.firstName[0]}{teacher.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{name}</p>
-                      <p className="text-xs text-muted-foreground">{teacher.qualification || 'No qualification'}</p>
-                    </div>
-                    <Badge className={teacher.status === 'Active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-violet-100 text-violet-700 hover:bg-violet-100'}>
-                      {teacher.status}
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Class</p>
-                      <Badge variant="secondary" className="text-xs mt-0.5">{teacher.class?.name || 'Unassigned'}</Badge>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Experience</p>
-                      <p className="font-medium">{teacher.experience || 0} yrs</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Specialization</p>
-                      <p className="font-medium text-xs">{teacher.specialization || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Staff Type</p>
-                      <p className="font-medium text-xs">{teacher.staffType || 'Teaching'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-4 pt-3 border-t">
-                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs"><Phone className="h-3 w-3 mr-1" /> Call</Button>
-                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs"><Mail className="h-3 w-3 mr-1" /> Email</Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-          {filteredTeachers.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-8">No teachers found</div>
-          )}
-        </div>
+      {loading.teachers ? <TableSkeleton /> : (
+        <Card className="rounded-3xl overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Class</TableHead>
+                    <TableHead className="hidden md:table-cell">Qualification</TableHead>
+                    <TableHead className="hidden sm:table-cell">Experience</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teachers.length === 0 ? (
+                    <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No teachers found</TableCell></TableRow>
+                  ) : teachers.map(t => (
+                    <TableRow key={t.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8"><AvatarFallback className="bg-sky-100 text-sky-700 text-xs">{t.firstName[0]}{t.lastName[0]}</AvatarFallback></Avatar>
+                          <div><p className="text-sm font-medium">{t.firstName} {t.lastName}</p><p className="text-[10px] text-muted-foreground">{t.email}</p></div>
+                        </div>
+                      </TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{t.assignedClass?.name || 'Unassigned'}</Badge></TableCell>
+                      <TableCell className="hidden md:table-cell text-sm">{t.qualification || '—'}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-sm">{t.experience || 0} yrs</TableCell>
+                      <TableCell><Badge className={`text-[10px] ${statusColors[t.status] || 'bg-slate-100 text-slate-700'}`}>{t.status}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -1354,551 +1063,253 @@ export default function PreOneDashboard() {
   // ============================================================
   // RENDER: ATTENDANCE
   // ============================================================
-  const renderAttendance = () => {
-    const stats = attendanceStats;
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Attendance</h2>
-            <p className="text-muted-foreground text-sm">Track daily attendance records</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Input type="date" value={attendanceDate} onChange={e => setAttendanceDate(e.target.value)} className="w-[180px]" />
-          </div>
+  const renderAttendance = () => (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label className="text-sm">Date:</Label>
+          <Input type="date" value={attendanceDate} onChange={e => setAttendanceDate(e.target.value)} className="w-44 rounded-xl" />
         </div>
+      </div>
 
-        {/* Today's Stats */}
-        {loading.attendance ? <StatsSkeleton count={4} /> : stats ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Total Students', value: stats.students.total, icon: GraduationCap, color: 'bg-violet-100 text-violet-600' },
-              { label: 'Present Today', value: stats.students.present, icon: UserCheck, color: 'bg-emerald-100 text-emerald-600' },
-              { label: 'Absent Today', value: stats.students.absent, icon: UserX, color: 'bg-rose-100 text-rose-600' },
-              { label: 'Late Arrivals', value: stats.students.late, icon: Timer, color: 'bg-orange-100 text-orange-600' },
-            ].map((stat) => (
-              <Card key={stat.label}>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${stat.color.split(' ')[0]}`}>
-                    <stat.icon className={`h-5 w-5 ${stat.color.split(' ')[1]}`} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {loading.attendance ? <StatsSkeleton count={3} /> : attendanceStats ? (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-2xl font-bold">{attendanceStats.students.present}</p><p className="text-xs text-muted-foreground">Present</p></CardContent></Card>
+            <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-rose-600">{attendanceStats.students.absent}</p><p className="text-xs text-muted-foreground">Absent</p></CardContent></Card>
+            <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-amber-600">{attendanceStats.students.late}</p><p className="text-xs text-muted-foreground">Late</p></CardContent></Card>
+            <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-slate-400">{attendanceStats.students.total - attendanceStats.students.marked}</p><p className="text-xs text-muted-foreground">Unmarked</p></CardContent></Card>
+            <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-emerald-600">{attendanceStats.students.attendanceRate}%</p><p className="text-xs text-muted-foreground">Rate</p></CardContent></Card>
           </div>
-        ) : (
-          <div className="text-center text-muted-foreground py-8">No attendance data for selected date</div>
-        )}
 
-        {/* Attendance Rate */}
-        {stats && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Today&apos;s Attendance Rate: {stats.students.attendanceRate}%</CardTitle>
-              <CardDescription>Class-wise attendance breakdown</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={stats.classWise}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="className" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <RTooltip />
-                  <Bar dataKey="present" fill="#10b981" name="Present" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="absent" fill="#ef4444" name="Absent" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="late" fill="#f59e0b" name="Late" radius={[4, 4, 0, 0]} />
-                  <Legend />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Class-wise Table */}
-        {stats && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Class-wise Attendance</CardTitle>
-            </CardHeader>
+          <Card className="rounded-3xl">
+            <CardHeader><CardTitle className="text-base">Class-wise Attendance</CardTitle></CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Class</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Present</TableHead>
-                    <TableHead>Absent</TableHead>
-                    <TableHead>Late</TableHead>
-                    <TableHead>Rate</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stats.classWise.map((cls) => (
-                    <TableRow key={cls.classId}>
-                      <TableCell className="font-medium">{cls.className}</TableCell>
-                      <TableCell>{cls.totalStudents}</TableCell>
-                      <TableCell className="text-emerald-600 font-medium">{cls.present}</TableCell>
-                      <TableCell className="text-rose-600 font-medium">{cls.absent}</TableCell>
-                      <TableCell className="text-amber-600 font-medium">{cls.late}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress value={cls.attendanceRate} className="w-16 h-2" />
-                          <span className="text-xs font-medium">{cls.attendanceRate}%</span>
-                        </div>
-                      </TableCell>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Class</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Present</TableHead>
+                      <TableHead>Absent</TableHead>
+                      <TableHead>Late</TableHead>
+                      <TableHead>Rate</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {attendanceStats.classWise.map(cw => (
+                      <TableRow key={cw.classId}>
+                        <TableCell className="font-medium text-sm">{cw.className}</TableCell>
+                        <TableCell className="text-sm">{cw.totalStudents}</TableCell>
+                        <TableCell className="text-sm text-emerald-600">{cw.present}</TableCell>
+                        <TableCell className="text-sm text-rose-600">{cw.absent}</TableCell>
+                        <TableCell className="text-sm text-amber-600">{cw.late}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2"><Progress value={cw.attendanceRate} className="h-2 w-16" /><span className="text-sm font-medium">{cw.attendanceRate}%</span></div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
-        )}
-      </div>
-    );
-  };
+        </>
+      ) : <p className="text-muted-foreground text-center py-8">No attendance data available</p>}
+    </div>
+  );
 
   // ============================================================
   // RENDER: FEES
   // ============================================================
-  const renderFees = () => {
-    const overview = feeOverview;
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Fee Management</h2>
-            <p className="text-muted-foreground text-sm">Track collections, invoices, and payments</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Export</Button>
-          </div>
+  const renderFees = () => (
+    <div className="space-y-4">
+      {feeOverview && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-lg font-bold">{formatCurrency(feeOverview.totalInvoiced)}</p><p className="text-xs text-muted-foreground">Total Invoiced</p></CardContent></Card>
+          <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-lg font-bold text-emerald-600">{formatCurrency(feeOverview.totalCollected)}</p><p className="text-xs text-muted-foreground">Collected</p></CardContent></Card>
+          <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-lg font-bold text-amber-600">{formatCurrency(feeOverview.totalPending)}</p><p className="text-xs text-muted-foreground">Pending</p></CardContent></Card>
+          <Card className="rounded-3xl"><CardContent className="p-4 text-center"><p className="text-lg font-bold text-sky-600">{feeOverview.collectionRate}%</p><p className="text-xs text-muted-foreground">Collection Rate</p></CardContent></Card>
         </div>
+      )}
 
-        {/* Fee Collection Overview */}
-        {loading.fees ? <StatsSkeleton count={3} /> : overview ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-l-4 border-l-emerald-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Total Collected</p>
-                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(overview.totalCollected)}</p>
-                <p className="text-xs text-emerald-600 flex items-center gap-1 mt-1"><CheckCircle2 className="h-3 w-3" /> {overview.collectionRate}% collection rate</p>
-              </CardContent>
-            </Card>
-            <Card className="border-l-4 border-l-violet-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Pending Payments</p>
-                <p className="text-2xl font-bold text-amber-600">{formatCurrency(overview.totalPending)}</p>
-                <p className="text-xs text-amber-600 flex items-center gap-1 mt-1"><Clock className="h-3 w-3" /> {overview.statusBreakdown?.Pending?.count || 0} invoices pending</p>
-              </CardContent>
-            </Card>
-            <Card className="border-l-4 border-l-rose-500">
-              <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Overdue Amount</p>
-                <p className="text-2xl font-bold text-rose-600">{formatCurrency(overview.statusBreakdown?.Overdue?.amount || 0)}</p>
-                <p className="text-xs text-rose-600 flex items-center gap-1 mt-1"><AlertTriangle className="h-3 w-3" /> {overview.statusBreakdown?.Overdue?.count || 0} invoices overdue</p>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="text-center text-muted-foreground py-8">No fee data available</div>
-        )}
-
-        {/* Fee Collection Chart */}
-        {revenueData?.monthly && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Monthly Fee Collection Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={revenueData.monthly.filter(m => m.revenue > 0 || m.collections > 0)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(1)}L`} />
-                  <RTooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, '']} />
-                  <Bar dataKey="collections" fill="#10b981" name="Collected" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="revenue" fill="#7C3AED" name="Expected" radius={[6, 6, 0, 0]} />
-                  <Legend />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Fee Structure */}
-        {feeStructures.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Fee Structures</CardTitle>
-              <CardDescription>Academic Year 2024-2025</CardDescription>
-            </CardHeader>
+      <Tabs defaultValue="invoices">
+        <TabsList className="rounded-xl">
+          <TabsTrigger value="invoices" className="rounded-lg">Invoices</TabsTrigger>
+          <TabsTrigger value="structures" className="rounded-lg">Fee Structures</TabsTrigger>
+        </TabsList>
+        <TabsContent value="invoices" className="mt-4">
+          <Card className="rounded-3xl overflow-hidden">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Class</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {feeStructures.map((fs) => (
-                    <TableRow key={fs.id}>
-                      <TableCell className="font-medium">{fs.name}</TableCell>
-                      <TableCell><Badge variant="outline" className="text-xs">{fs.feeType}</Badge></TableCell>
-                      <TableCell>₹{fs.amount.toLocaleString()}</TableCell>
-                      <TableCell>{fs.frequency}</TableCell>
-                      <TableCell>{fs.class?.name || 'All'}</TableCell>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Invoice</TableHead>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead className="hidden sm:table-cell">Due Date</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {invoices.length === 0 ? (
+                      <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No invoices found</TableCell></TableRow>
+                    ) : invoices.map(inv => (
+                      <TableRow key={inv.id}>
+                        <TableCell className="font-mono text-xs">{inv.invoiceNo}</TableCell>
+                        <TableCell className="text-sm">{inv.student.firstName} {inv.student.lastName}</TableCell>
+                        <TableCell className="text-sm font-medium">{formatCurrency(inv.netAmount)}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-sm">{formatDate(inv.dueDate)}</TableCell>
+                        <TableCell><Badge className={`text-[10px] ${invoiceStatusColors[inv.status] || ''}`}>{inv.status}</Badge></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
-        )}
-
-        {/* Invoice List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Recent Invoices</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="hidden md:table-cell">Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((inv) => (
-                  <TableRow key={inv.id}>
-                    <TableCell className="font-mono text-xs">{inv.invoiceNo}</TableCell>
-                    <TableCell className="text-sm font-medium">{inv.student.firstName} {inv.student.lastName}</TableCell>
-                    <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-xs">{inv.feeStructure?.feeType || inv.feeStructure?.name || 'Fee'}</Badge></TableCell>
-                    <TableCell className="text-sm">₹{inv.totalAmount.toLocaleString()}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
-                    <TableCell>
-                      <Badge className={`text-xs ${inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : inv.status === 'Pending' ? 'bg-amber-100 text-amber-700 hover:bg-amber-100' : inv.status === 'Overdue' ? 'bg-rose-100 text-rose-700 hover:bg-rose-100' : 'bg-blue-100 text-blue-700 hover:bg-blue-100'}`}>
-                        {inv.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {invoices.length === 0 && (
-                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No invoices found</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
+        </TabsContent>
+        <TabsContent value="structures" className="mt-4">
+          <Card className="rounded-3xl overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>Amount</TableHead><TableHead>Frequency</TableHead></TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {feeStructures.length === 0 ? (
+                      <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No fee structures found</TableCell></TableRow>
+                    ) : feeStructures.map(fs => (
+                      <TableRow key={fs.id}>
+                        <TableCell className="text-sm font-medium">{fs.name}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[10px]">{fs.type}</Badge></TableCell>
+                        <TableCell className="text-sm font-medium">{formatCurrency(fs.amount)}</TableCell>
+                        <TableCell className="text-sm">{fs.frequency}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 
   // ============================================================
   // RENDER: CRM
   // ============================================================
-  const renderCRM = () => {
-    const hotLeads = leads.filter(l => l.priority === 'Hot').length;
-    const crmStats = [
-      { label: 'Total Leads', value: crmPipeline?.totalLeads || leads.length, icon: Megaphone, color: 'text-violet-600' },
-      { label: 'Conversion Rate', value: `${crmPipeline?.conversionRate || 0}%`, icon: Target, color: 'text-emerald-600' },
-      { label: 'Active Leads', value: crmPipeline?.pipeline?.filter(s => !['Enrolled', 'Lost'].includes(s.stage)).reduce((sum, s) => sum + s.count, 0) || leads.filter(l => !['Enrolled', 'Lost'].includes(l.stage)).length, icon: Activity, color: 'text-orange-600' },
-      { label: 'Hot Leads', value: hotLeads, icon: Zap, color: 'text-rose-600' },
-    ];
-
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Admission CRM</h2>
-            <p className="text-muted-foreground text-sm">Manage leads and track admissions pipeline</p>
-          </div>
-          <Dialog open={addLeadOpen} onOpenChange={setAddLeadOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
-                <Plus className="h-4 w-4 mr-2" /> Add Lead
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Add New Lead</DialogTitle>
-                <DialogDescription>Enter inquiry details</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Parent Name</Label><Input placeholder="Parent name" value={newLead.parentName} onChange={e => setNewLead(s => ({ ...s, parentName: e.target.value }))} /></div>
-                  <div className="space-y-2"><Label>Phone</Label><Input placeholder="+91 XXXXX XXXXX" value={newLead.parentPhone} onChange={e => setNewLead(s => ({ ...s, parentPhone: e.target.value }))} /></div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Child Name</Label><Input placeholder="Child name" value={newLead.childName} onChange={e => setNewLead(s => ({ ...s, childName: e.target.value }))} /></div>
-                  <div className="space-y-2"><Label>Program Interest</Label>
-                    <Select value={newLead.programInterest} onValueChange={v => setNewLead(s => ({ ...s, programInterest: v }))}><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger><SelectContent>
-                      <SelectItem value="PlayGroup">PlayGroup</SelectItem><SelectItem value="Nursery">Nursery</SelectItem>
-                      <SelectItem value="LKG">LKG</SelectItem><SelectItem value="UKG">UKG</SelectItem>
-                    </SelectContent></Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Source</Label>
-                    <Select value={newLead.source} onValueChange={v => setNewLead(s => ({ ...s, source: v }))}><SelectTrigger><SelectValue placeholder="Source" /></SelectTrigger><SelectContent>
-                      <SelectItem value="WalkIn">Walk-in</SelectItem><SelectItem value="Website">Website</SelectItem>
-                      <SelectItem value="Referral">Referral</SelectItem><SelectItem value="SocialMedia">Social Media</SelectItem>
-                      <SelectItem value="WhatsApp">WhatsApp</SelectItem><SelectItem value="Call">Call</SelectItem>
-                    </SelectContent></Select>
-                  </div>
-                  <div className="space-y-2"><Label>Priority</Label>
-                    <Select value={newLead.priority} onValueChange={v => setNewLead(s => ({ ...s, priority: v }))}><SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger><SelectContent>
-                      <SelectItem value="Low">Low</SelectItem><SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="High">High</SelectItem><SelectItem value="Hot">Hot</SelectItem>
-                    </SelectContent></Select>
-                  </div>
-                </div>
-                <div className="space-y-2"><Label>Notes</Label><Textarea placeholder="Additional notes..." value={newLead.notes} onChange={e => setNewLead(s => ({ ...s, notes: e.target.value }))} /></div>
+  const renderCRM = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Admission Pipeline</h3>
+        <Dialog open={addLeadOpen} onOpenChange={setAddLeadOpen}>
+          <Button onClick={() => setAddLeadOpen(true)} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">
+            <Plus className="h-4 w-4 mr-1" /> Add Lead
+          </Button>
+          <DialogContent className="rounded-3xl">
+            <DialogHeader><DialogTitle>Add New Lead</DialogTitle></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Parent Name</Label><Input value={newLead.parentName} onChange={e => setNewLead(l => ({ ...l, parentName: e.target.value }))} /></div>
+                <div><Label>Parent Phone</Label><Input value={newLead.parentPhone} onChange={e => setNewLead(l => ({ ...l, parentPhone: e.target.value }))} /></div>
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setAddLeadOpen(false)}>Cancel</Button>
-                <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddLead} disabled={!newLead.parentName || !newLead.childName}>Add Lead</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div><Label>Child Name</Label><Input value={newLead.childName} onChange={e => setNewLead(l => ({ ...l, childName: e.target.value }))} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Program</Label><Select value={newLead.programInterest} onValueChange={v => setNewLead(l => ({ ...l, programInterest: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Nursery">Nursery</SelectItem><SelectItem value="LKG">LKG</SelectItem><SelectItem value="UKG">UKG</SelectItem></SelectContent></Select></div>
+                <div><Label>Source</Label><Select value={newLead.source} onValueChange={v => setNewLead(l => ({ ...l, source: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="WALK_IN">Walk In</SelectItem><SelectItem value="WEBSITE">Website</SelectItem><SelectItem value="REFERRAL">Referral</SelectItem><SelectItem value="INSTAGRAM">Instagram</SelectItem><SelectItem value="FACEBOOK">Facebook</SelectItem><SelectItem value="GOOGLE">Google</SelectItem></SelectContent></Select></div>
+              </div>
+              <div><Label>Notes</Label><Textarea value={newLead.notes} onChange={e => setNewLead(l => ({ ...l, notes: e.target.value }))} rows={2} /></div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setAddLeadOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button onClick={handleAddLead} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">Add Lead</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-        {/* CRM Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {crmStats.map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="p-4 flex items-center gap-3">
-                <stat.icon className={`h-8 w-8 ${stat.color}`} />
-                <div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
+      {crmPipeline && (
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+          {crmPipeline.pipeline.map(p => (
+            <Card key={p.stage} className="rounded-2xl text-center">
+              <CardContent className="p-3">
+                <div className="w-3 h-3 rounded-full mx-auto mb-1" style={{ backgroundColor: stageColors[p.stage] || '#94a3b8' }} />
+                <p className="text-lg font-bold">{p.count}</p>
+                <p className="text-[10px] text-muted-foreground">{stageLabels[p.stage] || p.stage}</p>
               </CardContent>
             </Card>
           ))}
         </div>
+      )}
 
-        {/* Pipeline View */}
-        {crmPipeline?.pipeline && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Admission Pipeline</CardTitle>
-              <CardDescription>Kanban-style pipeline view</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
-                {crmPipeline.pipeline.filter(s => s.stage !== 'Lost').map((stage) => (
-                  <div key={stage.stage} className="min-w-[180px] flex-shrink-0">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stageColors[stage.stage] || '#94a3b8' }} />
-                      <span className="text-xs font-semibold uppercase tracking-wider">{stageLabels[stage.stage] || stage.stage}</span>
-                      <Badge variant="secondary" className="text-xs ml-auto">{stage.count}</Badge>
-                    </div>
-                    <div className="space-y-2">
-                      {leads.filter(l => l.stage === stage.stage).slice(0, 3).map((lead) => (
-                        <div key={lead.id} className="p-2.5 bg-muted/50 rounded-lg border border-border/50 hover:bg-muted transition-colors cursor-pointer">
-                          <p className="text-sm font-medium truncate">{lead.parentName}</p>
-                          <p className="text-xs text-muted-foreground">{lead.childName}</p>
-                          <div className="flex items-center gap-1 mt-1.5">
-                            <Badge variant="outline" className="text-[10px] h-5 px-1">{lead.source}</Badge>
-                            {lead.priority === 'Hot' && <Badge className="text-[10px] h-5 px-1 bg-rose-100 text-rose-700">🔥 Hot</Badge>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* AI Insights */}
-        <Card className="border-violet-200 bg-gradient-to-r from-violet-50/50 to-sky-50/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-500" />
-              AI CRM Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-white rounded-lg border border-violet-100">
-                <div className="flex items-center gap-2 mb-2"><Bot className="h-4 w-4 text-violet-500" /><span className="text-xs font-semibold text-violet-700">Lead Scoring</span></div>
-                <p className="text-sm">{hotLeads > 0 ? `${hotLeads} hot lead${hotLeads > 1 ? 's' : ''} detected with high conversion probability. Prioritize immediate follow-ups.` : 'No hot leads currently. Focus on nurturing existing leads through the pipeline.'}</p>
-              </div>
-              <div className="p-4 bg-white rounded-lg border border-emerald-100">
-                <div className="flex items-center gap-2 mb-2"><TrendingUp className="h-4 w-4 text-emerald-500" /><span className="text-xs font-semibold text-emerald-700">Conversion Trend</span></div>
-                <p className="text-sm">Current conversion rate is {crmPipeline?.conversionRate || 0}%. {crmPipeline?.sourceBreakdown && Object.entries(crmPipeline.sourceBreakdown).sort((a, b) => b[1] - a[1])[0] ? `${Object.entries(crmPipeline.sourceBreakdown).sort((a, b) => b[1] - a[1])[0][0]} is the top lead source.` : ''}</p>
-              </div>
-              <div className="p-4 bg-white rounded-lg border border-orange-100">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-orange-500" /><span className="text-xs font-semibold text-orange-700">At-Risk Leads</span></div>
-                <p className="text-sm">{leads.filter(l => l.nextFollowUpDate && new Date(l.nextFollowUpDate) < new Date() && !['Enrolled', 'Lost'].includes(l.stage)).length} leads have overdue follow-ups. Immediate action recommended.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Lead List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Lead List</CardTitle>
-          </CardHeader>
+      {loading.leads ? <TableSkeleton /> : (
+        <Card className="rounded-3xl overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Parent</TableHead>
-                  <TableHead>Child</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="hidden lg:table-cell">Follow-up</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {leads.map((lead) => (
-                  <TableRow key={lead.id}>
-                    <TableCell>
-                      <div><p className="text-sm font-medium">{lead.parentName}</p><p className="text-xs text-muted-foreground">{lead.parentPhone}</p></div>
-                    </TableCell>
-                    <TableCell className="text-sm">{lead.childName}</TableCell>
-                    <TableCell><Badge variant="outline" className="text-xs">{lead.source}</Badge></TableCell>
-                    <TableCell>
-                      <Badge className="text-xs" style={{ backgroundColor: (stageColors[lead.stage] || '#94a3b8') + '20', color: stageColors[lead.stage] || '#94a3b8' }}>
-                        {stageLabels[lead.stage] || lead.stage}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`text-xs ${lead.priority === 'Hot' ? 'bg-rose-100 text-rose-700 hover:bg-rose-100' : lead.priority === 'High' ? 'bg-orange-100 text-orange-700 hover:bg-orange-100' : lead.priority === 'Medium' ? 'bg-amber-100 text-amber-700 hover:bg-amber-100' : 'bg-slate-100 text-slate-700 hover:bg-slate-100'}`}>
-                        {lead.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{lead.nextFollowUpDate ? formatDate(lead.nextFollowUpDate) : '—'}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><MoreVertical className="h-3.5 w-3.5" /></Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {leads.length === 0 && (
-                  <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No leads found</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
+              <Table>
+                <TableHeader>
+                  <TableRow><TableHead>Parent</TableHead><TableHead>Child</TableHead><TableHead className="hidden md:table-cell">Source</TableHead><TableHead>Stage</TableHead><TableHead className="hidden sm:table-cell">Priority</TableHead></TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leads.length === 0 ? (
+                    <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No leads found</TableCell></TableRow>
+                  ) : leads.map(l => (
+                    <TableRow key={l.id}>
+                      <TableCell>
+                        <div><p className="text-sm font-medium">{l.parentName}</p><p className="text-[10px] text-muted-foreground">{l.parentPhone}</p></div>
+                      </TableCell>
+                      <TableCell className="text-sm">{l.childName}</TableCell>
+                      <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-[10px]">{l.source}</Badge></TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColors[l.stage] || '#94a3b8' }} />
+                          <span className="text-xs">{stageLabels[l.stage] || l.stage}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell"><Badge className={`text-[10px] ${priorityColors[l.priority] || ''}`}>{l.priority}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
-      </div>
-    );
-  };
+      )}
+    </div>
+  );
 
   // ============================================================
   // RENDER: ACTIVITIES
   // ============================================================
   const renderActivities = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Activities</h2>
-          <p className="text-muted-foreground text-sm">Plan and track school activities</p>
-        </div>
-      </div>
-
-      {/* Activity Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Events', value: recentActivities.length + activitiesDB.length, icon: Calendar, color: 'text-violet-600' },
-          { label: 'Enrollments', value: recentActivities.filter(a => a.type === 'student_enrollment').length, icon: CheckCircle2, color: 'text-emerald-600' },
-          { label: 'Payments', value: recentActivities.filter(a => a.type === 'payment_received').length, icon: IndianRupee, color: 'text-orange-600' },
-          { label: 'Announcements', value: recentActivities.filter(a => a.type === 'announcement').length, icon: Bell, color: 'text-rose-600' },
-        ].map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <stat.icon className={`h-8 w-8 ${stat.color}`} />
-              <div>
-                <p className="text-2xl font-bold">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Activity Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Activity Timeline</CardTitle>
-          <CardDescription>Recent school activities and events</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading.activities ? (
-            <div className="space-y-4">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
-          ) : (
-            <div className="space-y-4">
-              {recentActivities.map((activity, idx) => {
-                const Icon = getActivityIcon(activity.type);
-                const color = getActivityColor(activity.type);
-                return (
-                  <div key={activity.id || idx} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className={`p-2 rounded-lg bg-muted ${color}`}>
-                      <Icon className="h-4 w-4" />
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">School Activities</h3>
+      {loading.activities ? <StatsSkeleton count={3} /> : activitiesDB.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activitiesDB.map(a => (
+            <Card key={a.id} className="rounded-3xl">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-violet-100 text-violet-600"><Palette className="h-4 w-4" /></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{a.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{a.description}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-[10px]">{a.type}</Badge>
+                      <span className="text-[10px] text-muted-foreground"><Clock className="h-3 w-3 inline mr-0.5" />{formatDate(a.date)}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground">{activity.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{timeAgo(activity.timestamp)}</p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] shrink-0">{activity.type.replace(/_/g, ' ')}</Badge>
                   </div>
-                );
-              })}
-              {recentActivities.length === 0 && (
-                <div className="text-center text-muted-foreground py-8">No activities found</div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Photo Gallery Placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Photo Gallery</CardTitle>
-          <CardDescription>Recent activity photos</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-violet-100 to-sky-100 border border-violet-200/50 flex items-center justify-center">
-                <ImageIcon className="h-8 w-8 text-violet-400" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : <p className="text-muted-foreground text-center py-8">No activities found</p>}
     </div>
   );
 
@@ -1906,125 +1317,67 @@ export default function PreOneDashboard() {
   // RENDER: GROWTH
   // ============================================================
   const renderGrowth = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Growth & Development</h2>
-        <p className="text-muted-foreground text-sm">Track student development and AI-powered insights</p>
-      </div>
-
-      {/* Class-wise Growth */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Class-wise Growth Overview</CardTitle>
-          <CardDescription>Average scores across development areas</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {growthChartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={growthChartData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="class" tick={{ fontSize: 11 }} width={80} />
-                <RTooltip />
-                <Legend />
-                <Bar dataKey="creativity" fill="#7C3AED" name="Creativity" />
-                <Bar dataKey="communication" fill="#10b981" name="Communication" />
-                <Bar dataKey="socialSkills" fill="#f97316" name="Social" />
-                <Bar dataKey="cognitive" fill="#fb7185" name="Cognitive" />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground text-sm">
-              {loading.growth ? <Loader2 className="h-6 w-6 animate-spin" /> : 'No growth data available. Loading...'}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Student Growth Radar + Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Student Growth Radar</CardTitle>
-            <CardDescription>
-              {growthData.length > 0 && growthData[0].students.find(s => s.growthScore)
-                ? `${growthData[0].students.find(s => s.growthScore)!.firstName} vs Class Average`
-                : 'Student vs Class Average'}
-            </CardDescription>
-          </CardHeader>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Student Growth</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="rounded-3xl">
+          <CardHeader><CardTitle className="text-base">Growth Radar</CardTitle><CardDescription>Class average vs top student</CardDescription></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <RadarChart data={growthRadarData}>
-                <PolarGrid />
+                <PolarGrid stroke="#e5e7eb" />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <Radar name="Student" dataKey="A" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.2} strokeWidth={2} />
-                <Radar name="Class Avg" dataKey="B" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
-                <Legend />
-                <RTooltip />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                <Radar name="Class Avg" dataKey="Class" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.15} />
+                <Radar name="Student" dataKey="Student" stroke="#0EA5E9" fill="#0EA5E9" fillOpacity={0.15} />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Growth Score Distribution</CardTitle>
-            <CardDescription>Students by overall score range</CardDescription>
-          </CardHeader>
+        <Card className="rounded-3xl">
+          <CardHeader><CardTitle className="text-base">Class Comparison</CardTitle><CardDescription>Overall growth scores by class</CardDescription></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[
-                { range: '0-20', count: growthData.flatMap(g => g.students.filter(s => s.growthScore && s.growthScore.overall < 20)).length },
-                { range: '21-40', count: growthData.flatMap(g => g.students.filter(s => s.growthScore && s.growthScore.overall >= 20 && s.growthScore.overall < 40)).length },
-                { range: '41-60', count: growthData.flatMap(g => g.students.filter(s => s.growthScore && s.growthScore.overall >= 40 && s.growthScore.overall < 60)).length },
-                { range: '61-80', count: growthData.flatMap(g => g.students.filter(s => s.growthScore && s.growthScore.overall >= 60 && s.growthScore.overall < 80)).length },
-                { range: '81-100', count: growthData.flatMap(g => g.students.filter(s => s.growthScore && s.growthScore.overall >= 80)).length },
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="range" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <RTooltip />
-                <Bar dataKey="count" fill="#7C3AED" radius={[6, 6, 0, 0]} name="Students" />
-              </BarChart>
-            </ResponsiveContainer>
+            {growthData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={growthData.filter(g => g.classAverages).map(g => ({ name: g.class.name, overall: Math.round(g.classAverages!.overall) }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <RTooltip />
+                  <Bar dataKey="overall" fill="#7C3AED" radius={[8, 8, 0, 0]} name="Overall Score" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <Skeleton className="h-[300px] w-full" />}
           </CardContent>
         </Card>
       </div>
 
-      {/* AI Insights */}
-      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-teal-50/50">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-emerald-500" />
-            AI Growth Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {growthData.some(g => g.topPerformers.length > 0) && (
-              <div className="p-4 bg-white rounded-lg border border-emerald-100">
-                <div className="flex items-center gap-2 mb-2"><TrendingUp className="h-4 w-4 text-emerald-500" /><span className="text-xs font-semibold text-emerald-700">Top Performers</span></div>
-                <p className="text-sm">{growthData.flatMap(g => g.topPerformers).slice(0, 3).map(p => `${p.name} (${p.overall}%)`).join(', ') || 'No top performers identified yet.'}</p>
-              </div>
-            )}
-            {growthData.some(g => g.needsAttention.length > 0) && (
-              <div className="p-4 bg-white rounded-lg border border-violet-100">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="h-4 w-4 text-violet-500" /><span className="text-xs font-semibold text-violet-700">Attention Needed</span></div>
-                <p className="text-sm">{growthData.flatMap(g => g.needsAttention).slice(0, 3).map(n => `${n.name} - weak in ${n.weakestArea}`).join(', ') || 'No students needing attention.'}</p>
-              </div>
-            )}
-            <div className="p-4 bg-white rounded-lg border border-blue-100">
-              <div className="flex items-center gap-2 mb-2"><Brain className="h-4 w-4 text-blue-500" /><span className="text-xs font-semibold text-blue-700">Cognitive Milestone</span></div>
-              <p className="text-sm">Growth tracking is active across {growthData.filter(g => g.classAverages).length} classes. Continue regular assessments for more accurate AI predictions.</p>
+      {growthData.some(g => g.needsAttention.length > 0) && (
+        <Card className="rounded-3xl">
+          <CardHeader><CardTitle className="text-base text-amber-600">Needs Attention</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {growthData.flatMap(g => g.needsAttention).map(n => (
+                <Badge key={n.id} variant="outline" className="text-xs border-amber-300 text-amber-700">{n.name} — {n.weakestArea}: {n.overall}</Badge>
+              ))}
             </div>
-            <div className="p-4 bg-white rounded-lg border border-rose-100">
-              <div className="flex items-center gap-2 mb-2"><Heart className="h-4 w-4 text-rose-500" /><span className="text-xs font-semibold text-rose-700">Emotional Wellness</span></div>
-              <p className="text-sm">Monitor daily mood patterns and social interaction scores for early detection of behavioral changes.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {growthData.some(g => g.topPerformers.length > 0) && (
+        <Card className="rounded-3xl">
+          <CardHeader><CardTitle className="text-base text-emerald-600">Top Performers</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {growthData.flatMap(g => g.topPerformers).map(t => (
+                <Badge key={t.id} variant="outline" className="text-xs border-emerald-300 text-emerald-700"><Star className="h-3 w-3 mr-0.5" />{t.name} — {t.overall}</Badge>
+              ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 
@@ -2032,153 +1385,57 @@ export default function PreOneDashboard() {
   // RENDER: COMMUNICATION
   // ============================================================
   const renderCommunication = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Communication</h2>
-          <p className="text-muted-foreground text-sm">Announcements, messages, and notifications</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Announcements</h3>
         <Dialog open={addAnnouncementOpen} onOpenChange={setAddAnnouncementOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
-              <Plus className="h-4 w-4 mr-2" /> New Announcement
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create Announcement</DialogTitle>
-              <DialogDescription>Send announcement to parents/teachers</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2"><Label>Title</Label><Input placeholder="Announcement title" value={newAnnouncement.title} onChange={e => setNewAnnouncement(s => ({ ...s, title: e.target.value }))} /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Type</Label>
-                  <Select value={newAnnouncement.type} onValueChange={v => setNewAnnouncement(s => ({ ...s, type: v }))}><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger><SelectContent>
-                    <SelectItem value="General">General</SelectItem><SelectItem value="Event">Event</SelectItem><SelectItem value="Fee">Fee</SelectItem>
-                    <SelectItem value="Health">Health</SelectItem><SelectItem value="Academic">Academic</SelectItem>
-                  </SelectContent></Select>
-                </div>
-                <div className="space-y-2"><Label>Audience</Label>
-                  <Select value={newAnnouncement.targetAudience} onValueChange={v => setNewAnnouncement(s => ({ ...s, targetAudience: v }))}><SelectTrigger><SelectValue placeholder="Audience" /></SelectTrigger><SelectContent>
-                    <SelectItem value="All">All</SelectItem><SelectItem value="Parents">Parents</SelectItem><SelectItem value="Teachers">Teachers</SelectItem>
-                  </SelectContent></Select>
-                </div>
+          <Button onClick={() => setAddAnnouncementOpen(true)} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">
+            <Plus className="h-4 w-4 mr-1" /> New Announcement
+          </Button>
+          <DialogContent className="rounded-3xl">
+            <DialogHeader><DialogTitle>Create Announcement</DialogTitle></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div><Label>Title</Label><Input value={newAnnouncement.title} onChange={e => setNewAnnouncement(a => ({ ...a, title: e.target.value }))} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Type</Label><Select value={newAnnouncement.type} onValueChange={v => setNewAnnouncement(a => ({ ...a, type: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="General">General</SelectItem><SelectItem value="Event">Event</SelectItem><SelectItem value="Fee">Fee</SelectItem><SelectItem value="Academic">Academic</SelectItem><SelectItem value="Health">Health</SelectItem></SelectContent></Select></div>
+                <div><Label>Target</Label><Select value={newAnnouncement.target} onValueChange={v => setNewAnnouncement(a => ({ ...a, target: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="All">All</SelectItem><SelectItem value="Parents">Parents</SelectItem><SelectItem value="Teachers">Teachers</SelectItem></SelectContent></Select></div>
               </div>
-              <div className="space-y-2"><Label>Content</Label><Textarea placeholder="Announcement content..." rows={4} value={newAnnouncement.content} onChange={e => setNewAnnouncement(s => ({ ...s, content: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>Priority</Label>
-                <Select value={newAnnouncement.priority} onValueChange={v => setNewAnnouncement(s => ({ ...s, priority: v }))}><SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger><SelectContent>
-                  <SelectItem value="Low">Low</SelectItem><SelectItem value="Normal">Normal</SelectItem>
-                  <SelectItem value="High">High</SelectItem><SelectItem value="Urgent">Urgent</SelectItem>
-                </SelectContent></Select>
-              </div>
+              <div><Label>Priority</Label><Select value={newAnnouncement.priority} onValueChange={v => setNewAnnouncement(a => ({ ...a, priority: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="LOW">Low</SelectItem><SelectItem value="NORMAL">Normal</SelectItem><SelectItem value="HIGH">High</SelectItem></SelectContent></Select></div>
+              <div><Label>Content</Label><Textarea value={newAnnouncement.content} onChange={e => setNewAnnouncement(a => ({ ...a, content: e.target.value }))} rows={4} /></div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setAddAnnouncementOpen(false)}>Cancel</Button>
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddAnnouncement} disabled={!newAnnouncement.title || !newAnnouncement.content}>
-                <Send className="h-4 w-4 mr-2" /> Publish
-              </Button>
+              <Button variant="outline" onClick={() => setAddAnnouncementOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button onClick={handleAddAnnouncement} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl">Publish</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Notification Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {(commStats ? [
-          { channel: 'Announcements', sent: commStats.announcements.total, delivered: commStats.announcements.publishedThisMonth, failed: commStats.announcements.scheduled, icon: Bell },
-          { channel: 'Chat Threads', sent: commStats.chat.activeThreads, delivered: commStats.chat.messagesThisMonth, failed: 0, icon: MessageSquare },
-          { channel: 'Fee Reminders', sent: commStats.notifications.feeRemindersSent, delivered: commStats.notifications.feeRemindersSent, failed: 0, icon: Receipt },
-          { channel: 'This Month', sent: commStats.announcements.publishedThisMonth, delivered: commStats.chat.messagesThisMonth, failed: 0, icon: Calendar },
-        ] : [
-          { channel: 'Announcements', sent: 0, delivered: 0, failed: 0, icon: Bell },
-          { channel: 'Chat Threads', sent: 0, delivered: 0, failed: 0, icon: MessageSquare },
-          { channel: 'Fee Reminders', sent: 0, delivered: 0, failed: 0, icon: Receipt },
-          { channel: 'This Month', sent: 0, delivered: 0, failed: 0, icon: Calendar },
-        ]).map((stat) => (
-          <Card key={stat.channel}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-semibold">{stat.channel}</span>
-              </div>
-              <p className="text-2xl font-bold">{stat.sent.toLocaleString()}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-emerald-600">{stat.delivered} active</span>
-                {stat.failed > 0 && <span className="text-xs text-rose-500">{stat.failed} pending</span>}
-              </div>
-              <Progress value={stat.sent > 0 ? (stat.delivered / stat.sent) * 100 : 0} className="h-1.5 mt-2" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Announcements */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Announcements</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {loading.communication ? (
-            <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
-          ) : (
-            announcements.map((ann) => (
-              <div key={ann.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                <div className={`p-2 rounded-lg shrink-0 ${ann.priority === 'Urgent' ? 'bg-rose-100' : ann.priority === 'High' ? 'bg-violet-100' : 'bg-muted'}`}>
-                  <Bell className={`h-4 w-4 ${ann.priority === 'Urgent' ? 'text-rose-600' : ann.priority === 'High' ? 'text-violet-600' : 'text-muted-foreground'}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <p className="font-medium text-sm">{ann.title}</p>
-                    <Badge variant="outline" className="text-[10px]">{ann.type}</Badge>
-                    {ann.priority === 'Urgent' && <Badge className="text-[10px] bg-rose-100 text-rose-700 hover:bg-rose-100">Urgent</Badge>}
+      {loading.communication ? <StatsSkeleton count={3} /> : announcements.length > 0 ? (
+        <div className="space-y-3">
+          {announcements.map(a => (
+            <Card key={a.id} className="rounded-3xl">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-medium">{a.title}</p>
+                      <Badge className={`text-[10px] ${priorityColors[a.priority] || ''}`}>{a.priority}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{a.content}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-[10px]">{a.type}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{a.target}</Badge>
+                      <span className="text-[10px] text-muted-foreground">{formatDate(a.publishedAt || a.createdAt)}</span>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{ann.content}</p>
-                  <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                    <span>{formatDate(ann.publishedAt || ann.createdAt)}</span>
-                    <span>•</span>
-                    <span>{ann.targetAudience}</span>
-                    <Badge className={`text-[10px] ml-auto ${ann.publishedAt ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-100'}`}>{ann.publishedAt ? 'Published' : 'Draft'}</Badge>
-                  </div>
+                  <Megaphone className="h-5 w-5 text-violet-400 shrink-0" />
                 </div>
-              </div>
-            ))
-          )}
-          {announcements.length === 0 && !loading.communication && (
-            <div className="text-center text-muted-foreground py-8">No announcements found</div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Message Center */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Message Center</CardTitle>
-          <CardDescription>Recent conversations</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {students.slice(0, 4).map((student) => {
-            const parent = student.parents?.[0]?.parent;
-            if (!parent) return null;
-            return (
-              <div key={student.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
-                <Avatar className="h-9 w-9">
-                  <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">{parent.firstName[0]}{parent.lastName[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{parent.firstName} {parent.lastName}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">Parent of {student.firstName} {student.lastName} • {parent.phone}</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="h-3.5 w-3.5" /></Button>
-              </div>
-            );
-          })}
-          {students.length === 0 && (
-            <div className="text-center text-muted-foreground py-8">No conversations yet</div>
-          )}
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : <p className="text-muted-foreground text-center py-8">No announcements found</p>}
     </div>
   );
 
@@ -2186,304 +1443,102 @@ export default function PreOneDashboard() {
   // RENDER: SETTINGS
   // ============================================================
   const renderSettings = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Settings</h2>
-        <p className="text-muted-foreground text-sm">Manage school and account settings</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* School Profile */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">School Profile</CardTitle>
-            <CardDescription>Basic information about your school</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>School Name</Label><Input defaultValue="PreOne Preschool" /></div>
-              <div className="space-y-2"><Label>Tagline</Label><Input defaultValue="Where learning begins with joy" /></div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Phone</Label><Input defaultValue="+91 11 4567 8900" /></div>
-              <div className="space-y-2"><Label>Email</Label><Input defaultValue="hello@preone.edu" /></div>
-            </div>
-            <div className="space-y-2"><Label>Address</Label><Textarea defaultValue="123, Learning Lane, Knowledge Park, New Delhi - 110001" /></div>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">Save Changes</Button>
-          </CardContent>
-        </Card>
-
-        {/* Account */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Account</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-14 w-14">
-                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-lg">
-                  {user?.email ? (user.email as string).slice(0, 2).toUpperCase() : 'AD'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold">{(user?.role as string) || 'Admin'}</p>
-                <p className="text-sm text-muted-foreground">{(user?.email as string) || 'admin@preone.com'}</p>
-              </div>
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input defaultValue={(user?.email as string) || 'admin@preone.com'} />
-            </div>
-            <Button variant="outline" className="w-full" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" /> Sign Out
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Preferences</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label>Academic Year</Label>
-              <Select defaultValue="2024-2025">
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2024-2025">2024-2025</SelectItem>
-                  <SelectItem value="2023-2024">2023-2024</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Date Format</Label>
-              <Select defaultValue="dd-mm-yyyy">
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dd-mm-yyyy">DD-MM-YYYY</SelectItem>
-                  <SelectItem value="mm-dd-yyyy">MM-DD-YYYY</SelectItem>
-                  <SelectItem value="yyyy-mm-dd">YYYY-MM-DD</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Currency</Label>
-              <Select defaultValue="inr">
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="inr">₹ Indian Rupee (INR)</SelectItem>
-                  <SelectItem value="usd">$ US Dollar (USD)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Settings</h3>
+      <Card className="rounded-3xl">
+        <CardHeader><CardTitle className="text-base">School Information</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><Label className="text-xs text-muted-foreground">School Name</Label><p className="text-sm font-medium">Little Stars Preschool</p></div>
+            <div><Label className="text-xs text-muted-foreground">Academic Year</Label><p className="text-sm font-medium">2024-2025</p></div>
+            <div><Label className="text-xs text-muted-foreground">Board</Label><p className="text-sm font-medium">CBSE</p></div>
+            <div><Label className="text-xs text-muted-foreground">School Code</Label><p className="text-sm font-medium">LSP-001</p></div>
           </div>
+        </CardContent>
+      </Card>
+      <Card className="rounded-3xl">
+        <CardHeader><CardTitle className="text-base">Account</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><Label className="text-xs text-muted-foreground">Name</Label><p className="text-sm font-medium">{user?.name || 'Admin'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Email</Label><p className="text-sm font-medium">{user?.email || 'admin@preone.com'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Role</Label><p className="text-sm font-medium">{user?.role || 'ADMIN'}</p></div>
+          </div>
+          <Button variant="outline" onClick={handleLogout} className="rounded-xl mt-4"><LogOut className="h-4 w-4 mr-2" />Sign Out</Button>
         </CardContent>
       </Card>
     </div>
   );
 
   // ============================================================
-  // RENDER MAIN LAYOUT
+  // RENDER: SECTION CONTENT
   // ============================================================
-  const sectionRenderers: Record<Section, () => React.ReactNode> = {
-    dashboard: renderDashboard,
-    students: renderStudents,
-    teachers: renderTeachers,
-    attendance: renderAttendance,
-    fees: renderFees,
-    crm: renderCRM,
-    activities: renderActivities,
-    growth: renderGrowth,
-    communication: renderCommunication,
-    settings: renderSettings,
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'dashboard': return renderDashboard();
+      case 'students': return renderStudents();
+      case 'teachers': return renderTeachers();
+      case 'attendance': return renderAttendance();
+      case 'fees': return renderFees();
+      case 'crm': return renderCRM();
+      case 'activities': return renderActivities();
+      case 'growth': return renderGrowth();
+      case 'communication': return renderCommunication();
+      case 'settings': return renderSettings();
+      default: return renderDashboard();
+    }
   };
 
-  // Show login screen if not authenticated
-  if (!authChecked) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-violet-500" /></div>;
-  }
-
-  if (!token) {
-    return <LoginScreen onLogin={handleLogin} />;
-  }
-
   // ============================================================
-  // ROLE-BASED ROUTING
+  // MAIN RENDER
   // ============================================================
-  const userRole = (user?.role as string) || 'Admin';
+  if (!authChecked) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-violet-500" /></div>;
 
-  // If user is a Parent, render the Parent Portal
-  if (userRole === 'Parent') {
-    return (
-      <ParentPortal
-        token={token!}
-        user={{ userId: (user?.userId as string) || '', email: (user?.email as string) || '', role: userRole, branchId: (user?.branchId as string) || null }}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  // If user is a Teacher, render the Teacher Portal
-  if (userRole === 'Teacher') {
-    return (
-      <TeacherPortal
-        token={token!}
-        user={{ userId: (user?.userId as string) || '', email: (user?.email as string) || '', role: userRole, branchId: (user?.branchId as string) || null }}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  // Default: Admin — render the admin dashboard
-  const userName = user?.email ? (user.email as string).split('@')[0] : 'Admin';
-
-  // Sidebar content (shared between desktop and mobile)
-  const sidebarContent = (
-    <>
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
-          <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
-        </div>
-        {(!sidebarCollapsed || isMobile) && (
-          <div className="overflow-hidden">
-            <h1 className="text-lg font-bold tracking-tight text-white">PreOne</h1>
-            <p className="text-[10px] text-sky-300/70 -mt-0.5">Preschool OS</p>
-          </div>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <ScrollArea className="flex-1 py-3">
-        <nav className="space-y-1 px-2">
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeSection === item.id;
-            return (
-              <Tooltip key={item.id} delayDuration={sidebarCollapsed && !isMobile ? 0 : 1000}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => { setActiveSection(item.id); if (isMobile) setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
-                      isActive
-                        ? 'nav-active-pill font-medium shadow-sm'
-                        : 'text-white/60 hover:bg-white/8 hover:text-white/90'
-                    }`}
-                  >
-                    <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-white' : ''}`} />
-                    {(!sidebarCollapsed || isMobile) && <span className="truncate">{item.label}</span>}
-                    {isActive && !sidebarCollapsed && !isMobile && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-400" />
-                    )}
-                  </button>
-                </TooltipTrigger>
-                {sidebarCollapsed && !isMobile && (
-                  <TooltipContent side="right" className="font-medium">
-                    {item.label}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            );
-          })}
-        </nav>
-      </ScrollArea>
-
-      {/* Sidebar Toggle (desktop only) */}
-      {!isMobile && (
-        <div className="px-2 py-2 border-t border-white/10">
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
-          >
-            {sidebarCollapsed ? <ChevronRight className="h-4 w-4 shrink-0" /> : <ChevronLeft className="h-4 w-4 shrink-0" />}
-            {!sidebarCollapsed && <span>Collapse</span>}
-          </button>
-        </div>
-      )}
-
-      {/* User Profile */}
-      <div className="px-3 py-3 border-t border-white/10">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9 shrink-0">
-            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
-              {userName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          {(!sidebarCollapsed || isMobile) && (
-            <div className="overflow-hidden flex-1">
-              <p className="text-sm font-medium text-white truncate capitalize">{userName}</p>
-              <p className="text-xs text-white/40 truncate capitalize">{(user?.role as string) || 'Admin'}</p>
-            </div>
-          )}
-          {(!sidebarCollapsed || isMobile) && (
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white hover:bg-white/10" onClick={handleLogout}>
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
-          )}
-        </div>
-      </div>
-    </>
-  );
+  if (!token || !user) return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    <TooltipProvider>
-      <div className="flex h-screen bg-background overflow-hidden">
-        {/* Desktop Sidebar */}
-        {!isMobile && (
-          <aside className={`${sidebarCollapsed ? 'w-[76px]' : 'w-[280px]'} bg-sidebar-gradient text-white flex flex-col transition-all duration-300 shrink-0`}>
-            {sidebarContent}
-          </aside>
-        )}
+    <div className="min-h-screen flex bg-gray-50/80">
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <aside className="w-[260px] bg-gradient-to-b from-violet-700 via-violet-600 to-sky-600 text-white flex flex-col shrink-0 sticky top-0 h-screen">
+          <SidebarContent />
+        </aside>
+      )}
 
-        {/* Mobile Sidebar */}
-        {isMobile && (
-          <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-            <SheetContent side="left" className="p-0 w-[280px] bg-sidebar-gradient text-white border-none">
-              {sidebarContent}
-            </SheetContent>
-          </Sheet>
-        )}
+      {/* Mobile Sidebar */}
+      {isMobile && (
+        <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-[260px] bg-gradient-to-b from-violet-700 via-violet-600 to-sky-600 border-0">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      )}
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto custom-scrollbar min-w-0">
-          {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b px-4 md:px-6 h-14 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              {isMobile && (
-                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => setMobileSidebarOpen(true)}>
-                  <Menu className="h-5 w-5" />
-                </Button>
-              )}
-              <Home className="h-4 w-4 text-muted-foreground hidden sm:block shrink-0" />
-              <span className="text-sm text-muted-foreground hidden sm:inline">/</span>
-              <span className="text-sm font-medium capitalize truncate">{activeSection === 'crm' ? 'Admission CRM' : activeSection}</span>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search anything..." className="pl-9 w-[240px] h-9 text-sm" />
-              </div>
-              <Button variant="ghost" size="icon" className="relative h-9 w-9">
-                <Bell className="h-4 w-4" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-bold">{recentActivities.length > 0 ? Math.min(recentActivities.length, 9) : 0}</span>
-              </Button>
-              {isMobile && (
-                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-rose-600" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </header>
-
-          {/* Content Area */}
-          <div className="p-4 md:p-6 max-w-[1400px]">
-            {sectionRenderers[activeSection]?.()}
+      {/* Main Content */}
+      <main className="flex-1 min-w-0">
+        {/* Top Bar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b px-4 sm:px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {isMobile && (
+              <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 rounded-lg hover:bg-muted">
+                <Menu className="h-5 w-5" />
+              </button>
+            )}
+            <h1 className="text-base sm:text-lg font-semibold capitalize">{activeSection === 'crm' ? 'Admission CRM' : activeSection}</h1>
           </div>
-        </main>
-      </div>
-    </TooltipProvider>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[10px] hidden sm:flex">{user.role}</Badge>
+            <Avatar className="h-8 w-8 bg-gradient-to-br from-violet-500 to-sky-500">
+              <AvatarFallback className="bg-transparent text-white text-xs">{user.name?.charAt(0) || 'A'}</AvatarFallback>
+            </Avatar>
+          </div>
+        </header>
+
+        {/* Section Content */}
+        <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+          {renderSection()}
+        </div>
+      </main>
+    </div>
   );
 }

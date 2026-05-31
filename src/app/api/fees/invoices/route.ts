@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 
 // GET /api/fees/invoices — List invoices
 export async function GET(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || user.branchId || '';
     const status = searchParams.get('status') || '';
     const studentId = searchParams.get('studentId') || '';
-    const academicYear = searchParams.get('academicYear') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    // Build where clause with branch isolation
-    const where: Record<string, unknown> = { ...branchFilter(user) };
-    if (branchId) where.branchId = branchId;
+    const where: Record<string, unknown> = {};
     if (status) where.status = status;
     if (studentId) where.studentId = studentId;
-    if (academicYear) where.academicYear = academicYear;
 
     const skip = (page - 1) * limit;
 
@@ -34,16 +29,14 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           student: {
-            select: { id: true, firstName: true, lastName: true, admissionNo: true },
+            select: { id: true, firstName: true, lastName: true, rollNumber: true },
           },
           feeStructure: {
-            select: { id: true, name: true, feeType: true, frequency: true },
+            select: { id: true, name: true, type: true, frequency: true },
           },
           payments: {
-            where: { status: 'Success' },
-            orderBy: { paidAt: 'desc' },
+            orderBy: { paymentDate: 'desc' },
           },
-          _count: { select: { reminders: true } },
         },
       }),
       db.invoice.count({ where }),
@@ -62,21 +55,17 @@ export async function GET(request: NextRequest) {
 // POST /api/fees/invoices — Create invoice
 export async function POST(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json();
     const {
-      studentId, branchId, feeStructureId, academicYear, period,
-      amount, discount, discountReason, lateFee, dueDate, notes,
+      studentId, feeStructureId, amount, discount, dueDate, description,
     } = body;
 
-    // Use user's branchId for branch isolation
-    const effectiveBranchId = user.branchId || branchId;
-
-    if (!studentId || !effectiveBranchId || !amount || !dueDate) {
+    if (!studentId || !amount || !dueDate) {
       return NextResponse.json(
-        { error: 'studentId, branchId, amount, and dueDate are required' },
+        { error: 'studentId, amount, and dueDate are required' },
         { status: 400 }
       );
     }
@@ -84,28 +73,23 @@ export async function POST(request: NextRequest) {
     // Generate invoice number
     const invoiceNo = `INV-${Date.now()}-${randomBytes(3).toString('hex').toUpperCase()}`;
 
-    const totalAmount = amount + (lateFee || 0) - (discount || 0);
+    const netAmount = amount - (discount || 0);
 
     const invoice = await db.invoice.create({
       data: {
         invoiceNo,
         studentId,
-        branchId: effectiveBranchId,
-        feeStructureId,
-        academicYear,
-        period,
+        feeStructureId: feeStructureId || null,
         amount,
         discount: discount || 0,
-        discountReason,
-        lateFee: lateFee || 0,
-        totalAmount,
-        paidAmount: 0,
+        netAmount,
+        status: 'PENDING',
         dueDate: new Date(dueDate),
-        notes,
+        description,
       },
       include: {
         student: { select: { id: true, firstName: true, lastName: true } },
-        feeStructure: { select: { name: true, feeType: true } },
+        feeStructure: { select: { name: true, type: true } },
       },
     });
 

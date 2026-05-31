@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
       include: {
         branch: true,
         teacher: true,
-        parent: true,
       },
     });
 
@@ -37,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isValid = verifyPassword(password, user.passwordHash);
+    const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
@@ -48,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Update last login
     await db.user.update({
       where: { id: user.id },
-      data: { lastLoginAt: new Date() },
+      data: { lastLogin: new Date() },
     });
 
     // Generate token — ensure role is a valid Role enum value
@@ -56,17 +55,31 @@ export async function POST(request: NextRequest) {
     const token = generateToken({
       userId: user.id,
       email: user.email,
+      name: user.name,
       role: userRole,
       branchId: user.branchId,
+      schoolId: user.schoolId,
     });
 
     // Return user data without password
-    const { passwordHash: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json({
       message: 'Login successful',
       token,
-      user: userWithoutPassword,
+      user: {
+        id: userWithoutPassword.id,
+        email: userWithoutPassword.email,
+        name: userWithoutPassword.name,
+        role: userWithoutPassword.role,
+        branchId: userWithoutPassword.branchId,
+        schoolId: userWithoutPassword.schoolId,
+        phone: userWithoutPassword.phone,
+        avatar: userWithoutPassword.avatar,
+        isActive: userWithoutPassword.isActive,
+        branch: userWithoutPassword.branch,
+        teacher: userWithoutPassword.teacher,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);

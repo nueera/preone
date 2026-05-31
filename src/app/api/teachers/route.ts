@@ -1,32 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
+import { hashPassword } from '@/lib/auth';
 
 // GET /api/teachers — List all teachers
 export async function GET(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || user.branchId || '';
-    const status = searchParams.get('status') || '';
-    const staffType = searchParams.get('staffType') || '';
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
-    // Build where clause with branch isolation
-    const where: Record<string, unknown> = { ...branchFilter(user) };
-    if (branchId) where.branchId = branchId;
-    if (status) where.status = status;
-    if (staffType) where.staffType = staffType;
+    const where: Record<string, unknown> = {};
     if (search) {
       where.OR = [
         { firstName: { contains: search } },
         { lastName: { contains: search } },
-        { employeeId: { contains: search } },
         { email: { contains: search } },
       ];
     }
@@ -40,13 +33,11 @@ export async function GET(request: NextRequest) {
         include: {
           branch: { select: { id: true, name: true } },
           user: { select: { id: true, email: true, isActive: true } },
-          class: { select: { id: true, name: true } },
+          assignedClass: { select: { id: true, name: true } },
           _count: {
             select: {
               qualifications: true,
               leaves: true,
-              activities: true,
-              observations: true,
             },
           },
         },
@@ -67,55 +58,64 @@ export async function GET(request: NextRequest) {
 // POST /api/teachers — Create new teacher
 export async function POST(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json();
     const {
-      branchId, employeeId, firstName, lastName, phone, email,
-      dob, gender, photo, address, qualification, specialization,
-      experience, staffType, userId,
+      branchId, firstName, lastName, phone, email,
+      dob, gender, address, qualification, specialization,
+      experience, salary,
     } = body;
 
-    // Use user's branchId for branch isolation
-    const effectiveBranchId = user.branchId || branchId;
-
-    if (!effectiveBranchId || !firstName || !lastName) {
+    if (!firstName || !lastName) {
       return NextResponse.json(
-        { error: 'branchId, firstName, and lastName are required' },
+        { error: 'firstName and lastName are required' },
         { status: 400 }
       );
     }
 
-    // Check employee ID uniqueness if provided
-    if (employeeId) {
-      const existing = await db.teacher.findUnique({ where: { employeeId } });
-      if (existing) {
-        return NextResponse.json({ error: 'Employee ID already exists' }, { status: 409 });
+    // Create user account for teacher if email provided
+    let userId: string | undefined;
+    if (email) {
+      const existingUser = await db.user.findUnique({ where: { email } });
+      if (!existingUser) {
+        const hashedPwd = await hashPassword('password123');
+        const newUser = await db.user.create({
+          data: {
+            email,
+            password: hashedPwd,
+            name: `${firstName} ${lastName}`,
+            phone,
+            role: 'TEACHER',
+            isActive: true,
+            branchId: branchId || null,
+          },
+        });
+        userId = newUser.id;
       }
     }
 
     const teacher = await db.teacher.create({
       data: {
-        branchId: effectiveBranchId,
-        employeeId,
+        userId,
+        branchId: branchId || null,
         firstName,
         lastName,
-        phone,
-        email,
+        phone: phone || '',
+        email: email || `${firstName.toLowerCase()}.${lastName.toLowerCase()}@littlestars.com`,
         dob: dob ? new Date(dob) : undefined,
         gender,
-        photo,
         address,
         qualification,
         specialization,
-        experience,
-        staffType: staffType || 'Teaching',
-        userId,
+        experience: experience || 0,
+        salary: salary || null,
+        status: 'ACTIVE',
       },
       include: {
         branch: { select: { id: true, name: true } },
-        class: { select: { id: true, name: true } },
+        assignedClass: { select: { id: true, name: true } },
       },
     });
 

@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       include: {
         branch: true,
         teacher: true,
-        parent: true,
       },
     });
 
@@ -26,10 +25,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { passwordHash: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json({
-      user: userWithoutPassword,
+      user: {
+        id: userWithoutPassword.id,
+        email: userWithoutPassword.email,
+        name: userWithoutPassword.name,
+        role: userWithoutPassword.role,
+        branchId: userWithoutPassword.branchId,
+        schoolId: userWithoutPassword.schoolId,
+        phone: userWithoutPassword.phone,
+        avatar: userWithoutPassword.avatar,
+        isActive: userWithoutPassword.isActive,
+        branch: userWithoutPassword.branch,
+        teacher: userWithoutPassword.teacher,
+      },
     });
   } catch (error) {
     console.error('Get profile error:', error);

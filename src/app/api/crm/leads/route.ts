@@ -1,30 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 
-// GET /api/crm/leads — List leads with pipeline stage
+// GET /api/crm/leads — List leads
 export async function GET(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || user.branchId || '';
     const stage = searchParams.get('stage') || '';
     const source = searchParams.get('source') || '';
-    const priority = searchParams.get('priority') || '';
-    const assignedTo = searchParams.get('assignedTo') || '';
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    // Build where clause with branch isolation
-    const where: Record<string, unknown> = { ...branchFilter(user) };
-    if (branchId) where.branchId = branchId;
+    const where: Record<string, unknown> = {};
     if (stage) where.stage = stage;
     if (source) where.source = source;
-    if (priority) where.priority = priority;
-    if (assignedTo) where.assignedTo = assignedTo;
     if (search) {
       where.OR = [
         { parentName: { contains: search } },
@@ -43,9 +36,8 @@ export async function GET(request: NextRequest) {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          branch: { select: { id: true, name: true } },
           followUps: {
-            orderBy: { followUpDate: 'desc' },
+            orderBy: { dateTime: 'desc' },
             take: 5,
           },
           _count: { select: { followUps: true } },
@@ -67,51 +59,38 @@ export async function GET(request: NextRequest) {
 // POST /api/crm/leads — Create new lead
 export async function POST(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json();
     const {
-      branchId, parentName, parentPhone, parentEmail, parentOccupation,
-      parentAddress, childName, childDob, childGender, programInterest,
-      source, sourceDetail, stage, assignedTo, notes, priority,
-      nextFollowUpDate, expectedEnrollmentDate, estimatedFee,
+      parentName, parentPhone, parentEmail, childName, childAge,
+      source, stage, assignedTo, notes, priority, programInterest,
+      estimatedValue, nextFollowUp,
     } = body;
 
-    // Use user's branchId for branch isolation
-    const effectiveBranchId = user.branchId || branchId;
-
-    if (!effectiveBranchId || !parentName || !parentPhone || !childName) {
+    if (!parentName || !parentPhone || !childName) {
       return NextResponse.json(
-        { error: 'branchId, parentName, parentPhone, and childName are required' },
+        { error: 'parentName, parentPhone, and childName are required' },
         { status: 400 }
       );
     }
 
     const lead = await db.lead.create({
       data: {
-        branchId: effectiveBranchId,
         parentName,
         parentPhone,
         parentEmail,
-        parentOccupation,
-        parentAddress,
         childName,
-        childDob: childDob ? new Date(childDob) : undefined,
-        childGender,
-        programInterest,
-        source: source || 'WalkIn',
-        sourceDetail,
-        stage: stage || 'NewInquiry',
+        childAge,
+        source: source || 'WALK_IN',
+        stage: stage || 'NEW',
         assignedTo: assignedTo || user.userId,
         notes,
-        priority: priority || 'Medium',
-        nextFollowUpDate: nextFollowUpDate ? new Date(nextFollowUpDate) : undefined,
-        expectedEnrollmentDate: expectedEnrollmentDate ? new Date(expectedEnrollmentDate) : undefined,
-        estimatedFee,
-      },
-      include: {
-        branch: { select: { id: true, name: true } },
+        priority: priority || 'NORMAL',
+        programInterest,
+        estimatedValue,
+        nextFollowUp: nextFollowUp ? new Date(nextFollowUp) : undefined,
       },
     });
 

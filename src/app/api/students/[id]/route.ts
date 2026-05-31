@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter, forbidden } from '@/lib/auth';
+import { getAuthUser, unauthorized, forbidden } from '@/lib/auth';
 
 // GET /api/students/[id] — Get student details
 export async function GET(
@@ -8,8 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const { id } = await params;
 
@@ -19,14 +19,13 @@ export async function GET(
         class: {
           select: { id: true, name: true, capacity: true, program: { select: { name: true } } },
         },
-        section: { select: { id: true, name: true } },
-        branch: { select: { id: true, name: true, city: true } },
+        branch: { select: { id: true, name: true } },
         parents: {
           include: {
             parent: true,
           },
         },
-        medicalRecords: { where: { isActive: true } },
+        medicalRecords: true,
         attendance: {
           orderBy: { date: 'desc' },
           take: 30,
@@ -35,7 +34,7 @@ export async function GET(
           orderBy: { createdAt: 'desc' },
           take: 10,
           include: {
-            payments: { orderBy: { paidAt: 'desc' } },
+            payments: { orderBy: { paymentDate: 'desc' } },
           },
         },
         growthScores: {
@@ -43,18 +42,14 @@ export async function GET(
           take: 5,
         },
         observations: {
-          orderBy: { date: 'desc' },
+          orderBy: { createdAt: 'desc' },
           take: 10,
-          include: {
-            teacher: { select: { firstName: true, lastName: true } },
-          },
         },
         dailyUpdates: {
           orderBy: { date: 'desc' },
           take: 7,
         },
         achievements: { orderBy: { date: 'desc' }, take: 5 },
-        milestones: { orderBy: { achievedDate: 'desc' }, take: 5 },
         _count: {
           select: {
             attendance: true,
@@ -71,7 +66,6 @@ export async function GET(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    // Verify branch isolation
     if (user.branchId && student.branchId !== user.branchId) {
       return forbidden('You do not have access to this student');
     }
@@ -83,35 +77,31 @@ export async function GET(
   }
 }
 
-// PUT /api/students/[id] — Update student
-export async function PUT(
+// PATCH /api/students/[id] — Update student
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const { id } = await params;
     const body = await request.json();
 
-    // Check student exists and belongs to user's branch
     const existing = await db.student.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    // Verify branch isolation
     if (user.branchId && existing.branchId !== user.branchId) {
       return forbidden('You do not have access to this student');
     }
 
-    // Build update data
     const updateData: Record<string, unknown> = {};
     const allowedFields = [
       'firstName', 'lastName', 'dob', 'gender', 'bloodGroup', 'photo',
-      'address', 'emergencyContact', 'classId', 'sectionId', 'status',
-      'admissionNo',
+      'classId', 'status', 'rollNumber', 'aadhaarNumber', 'branchId',
     ];
 
     for (const field of allowedFields) {
@@ -125,7 +115,6 @@ export async function PUT(
       data: updateData,
       include: {
         class: { select: { id: true, name: true } },
-        section: { select: { id: true, name: true } },
         branch: { select: { id: true, name: true } },
         parents: {
           include: { parent: true },
@@ -140,14 +129,14 @@ export async function PUT(
   }
 }
 
-// DELETE /api/students/[id] — Delete student (soft delete by setting status)
+// DELETE /api/students/[id] — Soft delete by setting status
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const { id } = await params;
 
@@ -156,15 +145,13 @@ export async function DELETE(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    // Verify branch isolation
     if (user.branchId && existing.branchId !== user.branchId) {
       return forbidden('You do not have access to this student');
     }
 
-    // Soft delete — set status to Inactive
     const student = await db.student.update({
       where: { id },
-      data: { status: 'Inactive' },
+      data: { status: 'INACTIVE' },
     });
 
     return NextResponse.json({

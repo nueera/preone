@@ -1,37 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, branchFilter } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 
 // GET /api/students — List all students with pagination, search, and filters
 export async function GET(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
     const classId = searchParams.get('classId') || '';
-    const branchId = searchParams.get('branchId') || user.branchId || '';
     const status = searchParams.get('status') || '';
-    const sectionId = searchParams.get('sectionId') || '';
 
     const skip = (page - 1) * limit;
 
-    // Build where clause with branch isolation
-    const where: Record<string, unknown> = { ...branchFilter(user) };
-
-    if (branchId) where.branchId = branchId;
+    const where: Record<string, unknown> = {};
     if (classId) where.classId = classId;
-    if (sectionId) where.sectionId = sectionId;
     if (status) where.status = status;
 
     if (search) {
       where.OR = [
         { firstName: { contains: search } },
         { lastName: { contains: search } },
-        { admissionNo: { contains: search } },
+        { rollNumber: { contains: search } },
       ];
     }
 
@@ -45,7 +39,6 @@ export async function GET(request: NextRequest) {
           class: {
             select: { id: true, name: true, program: { select: { name: true } } },
           },
-          section: { select: { id: true, name: true } },
           branch: { select: { id: true, name: true } },
           parents: {
             include: {
@@ -57,7 +50,6 @@ export async function GET(request: NextRequest) {
                   phone: true,
                   email: true,
                   relation: true,
-                  isPrimary: true,
                 },
               },
             },
@@ -92,24 +84,19 @@ export async function GET(request: NextRequest) {
 // POST /api/students — Create a new student
 export async function POST(request: NextRequest) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
 
     const body = await request.json();
     const {
       branchId,
-      admissionNo,
       firstName,
       lastName,
       dob,
       gender,
       bloodGroup,
-      photo,
-      address,
-      emergencyContact,
       classId,
-      sectionId,
-      status,
+      rollNumber,
       // Parent info
       parentFirstName,
       parentLastName,
@@ -119,46 +106,25 @@ export async function POST(request: NextRequest) {
       parentOccupation,
     } = body;
 
-    // Use user's branchId for branch isolation
-    const effectiveBranchId = user.branchId || branchId;
-
-    // Validation
-    if (!effectiveBranchId || !firstName || !lastName || !dob) {
+    if (!firstName || !lastName || !dob) {
       return NextResponse.json(
-        { error: 'branchId, firstName, lastName, and dob are required' },
+        { error: 'firstName, lastName, and dob are required' },
         { status: 400 }
       );
-    }
-
-    // Check admission number uniqueness if provided
-    if (admissionNo) {
-      const existing = await db.student.findUnique({
-        where: { admissionNo },
-      });
-      if (existing) {
-        return NextResponse.json(
-          { error: 'Admission number already exists' },
-          { status: 409 }
-        );
-      }
     }
 
     // Create student
     const student = await db.student.create({
       data: {
-        branchId: effectiveBranchId,
-        admissionNo,
+        branchId: branchId || null,
         firstName,
         lastName,
         dob: new Date(dob),
         gender,
         bloodGroup,
-        photo,
-        address,
-        emergencyContact,
-        classId,
-        sectionId,
-        status: status || 'Active',
+        classId: classId || null,
+        rollNumber,
+        status: 'ACTIVE',
       },
     });
 
@@ -172,7 +138,7 @@ export async function POST(request: NextRequest) {
           email: parentEmail,
           relation: parentRelation || 'Father',
           occupation: parentOccupation,
-          isPrimary: true,
+          isEmergencyContact: true,
         },
       });
 
@@ -191,7 +157,6 @@ export async function POST(request: NextRequest) {
       where: { id: student.id },
       include: {
         class: { select: { id: true, name: true } },
-        section: { select: { id: true, name: true } },
         branch: { select: { id: true, name: true } },
         parents: {
           include: {
