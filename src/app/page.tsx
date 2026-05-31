@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import {
   LayoutDashboard, Users, GraduationCap, ClipboardCheck, Receipt,
   Megaphone, Palette, TrendingUp, MessageSquare, Settings, ChevronLeft,
@@ -13,6 +14,10 @@ import {
   ExternalLink, Home, Building2, Smile, Frown, Meh, X, Check,
   LogOut, Loader2
 } from 'lucide-react';
+
+// Dynamic imports for role-based portals (code splitting)
+const ParentPortal = dynamic(() => import('@/components/parent-portal'), { ssr: false });
+const TeacherPortal = dynamic(() => import('@/components/teacher-portal'), { ssr: false });
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction,
 } from '@/components/ui/card';
@@ -353,7 +358,7 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
             <Baby className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold">PreOne</CardTitle>
-          <CardDescription>Preschool ERP — Admin Dashboard</CardDescription>
+          <CardDescription>Preschool ERP System</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -371,7 +376,14 @@ function LoginScreen({ onLogin }: { onLogin: (token: string, user: Record<string
             <Button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-white" disabled={loading}>
               {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Signing in...</> : 'Sign In'}
             </Button>
-            <p className="text-xs text-center text-muted-foreground">Demo: admin@preone.com / password123</p>
+            <div className="text-xs text-center text-muted-foreground space-y-1">
+              <p>Demo Accounts (password: password123)</p>
+              <div className="flex flex-wrap justify-center gap-1 mt-1">
+                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('admin@preone.com'); setPassword('password123'); }}>Admin</Badge>
+                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('kavitha.raman@littlestars.com'); setPassword('password123'); }}>Teacher</Badge>
+                <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => { setEmail('rajesh.sharma@email.com'); setPassword('password123'); }}>Parent</Badge>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>
@@ -2284,6 +2296,34 @@ export default function PreOneDashboard() {
     return <LoginScreen onLogin={handleLogin} />;
   }
 
+  // ============================================================
+  // ROLE-BASED ROUTING
+  // ============================================================
+  const userRole = (user?.role as string) || 'Admin';
+
+  // If user is a Parent, render the Parent Portal
+  if (userRole === 'Parent') {
+    return (
+      <ParentPortal
+        token={token!}
+        user={{ userId: (user?.userId as string) || '', email: (user?.email as string) || '', role: userRole, branchId: (user?.branchId as string) || null }}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // If user is a Teacher, render the Teacher Portal
+  if (userRole === 'Teacher') {
+    return (
+      <TeacherPortal
+        token={token!}
+        user={{ userId: (user?.userId as string) || '', email: (user?.email as string) || '', role: userRole, branchId: (user?.branchId as string) || null }}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // Default: Admin/Owner/SuperAdmin — render the existing admin dashboard
   const userName = user?.email ? (user.email as string).split('@')[0] : 'Admin';
 
   return (

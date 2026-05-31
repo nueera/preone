@@ -86,3 +86,30 @@ Stage Summary:
 - Dashboard shows real stats: 22 students, 6 teachers, ₹9.2L revenue
 - All CRUD operations functional (add student, teacher, lead, etc.)
 - Charts use real revenue, fee, and growth data
+
+---
+Task ID: parent-teacher-portals
+Agent: Main Agent
+Task: Build Parent and Teacher portals within the PreOne web app
+
+Work Log:
+- Explored current project structure at /home/z/my-project/
+- Analyzed existing monolithic page.tsx (2,400+ lines) with Admin Portal
+- Created 8 Parent Portal API routes in /api/parent/* (dashboard, children, attendance, fees, daily-updates, observations, growth, announcements)
+- Created 9 Teacher Portal API routes in /api/teacher/* (dashboard, class, attendance/mark, daily-updates, observations, activities, leaves, growth, schedule)
+- Built Parent Portal UI component at src/components/parent-portal.tsx (2,167 lines, 9 sections)
+- Built Teacher Portal UI component at src/components/teacher-portal.tsx (2,453 lines, 10 sections)
+- Modified src/app/page.tsx to add role-based routing with dynamic imports
+- Updated login screen with demo account quick-switch badges (Admin/Teacher/Parent)
+- All APIs return 200 with real database data from Prisma/SQLite
+- Lint passes with 0 errors
+- Verified parent login (rajesh.sharma@email.com) returns children data
+- Verified teacher login (kavitha.raman@littlestars.com) returns class data
+
+Stage Summary:
+- Parent Portal: 9 sections (Dashboard, My Children, Attendance, Fees, Daily Updates, Observations, Growth + Childhood Passport, Communication, Settings)
+- Teacher Portal: 10 sections (Dashboard, My Class, Attendance, Daily Updates, Observations, Activities, Growth, Schedule & Leave, Communication, Settings)
+- Role-based routing: Login → Admin/Parent/Teacher portal based on user role
+- Code splitting via dynamic imports for performance
+- Same amber/emerald theme across all portals
+- Mobile responsive with Sheet/drawer sidebar on mobile
