@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized, forbidden } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
-// GET /api/students/[id] — Get student details
+// GET /api/students/[id] — Get complete student details with all relations
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
 
@@ -17,7 +17,14 @@ export async function GET(
       where: { id },
       include: {
         class: {
-          select: { id: true, name: true, capacity: true, program: { select: { name: true } } },
+          select: {
+            id: true,
+            name: true,
+            capacity: true,
+            roomNo: true,
+            program: { select: { id: true, name: true, ageMin: true, ageMax: true } },
+            teacher: { select: { id: true, firstName: true, lastName: true } },
+          },
         },
         branch: { select: { id: true, name: true } },
         parents: {
@@ -28,28 +35,30 @@ export async function GET(
         medicalRecords: true,
         attendance: {
           orderBy: { date: 'desc' },
-          take: 30,
+          take: 90,
         },
         invoices: {
           orderBy: { createdAt: 'desc' },
-          take: 10,
           include: {
             payments: { orderBy: { paymentDate: 'desc' } },
           },
         },
+        payments: {
+          orderBy: { paymentDate: 'desc' },
+          take: 20,
+        },
         growthScores: {
           orderBy: { createdAt: 'desc' },
-          take: 5,
         },
         observations: {
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: 20,
         },
         dailyUpdates: {
           orderBy: { date: 'desc' },
-          take: 7,
+          take: 30,
         },
-        achievements: { orderBy: { date: 'desc' }, take: 5 },
+        achievements: { orderBy: { date: 'desc' }, take: 10 },
         _count: {
           select: {
             attendance: true,
@@ -66,10 +75,6 @@ export async function GET(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    if (user.branchId && student.branchId !== user.branchId) {
-      return forbidden('You do not have access to this student');
-    }
-
     return NextResponse.json({ student });
   } catch (error) {
     console.error('Get student error:', error);
@@ -77,14 +82,14 @@ export async function GET(
   }
 }
 
-// PATCH /api/students/[id] — Update student
+// PATCH /api/students/[id] — Update student (partial update, handle status changes)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -94,10 +99,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    if (user.branchId && existing.branchId !== user.branchId) {
-      return forbidden('You do not have access to this student');
-    }
-
+    // Build update data from allowed fields
     const updateData: Record<string, unknown> = {};
     const allowedFields = [
       'firstName', 'lastName', 'dob', 'gender', 'bloodGroup', 'photo',
@@ -106,19 +108,24 @@ export async function PATCH(
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = field === 'dob' ? new Date(body[field]) : body[field];
+        updateData[field] = field === 'dob' || field === 'admissionDate'
+          ? new Date(body[field])
+          : body[field];
       }
+    }
+
+    // Handle admissionDate separately
+    if (body.admissionDate !== undefined) {
+      updateData.admissionDate = new Date(body.admissionDate);
     }
 
     const student = await db.student.update({
       where: { id },
       data: updateData,
       include: {
-        class: { select: { id: true, name: true } },
+        class: { select: { id: true, name: true, program: { select: { name: true } } } },
         branch: { select: { id: true, name: true } },
-        parents: {
-          include: { parent: true },
-        },
+        parents: { include: { parent: true } },
       },
     });
 
@@ -129,24 +136,20 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/students/[id] — Soft delete by setting status
+// DELETE /api/students/[id] — Soft delete: set status to INACTIVE
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
 
     const existing = await db.student.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
-    }
-
-    if (user.branchId && existing.branchId !== user.branchId) {
-      return forbidden('You do not have access to this student');
     }
 
     const student = await db.student.update({

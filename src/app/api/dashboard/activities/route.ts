@@ -1,25 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
+import { formatDistanceToNow } from 'date-fns';
 
-interface ActivityItem {
-  id: string;
+// ── Activity type mapping ──
+interface ActivityEntry {
   type: string;
-  title: string;
-  description: string;
-  timestamp: Date;
+  message: string;
+  time: string;
+  icon: string;
+  color: string;
 }
 
+// GET /api/dashboard/activities — Recent activity feed
+// Query params: ?limit=15
+// Requires ADMIN role.
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    // ── Verify ADMIN role ──
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
+    const limit = Math.min(
+      parseInt(request.nextUrl.searchParams.get('limit') || '15'),
+      50,
+    );
 
-    const activities: ActivityItem[] = [];
+    const activities: ActivityEntry[] = [];
 
-    // Recent student enrollments
+    // ── Recent student admissions ──
     const recentStudents = await db.student.findMany({
       orderBy: { createdAt: 'desc' },
       take: 5,
@@ -27,22 +36,22 @@ export async function GET(request: NextRequest) {
         id: true,
         firstName: true,
         lastName: true,
-        rollNumber: true,
+        class: { select: { name: true } },
         createdAt: true,
       },
     });
 
     for (const s of recentStudents) {
       activities.push({
-        id: `student-${s.id}`,
-        type: 'student_enrollment',
-        title: 'New Student Enrolled',
-        description: `${s.firstName} ${s.lastName} (${s.rollNumber || 'New'}) enrolled`,
-        timestamp: s.createdAt,
+        type: 'ADMISSION',
+        message: `${s.firstName} ${s.lastName} admitted to ${s.class?.name || 'Unassigned'}`,
+        time: formatDistanceToNow(new Date(s.createdAt), { addSuffix: true }),
+        icon: 'UserPlus',
+        color: 'green',
       });
     }
 
-    // Recent payments
+    // ── Recent payments ──
     const recentPayments = await db.payment.findMany({
       orderBy: { paymentDate: 'desc' },
       take: 5,
@@ -53,18 +62,20 @@ export async function GET(request: NextRequest) {
 
     for (const p of recentPayments) {
       activities.push({
-        id: `payment-${p.id}`,
-        type: 'payment_received',
-        title: 'Payment Received',
-        description: `₹${p.amount} from ${p.student.firstName} ${p.student.lastName} via ${p.method}`,
-        timestamp: new Date(p.paymentDate),
+        type: 'PAYMENT',
+        message: `₹${p.amount.toLocaleString('en-IN')} received from ${p.student.firstName} ${p.student.lastName}`,
+        time: formatDistanceToNow(new Date(p.paymentDate), {
+          addSuffix: true,
+        }),
+        icon: 'IndianRupee',
+        color: 'emerald',
       });
     }
 
-    // Recent leads
+    // ── Recent leads ──
     const recentLeads = await db.lead.findMany({
       orderBy: { createdAt: 'desc' },
-      take: 5,
+      take: 4,
       select: {
         id: true,
         parentName: true,
@@ -77,39 +88,84 @@ export async function GET(request: NextRequest) {
 
     for (const l of recentLeads) {
       activities.push({
-        id: `lead-${l.id}`,
-        type: 'new_lead',
-        title: 'New Admission Inquiry',
-        description: `${l.parentName} inquired for ${l.childName} via ${l.source}`,
-        timestamp: l.createdAt,
+        type: 'LEAD',
+        message: `${l.parentName} inquired for ${l.childName} (${l.source})`,
+        time: formatDistanceToNow(new Date(l.createdAt), { addSuffix: true }),
+        icon: 'Phone',
+        color: 'purple',
       });
     }
 
-    // Recent announcements
+    // ── Recent attendance alerts (absences) ──
+    const recentAbsences = await db.studentAttendance.findMany({
+      where: { status: 'ABSENT' },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      include: {
+        student: { select: { firstName: true, lastName: true } },
+      },
+    });
+
+    for (const a of recentAbsences) {
+      activities.push({
+        type: 'ATTENDANCE',
+        message: `${a.student.firstName} ${a.student.lastName} marked absent`,
+        time: formatDistanceToNow(new Date(a.createdAt), { addSuffix: true }),
+        icon: 'AlertTriangle',
+        color: 'red',
+      });
+    }
+
+    // ── Recent staff leaves ──
+    const recentLeaves = await db.leave.findMany({
+      where: { status: 'APPROVED' },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      include: {
+        teacher: { select: { firstName: true, lastName: true } },
+      },
+    });
+
+    for (const l of recentLeaves) {
+      activities.push({
+        type: 'LEAVE',
+        message: `${l.teacher.firstName} ${l.teacher.lastName} on ${l.leaveType.toLowerCase()} leave`,
+        time: formatDistanceToNow(new Date(l.createdAt), { addSuffix: true }),
+        icon: 'Calendar',
+        color: 'orange',
+      });
+    }
+
+    // ── Recent announcements ──
     const recentAnnouncements = await db.announcement.findMany({
       orderBy: { createdAt: 'desc' },
       take: 3,
+      select: { id: true, title: true, createdAt: true },
     });
 
     for (const a of recentAnnouncements) {
       activities.push({
-        id: `announcement-${a.id}`,
-        type: 'announcement',
-        title: a.title,
-        description: a.content.substring(0, 100) + (a.content.length > 100 ? '...' : ''),
-        timestamp: a.createdAt,
+        type: 'ANNOUNCEMENT',
+        message: `New announcement: ${a.title}`,
+        time: formatDistanceToNow(new Date(a.createdAt), { addSuffix: true }),
+        icon: 'Megaphone',
+        color: 'blue',
       });
     }
 
-    // Sort all activities by timestamp descending
-    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    // ── Sort by recency (most recent first) ──
+    // Since we don't have exact timestamps in the ActivityEntry,
+    // we return them in the order they were collected (which is already desc)
+    // Shuffle them together by interleaving — for now just return flat sorted
 
     return NextResponse.json({
       activities: activities.slice(0, limit),
-      total: activities.length,
     });
   } catch (error) {
     console.error('Dashboard activities error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

@@ -1,31 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
-// GET /api/students — List all students with pagination, search, and filters
+// GET /api/students — List students with pagination, search, and filters
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = parseInt(searchParams.get('limit') || '25');
     const search = searchParams.get('search') || '';
     const classId = searchParams.get('classId') || '';
-    const status = searchParams.get('status') || '';
+    const statusParam = searchParams.get('status') || '';
+    const gender = searchParams.get('gender') || '';
+    const bloodGroup = searchParams.get('bloodGroup') || '';
 
     const skip = (page - 1) * limit;
 
+    // Build where clause
     const where: Record<string, unknown> = {};
-    if (classId) where.classId = classId;
-    if (status) where.status = status;
 
+    if (classId) {
+      where.classId = classId;
+    }
+
+    // Status can be comma-separated for multi-select
+    if (statusParam) {
+      const statuses = statusParam.split(',').filter(Boolean);
+      if (statuses.length === 1) {
+        where.status = statuses[0];
+      } else if (statuses.length > 1) {
+        where.status = { in: statuses };
+      }
+    }
+
+    if (gender && gender !== 'All') {
+      where.gender = gender;
+    }
+
+    // Blood group can be comma-separated for multi-select
+    if (bloodGroup) {
+      const groups = bloodGroup.split(',').filter(Boolean);
+      if (groups.length === 1) {
+        where.bloodGroup = groups[0];
+      } else if (groups.length > 1) {
+        where.bloodGroup = { in: groups };
+      }
+    }
+
+    // Search across student name and parent name
     if (search) {
-      where.OR = [
+      (where as Record<string, unknown>).OR = [
         { firstName: { contains: search } },
         { lastName: { contains: search } },
         { rollNumber: { contains: search } },
+        {
+          parents: {
+            some: {
+              parent: {
+                OR: [
+                  { firstName: { contains: search } },
+                  { lastName: { contains: search } },
+                ],
+              },
+            },
+          },
+        },
       ];
     }
 
@@ -37,7 +79,11 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           class: {
-            select: { id: true, name: true, program: { select: { name: true } } },
+            select: {
+              id: true,
+              name: true,
+              program: { select: { id: true, name: true } },
+            },
           },
           branch: { select: { id: true, name: true } },
           parents: {
@@ -54,26 +100,50 @@ export async function GET(request: NextRequest) {
               },
             },
           },
-          _count: {
-            select: {
-              attendance: true,
-              invoices: true,
-              observations: true,
-            },
-          },
         },
       }),
       db.student.count({ where }),
     ]);
 
+    // Format response — flatten primary parent info for easy access
+    const formattedStudents = students.map((s) => {
+      const primaryLink = s.parents.find((p) => p.isPrimary) || s.parents[0];
+      const primaryParent = primaryLink?.parent;
+      return {
+        id: s.id,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        dob: s.dob,
+        gender: s.gender,
+        bloodGroup: s.bloodGroup,
+        aadhaarNumber: s.aadhaarNumber,
+        photo: s.photo,
+        admissionDate: s.admissionDate,
+        status: s.status,
+        rollNumber: s.rollNumber,
+        classId: s.classId,
+        branchId: s.branchId,
+        class: s.class,
+        branch: s.branch,
+        primaryParent: primaryParent
+          ? {
+              id: primaryParent.id,
+              firstName: primaryParent.firstName,
+              lastName: primaryParent.lastName,
+              phone: primaryParent.phone,
+              email: primaryParent.email,
+              relation: primaryParent.relation,
+            }
+          : null,
+        parents: s.parents,
+      };
+    });
+
     return NextResponse.json({
-      students,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      students: formattedStudents,
+      total,
+      page,
+      limit,
     });
   } catch (error) {
     console.error('List students error:', error);
@@ -81,88 +151,179 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/students — Create a new student
+// POST /api/students — Create a new student with parents and medical record
 export async function POST(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const body = await request.json();
     const {
-      branchId,
+      // Student fields
       firstName,
       lastName,
       dob,
       gender,
       bloodGroup,
+      aadhaarNumber,
       classId,
+      branchId,
       rollNumber,
-      // Parent info
-      parentFirstName,
-      parentLastName,
-      parentPhone,
-      parentEmail,
-      parentRelation,
-      parentOccupation,
+      admissionDate,
+      photo,
+      // Father fields
+      fatherFirstName,
+      fatherLastName,
+      fatherPhone,
+      fatherEmail,
+      fatherOccupation,
+      // Mother fields
+      motherFirstName,
+      motherLastName,
+      motherPhone,
+      motherEmail,
+      motherOccupation,
+      // Emergency contact
+      emergencyContactName,
+      emergencyContactPhone,
+      // Address
+      address,
+      // Medical fields
+      allergies,
+      conditions,
+      medications,
+      vaccinationStatus,
+      doctorName,
+      doctorPhone,
+      medicalNotes,
     } = body;
 
-    if (!firstName || !lastName || !dob) {
+    // Validate required student fields
+    if (!firstName || !lastName || !dob || !gender) {
       return NextResponse.json(
-        { error: 'firstName, lastName, and dob are required' },
+        { error: 'firstName, lastName, dob, and gender are required' },
         { status: 400 }
       );
     }
 
-    // Create student
-    const student = await db.student.create({
-      data: {
-        branchId: branchId || null,
-        firstName,
-        lastName,
-        dob: new Date(dob),
-        gender,
-        bloodGroup,
-        classId: classId || null,
-        rollNumber,
-        status: 'ACTIVE',
-      },
-    });
+    // Validate parent fields
+    if (!fatherFirstName || !fatherLastName || !fatherPhone) {
+      return NextResponse.json(
+        { error: "Father's name and phone are required" },
+        { status: 400 }
+      );
+    }
 
-    // Create parent if provided
-    if (parentFirstName && parentLastName && parentPhone) {
-      const parent = await db.parent.create({
+    // Create student + parents + medical in a transaction
+    const student = await db.$transaction(async (tx) => {
+      // 1. Create student
+      const newStudent = await tx.student.create({
         data: {
-          firstName: parentFirstName,
-          lastName: parentLastName,
-          phone: parentPhone,
-          email: parentEmail,
-          relation: parentRelation || 'Father',
-          occupation: parentOccupation,
-          isEmergencyContact: true,
+          firstName,
+          lastName,
+          dob: new Date(dob),
+          gender,
+          bloodGroup: bloodGroup || null,
+          aadhaarNumber: aadhaarNumber || null,
+          classId: classId || null,
+          branchId: branchId || null,
+          rollNumber: rollNumber || null,
+          admissionDate: admissionDate ? new Date(admissionDate) : new Date(),
+          photo: photo || null,
+          status: 'ACTIVE',
         },
       });
 
-      // Link parent to student
-      await db.studentParent.create({
+      // 2. Create Father
+      const father = await tx.parent.create({
         data: {
-          studentId: student.id,
-          parentId: parent.id,
+          firstName: fatherFirstName,
+          lastName: fatherLastName,
+          phone: fatherPhone,
+          email: fatherEmail || null,
+          occupation: fatherOccupation || null,
+          relation: 'Father',
+          isEmergencyContact: false,
+          address: address || null,
+        },
+      });
+
+      // Link father as primary
+      await tx.studentParent.create({
+        data: {
+          studentId: newStudent.id,
+          parentId: father.id,
           isPrimary: true,
         },
       });
-    }
 
-    // Fetch the complete student with relations
+      // 3. Create Mother (if provided)
+      if (motherFirstName && motherLastName) {
+        const mother = await tx.parent.create({
+          data: {
+            firstName: motherFirstName,
+            lastName: motherLastName,
+            phone: motherPhone || null,
+            email: motherEmail || null,
+            occupation: motherOccupation || null,
+            relation: 'Mother',
+            isEmergencyContact: false,
+            address: address || null,
+          },
+        });
+
+        await tx.studentParent.create({
+          data: {
+            studentId: newStudent.id,
+            parentId: mother.id,
+            isPrimary: false,
+          },
+        });
+      }
+
+      // 4. Create Emergency Contact (if provided and different from parents)
+      if (emergencyContactName && emergencyContactPhone) {
+        await tx.parent.create({
+          data: {
+            firstName: emergencyContactName.split(' ')[0] || emergencyContactName,
+            lastName: emergencyContactName.split(' ').slice(1).join(' ') || '',
+            phone: emergencyContactPhone,
+            relation: 'Emergency',
+            isEmergencyContact: true,
+            address: address || null,
+          },
+        });
+        // Note: Not linking emergency contact as StudentParent since it's separate
+        // In a real app, you might want to link them too
+      }
+
+      // 5. Create medical record (if any data provided)
+      if (allergies || conditions || medications || vaccinationStatus || doctorName) {
+        await tx.medicalRecord.create({
+          data: {
+            studentId: newStudent.id,
+            allergies: allergies || null,
+            conditions: conditions || null,
+            medications: medications || null,
+            vaccinationStatus: vaccinationStatus || null,
+            doctorName: doctorName || null,
+            doctorPhone: doctorPhone || null,
+            notes: medicalNotes || null,
+          },
+        });
+      }
+
+      return newStudent;
+    });
+
+    // Fetch complete student with relations
     const completeStudent = await db.student.findUnique({
       where: { id: student.id },
       include: {
-        class: { select: { id: true, name: true } },
+        class: { select: { id: true, name: true, program: { select: { name: true } } } },
         branch: { select: { id: true, name: true } },
-        parents: {
-          include: {
-            parent: true,
-          },
-        },
+        parents: { include: { parent: true } },
+        medicalRecords: true,
       },
     });
 
