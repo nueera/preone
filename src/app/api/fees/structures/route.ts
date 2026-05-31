@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/fees/structures — Fee structures
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const academicYear = searchParams.get('academicYear') || '';
     const feeType = searchParams.get('feeType') || '';
     const classId = searchParams.get('classId') || '';
 
-    const where: Record<string, unknown> = { isActive: true };
+    // Build where clause with branch isolation
+    const where: Record<string, unknown> = { isActive: true, ...branchFilter(user) };
     if (branchId) where.branchId = branchId;
     if (academicYear) where.academicYear = academicYear;
     if (feeType) where.feeType = feeType;

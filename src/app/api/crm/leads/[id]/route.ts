@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, forbidden } from '@/lib/auth';
 
 // PUT /api/crm/leads/[id] — Update lead (change stage, add follow-up)
 export async function PUT(
@@ -8,10 +8,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
     const body = await request.json();
@@ -19,6 +17,11 @@ export async function PUT(
     const existing = await db.lead.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+    }
+
+    // Verify branch isolation
+    if (user.branchId && existing.branchId !== user.branchId) {
+      return forbidden('You do not have access to this lead');
     }
 
     // Update lead fields
@@ -67,7 +70,7 @@ export async function PUT(
             notes: followUpNotes,
             outcome,
             followUpDate: new Date(followUpDate),
-            conductedBy: authUser.userId,
+            conductedBy: user.userId,
             nextFollowUpDate: nfDate ? new Date(nfDate) : undefined,
             duration,
           },

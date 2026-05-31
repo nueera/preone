@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 
 // GET /api/fees/invoices — List invoices
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const status = searchParams.get('status') || '';
     const studentId = searchParams.get('studentId') || '';
     const academicYear = searchParams.get('academicYear') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: Record<string, unknown> = {};
+    // Build where clause with branch isolation
+    const where: Record<string, unknown> = { ...branchFilter(user) };
     if (branchId) where.branchId = branchId;
     if (status) where.status = status;
     if (studentId) where.studentId = studentId;
@@ -63,10 +62,8 @@ export async function GET(request: NextRequest) {
 // POST /api/fees/invoices — Create invoice
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const body = await request.json();
     const {
@@ -74,7 +71,10 @@ export async function POST(request: NextRequest) {
       amount, discount, discountReason, lateFee, dueDate, notes,
     } = body;
 
-    if (!studentId || !branchId || !amount || !dueDate) {
+    // Use user's branchId for branch isolation
+    const effectiveBranchId = user.branchId || branchId;
+
+    if (!studentId || !effectiveBranchId || !amount || !dueDate) {
       return NextResponse.json(
         { error: 'studentId, branchId, amount, and dueDate are required' },
         { status: 400 }
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       data: {
         invoiceNo,
         studentId,
-        branchId,
+        branchId: effectiveBranchId,
         feeStructureId,
         academicYear,
         period,

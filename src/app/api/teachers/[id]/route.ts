@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, forbidden } from '@/lib/auth';
 
 // GET /api/teachers/[id] — Get teacher details
 export async function GET(
@@ -8,10 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
 
@@ -44,6 +42,11 @@ export async function GET(
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
 
+    // Verify branch isolation
+    if (user.branchId && teacher.branchId !== user.branchId) {
+      return forbidden('You do not have access to this teacher');
+    }
+
     return NextResponse.json({ teacher });
   } catch (error) {
     console.error('Get teacher error:', error);
@@ -57,10 +60,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
     const body = await request.json();
@@ -68,6 +69,11 @@ export async function PUT(
     const existing = await db.teacher.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
+    }
+
+    // Verify branch isolation
+    if (user.branchId && existing.branchId !== user.branchId) {
+      return forbidden('You do not have access to this teacher');
     }
 
     const updateData: Record<string, unknown> = {};

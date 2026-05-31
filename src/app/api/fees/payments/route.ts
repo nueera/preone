@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 
 // POST /api/fees/payments — Record payment
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const body = await request.json();
     const {
@@ -46,7 +44,7 @@ export async function POST(request: NextRequest) {
         status: 'Success',
         paidBy,
         paidByName,
-        receivedBy: authUser.userId,
+        receivedBy: user.userId,
         notes,
       },
     });
@@ -58,7 +56,7 @@ export async function POST(request: NextRequest) {
         paymentId: payment.id,
         receiptNo,
         amount,
-        issuedBy: authUser.userId,
+        issuedBy: user.userId,
       },
     });
 

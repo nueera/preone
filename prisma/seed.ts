@@ -153,17 +153,17 @@ async function main() {
   console.log('  ✓ School & Branch created');
 
   // ============================================================
-  // 2. USERS (SuperAdmin, Owner, Teachers, Parents)
+  // 2. USERS (Admin, Teachers, Parents)
   // ============================================================
   console.log('  Creating Users...');
   const passwordHash = hashPassword('password123');
 
   const superAdminUser = await prisma.user.create({
-    data: { email: 'admin@preone.com', phone: '+91 99000 00001', passwordHash, role: 'SuperAdmin', isActive: true, isVerified: true, branchId: branch.id },
+    data: { email: 'admin@preone.com', phone: '+91 99000 00001', passwordHash, role: 'Admin', isActive: true, isVerified: true, branchId: branch.id },
   });
 
   const ownerUser = await prisma.user.create({
-    data: { email: 'owner@littlestars.com', phone: '+91 98200 12345', passwordHash, role: 'Owner', isActive: true, isVerified: true, branchId: branch.id },
+    data: { email: 'owner@littlestars.com', phone: '+91 98200 12345', passwordHash, role: 'Admin', isActive: true, isVerified: true, branchId: branch.id },
   });
 
   // Teacher users
@@ -1043,8 +1043,8 @@ async function main() {
   console.log(`   Holidays: ${holidayDefs.length}`);
   console.log(`   Events: ${eventDefs.length}`);
   console.log(`\n   Login credentials:`);
-  console.log(`   SuperAdmin: admin@preone.com / password123`);
-  console.log(`   Owner: owner@littlestars.com / password123`);
+  console.log(`   Admin: admin@preone.com / password123`);
+  console.log(`   Admin: owner@littlestars.com / password123`);
   console.log(`   Teachers: kavitha.raman@littlestars.com / password123 (etc)`);
 }
 

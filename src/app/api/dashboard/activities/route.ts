@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 interface ActivityItem {
   id: string;
@@ -13,19 +13,21 @@ interface ActivityItem {
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
-    const branchId = request.nextUrl.searchParams.get('branchId') || authUser.branchId;
+    const branchId = request.nextUrl.searchParams.get('branchId') || user.branchId;
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
+
+    // Apply branch isolation: if user has branchId and no explicit branchId param, use user's
+    const effectiveBranchId = branchId || (user.branchId ? user.branchId : undefined);
+    const bf = effectiveBranchId ? { branchId: effectiveBranchId } : branchFilter(user);
 
     const activities: ActivityItem[] = [];
 
     // Recent student enrollments
     const recentStudents = await db.student.findMany({
-      where: branchId ? { branchId } : {},
+      where: bf,
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: {
@@ -63,8 +65,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const filteredPayments = branchId
-      ? recentPayments.filter(p => p.invoice.branchId === branchId)
+    const filteredPayments = effectiveBranchId
+      ? recentPayments.filter(p => p.invoice.branchId === effectiveBranchId)
       : recentPayments;
 
     for (const p of filteredPayments) {
@@ -80,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     // Recent leads
     const recentLeads = await db.lead.findMany({
-      where: branchId ? { branchId } : {},
+      where: bf,
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: {
@@ -116,8 +118,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const filteredAttendance = branchId
-      ? todayAttendance.filter(a => a.student.branchId === branchId)
+    const filteredAttendance = effectiveBranchId
+      ? todayAttendance.filter(a => a.student.branchId === effectiveBranchId)
       : todayAttendance;
 
     for (const a of filteredAttendance) {
@@ -135,7 +137,7 @@ export async function GET(request: NextRequest) {
     const recentAnnouncements = await db.announcement.findMany({
       where: {
         isActive: true,
-        ...(branchId ? { branchId } : {}),
+        ...(effectiveBranchId ? { branchId: effectiveBranchId } : branchFilter(user)),
       },
       orderBy: { createdAt: 'desc' },
       take: 3,

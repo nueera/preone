@@ -1,22 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // GET /api/parent/children — List all children or single child details
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    if (authUser.role !== 'Parent') {
-      return NextResponse.json({ error: 'Access denied. Parent role required.' }, { status: 403 });
-    }
+    const user = requireRole(request, Role.Parent);
+    if (user instanceof NextResponse) return user;
 
     // Find the Parent record linked to this user
     const parent = await db.parent.findUnique({
-      where: { userId: authUser.userId },
+      where: { userId: user.userId },
     });
 
     if (!parent) {

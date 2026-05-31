@@ -2324,7 +2324,7 @@ export default function PreOneDashboard() {
     );
   }
 
-  // Default: Admin/Owner/SuperAdmin — render the existing admin dashboard
+  // Default: Admin — render the admin dashboard
   const userName = user?.email ? (user.email as string).split('@')[0] : 'Admin';
 
   return (

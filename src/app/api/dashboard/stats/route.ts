@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/dashboard/stats — aggregate counts and revenue
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    // Allow unauthenticated access for demo — use first branch as default
-    const branchId = request.nextUrl.searchParams.get('branchId') || authUser?.branchId || '';
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
-    const branchFilter = branchId ? { branchId } : {};
+    const branchId = request.nextUrl.searchParams.get('branchId') || user.branchId || '';
+
+    const bf = branchId ? { branchId } : branchFilter(user);
 
     // Total students
     const totalStudents = await db.student.count({
-      where: { ...branchFilter, status: 'Active' },
+      where: { ...bf, status: 'Active' },
     });
 
     // Total teachers
     const totalTeachers = await db.teacher.count({
-      where: { ...branchFilter, status: 'Active' },
+      where: { ...bf, status: 'Active' },
     });
 
     // Revenue — sum of all successful payments
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     const newAdmissions = await db.student.count({
       where: {
         enrollmentDate: { gte: monthStart },
-        ...branchFilter,
+        ...bf,
       },
     });
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // Class occupancy
     const classes = await db.class.findMany({
-      where: { ...branchFilter, isActive: true },
+      where: { ...bf, isActive: true },
       include: { _count: { select: { students: true } } },
     });
     const totalCapacity = classes.reduce((sum, c) => sum + c.capacity, 0);
@@ -68,13 +69,13 @@ export async function GET(request: NextRequest) {
     const pendingInvoices = await db.invoice.count({
       where: {
         status: { in: ['Pending', 'Overdue', 'Partial'] },
-        ...branchFilter,
+        ...bf,
       },
     });
 
     // Fee collection breakdown
     const feeInvoices = await db.invoice.findMany({
-      where: branchFilter,
+      where: bf,
       select: { status: true, totalAmount: true, paidAmount: true },
     });
     const collected = feeInvoices.filter(i => i.status === 'Paid').reduce((s, i) => s + i.paidAmount, 0);
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
     const activeLeads = await db.lead.count({
       where: {
         stage: { notIn: ['Enrolled', 'Lost'] },
-        ...branchFilter,
+        ...bf,
       },
     });
 

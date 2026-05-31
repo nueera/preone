@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // GET /api/growth/class/[classId] — Class growth overview
 export async function GET(
@@ -8,10 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ classId: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireRole(request, Role.Admin, Role.Teacher);
+    if (user instanceof NextResponse) return user;
 
     const { classId } = await params;
     const period = request.nextUrl.searchParams.get('period') || '';

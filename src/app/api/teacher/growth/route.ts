@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // GET /api/teacher/growth — Get class-wide growth data
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    if (authUser.role !== 'Teacher') {
-      return NextResponse.json({ error: 'Teacher access required' }, { status: 403 });
-    }
+    const user = requireRole(request, Role.Teacher);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
     const classId = searchParams.get('classId') || '';
@@ -21,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     // Find the teacher profile
     const teacher = await db.teacher.findUnique({
-      where: { userId: authUser.userId },
+      where: { userId: user.userId },
       select: { id: true, branchId: true },
     });
 
@@ -111,18 +105,12 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/growth — Update growth score for a student
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    if (authUser.role !== 'Teacher') {
-      return NextResponse.json({ error: 'Teacher access required' }, { status: 403 });
-    }
+    const user = requireRole(request, Role.Teacher);
+    if (user instanceof NextResponse) return user;
 
     // Find the teacher profile
     const teacher = await db.teacher.findUnique({
-      where: { userId: authUser.userId },
+      where: { userId: user.userId },
       select: { id: true },
     });
 

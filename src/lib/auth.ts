@@ -1,4 +1,24 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
+import { NextRequest, NextResponse } from 'next/server';
+
+// ============================================================
+// ROLE SYSTEM — 3 Core Roles
+// ============================================================
+
+export enum Role {
+  Admin = 'Admin',
+  Teacher = 'Teacher',
+  Parent = 'Parent',
+}
+
+export const ALL_ROLES = [Role.Admin, Role.Teacher, Role.Parent] as const;
+
+// Permission tiers: Admin > Teacher > Parent
+export const ROLE_HIERARCHY: Record<Role, number> = {
+  [Role.Admin]: 100,
+  [Role.Parent]: 50,
+  [Role.Teacher]: 50,
+};
 
 // ============================================================
 // Password Hashing (using Node.js crypto HMAC-SHA256)
@@ -28,13 +48,13 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 }
 
 // ============================================================
-// Stateless Token Management (HMAC-signed JSON tokens)
+// Token Payload — Strongly Typed
 // ============================================================
 
-interface TokenPayload {
+export interface TokenPayload {
   userId: string;
   email: string;
-  role: string;
+  role: Role;
   branchId?: string | null;
 }
 
@@ -71,11 +91,14 @@ export function verifyToken(token: string): TokenPayload | null {
     // Check expiry
     if (Date.now() > payload.expiresAt) return null;
 
-    // Return without expiresAt
+    // Validate role is a known role
+    const role = payload.role as string;
+    if (!ALL_ROLES.includes(role as Role)) return null;
+
     return {
       userId: payload.userId,
       email: payload.email,
-      role: payload.role,
+      role: role as Role,
       branchId: payload.branchId,
     };
   } catch {
@@ -84,10 +107,8 @@ export function verifyToken(token: string): TokenPayload | null {
 }
 
 // ============================================================
-// Auth Helper for API Routes
+// Auth Helpers for API Routes
 // ============================================================
-
-import { NextRequest } from 'next/server';
 
 export function getAuthUser(request: NextRequest): TokenPayload | null {
   const authHeader = request.headers.get('authorization');
@@ -96,10 +117,108 @@ export function getAuthUser(request: NextRequest): TokenPayload | null {
   return verifyToken(token);
 }
 
-export function requireAuth(request: NextRequest): TokenPayload | { error: boolean; message: string; status: number } {
+export function requireAuth(request: NextRequest): TokenPayload | null {
+  return getAuthUser(request);
+}
+
+// ============================================================
+// Role-Based Access Control (RBAC)
+// ============================================================
+
+/**
+ * Check if a user has one of the allowed roles.
+ */
+export function hasRole(user: TokenPayload, ...allowedRoles: Role[]): boolean {
+  return allowedRoles.includes(user.role);
+}
+
+/**
+ * Check if user is Admin.
+ */
+export function isAdmin(user: TokenPayload): boolean {
+  return user.role === Role.Admin;
+}
+
+/**
+ * Check if user is Teacher.
+ */
+export function isTeacher(user: TokenPayload): boolean {
+  return user.role === Role.Teacher;
+}
+
+/**
+ * Check if user is Parent.
+ */
+export function isParent(user: TokenPayload): boolean {
+  return user.role === Role.Parent;
+}
+
+/**
+ * Create a 401 Unauthorized response.
+ */
+export function unauthorized(message = 'Authentication required'): NextResponse {
+  return NextResponse.json({ error: true, message }, { status: 401 });
+}
+
+/**
+ * Create a 403 Forbidden response.
+ */
+export function forbidden(message = 'You do not have permission to access this resource'): NextResponse {
+  return NextResponse.json({ error: true, message }, { status: 403 });
+}
+
+/**
+ * Require auth + specific roles. Returns user if authorized, or NextResponse if not.
+ * Usage: const user = requireRole(request, Role.Admin); if (user instanceof NextResponse) return user;
+ */
+export function requireRole(request: NextRequest, ...allowedRoles: Role[]): TokenPayload | NextResponse {
   const user = getAuthUser(request);
-  if (!user) {
-    return { error: true, message: 'Authentication required', status: 401 };
-  }
+  if (!user) return unauthorized();
+  if (!hasRole(user, ...allowedRoles)) return forbidden();
   return user;
+}
+
+/**
+ * Require auth + Admin role. Returns user if authorized, or NextResponse if not.
+ * Usage: const user = requireAdmin(request); if (user instanceof NextResponse) return user;
+ */
+export function requireAdmin(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.Admin);
+}
+
+/**
+ * Require auth + Teacher role.
+ */
+export function requireTeacher(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.Teacher);
+}
+
+/**
+ * Require auth + Parent role.
+ */
+export function requireParent(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.Parent);
+}
+
+// ============================================================
+// Branch Isolation Helper
+// ============================================================
+
+/**
+ * Build a Prisma where clause that enforces branch isolation.
+ * Admin can optionally see all branches; Teacher/Parent are scoped to their branch.
+ */
+export function branchFilter(user: TokenPayload): Record<string, unknown> {
+  if (user.branchId) {
+    return { branchId: user.branchId };
+  }
+  return {};
+}
+
+/**
+ * Enforce that a user can only access data within their branch.
+ * Returns the branchId to filter by, or undefined if no restriction (admin without branch).
+ */
+export function getBranchScope(user: TokenPayload): string | undefined {
+  return user.branchId || undefined;
 }

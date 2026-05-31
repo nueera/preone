@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/crm/pipeline — Pipeline statistics
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
 
-    const where = branchId ? { branchId } : {};
+    // Build where clause with branch isolation
+    const where = branchId ? { branchId } : branchFilter(user);
 
     // Get all leads grouped by stage
     const leads = await db.lead.findMany({

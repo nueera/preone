@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/attendance/stats — Today's attendance stats
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const classId = searchParams.get('classId') || '';
     const dateParam = searchParams.get('date') || '';
 
@@ -27,6 +25,7 @@ export async function GET(request: NextRequest) {
             gte: new Date(dateStr + 'T00:00:00.000Z'),
             lte: new Date(dateStr + 'T23:59:59.999Z'),
           },
+          ...branchFilter(user),
         },
       });
 
@@ -58,11 +57,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Filter by branch/class
+    // Filter by branch/class (with branch isolation)
     let filteredStudentAttendance = studentAttendance;
     if (branchId) {
       filteredStudentAttendance = filteredStudentAttendance.filter(
         a => a.student.branchId === branchId
+      );
+    } else if (user.branchId) {
+      filteredStudentAttendance = filteredStudentAttendance.filter(
+        a => a.student.branchId === user.branchId
       );
     }
     if (classId) {
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
     const studentExcused = filteredStudentAttendance.filter(a => a.status === 'Excused').length;
 
     // Get total active students for the filter
-    const studentWhere: Record<string, unknown> = { status: 'Active' };
+    const studentWhere: Record<string, unknown> = { status: 'Active', ...branchFilter(user) };
     if (branchId) studentWhere.branchId = branchId;
     if (classId) studentWhere.classId = classId;
     const totalActiveStudents = await db.student.count({ where: studentWhere });
@@ -105,6 +108,10 @@ export async function GET(request: NextRequest) {
       filteredStaffAttendance = filteredStaffAttendance.filter(
         a => a.teacher.branchId === branchId
       );
+    } else if (user.branchId) {
+      filteredStaffAttendance = filteredStaffAttendance.filter(
+        a => a.teacher.branchId === user.branchId
+      );
     }
 
     const staffPresent = filteredStaffAttendance.filter(a => a.status === 'Present').length;
@@ -115,7 +122,7 @@ export async function GET(request: NextRequest) {
     const totalActiveStaff = await db.teacher.count({
       where: {
         status: 'Active',
-        ...(branchId ? { branchId } : {}),
+        ...(branchId ? { branchId } : branchFilter(user)),
       },
     });
 
@@ -123,7 +130,7 @@ export async function GET(request: NextRequest) {
     const classes = await db.class.findMany({
       where: {
         isActive: true,
-        ...(branchId ? { branchId } : {}),
+        ...(branchId ? { branchId } : branchFilter(user)),
       },
       include: {
         _count: { select: { students: true } },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyPassword, generateToken } from '@/lib/auth';
+import { verifyPassword, generateToken, Role } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,11 +51,12 @@ export async function POST(request: NextRequest) {
       data: { lastLoginAt: new Date() },
     });
 
-    // Generate token
+    // Generate token — ensure role is a valid Role enum value
+    const userRole = user.role as Role;
     const token = generateToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: userRole,
       branchId: user.branchId,
     });
 

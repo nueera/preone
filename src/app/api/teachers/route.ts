@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/teachers — List all teachers
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const status = searchParams.get('status') || '';
     const staffType = searchParams.get('staffType') || '';
     const search = searchParams.get('search') || '';
@@ -19,7 +17,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = {};
+    // Build where clause with branch isolation
+    const where: Record<string, unknown> = { ...branchFilter(user) };
     if (branchId) where.branchId = branchId;
     if (status) where.status = status;
     if (staffType) where.staffType = staffType;
@@ -68,10 +67,8 @@ export async function GET(request: NextRequest) {
 // POST /api/teachers — Create new teacher
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const body = await request.json();
     const {
@@ -80,7 +77,10 @@ export async function POST(request: NextRequest) {
       experience, staffType, userId,
     } = body;
 
-    if (!branchId || !firstName || !lastName) {
+    // Use user's branchId for branch isolation
+    const effectiveBranchId = user.branchId || branchId;
+
+    if (!effectiveBranchId || !firstName || !lastName) {
       return NextResponse.json(
         { error: 'branchId, firstName, and lastName are required' },
         { status: 400 }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     const teacher = await db.teacher.create({
       data: {
-        branchId,
+        branchId: effectiveBranchId,
         employeeId,
         firstName,
         lastName,

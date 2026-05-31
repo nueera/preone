@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter, forbidden } from '@/lib/auth';
 
 // GET /api/students/[id] — Get student details
 export async function GET(
@@ -8,10 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
 
@@ -73,6 +71,11 @@ export async function GET(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
+    // Verify branch isolation
+    if (user.branchId && student.branchId !== user.branchId) {
+      return forbidden('You do not have access to this student');
+    }
+
     return NextResponse.json({ student });
   } catch (error) {
     console.error('Get student error:', error);
@@ -86,18 +89,21 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
     const body = await request.json();
 
-    // Check student exists
+    // Check student exists and belongs to user's branch
     const existing = await db.student.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+    }
+
+    // Verify branch isolation
+    if (user.branchId && existing.branchId !== user.branchId) {
+      return forbidden('You do not have access to this student');
     }
 
     // Build update data
@@ -140,16 +146,19 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const { id } = await params;
 
     const existing = await db.student.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+    }
+
+    // Verify branch isolation
+    if (user.branchId && existing.branchId !== user.branchId) {
+      return forbidden('You do not have access to this student');
     }
 
     // Soft delete — set status to Inactive

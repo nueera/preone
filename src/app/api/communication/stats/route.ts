@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/communication/stats — Communication stats
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
 
-    const announcementWhere: Record<string, unknown> = { isActive: true };
+    // Build where clause with branch isolation
+    const announcementWhere: Record<string, unknown> = { isActive: true, ...branchFilter(user) };
     if (branchId) announcementWhere.branchId = branchId;
 
     // Announcements count
@@ -32,11 +31,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Announcements by priority
-    const announcementsByPriority: Record<string, number> = {};
-    for (const a of allAnnouncements) {
-      // We need priority, which we didn't select. Let me just use a separate query
-    }
-
     const priorityStats = await db.announcement.groupBy({
       by: ['priority'],
       where: announcementWhere,
@@ -70,6 +64,7 @@ export async function GET(request: NextRequest) {
     // Chat threads activity
     const chatThreadWhere: Record<string, unknown> = {};
     if (branchId) chatThreadWhere.branchId = branchId;
+    else Object.assign(chatThreadWhere, branchFilter(user));
 
     const activeChatThreads = await db.chatThread.count({
       where: { ...chatThreadWhere, isActive: true },

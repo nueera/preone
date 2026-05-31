@@ -17,6 +17,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  Admin
+  Teacher
+  Parent
+}
+
 // ============================================================
 // 1. USERS & AUTHENTICATION
 // ============================================================
@@ -26,7 +32,7 @@ model User {
   email        String   @unique
   phone        String?
   passwordHash String
-  role         String   // SuperAdmin, Owner, Admin, Teacher, Parent
+  role         Role     @default(Admin)
   isActive     Boolean  @default(true)
   isVerified   Boolean  @default(false)
   lastLoginAt  DateTime?

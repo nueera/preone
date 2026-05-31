@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/fees/overview — Fee collection summary
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const academicYear = searchParams.get('academicYear') || '';
 
-    // Build invoice filter
-    const invoiceWhere: Record<string, unknown> = {};
+    // Build invoice filter with branch isolation
+    const invoiceWhere: Record<string, unknown> = { ...branchFilter(user) };
     if (branchId) invoiceWhere.branchId = branchId;
     if (academicYear) invoiceWhere.academicYear = academicYear;
 

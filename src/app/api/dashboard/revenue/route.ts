@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/dashboard/revenue — monthly revenue data for charts
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
-    const branchId = request.nextUrl.searchParams.get('branchId') || authUser.branchId;
+    const branchId = request.nextUrl.searchParams.get('branchId') || user.branchId;
     const year = parseInt(request.nextUrl.searchParams.get('year') || new Date().getFullYear().toString());
 
     // Get all successful payments for the year
@@ -29,17 +27,25 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Filter by branch if needed
+    // Filter by branch if needed (with branch isolation)
     const filteredPayments = branchId
       ? payments.filter(p => p.invoice.branchId === branchId)
-      : payments;
+      : user.branchId
+        ? payments.filter(p => p.invoice.branchId === user.branchId)
+        : payments;
 
     // Get invoices for invoiced amounts
+    const invoiceWhere: Record<string, unknown> = {
+      issuedAt: { gte: yearStart, lte: yearEnd },
+    };
+    if (branchId) {
+      invoiceWhere.branchId = branchId;
+    } else {
+      Object.assign(invoiceWhere, branchFilter(user));
+    }
+
     const invoices = await db.invoice.findMany({
-      where: {
-        issuedAt: { gte: yearStart, lte: yearEnd },
-        ...(branchId ? { branchId } : {}),
-      },
+      where: invoiceWhere,
       select: {
         totalAmount: true,
         paidAmount: true,
@@ -75,11 +81,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Fee type breakdown
+    const feeInvoiceWhere: Record<string, unknown> = {
+      status: { in: ['Paid', 'Partial'] },
+    };
+    if (branchId) {
+      feeInvoiceWhere.branchId = branchId;
+    } else {
+      Object.assign(feeInvoiceWhere, branchFilter(user));
+    }
+
     const feeInvoices = await db.invoice.findMany({
-      where: {
-        status: { in: ['Paid', 'Partial'] },
-        ...(branchId ? { branchId } : {}),
-      },
+      where: feeInvoiceWhere,
       include: {
         feeStructure: {
           select: { feeType: true, name: true },

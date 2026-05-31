@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // POST /api/growth/observations — Add teacher observation
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireRole(request, Role.Admin, Role.Teacher);
+    if (user instanceof NextResponse) return user;
 
     const body = await request.json();
     const {
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Find teacher by user ID
     const teacher = await db.teacher.findFirst({
-      where: { userId: authUser.userId },
+      where: { userId: user.userId },
     });
 
     if (!teacher) {

@@ -1,28 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireAdmin, branchFilter } from '@/lib/auth';
 
 // GET /api/students — List all students with pagination, search, and filters
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
     const classId = searchParams.get('classId') || '';
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
+    const branchId = searchParams.get('branchId') || user.branchId || '';
     const status = searchParams.get('status') || '';
     const sectionId = searchParams.get('sectionId') || '';
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
-    const where: Record<string, unknown> = {};
+    // Build where clause with branch isolation
+    const where: Record<string, unknown> = { ...branchFilter(user) };
 
     if (branchId) where.branchId = branchId;
     if (classId) where.classId = classId;
@@ -94,10 +92,8 @@ export async function GET(request: NextRequest) {
 // POST /api/students — Create a new student
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const body = await request.json();
     const {
@@ -123,8 +119,11 @@ export async function POST(request: NextRequest) {
       parentOccupation,
     } = body;
 
+    // Use user's branchId for branch isolation
+    const effectiveBranchId = user.branchId || branchId;
+
     // Validation
-    if (!branchId || !firstName || !lastName || !dob) {
+    if (!effectiveBranchId || !firstName || !lastName || !dob) {
       return NextResponse.json(
         { error: 'branchId, firstName, lastName, and dob are required' },
         { status: 400 }
@@ -147,7 +146,7 @@ export async function POST(request: NextRequest) {
     // Create student
     const student = await db.student.create({
       data: {
-        branchId,
+        branchId: effectiveBranchId,
         admissionNo,
         firstName,
         lastName,
