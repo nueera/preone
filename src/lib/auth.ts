@@ -1,6 +1,12 @@
+// ============================================================
+// PreOne — Auth Utility
+// JWT-based authentication with HMAC-SHA256 signing
+// Uses bcryptjs for password hashing
+// ============================================================
+
 import { createHmac, timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // ============================================================
 // ROLE SYSTEM — 4 Core Roles (Uppercase, matching Prisma enum)
@@ -23,8 +29,16 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
   [Role.PARENT]: 30,
 };
 
+// Route prefixes mapped to required roles
+export const ROLE_ROUTE_MAP: Record<string, Role> = {
+  '/admin': Role.ADMIN,
+  '/teacher': Role.TEACHER,
+  '/parent': Role.PARENT,
+  '/taskmaster': Role.TASK_MASTER,
+};
+
 // ============================================================
-// Password Hashing (using bcrypt)
+// Password Hashing (using bcryptjs)
 // ============================================================
 
 const SALT_ROUNDS = 10;
@@ -37,13 +51,16 @@ export function hashPasswordSync(password: string): string {
   return bcrypt.hashSync(password, SALT_ROUNDS);
 }
 
-export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+export async function comparePassword(password: string, hash: string): Promise<boolean> {
   try {
-    return await bcrypt.compare(password, storedHash);
+    return await bcrypt.compare(password, hash);
   } catch {
     return false;
   }
 }
+
+// Legacy alias for backward compatibility
+export const verifyPassword = comparePassword;
 
 // ============================================================
 // Token Payload — Strongly Typed
@@ -58,16 +75,27 @@ export interface TokenPayload {
   schoolId?: string | null;
 }
 
-// Secret key for signing tokens — in production use env var
-const TOKEN_SECRET = process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
+// Secret key for signing tokens — JWT_SECRET in production
+const JWT_SECRET = process.env.JWT_SECRET || process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
 
 function sign(data: string): string {
-  return createHmac('sha256', TOKEN_SECRET).update(data).digest('hex');
+  return createHmac('sha256', JWT_SECRET).update(data).digest('hex');
 }
 
-export function generateToken(payload: TokenPayload): string {
+export function generateToken(payload: { userId: string; role: string; schoolId?: string | null; email?: string; name?: string; branchId?: string | null }): string {
   const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-  const payloadData = JSON.stringify({ ...payload, expiresAt });
+
+  const fullPayload: TokenPayload & { expiresAt: number } = {
+    userId: payload.userId,
+    email: payload.email || '',
+    name: payload.name || '',
+    role: payload.role as Role,
+    branchId: payload.branchId ?? null,
+    schoolId: payload.schoolId ?? null,
+    expiresAt,
+  };
+
+  const payloadData = JSON.stringify(fullPayload);
   const payloadB64 = Buffer.from(payloadData).toString('base64url');
   const signature = sign(payloadB64);
   return `${payloadB64}.${signature}`;
@@ -97,7 +125,7 @@ export function verifyToken(token: string): TokenPayload | null {
 
     return {
       userId: payload.userId,
-      email: payload.email,
+      email: payload.email || '',
       name: payload.name || '',
       role: role as Role,
       branchId: payload.branchId,
@@ -112,7 +140,7 @@ export function verifyToken(token: string): TokenPayload | null {
 // Auth Helpers for API Routes
 // ============================================================
 
-export function getAuthUser(request: NextRequest): TokenPayload | null {
+export function getAuthUser(request: NextRequest | Request): TokenPayload | null {
   const authHeader = request.headers.get('authorization');
   if (!authHeader?.startsWith('Bearer ')) return null;
   const token = authHeader.substring(7);
@@ -141,6 +169,10 @@ export function isTeacher(user: TokenPayload): boolean {
 
 export function isParent(user: TokenPayload): boolean {
   return user.role === Role.PARENT;
+}
+
+export function isTaskMaster(user: TokenPayload): boolean {
+  return user.role === Role.TASK_MASTER;
 }
 
 export function unauthorized(message = 'Authentication required'): NextResponse {
@@ -173,6 +205,10 @@ export function requireParent(request: NextRequest): TokenPayload | NextResponse
   return requireRole(request, Role.PARENT);
 }
 
+export function requireTaskMaster(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.TASK_MASTER);
+}
+
 // ============================================================
 // Branch Isolation Helper
 // ============================================================
@@ -186,4 +222,23 @@ export function branchFilter(user: TokenPayload): Record<string, unknown> {
 
 export function getBranchScope(user: TokenPayload): string | undefined {
   return user.branchId || undefined;
+}
+
+// ============================================================
+// Role-based redirect helper
+// ============================================================
+
+export function getDashboardPath(role: Role): string {
+  switch (role) {
+    case Role.ADMIN:
+      return '/admin/dashboard';
+    case Role.TEACHER:
+      return '/teacher/dashboard';
+    case Role.PARENT:
+      return '/parent/dashboard';
+    case Role.TASK_MASTER:
+      return '/taskmaster/dashboard';
+    default:
+      return '/login';
+  }
 }

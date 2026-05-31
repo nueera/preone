@@ -181,3 +181,57 @@ Stage Summary:
 - Admin Portal: rebuilt from scratch with PreOne brand, 10 sections, mobile responsive
 - Login: admin@preone.com / password123
 - 0 lint errors
+---
+Task ID: 2-6
+Agent: Main Agent
+Task: Implement STEPS 2-6 for PreOne admin portal foundation (Auth Utility, Auth API Routes, Login Page, Middleware, Seed Data)
+
+Work Log:
+- Installed bcryptjs and @types/bcryptjs (replacing bcrypt for cross-platform compatibility)
+- STEP 2: Rewrote /src/lib/auth.ts with JWT-based auth using HMAC-SHA256, bcryptjs password hashing, Role enum, RBAC helpers
+- STEP 3: Created 4 Auth API Routes:
+  - POST /api/auth/login — email/password authentication, JWT token generation, audit log
+  - POST /api/auth/register — user creation with role validation, email uniqueness check
+  - POST /api/auth/forgot-password — 6-digit OTP generation with 10min expiry
+  - POST /api/auth/reset-password — OTP verification, password reset, audit log
+- STEP 4: Built /src/app/login/page.tsx — beautiful preschool-themed login page with:
+  - Purple→Pink gradient branding with PreOne logo
+  - Email/password fields with show/hide toggle
+  - Forgot password dialog with OTP input (InputOTP component)
+  - Demo credentials quick-fill buttons
+  - Loading states, error toasts, role-based redirect
+  - Cookie + localStorage token storage for middleware compatibility
+- STEP 5: Created middleware at /middleware.ts (project root for Next.js 16):
+  - Route protection for /admin, /teacher, /parent, /taskmaster
+  - Role-based access control (role must match route prefix)
+  - Cookie-based token extraction
+  - Edge-compatible token parser in /src/lib/auth-edge.ts (no Node.js crypto dependency)
+  - Public route whitelist (/login, /api/auth/*)
+  - User info headers injection for downstream use
+- STEP 6: Updated /prisma/seed.ts with comprehensive demo data:
+  - 1 School (Little Stars Preschool, Mumbai)
+  - 1 Branch (Main Campus, capacity 200)
+  - 1 Admin User (admin@preone.com / admin123)
+  - 3 Programs (Nursery, LKG, UKG)
+  - 6 Classes (Nursery-A/B, LKG-A/B, UKG-A/B, capacity 30 each)
+  - 5 Teachers with qualifications and work schedules
+  - 20 Students with medical records, spread across 6 classes
+  - 40 Parents (20 fathers + 20 mothers)
+  - 5 Fee Structures (Tuition ₹15000/qtr, Transport ₹3000/mo, Activity ₹2000/qtr, Exam ₹500 one-time, Development ₹1000/yr)
+  - Invoices and payments for 2 months
+  - 30 days of student and staff attendance
+  - Growth scores, daily updates, activities, observations
+  - 5 Announcements
+  - 10 CRM Leads with different stages and follow-ups
+  - Holidays and events
+- Added `db:seed` script to package.json
+- Ran `prisma db push` and `bun run db:seed` successfully
+- Build passes with zero errors and zero warnings
+
+Stage Summary:
+- Auth system fully functional with JWT tokens (HMAC-SHA256, 24h expiry)
+- Login page with PreOne branding, forgot password flow
+- Middleware protecting role-based routes with edge-compatible token parsing
+- Database seeded with realistic demo data
+- Login credentials: admin@preone.com / admin123
+- Build: ✓ Clean (0 errors, 0 warnings)

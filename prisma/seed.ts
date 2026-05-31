@@ -1,10 +1,10 @@
 // ============================================================
-// PreOne — Seed Script (New 52-Model Schema)
+// PreOne — Seed Script
 // Populates the database with realistic Indian preschool demo data
 // ============================================================
 
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient({ log: ['warn', 'error'] });
 
@@ -41,7 +41,6 @@ function utcDate(year: number, month: number, day: number, hour = 0, minute = 0)
   return new Date(Date.UTC(year, month, day, hour, minute, 0, 0));
 }
 
-const CURRENT_PERIOD = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
 const CURRENT_QUARTER = `${new Date().getFullYear()}-Q${Math.ceil((new Date().getMonth() + 1) / 3)}`;
 
 // ============================================================
@@ -49,7 +48,7 @@ const CURRENT_QUARTER = `${new Date().getFullYear()}-Q${Math.ceil((new Date().ge
 // ============================================================
 
 async function main() {
-  console.log('🌱 Starting PreOne seed (new schema)...');
+  console.log('🌱 Starting PreOne seed...');
 
   // Clean existing data (order matters for foreign keys)
   console.log('  Cleaning existing data...');
@@ -76,201 +75,175 @@ async function main() {
   console.log('  ✓ Cleaned existing data');
 
   // ============================================================
-  // 1. SCHOOL & BRANCHES
+  // 1. SCHOOL & BRANCH
   // ============================================================
-  console.log('  Creating School & Branches...');
+  console.log('  Creating School & Branch...');
   const school = await prisma.school.create({
     data: {
       name: 'Little Stars Preschool',
-      address: 'FC Road, Shivajinagar, Pune, Maharashtra 411005',
-      city: 'Pune',
+      address: '123 Main St, Mumbai',
+      city: 'Mumbai',
       state: 'Maharashtra',
-      pincode: '411005',
-      phone: '+91 20 2613 4567',
+      pincode: '400001',
+      phone: '9876543210',
       email: 'info@littlestars.com',
       website: 'https://littlestars.com',
-      academicYear: '2024-2025',
+      academicYear: '2025-2026',
       board: 'CBSE',
       schoolCode: 'LSP-001',
     },
   });
 
-  const branchMain = await prisma.branch.create({
+  const branch = await prisma.branch.create({
     data: {
       schoolId: school.id,
       name: 'Main Campus',
-      address: '42, Koregaon Park Road, Near MGF Mall, Pune 411001',
-      phone: '+91 20 2613 4567',
+      address: '123 Main St, Mumbai',
+      phone: '9876543210',
       capacity: 200,
       inChargeName: 'Sunil Mehta',
-      inChargePhone: '+91 98200 12345',
+      inChargePhone: '9876512345',
       isActive: true,
     },
   });
-
-  const branchCity = await prisma.branch.create({
-    data: {
-      schoolId: school.id,
-      name: 'City Center',
-      address: '15, M.G. Road, Camp, Pune 411001',
-      phone: '+91 20 2643 8901',
-      capacity: 150,
-      inChargeName: 'Anita Deshmukh',
-      inChargePhone: '+91 98200 67890',
-      isActive: true,
-    },
-  });
-  console.log('  ✓ School & 2 Branches created');
+  console.log('  ✓ School & Branch created');
 
   // ============================================================
-  // 2. USERS (Admin, Teachers, Parents)
+  // 2. ADMIN USER
   // ============================================================
-  console.log('  Creating Users...');
-  const passwordHash = await hashPassword('password123');
-
+  console.log('  Creating Admin User...');
+  const adminPasswordHash = await hashPassword('admin123');
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@preone.com',
-      password: passwordHash,
+      password: adminPasswordHash,
       name: 'Admin User',
-      phone: '+91 99000 00001',
+      phone: '9876543210',
       role: 'ADMIN',
       isActive: true,
       schoolId: school.id,
-      branchId: branchMain.id,
+      branchId: branch.id,
+    },
+  });
+  console.log('  ✓ Admin user created (admin@preone.com / admin123)');
+
+  // ============================================================
+  // 3. PROGRAMS (Nursery, LKG, UKG)
+  // ============================================================
+  console.log('  Creating Programs...');
+  const programNursery = await prisma.program.create({
+    data: {
+      name: 'Nursery',
+      description: 'Foundation program for ages 2.5-3.5 years',
+      ageMin: 2,
+      ageMax: 3,
+      branchId: branch.id,
     },
   });
 
-  // Teacher users
-  const teacherUserData = [
-    { name: 'Kavitha Raman', email: 'kavitha.raman@littlestars.com', phone: '+91 98123 45670' },
-    { name: 'Priya Nair', email: 'priya.nair@littlestars.com', phone: '+91 87234 56789' },
+  const programLKG = await prisma.program.create({
+    data: {
+      name: 'LKG',
+      description: 'Lower Kindergarten for ages 3.5-4.5 years',
+      ageMin: 3,
+      ageMax: 4,
+      branchId: branch.id,
+    },
+  });
+
+  const programUKG = await prisma.program.create({
+    data: {
+      name: 'UKG',
+      description: 'Upper Kindergarten for ages 4.5-5.5 years',
+      ageMin: 4,
+      ageMax: 5,
+      branchId: branch.id,
+    },
+  });
+
+  const programRecords = [
+    { name: 'Nursery', id: programNursery.id },
+    { name: 'LKG', id: programLKG.id },
+    { name: 'UKG', id: programUKG.id },
   ];
-
-  const teacherUsers: { name: string; email: string; phone: string; userId: string }[] = [];
-  for (const td of teacherUserData) {
-    const user = await prisma.user.create({
-      data: {
-        email: td.email,
-        password: passwordHash,
-        name: td.name,
-        phone: td.phone,
-        role: 'TEACHER',
-        isActive: true,
-        schoolId: school.id,
-        branchId: branchMain.id,
-      },
-    });
-    teacherUsers.push({ ...td, userId: user.id });
-  }
-
-  // Parent users
-  const parentUserData = [
-    { name: 'Rajesh Sharma', email: 'rajesh.sharma@email.com', phone: '+91 98765 43210' },
-    { name: 'Anitha Kumar', email: 'anitha.kumar@email.com', phone: '+91 87654 32109' },
-  ];
-
-  const parentUsers: { name: string; email: string; phone: string; userId: string }[] = [];
-  for (const pd of parentUserData) {
-    const user = await prisma.user.create({
-      data: {
-        email: pd.email,
-        password: passwordHash,
-        name: pd.name,
-        phone: pd.phone,
-        role: 'PARENT',
-        isActive: true,
-        schoolId: school.id,
-        branchId: branchMain.id,
-      },
-    });
-    parentUsers.push({ ...pd, userId: user.id });
-  }
-
-  console.log(`  ✓ Created ${1 + teacherUsers.length + parentUsers.length} users`);
+  console.log('  ✓ 3 Programs created');
 
   // ============================================================
-  // 3. PROGRAMS & CLASSES
+  // 4. CLASSES (6 total)
   // ============================================================
-  console.log('  Creating Programs & Classes...');
-  const programDefs = [
-    { name: 'PlayGroup', ageMin: 2, ageMax: 3, description: 'Foundation program for toddlers' },
-    { name: 'Nursery', ageMin: 3, ageMax: 4, description: 'Pre-school readiness program' },
-    { name: 'LKG', ageMin: 4, ageMax: 5, description: 'Lower Kindergarten' },
-    { name: 'UKG', ageMin: 5, ageMax: 6, description: 'Upper Kindergarten' },
-  ];
-
-  const programRecords: { name: string; id: string }[] = [];
-  for (const p of programDefs) {
-    const prog = await prisma.program.create({
-      data: {
-        name: p.name,
-        description: p.description,
-        ageMin: p.ageMin,
-        ageMax: p.ageMax,
-        branchId: branchMain.id,
-      },
-    });
-    programRecords.push({ name: p.name, id: prog.id });
-  }
-
-  // 6 classes: Nursery-A, Nursery-B, LKG-A, LKG-B, UKG-A, UKG-B
+  console.log('  Creating Classes...');
   const classDefs = [
-    { name: 'Nursery-A', programName: 'Nursery', capacity: 30, roomNo: '201' },
-    { name: 'Nursery-B', programName: 'Nursery', capacity: 30, roomNo: '202' },
-    { name: 'LKG-A', programName: 'LKG', capacity: 35, roomNo: '301' },
-    { name: 'LKG-B', programName: 'LKG', capacity: 35, roomNo: '302' },
-    { name: 'UKG-A', programName: 'UKG', capacity: 40, roomNo: '401' },
-    { name: 'UKG-B', programName: 'UKG', capacity: 40, roomNo: '402' },
+    { name: 'Nursery-A', programId: programNursery.id, capacity: 30, roomNo: '101' },
+    { name: 'Nursery-B', programId: programNursery.id, capacity: 30, roomNo: '102' },
+    { name: 'LKG-A', programId: programLKG.id, capacity: 30, roomNo: '201' },
+    { name: 'LKG-B', programId: programLKG.id, capacity: 30, roomNo: '202' },
+    { name: 'UKG-A', programId: programUKG.id, capacity: 30, roomNo: '301' },
+    { name: 'UKG-B', programId: programUKG.id, capacity: 30, roomNo: '302' },
   ];
 
   const classRecords: { name: string; id: string; programId: string }[] = [];
   for (const cd of classDefs) {
-    const program = programRecords.find(p => p.name === cd.programName)!;
     const cls = await prisma.class.create({
       data: {
         name: cd.name,
-        programId: program.id,
-        branchId: branchMain.id,
+        programId: cd.programId,
+        branchId: branch.id,
         capacity: cd.capacity,
         roomNo: cd.roomNo,
       },
     });
-    classRecords.push({ name: cd.name, id: cls.id, programId: program.id });
+    classRecords.push({ name: cd.name, id: cls.id, programId: cd.programId });
   }
-  console.log('  ✓ 4 Programs & 6 Classes created');
+  console.log('  ✓ 6 Classes created');
 
   // ============================================================
-  // 4. TEACHERS
+  // 5. TEACHERS (5 with different qualifications)
   // ============================================================
   console.log('  Creating Teachers...');
-  const teacherDetails = [
-    { ...teacherUsers[0], firstName: 'Kavitha', lastName: 'Raman', qualification: 'PhD Early Education', specialization: 'Montessori Method', experience: 12, gender: 'Female' },
-    { ...teacherUsers[1], firstName: 'Priya', lastName: 'Nair', qualification: 'M.Ed', specialization: 'Child Psychology', experience: 8, gender: 'Female' },
+  const teacherDefs = [
+    { firstName: 'Kavitha', lastName: 'Raman', email: 'kavitha.raman@littlestars.com', phone: '9812345670', qualification: 'PhD Early Education', specialization: 'Montessori Method', experience: 12, gender: 'Female', salary: 45000 },
+    { firstName: 'Priya', lastName: 'Nair', email: 'priya.nair@littlestars.com', phone: '8723456789', qualification: 'M.Ed', specialization: 'Child Psychology', experience: 8, gender: 'Female', salary: 38000 },
+    { firstName: 'Meena', lastName: 'Sharma', email: 'meena.sharma@littlestars.com', phone: '9988776655', qualification: 'B.Ed + Diploma in ECCE', specialization: 'Early Childhood Care', experience: 6, gender: 'Female', salary: 32000 },
+    { firstName: 'Rajesh', lastName: 'Iyer', email: 'rajesh.iyer@littlestars.com', phone: '8877665544', qualification: 'M.A. Education', specialization: 'Creative Arts', experience: 10, gender: 'Male', salary: 42000 },
+    { firstName: 'Sunita', lastName: 'Patel', email: 'sunita.patel@littlestars.com', phone: '7766554433', qualification: 'NTT + B.Ed', specialization: 'Physical Education', experience: 4, gender: 'Female', salary: 28000 },
   ];
 
   const teacherRecords: { id: string; firstName: string; lastName: string; className?: string }[] = [];
-  const classAssignments = ['Nursery-A', 'LKG-A']; // Assign teachers to classes
+  const classAssignments = ['Nursery-A', 'Nursery-B', 'LKG-A', 'LKG-B', 'UKG-A'];
 
-  for (let i = 0; i < teacherDetails.length; i++) {
-    const td = teacherDetails[i];
+  for (let i = 0; i < teacherDefs.length; i++) {
+    const td = teacherDefs[i];
     const assignedClassName = classAssignments[i];
+
+    // Create user for teacher
+    const teacherUser = await prisma.user.create({
+      data: {
+        email: td.email,
+        password: adminPasswordHash, // All teachers use password123 for demo
+        name: `${td.firstName} ${td.lastName}`,
+        phone: td.phone,
+        role: 'TEACHER',
+        isActive: true,
+        schoolId: school.id,
+        branchId: branch.id,
+      },
+    });
 
     const teacher = await prisma.teacher.create({
       data: {
-        userId: td.userId,
-        branchId: branchMain.id,
+        userId: teacherUser.id,
+        branchId: branch.id,
         firstName: td.firstName,
         lastName: td.lastName,
         phone: td.phone,
         email: td.email,
-        dob: new Date(1985 + randomInt(0, 10), randomInt(0, 11), randomInt(1, 28)),
+        dob: new Date(1985 + randomInt(0, 8), randomInt(0, 11), randomInt(1, 28)),
         gender: td.gender,
         qualification: td.qualification,
         specialization: td.specialization,
         experience: td.experience,
         status: 'ACTIVE',
-        salary: 35000 + i * 5000,
+        salary: td.salary,
       },
     });
 
@@ -292,7 +265,7 @@ async function main() {
       data: {
         teacherId: teacher.id,
         degree: td.qualification,
-        institution: randomItem(['University of Pune', 'Mumbai University', 'Bharati Vidyapeeth']),
+        institution: randomItem(['University of Mumbai', 'Pune University', 'Bharati Vidyapeeth', 'Tata Institute']),
         year: 2010 + randomInt(0, 8),
       },
     });
@@ -309,65 +282,113 @@ async function main() {
       });
     }
   }
-  console.log('  ✓ 2 Teachers created with qualifications, schedules, class assignments');
+  console.log('  ✓ 5 Teachers created with qualifications, schedules, class assignments');
 
   // ============================================================
-  // 5. PARENTS
+  // 6. PARENTS (20 students × 2 parents each = 40 parents)
   // ============================================================
   console.log('  Creating Parents...');
-  const parentDetails = [
-    { firstName: 'Rajesh', lastName: 'Sharma', phone: '+91 98765 43210', email: 'rajesh.sharma@email.com', occupation: 'Software Engineer', relation: 'Father' },
-    { firstName: 'Anitha', lastName: 'Kumar', phone: '+91 87654 32109', email: 'anitha.kumar@email.com', occupation: 'Doctor', relation: 'Mother' },
-    { firstName: 'Amit', lastName: 'Patel', phone: '+91 76543 21098', email: 'amit.patel@email.com', occupation: 'Businessman', relation: 'Father' },
-    { firstName: 'Sunita', lastName: 'Singh', phone: '+91 65432 10987', email: 'sunita.singh@email.com', occupation: 'Teacher', relation: 'Mother' },
-    { firstName: 'Venkat', lastName: 'Reddy', phone: '+91 54321 09876', email: 'venkat.reddy@email.com', occupation: 'Bank Manager', relation: 'Father' },
-    { firstName: 'Neha', lastName: 'Gupta', phone: '+91 43210 98765', email: 'neha.gupta@email.com', occupation: 'Architect', relation: 'Mother' },
-    { firstName: 'Sanjay', lastName: 'Joshi', phone: '+91 32109 87654', email: 'sanjay.joshi@email.com', occupation: 'Professor', relation: 'Father' },
-    { firstName: 'Lakshmi', lastName: 'Iyer', phone: '+91 21098 76543', email: 'lakshmi.iyer@email.com', occupation: 'CA', relation: 'Mother' },
+  const fatherNames = [
+    'Rajesh Sharma', 'Amit Patel', 'Venkat Reddy', 'Sanjay Joshi',
+    'Deepak Chauhan', 'Manish Agarwal', 'Vikram Malhotra', 'Ramesh Iyer',
+    'Suresh Kumar', 'Anil Gupta', 'Prakash Naik', 'Kiran Deshmukh',
+    'Ravi Menon', 'Arun Kulkarni', 'Vivek Subramanian', 'Mahesh Bhatt',
+    'Dinesh Nambiar', 'Ashok Pillai', 'Ganesh Iyer', 'Rahul Mehta',
   ];
 
-  const parentRecords: { id: string; firstName: string; lastName: string; relation: string }[] = [];
-  for (const pd of parentDetails) {
-    const parent = await prisma.parent.create({
+  const motherNames = [
+    'Anitha Kumar', 'Sunita Singh', 'Neha Gupta', 'Lakshmi Iyer',
+    'Pooja Menon', 'Saritha Nambiar', 'Sneha Kulkarni', 'Kavitha Subramanian',
+    'Priya Desai', 'Meera Joshi', 'Sujata Patil', 'Renuka Shinde',
+    'Lata Menon', 'Usha Kulkarni', 'Deepa Subramanian', 'Rekha Bhatt',
+    'Vijaya Nambiar', 'Padma Pillai', 'Savitha Iyer', 'Swati Mehta',
+  ];
+
+  const parentRecords: { id: string; firstName: string; lastName: string; relation: string; email: string }[] = [];
+  const areas = ['Andheri', 'Bandra', 'Juhu', 'Powai', 'Thane', 'Borivali', 'Malad', 'Goregaon', 'Kandivali', 'Dadar'];
+
+  // Create father + mother pairs for each of the 20 students
+  for (let i = 0; i < 20; i++) {
+    const area = randomItem(areas);
+    const flatNo = randomInt(1, 500);
+
+    // Father
+    const [fFirst, ...fRest] = fatherNames[i].split(' ');
+    const fLast = fRest.join(' ');
+    const father = await prisma.parent.create({
       data: {
-        firstName: pd.firstName,
-        lastName: pd.lastName,
-        phone: pd.phone,
-        email: pd.email,
-        occupation: pd.occupation,
-        relation: pd.relation,
-        isEmergencyContact: true,
-        address: `${randomInt(1, 500)}, ${randomItem(['Koregaon Park', 'Viman Nagar', 'Baner', 'Aundh', 'Kothrud'])}, Pune 41100${randomInt(1, 9)}`,
+        firstName: fFirst,
+        lastName: fLast,
+        phone: `+91 ${98765 - i}${randomInt(1000, 9999)}`,
+        email: `${fFirst.toLowerCase()}.${fLast.toLowerCase()}@email.com`,
+        occupation: randomItem(['Software Engineer', 'Businessman', 'Doctor', 'Professor', 'Bank Manager', 'CA', 'Lawyer']),
+        relation: 'Father',
+        isEmergencyContact: i < 5, // First 5 fathers are emergency contacts
+        address: `${flatNo}, ${area}, Mumbai 4000${randomInt(1, 99)}`,
       },
     });
-    parentRecords.push({ id: parent.id, firstName: pd.firstName, lastName: pd.lastName, relation: pd.relation });
+    parentRecords.push({ id: father.id, firstName: fFirst, lastName: fLast, relation: 'Father', email: father.email });
+
+    // Mother
+    const [mFirst, ...mRest] = motherNames[i].split(' ');
+    const mLast = mRest.join(' ');
+    const mother = await prisma.parent.create({
+      data: {
+        firstName: mFirst,
+        lastName: mLast,
+        phone: `+91 ${87654 - i}${randomInt(1000, 9999)}`,
+        email: `${mFirst.toLowerCase()}.${mLast.toLowerCase()}@email.com`,
+        occupation: randomItem(['Teacher', 'Architect', 'Homemaker', 'Nurse', 'Designer', 'Manager']),
+        relation: 'Mother',
+        isEmergencyContact: i >= 5, // Remaining mothers are emergency contacts
+        address: `${flatNo}, ${area}, Mumbai 4000${randomInt(1, 99)}`,
+      },
+    });
+    parentRecords.push({ id: mother.id, firstName: mFirst, lastName: mLast, relation: 'Mother', email: mother.email });
   }
-  console.log(`  ✓ ${parentRecords.length} Parents created`);
+  console.log(`  ✓ ${parentRecords.length} Parents created (40 = 20 fathers + 20 mothers)`);
 
   // ============================================================
-  // 6. STUDENTS (15)
+  // 7. STUDENTS (20 spread across classes)
   // ============================================================
   console.log('  Creating Students...');
   const studentDefs = [
-    { firstName: 'Aarav', lastName: 'Sharma', className: 'Nursery-A', gender: 'Male', bloodGroup: 'B+', parentIdx: 0, dob: new Date(2021, 4, 15) },
-    { firstName: 'Ananya', lastName: 'Kumar', className: 'Nursery-B', gender: 'Female', bloodGroup: 'O+', parentIdx: 1, dob: new Date(2021, 7, 22) },
-    { firstName: 'Vivaan', lastName: 'Patel', className: 'LKG-A', gender: 'Male', bloodGroup: 'A+', parentIdx: 2, dob: new Date(2020, 11, 3) },
-    { firstName: 'Diya', lastName: 'Singh', className: 'LKG-B', gender: 'Female', bloodGroup: 'AB+', parentIdx: 3, dob: new Date(2020, 10, 18) },
-    { firstName: 'Arjun', lastName: 'Reddy', className: 'UKG-A', gender: 'Male', bloodGroup: 'B-', parentIdx: 4, dob: new Date(2019, 2, 7) },
-    { firstName: 'Isha', lastName: 'Gupta', className: 'UKG-B', gender: 'Female', bloodGroup: 'O-', parentIdx: 5, dob: new Date(2019, 6, 25) },
-    { firstName: 'Kabir', lastName: 'Joshi', className: 'Nursery-A', gender: 'Male', bloodGroup: 'A-', parentIdx: 6, dob: new Date(2021, 8, 12) },
-    { firstName: 'Meera', lastName: 'Iyer', className: 'Nursery-B', gender: 'Female', bloodGroup: 'B+', parentIdx: 7, dob: new Date(2021, 0, 30) },
-    { firstName: 'Rohan', lastName: 'Sharma', className: 'LKG-A', gender: 'Male', bloodGroup: 'O+', parentIdx: 0, dob: new Date(2020, 3, 14) },
-    { firstName: 'Sara', lastName: 'Kumar', className: 'LKG-B', gender: 'Female', bloodGroup: 'AB-', parentIdx: 1, dob: new Date(2020, 5, 28) },
-    { firstName: 'Ayaan', lastName: 'Patel', className: 'UKG-A', gender: 'Male', bloodGroup: 'A-', parentIdx: 2, dob: new Date(2019, 3, 22) },
-    { firstName: 'Prisha', lastName: 'Singh', className: 'UKG-B', gender: 'Female', bloodGroup: 'B-', parentIdx: 3, dob: new Date(2019, 8, 5) },
-    { firstName: 'Vihaan', lastName: 'Reddy', className: 'Nursery-A', gender: 'Male', bloodGroup: 'O+', parentIdx: 4, dob: new Date(2021, 6, 8) },
-    { firstName: 'Kiara', lastName: 'Gupta', className: 'LKG-A', gender: 'Female', bloodGroup: 'A+', parentIdx: 5, dob: new Date(2020, 1, 25) },
-    { firstName: 'Arnav', lastName: 'Joshi', className: 'Nursery-B', gender: 'Male', bloodGroup: 'B+', parentIdx: 6, dob: new Date(2021, 2, 14) },
+    // Nursery-A (4 students)
+    { firstName: 'Aarav', lastName: 'Sharma', className: 'Nursery-A', gender: 'Male', bloodGroup: 'B+', dob: new Date(2022, 4, 15) },
+    { firstName: 'Kabir', lastName: 'Joshi', className: 'Nursery-A', gender: 'Male', bloodGroup: 'A-', dob: new Date(2022, 8, 12) },
+    { firstName: 'Vihaan', lastName: 'Reddy', className: 'Nursery-A', gender: 'Male', bloodGroup: 'O+', dob: new Date(2022, 6, 8) },
+    { firstName: 'Anaya', lastName: 'Patel', className: 'Nursery-A', gender: 'Female', bloodGroup: 'A+', dob: new Date(2022, 2, 20) },
+
+    // Nursery-B (3 students)
+    { firstName: 'Ananya', lastName: 'Kumar', className: 'Nursery-B', gender: 'Female', bloodGroup: 'O+', dob: new Date(2022, 7, 22) },
+    { firstName: 'Meera', lastName: 'Iyer', className: 'Nursery-B', gender: 'Female', bloodGroup: 'B+', dob: new Date(2022, 0, 30) },
+    { firstName: 'Arnav', lastName: 'Agarwal', className: 'Nursery-B', gender: 'Male', bloodGroup: 'B+', dob: new Date(2022, 2, 14) },
+
+    // LKG-A (4 students)
+    { firstName: 'Vivaan', lastName: 'Patel', className: 'LKG-A', gender: 'Male', bloodGroup: 'A+', dob: new Date(2021, 11, 3) },
+    { firstName: 'Rohan', lastName: 'Sharma', className: 'LKG-A', gender: 'Male', bloodGroup: 'O+', dob: new Date(2021, 3, 14) },
+    { firstName: 'Kiara', lastName: 'Gupta', className: 'LKG-A', gender: 'Female', bloodGroup: 'A+', dob: new Date(2021, 1, 25) },
+    { firstName: 'Aditya', lastName: 'Naik', className: 'LKG-A', gender: 'Male', bloodGroup: 'B-', dob: new Date(2021, 5, 10) },
+
+    // LKG-B (3 students)
+    { firstName: 'Diya', lastName: 'Singh', className: 'LKG-B', gender: 'Female', bloodGroup: 'AB+', dob: new Date(2021, 10, 18) },
+    { firstName: 'Sara', lastName: 'Kumar', className: 'LKG-B', gender: 'Female', bloodGroup: 'AB-', dob: new Date(2021, 5, 28) },
+    { firstName: 'Prisha', lastName: 'Deshmukh', className: 'LKG-B', gender: 'Female', bloodGroup: 'B-', dob: new Date(2021, 8, 5) },
+
+    // UKG-A (3 students)
+    { firstName: 'Arjun', lastName: 'Reddy', className: 'UKG-A', gender: 'Male', bloodGroup: 'B-', dob: new Date(2020, 2, 7) },
+    { firstName: 'Ayaan', lastName: 'Menon', className: 'UKG-A', gender: 'Male', bloodGroup: 'A-', dob: new Date(2020, 3, 22) },
+    { firstName: 'Ishaan', lastName: 'Nambiar', className: 'UKG-A', gender: 'Male', bloodGroup: 'O+', dob: new Date(2020, 1, 15) },
+
+    // UKG-B (3 students)
+    { firstName: 'Isha', lastName: 'Gupta', className: 'UKG-B', gender: 'Female', bloodGroup: 'O-', dob: new Date(2020, 6, 25) },
+    { firstName: 'Prisha', lastName: 'Pillai', className: 'UKG-B', gender: 'Female', bloodGroup: 'B+', dob: new Date(2020, 9, 8) },
+    { firstName: 'Saavi', lastName: 'Mehta', className: 'UKG-B', gender: 'Female', bloodGroup: 'A+', dob: new Date(2020, 4, 3) },
   ];
 
   const studentRecords: { id: string; classId: string; parentId: string; firstName: string; className: string }[] = [];
-  for (const sd of studentDefs) {
+  for (let i = 0; i < studentDefs.length; i++) {
+    const sd = studentDefs[i];
     const cls = classRecords.find(c => c.name === sd.className)!;
     const student = await prisma.student.create({
       data: {
@@ -377,106 +398,123 @@ async function main() {
         gender: sd.gender,
         bloodGroup: sd.bloodGroup,
         classId: cls.id,
-        branchId: branchMain.id,
+        branchId: branch.id,
         status: 'ACTIVE',
         admissionDate: daysAgo(randomInt(30, 180)),
-        rollNumber: `R${String(studentRecords.length + 1).padStart(3, '0')}`,
+        rollNumber: `R${String(i + 1).padStart(3, '0')}`,
       },
     });
 
-    // Link parent
-    const parentRec = parentRecords[sd.parentIdx % parentRecords.length];
+    // Link father (index i*2 in parentRecords) and mother (index i*2+1)
+    const fatherRec = parentRecords[i * 2];
+    const motherRec = parentRecords[i * 2 + 1];
+
     await prisma.studentParent.create({
       data: {
         studentId: student.id,
-        parentId: parentRec.id,
+        parentId: fatherRec.id,
         isPrimary: true,
       },
     });
 
-    studentRecords.push({ id: student.id, classId: cls.id, parentId: parentRec.id, firstName: sd.firstName, className: sd.className });
+    await prisma.studentParent.create({
+      data: {
+        studentId: student.id,
+        parentId: motherRec.id,
+        isPrimary: false,
+      },
+    });
+
+    studentRecords.push({ id: student.id, classId: cls.id, parentId: fatherRec.id, firstName: sd.firstName, className: sd.className });
+
+    // Create medical record for each student
+    await prisma.medicalRecord.create({
+      data: {
+        studentId: student.id,
+        allergies: randomItem(['None', 'Peanuts', 'Dust', 'None', 'None', 'Milk']),
+        conditions: randomItem(['None', 'None', 'None', 'Mild Asthma', 'None']),
+        medications: randomItem(['None', 'None', 'Inhaler (as needed)', 'None']),
+        vaccinationStatus: randomItem(['Up to date', 'Up to date', 'Up to date', 'Partial']),
+      },
+    });
   }
-  console.log(`  ✓ Created ${studentRecords.length} students`);
+  console.log(`  ✓ ${studentRecords.length} Students created (spread across 6 classes)`);
 
   // ============================================================
-  // 7. FEE STRUCTURES
+  // 8. FEE STRUCTURES (5 as specified)
   // ============================================================
   console.log('  Creating Fee Structures...');
   const feeStructureDefs = [
-    { name: 'Tuition Fee - Nursery', type: 'TUITION', amount: 7500, frequency: 'MONTHLY', programName: 'Nursery' },
-    { name: 'Activity Fee - Nursery', type: 'ACTIVITY', amount: 2000, frequency: 'MONTHLY', programName: 'Nursery' },
-    { name: 'Tuition Fee - LKG', type: 'TUITION', amount: 8500, frequency: 'MONTHLY', programName: 'LKG' },
-    { name: 'Activity Fee - LKG', type: 'ACTIVITY', amount: 2000, frequency: 'MONTHLY', programName: 'LKG' },
-    { name: 'Tuition Fee - UKG', type: 'TUITION', amount: 9500, frequency: 'MONTHLY', programName: 'UKG' },
-    { name: 'Activity Fee - UKG', type: 'ACTIVITY', amount: 2500, frequency: 'MONTHLY', programName: 'UKG' },
-    { name: 'Transport Fee', type: 'TRANSPORT', amount: 3000, frequency: 'MONTHLY', programName: 'Nursery' },
+    { name: 'Tuition Fee', type: 'TUITION' as const, amount: 15000, frequency: 'QUARTERLY' as const, programId: programNursery.id, description: 'Quarterly tuition fee' },
+    { name: 'Transport Fee', type: 'TRANSPORT' as const, amount: 3000, frequency: 'MONTHLY' as const, programId: programNursery.id, description: 'Monthly transport fee' },
+    { name: 'Activity Fee', type: 'ACTIVITY' as const, amount: 2000, frequency: 'QUARTERLY' as const, programId: programNursery.id, description: 'Quarterly activity and material fee' },
+    { name: 'Exam Fee', type: 'EXAM' as const, amount: 500, frequency: 'ONE_TIME' as const, programId: programNursery.id, description: 'One-time exam and assessment fee' },
+    { name: 'Development Fee', type: 'DEVELOPMENT' as const, amount: 1000, frequency: 'ANNUAL' as const, programId: programNursery.id, description: 'Annual school development fee' },
   ];
 
-  const feeStructureRecords: { id: string; amount: number; type: string; classId?: string }[] = [];
+  const feeStructureRecords: { id: string; amount: number; type: string }[] = [];
   for (const fsd of feeStructureDefs) {
-    const program = programRecords.find(p => p.name === fsd.programName)!;
-    // Create one fee structure per program (not per class)
     const fs = await prisma.feeStructure.create({
       data: {
         name: fsd.name,
-        type: fsd.type as 'TUITION' | 'ACTIVITY' | 'TRANSPORT' | 'EXAM' | 'LABORATORY' | 'LIBRARY' | 'DEVELOPMENT' | 'OTHER',
+        type: fsd.type,
         amount: fsd.amount,
-        frequency: fsd.frequency as 'MONTHLY' | 'QUARTERLY' | 'HALF_YEARLY' | 'ANNUAL' | 'ONE_TIME',
-        programId: program.id,
+        frequency: fsd.frequency,
+        programId: fsd.programId,
+        description: fsd.description,
         isActive: true,
       },
     });
     feeStructureRecords.push({ id: fs.id, amount: fsd.amount, type: fsd.type });
   }
-  console.log('  ✓ Fee structures created');
+  console.log('  ✓ 5 Fee Structures created');
 
   // ============================================================
-  // 8. INVOICES & PAYMENTS
+  // 9. INVOICES & PAYMENTS
   // ============================================================
   console.log('  Creating Invoices & Payments...');
   let invoiceCounter = 1;
   const paymentMethods = ['UPI', 'CASH', 'BANK_TRANSFER', 'CHEQUE', 'ONLINE'] as const;
 
-  for (let monthOffset = 5; monthOffset >= 0; monthOffset--) {
+  // Create invoices for current and last month for each student
+  for (let monthOffset = 0; monthOffset < 2; monthOffset++) {
     const now = new Date();
     const invYear = now.getMonth() - monthOffset >= 0 ? now.getFullYear() : now.getFullYear() - 1;
     const invMonth = (now.getMonth() - monthOffset + 12) % 12;
     const dueDate = utcDate(invYear, invMonth, 5);
 
     for (const student of studentRecords) {
-      // Get a tuition fee structure (simplified — just use first one)
+      // Get tuition fee structure
       const tuitionFee = feeStructureRecords.find(f => f.type === 'TUITION');
       if (!tuitionFee) continue;
 
       const amount = tuitionFee.amount;
-      const discount = monthOffset > 3 ? 0 : Math.random() > 0.8 ? 500 : 0;
+      const discount = Math.random() > 0.85 ? 500 : 0;
       const netAmount = amount - discount;
 
       let status: 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE' | 'CANCELLED';
       if (monthOffset > 0) {
-        status = Math.random() < 0.90 ? 'PAID' : (Math.random() < 0.5 ? 'PENDING' : 'OVERDUE');
+        status = Math.random() < 0.85 ? 'PAID' : (Math.random() < 0.5 ? 'PENDING' : 'OVERDUE');
       } else {
         const rand = Math.random();
-        status = rand < 0.50 ? 'PAID' : (rand < 0.80 ? 'PENDING' : 'OVERDUE');
+        status = rand < 0.40 ? 'PAID' : (rand < 0.75 ? 'PENDING' : 'OVERDUE');
       }
-
-      const currentDueDate = status === 'OVERDUE' ? new Date(dueDate.getTime() - 15 * 86400000) : dueDate;
 
       const invoice = await prisma.invoice.create({
         data: {
-          invoiceNo: `INV-2024-${String(invoiceCounter++).padStart(4, '0')}`,
+          invoiceNo: `INV-2025-${String(invoiceCounter++).padStart(4, '0')}`,
           studentId: student.id,
           feeStructureId: tuitionFee.id,
           amount,
           discount,
           netAmount,
           status,
-          dueDate: currentDueDate,
-          description: `Fee for ${invYear}-${String(invMonth + 1).padStart(2, '0')}`,
+          dueDate,
+          description: `Tuition fee for ${invYear}-${String(invMonth + 1).padStart(2, '0')}`,
         },
       });
 
-      // If Paid, create Payment
+      // If Paid, create Payment + Receipt
       if (status === 'PAID') {
         const payDate = utcDate(invYear, invMonth, randomInt(5, 15));
         const method = randomItem([...paymentMethods]);
@@ -485,7 +523,7 @@ async function main() {
             invoiceId: invoice.id,
             studentId: student.id,
             amount: netAmount,
-            method: method,
+            method,
             transactionRef: method === 'UPI' || method === 'ONLINE' ? `TXN${payDate.getTime()}${randomInt(100, 999)}` : null,
             paymentDate: payDate,
           },
@@ -494,19 +532,19 @@ async function main() {
         await prisma.receipt.create({
           data: {
             invoiceId: invoice.id,
-            receiptNo: `RCT-2024-${String(invoiceCounter).padStart(4, '0')}`,
+            receiptNo: `RCT-2025-${String(invoiceCounter).padStart(4, '0')}`,
             amount: netAmount,
           },
         });
       }
     }
   }
-  console.log('  ✓ Invoices & Payments created (6 months of data)');
+  console.log('  ✓ Invoices & Payments created');
 
   // ============================================================
-  // 9. ATTENDANCE (past 30 days)
+  // 10. ATTENDANCE (today + past 30 days)
   // ============================================================
-  console.log('  Creating Attendance (30 days)...');
+  console.log('  Creating Attendance...');
   const attendanceStatuses: ('PRESENT' | 'ABSENT' | 'LATE')[] = ['PRESENT', 'PRESENT', 'PRESENT', 'PRESENT', 'PRESENT', 'PRESENT', 'PRESENT', 'PRESENT', 'ABSENT', 'LATE'];
 
   for (let dayOffset = 0; dayOffset < 30; dayOffset++) {
@@ -545,10 +583,10 @@ async function main() {
       });
     }
   }
-  console.log('  ✓ Attendance created');
+  console.log('  ✓ Attendance created (30 days)');
 
   // ============================================================
-  // 10. GROWTH SCORES
+  // 11. GROWTH SCORES
   // ============================================================
   console.log('  Creating Growth Scores...');
   for (const student of studentRecords) {
@@ -585,7 +623,7 @@ async function main() {
   console.log('  ✓ Growth scores created');
 
   // ============================================================
-  // 11. DAILY UPDATES (today, first 5 students)
+  // 12. DAILY UPDATES (today for first 5 students)
   // ============================================================
   console.log('  Creating Daily Updates...');
   const moods = ['Happy', 'Calm', 'Excited', 'Tired', 'Fussy'];
@@ -623,7 +661,7 @@ async function main() {
   console.log('  ✓ Daily updates created');
 
   // ============================================================
-  // 12. ACTIVITIES
+  // 13. ACTIVITIES
   // ============================================================
   console.log('  Creating Activities...');
   const activityDefs = [
@@ -655,7 +693,7 @@ async function main() {
   console.log('  ✓ Activities created');
 
   // ============================================================
-  // 13. OBSERVATIONS
+  // 14. OBSERVATIONS
   // ============================================================
   console.log('  Creating Observations...');
   for (let i = 0; i < 5; i++) {
@@ -675,15 +713,15 @@ async function main() {
   console.log('  ✓ Observations created');
 
   // ============================================================
-  // 14. ANNOUNCEMENTS
+  // 15. ANNOUNCEMENTS (5)
   // ============================================================
   console.log('  Creating Announcements...');
   const announcementDefs = [
-    { title: 'Annual Day Celebration', type: 'Event', priority: 'HIGH' as const, target: 'All', content: 'Annual day celebration on June 20th. All parents are cordially invited. Cultural performances by students from all classes.' },
-    { title: 'Fee Payment Reminder', type: 'Fee', priority: 'NORMAL' as const, target: 'Parents', content: 'June month fee is due by 5th. Late fee of ₹50/day applicable after 10th. Please pay on time to avoid penalties.' },
-    { title: 'Summer Camp Registration', type: 'Academic', priority: 'NORMAL' as const, target: 'All', content: 'Summer camp registrations are now open! Limited seats available. Activities include art, dance, swimming, and nature exploration.' },
-    { title: 'Health Check-up Drive', type: 'Health', priority: 'HIGH' as const, target: 'All', content: 'Annual health check-up for all students scheduled. Pediatrician visit and dental check-up included.' },
-    { title: 'Parent-Teacher Meeting', type: 'Academic', priority: 'HIGH' as const, target: 'Parents', content: 'PTM scheduled for June 25th. Individual time slots will be shared via WhatsApp. Please ensure attendance.' },
+    { title: 'Annual Day Celebration', type: 'Event', priority: 'HIGH' as const, target: 'All', content: 'Annual day celebration on June 20th. All parents are cordially invited. Cultural performances by students from all classes. Please ensure your child attends the practice sessions.' },
+    { title: 'Fee Payment Reminder', type: 'Fee', priority: 'NORMAL' as const, target: 'Parents', content: 'June month fee is due by 5th. Late fee of Rs 50 per day applicable after 10th. Please pay on time to avoid penalties. Payment can be made via UPI, bank transfer, or at the school office.' },
+    { title: 'Summer Camp Registration', type: 'Academic', priority: 'NORMAL' as const, target: 'All', content: 'Summer camp registrations are now open! Limited seats available. Activities include art, dance, swimming, and nature exploration. Register before June 15th for early bird discount.' },
+    { title: 'Health Check-up Drive', type: 'Health', priority: 'HIGH' as const, target: 'All', content: 'Annual health check-up for all students scheduled for next week. Pediatrician visit and dental check-up included. Please send your child in comfortable clothing.' },
+    { title: 'Parent-Teacher Meeting', type: 'Academic', priority: 'HIGH' as const, target: 'Parents', content: 'PTM scheduled for June 25th. Individual time slots will be shared via WhatsApp. Please ensure attendance to discuss your child progress and development.' },
   ];
 
   for (const ann of announcementDefs) {
@@ -700,21 +738,23 @@ async function main() {
       },
     });
   }
-  console.log('  ✓ Announcements created');
+  console.log('  ✓ 5 Announcements created');
 
   // ============================================================
-  // 15. CRM LEADS & FOLLOW-UPS
+  // 16. CRM LEADS (10 with different stages)
   // ============================================================
   console.log('  Creating CRM Leads...');
   const leadDefs = [
-    { parentName: 'Vikram Malhotra', childName: 'Ayaan Malhotra', phone: '+91 99887 76655', email: 'vikram.m@email.com', source: 'WEBSITE' as const, stage: 'NEW' as const, priority: 'HIGH' as const, program: 'Nursery', notes: 'Interested in full-day program' },
-    { parentName: 'Sneha Kulkarni', childName: 'Riya Kulkarni', phone: '+91 88776 65544', email: 'sneha.k@email.com', source: 'REFERRAL' as const, stage: 'CONTACTED' as const, priority: 'NORMAL' as const, program: 'LKG', notes: 'Referred by existing parent Rajesh Sharma' },
-    { parentName: 'Deepak Chauhan', childName: 'Ayaan Chauhan', phone: '+91 77665 54433', email: 'deepak.c@email.com', source: 'INSTAGRAM' as const, stage: 'VISITED' as const, priority: 'HIGH' as const, program: 'UKG', notes: 'Visited campus, impressed with facilities' },
-    { parentName: 'Pooja Menon', childName: 'Aditi Menon', phone: '+91 66554 43322', email: 'pooja.m@email.com', source: 'WALK_IN' as const, stage: 'APPLIED' as const, priority: 'NORMAL' as const, program: 'Nursery', notes: 'Filled application form, wants morning batch' },
-    { parentName: 'Ramesh Iyer', childName: 'Karthik Iyer', phone: '+91 55443 32211', source: 'FACEBOOK' as const, stage: 'ENROLLED' as const, priority: 'LOW' as const, program: 'LKG', notes: 'Admission confirmed, fee paid' },
-    { parentName: 'Kavitha Subramanian', childName: 'Arjun Subramanian', phone: '+91 44332 21100', source: 'GOOGLE' as const, stage: 'NEW' as const, priority: 'NORMAL' as const, program: 'Nursery', notes: 'Found via Google search, requested callback' },
-    { parentName: 'Manish Agarwal', childName: 'Riya Agarwal', phone: '+91 33221 10099', source: 'JUSTDIAL' as const, stage: 'LOST' as const, priority: 'LOW' as const, program: 'UKG', notes: 'Chose competitor school due to proximity' },
-    { parentName: 'Saritha Nambiar', childName: 'Dev Nambiar', phone: '+91 22110 09988', source: 'EVENT' as const, stage: 'CONTACTED' as const, priority: 'NORMAL' as const, program: 'LKG', notes: 'Met at education fair, showed interest' },
+    { parentName: 'Vikram Malhotra', childName: 'Ayaan Malhotra', phone: '+91 9988776655', email: 'vikram.m@email.com', source: 'WEBSITE' as const, stage: 'NEW' as const, priority: 'HIGH' as const, program: 'Nursery', notes: 'Interested in full-day program' },
+    { parentName: 'Sneha Kulkarni', childName: 'Riya Kulkarni', phone: '+91 8877665544', email: 'sneha.k@email.com', source: 'REFERRAL' as const, stage: 'CONTACTED' as const, priority: 'NORMAL' as const, program: 'LKG', notes: 'Referred by existing parent Rajesh Sharma' },
+    { parentName: 'Deepak Chauhan', childName: 'Ayaan Chauhan', phone: '+91 7766554433', email: 'deepak.c@email.com', source: 'INSTAGRAM' as const, stage: 'VISITED' as const, priority: 'HIGH' as const, program: 'UKG', notes: 'Visited campus, impressed with facilities' },
+    { parentName: 'Pooja Menon', childName: 'Aditi Menon', phone: '+91 6655443322', email: 'pooja.m@email.com', source: 'WALK_IN' as const, stage: 'APPLIED' as const, priority: 'NORMAL' as const, program: 'Nursery', notes: 'Filled application form, wants morning batch' },
+    { parentName: 'Ramesh Iyer', childName: 'Karthik Iyer', phone: '+91 5544332211', source: 'FACEBOOK' as const, stage: 'ENROLLED' as const, priority: 'LOW' as const, program: 'LKG', notes: 'Admission confirmed, fee paid' },
+    { parentName: 'Kavitha Subramanian', childName: 'Arjun Subramanian', phone: '+91 4433221100', source: 'GOOGLE' as const, stage: 'NEW' as const, priority: 'NORMAL' as const, program: 'Nursery', notes: 'Found via Google search, requested callback' },
+    { parentName: 'Manish Agarwal', childName: 'Riya Agarwal', phone: '+91 3322110099', source: 'JUSTDIAL' as const, stage: 'LOST' as const, priority: 'LOW' as const, program: 'UKG', notes: 'Chose competitor school due to proximity' },
+    { parentName: 'Saritha Nambiar', childName: 'Dev Nambiar', phone: '+91 2211009988', source: 'EVENT' as const, stage: 'CONTACTED' as const, priority: 'NORMAL' as const, program: 'LKG', notes: 'Met at education fair, showed interest' },
+    { parentName: 'Harish Pillai', childName: 'Meera Pillai', phone: '+91 1100998877', source: 'NEWSPAPER' as const, stage: 'NEW' as const, priority: 'NORMAL' as const, program: 'Nursery', notes: 'Saw ad in Times of India, wants campus tour' },
+    { parentName: 'Asha Desai', childName: 'Vivaan Desai', phone: '+91 9900887766', source: 'HOARDING' as const, stage: 'VISITED' as const, priority: 'HIGH' as const, program: 'LKG', notes: 'Saw billboard on highway, visited same day' },
   ];
 
   const leadRecords: { id: string; stage: string }[] = [];
@@ -733,7 +773,7 @@ async function main() {
         notes: ld.notes,
         assignedTo: adminUser.id,
         nextFollowUp: ['NEW', 'CONTACTED', 'VISITED'].includes(ld.stage) ? daysAgo(-randomInt(1, 7)) : null,
-        lostReason: ld.stage === 'LOST' ? 'Chose competitor' : null,
+        lostReason: ld.stage === 'LOST' ? 'Chose competitor school' : null,
       },
     });
     leadRecords.push({ id: lead.id, stage: ld.stage });
@@ -755,7 +795,7 @@ async function main() {
   console.log(`  ✓ ${leadRecords.length} CRM Leads with follow-ups created`);
 
   // ============================================================
-  // 16. HOLIDAYS & EVENTS
+  // 17. HOLIDAYS & EVENTS
   // ============================================================
   console.log('  Creating Holidays & Events...');
   const holidayDefs = [
@@ -799,18 +839,18 @@ async function main() {
   // ============================================================
   // DONE
   // ============================================================
-  console.log('\n🎉 PreOne seed completed successfully!');
+  console.log('\n✅ PreOne seed completed successfully!');
   console.log(`  School: ${school.name}`);
-  console.log(`  Branches: Main Campus, City Center`);
-  console.log(`  Users: ${1 + teacherUsers.length + parentUsers.length} (1 Admin, ${teacherUsers.length} Teachers, ${parentUsers.length} Parents)`);
-  console.log(`  Students: ${studentRecords.length}`);
+  console.log(`  Branch: ${branch.name}`);
+  console.log(`  Programs: ${programRecords.length} (Nursery, LKG, UKG)`);
   console.log(`  Classes: ${classRecords.length}`);
-  console.log(`  Programs: ${programRecords.length}`);
+  console.log(`  Teachers: ${teacherRecords.length}`);
+  console.log(`  Students: ${studentRecords.length}`);
+  console.log(`  Parents: ${parentRecords.length}`);
   console.log(`  Leads: ${leadRecords.length}`);
-  console.log(`  Activities: ${activityDefs.length}`);
   console.log(`  Announcements: ${announcementDefs.length}`);
-  console.log('\n  Login credentials:');
-  console.log('    Admin:    admin@preone.com / password123');
+  console.log('\n  🔑 Login credentials:');
+  console.log('    Admin:    admin@preone.com / admin123');
   console.log('    Teacher:  kavitha.raman@littlestars.com / password123');
   console.log('    Parent:   rajesh.sharma@email.com / password123');
 }

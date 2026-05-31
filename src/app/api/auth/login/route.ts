@@ -1,6 +1,11 @@
+// ============================================================
+// POST /api/auth/login
+// Authenticates user with email + password, returns JWT token
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { verifyPassword, generateToken, Role } from '@/lib/auth';
+import { comparePassword, generateToken, Role } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +19,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Find user by email
     const user = await db.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase().trim() },
       include: {
         branch: true,
         teacher: true,
@@ -29,6 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if account is active
     if (!user.isActive) {
       return NextResponse.json(
         { error: 'Account is deactivated. Contact administrator.' },
@@ -36,7 +43,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isValid = await verifyPassword(password, user.password);
+    // Compare password
+    const isValid = await comparePassword(password, user.password);
     if (!isValid) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
@@ -44,13 +52,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update last login
+    // Update last login timestamp
     await db.user.update({
       where: { id: user.id },
       data: { lastLogin: new Date() },
     });
 
-    // Generate token — ensure role is a valid Role enum value
+    // Create audit log for login
+    await db.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'LOGIN',
+        entity: 'User',
+        entityId: user.id,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null,
+      },
+    });
+
+    // Generate JWT token with HMAC-SHA256
     const userRole = user.role as Role;
     const token = generateToken({
       userId: user.id,
@@ -61,24 +80,21 @@ export async function POST(request: NextRequest) {
       schoolId: user.schoolId,
     });
 
-    // Return user data without password
-    const { password: _, ...userWithoutPassword } = user;
-
     return NextResponse.json({
       message: 'Login successful',
       token,
       user: {
-        id: userWithoutPassword.id,
-        email: userWithoutPassword.email,
-        name: userWithoutPassword.name,
-        role: userWithoutPassword.role,
-        branchId: userWithoutPassword.branchId,
-        schoolId: userWithoutPassword.schoolId,
-        phone: userWithoutPassword.phone,
-        avatar: userWithoutPassword.avatar,
-        isActive: userWithoutPassword.isActive,
-        branch: userWithoutPassword.branch,
-        teacher: userWithoutPassword.teacher,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        schoolId: user.schoolId,
+        branchId: user.branchId,
+        phone: user.phone,
+        avatar: user.avatar,
+        isActive: user.isActive,
+        branch: user.branch,
+        teacher: user.teacher,
       },
     });
   } catch (error) {

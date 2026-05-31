@@ -1,21 +1,27 @@
+// ============================================================
+// POST /api/auth/register
+// Creates a new user account, returns JWT token
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { hashPassword, generateToken } from '@/lib/auth';
+import { hashPassword, generateToken, Role, ALL_ROLES } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, phone, role, branchId, firstName, lastName } = body;
+    const { email, password, name, phone, role, schoolId } = body;
 
     // Validation
-    if (!email || !password || !role) {
+    if (!email || !password || !name || !role) {
       return NextResponse.json(
-        { error: 'Email, password, and role are required' },
+        { error: 'Email, password, name, and role are required' },
         { status: 400 }
       );
     }
 
-    const validRoles = ['SuperAdmin', 'Owner', 'Admin', 'Teacher', 'Parent'];
+    // Validate role against enum
+    const validRoles = ALL_ROLES.map(r => r as string);
     if (!validRoles.includes(role)) {
       return NextResponse.json(
         { error: `Invalid role. Must be one of: ${validRoles.join(', ')}` },
@@ -30,9 +36,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
+    // Check email uniqueness
     const existingUser = await db.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase().trim() },
     });
 
     if (existingUser) {
@@ -42,64 +48,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+
     // Create user
-    const passwordHash = hashPassword(password);
     const user = await db.user.create({
       data: {
-        email,
-        passwordHash,
-        phone,
-        role,
-        branchId,
-        isVerified: role === 'SuperAdmin', // Auto-verify super admin
+        email: email.toLowerCase().trim(),
+        password: hashedPassword,
+        name,
+        phone: phone || null,
+        role: role as Role,
+        schoolId: schoolId || null,
+        isActive: true,
       },
       include: {
         branch: true,
       },
     });
 
-    // If registering as Teacher, create Teacher profile
-    if (role === 'Teacher' && firstName && lastName && branchId) {
-      await db.teacher.create({
-        data: {
-          userId: user.id,
-          branchId,
-          firstName,
-          lastName,
-          phone,
-          email,
-        },
-      });
-    }
-
-    // If registering as Parent, create Parent profile
-    if (role === 'Parent' && firstName && lastName) {
-      await db.parent.create({
-        data: {
-          userId: user.id,
-          firstName,
-          lastName,
-          phone: phone || '',
-          email,
-        },
-      });
-    }
-
-    // Generate token
+    // Generate JWT token
     const token = generateToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      name: user.name,
+      role: user.role as Role,
       branchId: user.branchId,
+      schoolId: user.schoolId,
     });
 
-    const { passwordHash: _, ...userWithoutPassword } = user;
+    // Create audit log
+    await db.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'REGISTER',
+        entity: 'User',
+        entityId: user.id,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null,
+      },
+    });
 
     return NextResponse.json(
       {
         message: 'Registration successful',
         token,
-        user: userWithoutPassword,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          schoolId: user.schoolId,
+          branchId: user.branchId,
+          phone: user.phone,
+          isActive: user.isActive,
+        },
       },
       { status: 201 }
     );
