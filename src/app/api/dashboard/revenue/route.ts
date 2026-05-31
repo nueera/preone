@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
 
+// GET /api/dashboard/revenue — monthly revenue data for charts
 export async function GET(request: NextRequest) {
   try {
     const authUser = getAuthUser(request);
@@ -33,8 +34,22 @@ export async function GET(request: NextRequest) {
       ? payments.filter(p => p.invoice.branchId === branchId)
       : payments;
 
+    // Get invoices for invoiced amounts
+    const invoices = await db.invoice.findMany({
+      where: {
+        issuedAt: { gte: yearStart, lte: yearEnd },
+        ...(branchId ? { branchId } : {}),
+      },
+      select: {
+        totalAmount: true,
+        paidAmount: true,
+        issuedAt: true,
+        status: true,
+      },
+    });
+
     // Group by month
-    const monthlyData: { month: string; revenue: number; collections: number }[] = [];
+    const monthlyData: { month: string; revenue: number; collections: number; invoiced: number }[] = [];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     for (let i = 0; i < 12; i++) {
@@ -43,15 +58,24 @@ export async function GET(request: NextRequest) {
         return paidAt.getMonth() === i && paidAt.getFullYear() === year;
       });
 
+      const monthInvoices = invoices.filter(inv => {
+        const issuedAt = new Date(inv.issuedAt);
+        return issuedAt.getMonth() === i && issuedAt.getFullYear() === year;
+      });
+
+      const collections = monthPayments.reduce((sum, p) => sum + p.amount, 0);
+      const invoiced = monthInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
+
       monthlyData.push({
         month: monthNames[i],
-        revenue: monthPayments.reduce((sum, p) => sum + p.amount, 0),
-        collections: monthPayments.length,
+        revenue: invoiced,
+        collections,
+        invoiced,
       });
     }
 
     // Fee type breakdown
-    const invoices = await db.invoice.findMany({
+    const feeInvoices = await db.invoice.findMany({
       where: {
         status: { in: ['Paid', 'Partial'] },
         ...(branchId ? { branchId } : {}),
@@ -64,7 +88,7 @@ export async function GET(request: NextRequest) {
     });
 
     const feeTypeBreakdown: Record<string, { type: string; amount: number; count: number }> = {};
-    for (const inv of invoices) {
+    for (const inv of feeInvoices) {
       const type = inv.feeStructure?.feeType || 'Other';
       if (!feeTypeBreakdown[type]) {
         feeTypeBreakdown[type] = { type, amount: 0, count: 0 };

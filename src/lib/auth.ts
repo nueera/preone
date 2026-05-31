@@ -1,12 +1,11 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 
 // ============================================================
-// Password Hashing (using Node.js crypto - scrypt-like approach)
+// Password Hashing (using Node.js crypto HMAC-SHA256)
 // ============================================================
 
 const HASH_ALGORITHM = 'sha256';
 const SALT_LENGTH = 16;
-const ITERATIONS = 100000;
 
 export function hashPassword(password: string): string {
   const salt = randomBytes(SALT_LENGTH).toString('hex');
@@ -29,7 +28,7 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 }
 
 // ============================================================
-// Simple Token Management (in-memory for dev, use DB in prod)
+// Stateless Token Management (HMAC-signed JSON tokens)
 // ============================================================
 
 interface TokenPayload {
@@ -39,32 +38,49 @@ interface TokenPayload {
   branchId?: string | null;
 }
 
-// In-memory token store — replace with Redis/DB in production
-const tokenStore = new Map<string, { payload: TokenPayload; expiresAt: number }>();
+// Secret key for signing tokens — in production use env var
+const TOKEN_SECRET = process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
 
-const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+function sign(data: string): string {
+  return createHmac('sha256', TOKEN_SECRET).update(data).digest('hex');
+}
 
 export function generateToken(payload: TokenPayload): string {
-  const token = randomBytes(32).toString('hex');
-  tokenStore.set(token, {
-    payload,
-    expiresAt: Date.now() + TOKEN_EXPIRY_MS,
-  });
-  return token;
+  const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  const payloadData = JSON.stringify({ ...payload, expiresAt });
+  const payloadB64 = Buffer.from(payloadData).toString('base64url');
+  const signature = sign(payloadB64);
+  return `${payloadB64}.${signature}`;
 }
 
 export function verifyToken(token: string): TokenPayload | null {
-  const entry = tokenStore.get(token);
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    tokenStore.delete(token);
+  try {
+    const [payloadB64, signature] = token.split('.');
+    if (!payloadB64 || !signature) return null;
+
+    // Verify signature
+    const expectedSig = sign(payloadB64);
+    if (!timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expectedSig, 'hex'))) {
+      return null;
+    }
+
+    // Decode payload
+    const payloadData = Buffer.from(payloadB64, 'base64url').toString('utf8');
+    const payload = JSON.parse(payloadData);
+
+    // Check expiry
+    if (Date.now() > payload.expiresAt) return null;
+
+    // Return without expiresAt
+    return {
+      userId: payload.userId,
+      email: payload.email,
+      role: payload.role,
+      branchId: payload.branchId,
+    };
+  } catch {
     return null;
   }
-  return entry.payload;
-}
-
-export function revokeToken(token: string): void {
-  tokenStore.delete(token);
 }
 
 // ============================================================

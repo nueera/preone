@@ -38,14 +38,15 @@ export async function GET(request: NextRequest) {
     const totalLateFee = invoices.reduce((sum, i) => sum + i.lateFee, 0);
     const totalPending = totalInvoiced - totalCollected;
 
-    // Status breakdown
-    const statusBreakdown: Record<string, { count: number; amount: number }> = {};
+    // Status breakdown — show collected amount for Paid, remaining for others
+    const statusBreakdown: Record<string, { count: number; amount: number; collected: number }> = {};
     for (const inv of invoices) {
       if (!statusBreakdown[inv.status]) {
-        statusBreakdown[inv.status] = { count: 0, amount: 0 };
+        statusBreakdown[inv.status] = { count: 0, amount: 0, collected: 0 };
       }
       statusBreakdown[inv.status].count += 1;
-      statusBreakdown[inv.status].amount += inv.totalAmount - inv.paidAmount;
+      statusBreakdown[inv.status].amount += inv.totalAmount;
+      statusBreakdown[inv.status].collected += inv.paidAmount;
     }
 
     // Overdue invoices
@@ -87,8 +88,8 @@ export async function GET(request: NextRequest) {
       totalInvoices: invoices.length,
       overdueInvoices,
       statusBreakdown,
-      paymentMethodBreakdown: Object.values(paymentMethodBreakdown).map((v, i) => ({
-        method: Object.keys(paymentMethodBreakdown)[i],
+      paymentMethodBreakdown: Object.entries(paymentMethodBreakdown).map(([method, v]) => ({
+        method,
         ...v,
       })),
     });

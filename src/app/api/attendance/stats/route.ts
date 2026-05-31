@@ -13,15 +13,44 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const branchId = searchParams.get('branchId') || authUser.branchId || '';
     const classId = searchParams.get('classId') || '';
+    const dateParam = searchParams.get('date') || '';
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    // Use provided date or today
+    let targetDate = dateParam ? new Date(dateParam) : new Date();
+    let dateStr = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Student attendance stats
+    // If no date param provided and today has no data, find the most recent date with attendance
+    if (!dateParam) {
+      const todayCount = await db.studentAttendance.count({
+        where: {
+          date: {
+            gte: new Date(dateStr + 'T00:00:00.000Z'),
+            lte: new Date(dateStr + 'T23:59:59.999Z'),
+          },
+        },
+      });
+
+      if (todayCount === 0) {
+        // Find the most recent date with attendance records
+        const recentAttendance = await db.studentAttendance.findFirst({
+          orderBy: { date: 'desc' },
+          select: { date: true },
+        });
+        if (recentAttendance) {
+          dateStr = recentAttendance.date.toISOString().split('T')[0];
+          targetDate = new Date(dateStr + 'T00:00:00.000Z');
+        }
+      }
+    }
+
+    // Student attendance stats — use date string comparison for SQLite
     const studentAttendance = await db.studentAttendance.findMany({
-      where: { date: { gte: today, lte: todayEnd } },
+      where: {
+        date: {
+          gte: new Date(dateStr + 'T00:00:00.000Z'),
+          lte: new Date(dateStr + 'T23:59:59.999Z'),
+        },
+      },
       include: {
         student: {
           select: { branchId: true, classId: true },
@@ -58,7 +87,12 @@ export async function GET(request: NextRequest) {
 
     // Staff attendance stats
     const staffAttendance = await db.staffAttendance.findMany({
-      where: { date: { gte: today, lte: todayEnd } },
+      where: {
+        date: {
+          gte: new Date(dateStr + 'T00:00:00.000Z'),
+          lte: new Date(dateStr + 'T23:59:59.999Z'),
+        },
+      },
       include: {
         teacher: {
           select: { branchId: true, staffType: true },
@@ -102,12 +136,14 @@ export async function GET(request: NextRequest) {
       );
       const present = classAttendance.filter(a => a.status === 'Present').length;
       const absent = classAttendance.filter(a => a.status === 'Absent').length;
+      const late = classAttendance.filter(a => a.status === 'Late').length;
       return {
         classId: cls.id,
         className: cls.name,
         totalStudents: cls._count.students,
         present,
         absent,
+        late,
         unmarked: cls._count.students - classAttendance.length,
         attendanceRate: cls._count.students > 0
           ? Math.round((present / cls._count.students) * 100)
@@ -116,7 +152,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      date: today.toISOString().split('T')[0],
+      date: dateStr,
       students: {
         total: totalActiveStudents,
         marked: filteredStudentAttendance.length,
