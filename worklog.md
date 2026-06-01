@@ -265,3 +265,43 @@ Stage Summary:
 - Salary processing with auto net-pay calculation
 - Leave management with approve/reject workflow
 - Performance reviews with 5-dimension slider ratings
+---
+Task ID: attendance-fees-modules
+Agent: main
+Task: Build complete Attendance and Fees modules for PreOne Admin Portal
+
+Work Log:
+- Explored existing attendance/fees API routes and identified schema mismatches
+- Fixed /api/attendance/route.ts — removed non-existent fields (employeeId, staffType, admissionNo, remarks, workingHours)
+- Fixed /api/attendance/stats/route.ts — enhanced with staff onLeave count, class-wise rates
+- Created /api/attendance/staff/route.ts — GET staff attendance with teacher details per date
+- Fixed /api/fees/structures/route.ts — removed broken class relation, added POST create structure
+- Fixed /api/fees/payments/route.ts — rewrote to use actual Prisma schema fields (method, studentId, receiptNo)
+- Created /api/fees/invoices/generate/route.ts — POST bulk/single invoice generation with auto invoiceNo
+- Created /api/fees/reminders/route.ts — POST send fee reminders by channel
+- Created /api/fees/refunds/route.ts — POST process refunds with invoice cancellation
+- Built /admin/attendance/page.tsx — Complete attendance page with:
+  - Date picker + class filter + export CSV
+  - Class-wise stats table with visual progress bars (green/amber/red)
+  - Staff attendance stat cards (Present/On Leave/Late/Absent)
+  - Staff detail table with status badges and check-in times
+  - Mark attendance dialog with per-student Present/Late/Absent toggle buttons
+  - Check-in/out table with duration calculation
+- Built /admin/fees/page.tsx — Complete fees page with:
+  - 4 stat cards (Invoiced/Collected/Pending/Rate)
+  - Donut pie chart (Collected/Pending/Overdue)
+  - Fee structures table with add structure dialog
+  - Invoices table with status filter, pagination, actions dropdown
+  - Generate Invoice dialog (single + bulk modes with student search)
+  - Collect Payment dialog (method-dependent fields: UPI ref, cheque no, bank)
+  - Fee Reminders dialog (target + channel selection)
+  - Refund dialog (reason, method, bank details)
+- Built /admin/fees/receipt/[id]/page.tsx — Print-friendly receipt with school header, student info, fee breakdown, signatory line
+- Build passes with 0 errors, 0 warnings
+- Pushed to GitHub as commit aea1313
+
+Stage Summary:
+- Attendance: 3 API routes (attendance, stats, staff) + 1 admin page
+- Fees: 6 API routes (overview, structures, invoices, generate, payments, refunds, reminders) + 2 admin pages (fees, receipt)
+- All schema mismatches fixed
+- All routes verify ADMIN role
