@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      title, content, type, target, priority, scheduledAt,
+      title, content, type, target, priority, scheduledAt, channels,
     } = body;
 
     if (!title || !content || !type) {
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isScheduled = !!scheduledAt;
     const announcement = await db.announcement.create({
       data: {
         title,
@@ -67,9 +68,10 @@ export async function POST(request: NextRequest) {
         type,
         target: target || 'All',
         priority: priority || 'NORMAL',
-        status: 'Published',
-        publishedAt: !scheduledAt ? new Date() : null,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        status: isScheduled ? 'Scheduled' : 'Published',
+        publishedAt: isScheduled ? null : new Date(),
+        scheduledAt: isScheduled ? new Date(scheduledAt) : null,
+        channels: channels || null,
         createdBy: user.userId,
       },
     });
