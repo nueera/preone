@@ -263,7 +263,8 @@ async function apiFetch(url: string, token: string | null, options?: RequestInit
   return res.json();
 }
 
-function formatCurrency(value: number) {
+function formatCurrency(value: number | undefined | null) {
+  if (value === undefined || value === null || isNaN(value)) return '₹0';
   if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
   return `₹${value.toLocaleString('en-IN')}`;
 }

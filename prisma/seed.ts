@@ -216,10 +216,11 @@ async function main() {
     const assignedClassName = classAssignments[i];
 
     // Create user for teacher
+    const teacherPasswordHash = await hashPassword('password123');
     const teacherUser = await prisma.user.create({
       data: {
         email: td.email,
-        password: adminPasswordHash, // All teachers use password123 for demo
+        password: teacherPasswordHash, // All teachers use password123 for demo
         name: `${td.firstName} ${td.lastName}`,
         phone: td.phone,
         role: 'TEACHER',
