@@ -329,3 +329,30 @@ Stage Summary:
 - 6 API routes, 3 frontend components, 1 page, 1 analytics component
 - 10 seed leads across all 6 stages
 - Kanban drag-drop, list view with filters, lead detail drawer, convert flow, analytics dashboard
+
+---
+Task ID: activities-growth-modules
+Agent: Main
+Task: Build Activities and Growth modules for PreOne Admin Portal
+
+Work Log:
+- Explored existing project state: found teacher-scoped activity/growth APIs but no admin pages or admin APIs
+- Built Activities admin API: GET/POST /api/activities (list with filters + create), GET/PATCH/DELETE /api/activities/[id]
+- Built Activities page with List/Calendar toggle views
+- Built Add Activity Dialog with all required fields
+- Built Activity Detail Dialog with view/edit/delete/publish
+- Built Growth admin API: POST /api/growth/scores (bulk upsert), GET /api/growth/attention, GET /api/growth/top-performers, GET /api/growth/ai-observations, GET /api/growth/milestones/[studentId]
+- Fixed Growth class/student API routes (removed socialSkills→social, assessmentDate references)
+- Fixed teacher activities route (removed teacherId, branchId, status='Planned'→'UPCOMING')
+- Fixed teacher growth route (socialSkills→social, removed assessmentDate)
+- Fixed growth observations route (mapped category/priority to Prisma enum values)
+- Built Growth page with 6 tabs: Overview (radar chart), Score Entry (bulk+single), Needs Attention, Top Performers, AI Insights, Milestones
+- Milestones API auto-creates default milestones if none exist in DB
+- Build passed with 0 errors
+- Pushed to GitHub (commit 9b4ac56)
+
+Stage Summary:
+- 2 admin pages: /admin/activities, /admin/growth
+- 3 new components: add-activity-dialog, activity-detail-dialog (growth is inline)
+- 7 new API routes + 5 fixed existing routes
+- 17 files changed, 2954 insertions
