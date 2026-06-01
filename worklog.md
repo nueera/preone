@@ -305,3 +305,27 @@ Stage Summary:
 - Fees: 6 API routes (overview, structures, invoices, generate, payments, refunds, reminders) + 2 admin pages (fees, receipt)
 - All schema mismatches fixed
 - All routes verify ADMIN role
+
+---
+Task ID: crm-module
+Agent: Main
+Task: Build complete Admission CRM module for PreOne Admin Portal
+
+Work Log:
+- Explored project state: checked schema (Lead, FollowUp models), existing patterns, @dnd-kit availability
+- Built 6 CRM API routes: leads CRUD, followups, convert, pipeline, insights
+- Built CRM page with 3 tabs: Pipeline (Kanban), List, Analytics
+- Implemented Kanban board with @dnd-kit drag-and-drop across 6 stages
+- Built Add Lead Dialog with all fields (parent info, child info, source, priority, program, etc.)
+- Built Lead Detail Drawer (Sheet, 480px) with 3 tabs: Details (editable), Follow-ups (timeline), Activity (audit)
+- Built Convert to Student dialog with pre-filled data from lead
+- Built CRM Analytics with 4 stat cards + 4 Recharts charts
+- Fixed seed data follow-up types/outcomes to match frontend constants
+- Build passed with 0 errors
+- Pushed to GitHub (commit f3dbc34)
+
+Stage Summary:
+- Complete Admission CRM module built and deployed
+- 6 API routes, 3 frontend components, 1 page, 1 analytics component
+- 10 seed leads across all 6 stages
+- Kanban drag-drop, list view with filters, lead detail drawer, convert flow, analytics dashboard
