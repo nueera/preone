@@ -784,9 +784,9 @@ async function main() {
       await prisma.followUp.create({
         data: {
           leadId: lead.id,
-          type: randomItem(['Phone', 'Email', 'InPerson', 'WhatsApp']),
+          type: randomItem(['Call', 'Email', 'Visit', 'WhatsApp']),
           dateTime: daysAgo(randomInt(1, 5)),
-          outcome: 'Positive',
+          outcome: 'Interested',
           notes: `Discussed enrollment for ${ld.childName}. ${ld.stage === 'APPLIED' ? 'Application submitted.' : 'Parent interested, scheduling next step.'}`,
           createdBy: adminUser.id,
         },

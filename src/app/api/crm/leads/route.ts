@@ -1,33 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { getAuthUser, requireAdmin } from '@/lib/auth';
 
-// GET /api/crm/leads — List leads
+// GET /api/crm/leads — List leads with filters & pagination
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = getAuthUser(request);
+    if (!authResult) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
     const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '50');
     const stage = searchParams.get('stage') || '';
     const source = searchParams.get('source') || '';
+    const priority = searchParams.get('priority') || '';
+    const assignedTo = searchParams.get('assignedTo') || '';
     const search = searchParams.get('search') || '';
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const dateFrom = searchParams.get('dateFrom') || '';
+    const dateTo = searchParams.get('dateTo') || '';
 
+    const skip = (page - 1) * limit;
+
+    // Build where clause
     const where: Record<string, unknown> = {};
-    if (stage) where.stage = stage;
-    if (source) where.source = source;
+
+    // Stage filter (comma-separated for multi-select)
+    if (stage) {
+      const stages = stage.split(',').filter(Boolean);
+      if (stages.length === 1) {
+        where.stage = stages[0];
+      } else if (stages.length > 1) {
+        where.stage = { in: stages };
+      }
+    }
+
+    // Source filter (comma-separated)
+    if (source) {
+      const sources = source.split(',').filter(Boolean);
+      if (sources.length === 1) {
+        where.source = sources[0];
+      } else if (sources.length > 1) {
+        where.source = { in: sources };
+      }
+    }
+
+    // Priority filter
+    if (priority) {
+      where.priority = priority;
+    }
+
+    // Assigned to filter
+    if (assignedTo) {
+      where.assignedTo = assignedTo;
+    }
+
+    // Date range filter
+    if (dateFrom || dateTo) {
+      const createdAt: Record<string, unknown> = {};
+      if (dateFrom) createdAt.gte = new Date(dateFrom);
+      if (dateTo) createdAt.lte = new Date(dateTo);
+      where.createdAt = createdAt;
+    }
+
+    // Search filter
     if (search) {
-      where.OR = [
+      (where as Record<string, unknown>).OR = [
         { parentName: { contains: search } },
         { childName: { contains: search } },
         { parentPhone: { contains: search } },
         { parentEmail: { contains: search } },
       ];
     }
-
-    const skip = (page - 1) * limit;
 
     const [leads, total] = await Promise.all([
       db.lead.findMany({
@@ -38,9 +83,8 @@ export async function GET(request: NextRequest) {
         include: {
           followUps: {
             orderBy: { dateTime: 'desc' },
-            take: 5,
+            take: 1,
           },
-          _count: { select: { followUps: true } },
         },
       }),
       db.lead.count({ where }),
@@ -48,7 +92,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       leads,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('List leads error:', error);
@@ -56,41 +105,72 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/crm/leads — Create new lead
+// POST /api/crm/leads — Create a new lead
 export async function POST(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const body = await request.json();
     const {
-      parentName, parentPhone, parentEmail, childName, childAge,
-      source, stage, assignedTo, notes, priority, programInterest,
-      estimatedValue, nextFollowUp,
+      parentName,
+      parentPhone,
+      parentEmail,
+      childName,
+      childAge,
+      source,
+      priority,
+      programInterest,
+      estimatedValue,
+      assignedTo,
+      notes,
+      nextFollowUp,
     } = body;
 
-    if (!parentName || !parentPhone || !childName) {
+    // Validate required fields
+    if (!parentName || parentName.trim().length < 2) {
       return NextResponse.json(
-        { error: 'parentName, parentPhone, and childName are required' },
+        { error: 'Parent name is required (min 2 characters)' },
+        { status: 400 }
+      );
+    }
+    if (!parentPhone || !/^\d{10}$/.test(parentPhone)) {
+      return NextResponse.json(
+        { error: 'Valid 10-digit phone number is required' },
+        { status: 400 }
+      );
+    }
+    if (!childName || childName.trim().length < 2) {
+      return NextResponse.json(
+        { error: 'Child name is required (min 2 characters)' },
+        { status: 400 }
+      );
+    }
+    if (!source) {
+      return NextResponse.json(
+        { error: 'Source is required' },
         { status: 400 }
       );
     }
 
     const lead = await db.lead.create({
       data: {
-        parentName,
-        parentPhone,
-        parentEmail,
-        childName,
-        childAge,
-        source: source || 'WALK_IN',
-        stage: stage || 'NEW',
-        assignedTo: assignedTo || user.userId,
-        notes,
+        parentName: parentName.trim(),
+        parentPhone: parentPhone.trim(),
+        parentEmail: parentEmail?.trim() || null,
+        childName: childName.trim(),
+        childAge: childAge?.trim() || null,
+        source,
         priority: priority || 'NORMAL',
-        programInterest,
-        estimatedValue,
-        nextFollowUp: nextFollowUp ? new Date(nextFollowUp) : undefined,
+        programInterest: programInterest || null,
+        estimatedValue: estimatedValue ? parseFloat(estimatedValue) : null,
+        assignedTo: assignedTo || null,
+        notes: notes?.trim() || null,
+        nextFollowUp: nextFollowUp ? new Date(nextFollowUp) : null,
+        stage: 'NEW',
+      },
+      include: {
+        followUps: true,
       },
     });
 

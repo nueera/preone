@@ -1,95 +1,116 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin, forbidden } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
-// PUT /api/crm/leads/[id] — Update lead (change stage, add follow-up)
-export async function PUT(
+// GET /api/crm/leads/[id] — Get lead by ID with follow-ups
+export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = requireAdmin(request);
-    if (user instanceof NextResponse) return user;
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
+
+    const { id } = await params;
+    const lead = await db.lead.findUnique({
+      where: { id },
+      include: {
+        followUps: {
+          orderBy: { dateTime: 'desc' },
+        },
+      },
+    });
+
+    if (!lead) {
+      return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ lead });
+  } catch (error) {
+    console.error('Get lead error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// PATCH /api/crm/leads/[id] — Update lead (including stage change for drag-drop)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
     const body = await request.json();
 
+    // Verify lead exists
     const existing = await db.lead.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
     }
 
-    // Verify branch isolation
-    if (user.branchId && existing.branchId !== user.branchId) {
-      return forbidden('You do not have access to this lead');
-    }
-
-    // Update lead fields
-    const updateData: Record<string, unknown> = {};
+    // Allowed update fields
     const allowedFields = [
-      'parentName', 'parentPhone', 'parentEmail', 'parentOccupation',
-      'parentAddress', 'childName', 'childGender', 'programInterest',
-      'source', 'sourceDetail', 'stage', 'assignedTo', 'notes',
-      'priority', 'lostReason', 'estimatedFee', 'convertedStudentId',
+      'parentName', 'parentPhone', 'parentEmail', 'childName', 'childAge',
+      'source', 'stage', 'priority', 'programInterest', 'estimatedValue',
+      'assignedTo', 'notes', 'nextFollowUp', 'convertedStudentId', 'lostReason',
     ];
 
+    const updateData: Record<string, unknown> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        if (field === 'nextFollowUp' && body[field]) {
+          updateData[field] = new Date(body[field]);
+        } else if (field === 'estimatedValue' && body[field] !== null) {
+          updateData[field] = parseFloat(body[field]);
+        } else {
+          updateData[field] = body[field];
+        }
       }
-    }
-
-    // Handle date fields
-    if (body.childDob !== undefined) updateData.childDob = body.childDob ? new Date(body.childDob) : null;
-    if (body.nextFollowUpDate !== undefined) updateData.nextFollowUpDate = body.nextFollowUpDate ? new Date(body.nextFollowUpDate) : null;
-    if (body.expectedEnrollmentDate !== undefined) updateData.expectedEnrollmentDate = body.expectedEnrollmentDate ? new Date(body.expectedEnrollmentDate) : null;
-
-    // If stage changed to Enrolled, increment interaction count
-    if (body.stage && body.stage !== existing.stage) {
-      updateData.interactionCount = existing.interactionCount + 1;
     }
 
     const lead = await db.lead.update({
       where: { id },
       data: updateData,
       include: {
-        branch: { select: { id: true, name: true } },
-        followUps: { orderBy: { followUpDate: 'desc' }, take: 10 },
+        followUps: {
+          orderBy: { dateTime: 'desc' },
+        },
       },
     });
-
-    // If a follow-up is provided, create it
-    if (body.followUp) {
-      const { type, notes: followUpNotes, outcome, followUpDate, nextFollowUpDate: nfDate, duration } = body.followUp;
-
-      if (type && followUpNotes && followUpDate) {
-        await db.followUp.create({
-          data: {
-            leadId: id,
-            type,
-            notes: followUpNotes,
-            outcome,
-            followUpDate: new Date(followUpDate),
-            conductedBy: user.userId,
-            nextFollowUpDate: nfDate ? new Date(nfDate) : undefined,
-            duration,
-          },
-        });
-
-        // Update lead's next follow-up date and interaction count
-        await db.lead.update({
-          where: { id },
-          data: {
-            interactionCount: lead.interactionCount + 1,
-            nextFollowUpDate: nfDate ? new Date(nfDate) : undefined,
-          },
-        });
-      }
-    }
 
     return NextResponse.json({ message: 'Lead updated successfully', lead });
   } catch (error) {
     console.error('Update lead error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// DELETE /api/crm/leads/[id] — Delete a lead
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
+
+    const { id } = await params;
+
+    // Verify lead exists
+    const existing = await db.lead.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+    }
+
+    // Delete follow-ups first (cascade)
+    await db.followUp.deleteMany({ where: { leadId: id } });
+    await db.lead.delete({ where: { id } });
+
+    return NextResponse.json({ message: 'Lead deleted successfully' });
+  } catch (error) {
+    console.error('Delete lead error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
