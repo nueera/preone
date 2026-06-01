@@ -16,33 +16,40 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
-    // Find the teacher profile
+    // Find the teacher profile to get their assigned class
     const teacher = await db.teacher.findUnique({
       where: { userId: user.userId },
-      select: { id: true, branchId: true },
+      select: { id: true, assignedClass: { select: { id: true } } },
     });
 
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher profile not found' }, { status: 404 });
     }
 
+    // Filter by the teacher's assigned class or createdBy
     const where: Record<string, unknown> = {
-      teacherId: teacher.id,
+      createdBy: user.userId,
     };
 
-    // Filter by date
+    // Also show activities for their assigned class
+    if (teacher.assignedClass) {
+      where.OR = [
+        { createdBy: user.userId },
+        { classId: teacher.assignedClass.id },
+      ];
+      delete where.createdBy;
+    }
+
     if (date) {
       const dateStart = new Date(date + 'T00:00:00.000Z');
       const dateEnd = new Date(date + 'T23:59:59.999Z');
       where.date = { gte: dateStart, lte: dateEnd };
     }
 
-    // Filter by status
     if (status) {
       where.status = status;
     }
 
-    // Filter by type
     if (type) {
       where.type = type;
     }
@@ -83,16 +90,6 @@ export async function POST(request: NextRequest) {
     const user = requireRole(request, Role.Teacher);
     if (user instanceof NextResponse) return user;
 
-    // Find the teacher profile
-    const teacher = await db.teacher.findUnique({
-      where: { userId: user.userId },
-      select: { id: true, branchId: true },
-    });
-
-    if (!teacher) {
-      return NextResponse.json({ error: 'Teacher profile not found' }, { status: 404 });
-    }
-
     const body = await request.json();
     const {
       title,
@@ -114,8 +111,6 @@ export async function POST(request: NextRequest) {
 
     const activity = await db.activity.create({
       data: {
-        branchId: teacher.branchId,
-        teacherId: teacher.id,
         classId: classId || null,
         title,
         type,
@@ -124,8 +119,9 @@ export async function POST(request: NextRequest) {
         startTime: startTime || null,
         endTime: endTime || null,
         learningOutcomes: learningOutcomes || null,
-        status: 'Planned',
+        status: 'UPCOMING',
         isPublished: false,
+        createdBy: user.userId,
       },
       include: {
         class: {

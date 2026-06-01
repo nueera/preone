@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // GET /api/teacher/growth — Get class-wide growth data
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Find the teacher profile
     const teacher = await db.teacher.findUnique({
       where: { userId: user.userId },
-      select: { id: true, branchId: true },
+      select: { id: true },
     });
 
     if (!teacher) {
@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
       effectiveClassId = assignedClass?.id || '';
     }
 
-    // Build where clause
     const where: Record<string, unknown> = {};
 
     if (studentId) {
@@ -63,26 +62,26 @@ export async function GET(request: NextRequest) {
       orderBy: { student: { firstName: 'asc' } },
     });
 
-    // Calculate class averages if we have data
+    // Calculate class averages
     let classAverages = null;
     if (growthScores.length > 0) {
       const sum = growthScores.reduce(
         (acc, g) => ({
           creativity: acc.creativity + g.creativity,
           communication: acc.communication + g.communication,
-          socialSkills: acc.socialSkills + g.socialSkills,
+          social: acc.social + g.social,
           confidence: acc.confidence + g.confidence,
           cognitive: acc.cognitive + g.cognitive,
           physical: acc.physical + g.physical,
-          overall: acc.overall + g.overall,
+          overall: acc.overall + (g.overall || 0),
         }),
-        { creativity: 0, communication: 0, socialSkills: 0, confidence: 0, cognitive: 0, physical: 0, overall: 0 }
+        { creativity: 0, communication: 0, social: 0, confidence: 0, cognitive: 0, physical: 0, overall: 0 }
       );
       const n = growthScores.length;
       classAverages = {
         creativity: Math.round((sum.creativity / n) * 10) / 10,
         communication: Math.round((sum.communication / n) * 10) / 10,
-        socialSkills: Math.round((sum.socialSkills / n) * 10) / 10,
+        social: Math.round((sum.social / n) * 10) / 10,
         confidence: Math.round((sum.confidence / n) * 10) / 10,
         cognitive: Math.round((sum.cognitive / n) * 10) / 10,
         physical: Math.round((sum.physical / n) * 10) / 10,
@@ -105,10 +104,9 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/growth — Update growth score for a student
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
-    // Find the teacher profile
     const teacher = await db.teacher.findUnique({
       where: { userId: user.userId },
       select: { id: true },
@@ -124,7 +122,7 @@ export async function POST(request: NextRequest) {
       period,
       creativity,
       communication,
-      socialSkills,
+      social,
       confidence,
       cognitive,
       physical,
@@ -140,7 +138,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate score ranges (0-100)
-    const scores = { creativity, communication, socialSkills, confidence, cognitive, physical, overall };
+    const scores = { creativity, communication, social, confidence, cognitive, physical, overall };
     for (const [key, value] of Object.entries(scores)) {
       if (value !== undefined && (value < 0 || value > 100)) {
         return NextResponse.json(
@@ -151,9 +149,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Compute overall if not provided
-    const providedScores = [creativity, communication, socialSkills, confidence, cognitive, physical].filter(
-      v => v !== undefined
-    ) as number[];
+    const providedScores = [creativity, communication, social, confidence, cognitive, physical].filter(
+      (v): v is number => v !== undefined
+    );
     const computedOverall =
       overall ??
       (providedScores.length > 0
@@ -172,25 +170,23 @@ export async function POST(request: NextRequest) {
         period,
         creativity: creativity ?? 0,
         communication: communication ?? 0,
-        socialSkills: socialSkills ?? 0,
+        social: social ?? 0,
         confidence: confidence ?? 0,
         cognitive: cognitive ?? 0,
         physical: physical ?? 0,
         overall: computedOverall,
         assessedBy: teacher.id,
-        assessmentDate: new Date(),
         comments: comments || null,
       },
       update: {
         creativity: creativity ?? undefined,
         communication: communication ?? undefined,
-        socialSkills: socialSkills ?? undefined,
+        social: social ?? undefined,
         confidence: confidence ?? undefined,
         cognitive: cognitive ?? undefined,
         physical: physical ?? undefined,
         overall: computedOverall,
         assessedBy: teacher.id,
-        assessmentDate: new Date(),
         comments: comments !== undefined ? comments : undefined,
       },
       include: {

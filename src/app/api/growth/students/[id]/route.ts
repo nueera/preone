@@ -8,24 +8,28 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = requireRole(request, Role.Admin, Role.Teacher);
+    const user = requireRole(request, Role.ADMIN, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const { id } = await params;
+    const period = request.nextUrl.searchParams.get('period') || '';
 
     const student = await db.student.findUnique({
       where: { id },
-      select: { id: true, firstName: true, lastName: true, dob: true },
+      select: { id: true, firstName: true, lastName: true, dob: true, classId: true },
     });
 
     if (!student) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
-    // Growth scores over time
+    // Growth scores
+    const where: Record<string, unknown> = { studentId: id };
+    if (period) where.period = period;
+
     const growthScores = await db.growthScore.findMany({
-      where: { studentId: id },
-      orderBy: { assessmentDate: 'asc' },
+      where,
+      orderBy: { createdAt: 'asc' },
     });
 
     // AI Observations
@@ -35,39 +39,30 @@ export async function GET(
       take: 10,
     });
 
-    // Teacher observations
-    const observations = await db.observation.findMany({
-      where: { studentId: id },
-      orderBy: { date: 'desc' },
-      take: 20,
-      include: {
-        teacher: { select: { firstName: true, lastName: true } },
-      },
-    });
-
-    // Milestones achieved
+    // Milestones
     const milestones = await db.milestoneTimeline.findMany({
       where: { studentId: id },
       orderBy: { achievedDate: 'desc' },
       include: {
-        milestone: { select: { name: true, category: true, ageRange: true } },
+        milestone: { select: { name: true, category: true, ageGroup: true } },
       },
     });
 
-    // Latest growth summary
     const latestScore = growthScores[growthScores.length - 1] || null;
     const previousScore = growthScores.length > 1 ? growthScores[growthScores.length - 2] : null;
 
     // Calculate growth deltas
-    const growthDeltas = latestScore && previousScore ? {
-      creativity: latestScore.creativity - previousScore.creativity,
-      communication: latestScore.communication - previousScore.communication,
-      socialSkills: latestScore.socialSkills - previousScore.socialSkills,
-      confidence: latestScore.confidence - previousScore.confidence,
-      cognitive: latestScore.cognitive - previousScore.cognitive,
-      physical: latestScore.physical - previousScore.physical,
-      overall: latestScore.overall - previousScore.overall,
-    } : null;
+    const growthDeltas = latestScore && previousScore
+      ? {
+          creativity: latestScore.creativity - previousScore.creativity,
+          communication: latestScore.communication - previousScore.communication,
+          social: latestScore.social - previousScore.social,
+          confidence: latestScore.confidence - previousScore.confidence,
+          cognitive: latestScore.cognitive - previousScore.cognitive,
+          physical: latestScore.physical - previousScore.physical,
+          overall: (latestScore.overall || 0) - (previousScore.overall || 0),
+        }
+      : null;
 
     return NextResponse.json({
       student,
@@ -75,7 +70,6 @@ export async function GET(
       latestScore,
       growthDeltas,
       aiObservations,
-      observations,
       milestones,
     });
   } catch (error) {

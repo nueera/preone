@@ -11,7 +11,6 @@ export async function GET(
     const user = getAuthUser(request);
     if (!user) return unauthorized();
 
-    // Allow both admin and teacher
     if (user.role !== Role.ADMIN && user.role !== Role.TEACHER) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -19,7 +18,6 @@ export async function GET(
     const { classId } = await params;
     const period = request.nextUrl.searchParams.get('period') || '';
 
-    // Get class info
     const classInfo = await db.class.findUnique({
       where: { id: classId },
       include: {
@@ -33,13 +31,12 @@ export async function GET(
       return NextResponse.json({ error: 'Class not found' }, { status: 404 });
     }
 
-    // Get all active students in the class
     const students = await db.student.findMany({
       where: { classId, status: 'ACTIVE' },
       select: { id: true, firstName: true, lastName: true },
     });
 
-    // Get latest growth score for each student
+    // Get growth scores for each student
     const studentGrowth = await Promise.all(
       students.map(async (student) => {
         const where: Record<string, unknown> = { studentId: student.id };
@@ -50,59 +47,75 @@ export async function GET(
           orderBy: { createdAt: 'desc' },
         });
 
-        return {
-          ...student,
-          growthScore: latestScore,
-        };
+        return { ...student, growthScore: latestScore };
       })
     );
 
     // Class averages
-    const studentsWithScores = studentGrowth.filter(s => s.growthScore);
-    const classAverages = studentsWithScores.length > 0 ? {
-      creativity: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.creativity || 0), 0) / studentsWithScores.length,
-      communication: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.communication || 0), 0) / studentsWithScores.length,
-      social: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.social || 0), 0) / studentsWithScores.length,
-      confidence: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.confidence || 0), 0) / studentsWithScores.length,
-      cognitive: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.cognitive || 0), 0) / studentsWithScores.length,
-      physical: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.physical || 0), 0) / studentsWithScores.length,
-      overall: studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.overall || 0), 0) / studentsWithScores.length,
-    } : null;
+    const studentsWithScores = studentGrowth.filter((s) => s.growthScore);
+    const classAverages = studentsWithScores.length > 0
+      ? {
+          creativity: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.creativity || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          communication: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.communication || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          social: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.social || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          confidence: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.confidence || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          cognitive: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.cognitive || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          physical: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.physical || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+          overall: Math.round(
+            (studentsWithScores.reduce((sum, s) => sum + (s.growthScore?.overall || 0), 0) / studentsWithScores.length) * 10
+          ) / 10,
+        }
+      : null;
 
-    // Identify students needing attention (overall < 40)
-    const needsAttention = studentGrowth.filter(
-      s => s.growthScore && s.growthScore.overall < 40
-    ).map(s => ({
-      id: s.id,
-      name: `${s.firstName} ${s.lastName}`,
-      overall: s.growthScore!.overall,
-      weakestArea: getWeakestArea(s.growthScore!),
-    }));
-
-    // Top performers
-    const topPerformers = studentGrowth
-      .filter(s => s.growthScore && s.growthScore.overall >= 75)
-      .sort((a, b) => (b.growthScore?.overall || 0) - (a.growthScore?.overall || 0))
-      .slice(0, 5)
-      .map(s => ({
+    // Students needing attention (any dimension < 40)
+    const needsAttention = studentGrowth
+      .filter((s) => {
+        if (!s.growthScore) return false;
+        const sc = s.growthScore;
+        return (
+          sc.creativity < 40 ||
+          sc.communication < 40 ||
+          sc.social < 40 ||
+          sc.confidence < 40 ||
+          sc.cognitive < 40 ||
+          sc.physical < 40
+        );
+      })
+      .map((s) => ({
         id: s.id,
         name: `${s.firstName} ${s.lastName}`,
+        weakestArea: getWeakestArea(s.growthScore!),
+        weakestScore: getWeakestScore(s.growthScore!),
+      }))
+      .sort((a, b) => a.weakestScore - b.weakestScore);
+
+    // Top performers (overall >= 80)
+    const topPerformers = studentGrowth
+      .filter((s) => s.growthScore && s.growthScore.overall >= 80)
+      .sort((a, b) => (b.growthScore?.overall || 0) - (a.growthScore?.overall || 0))
+      .map((s) => ({
+        id: s.id,
+        name: `${s.firstName} ${s.lastName}`,
+        strongestArea: getStrongestArea(s.growthScore!),
         overall: s.growthScore!.overall,
       }));
 
     return NextResponse.json({
       class: classInfo,
       students: studentGrowth,
-      classAverages: classAverages ? {
-        ...classAverages,
-        creativity: Math.round(classAverages.creativity * 10) / 10,
-        communication: Math.round(classAverages.communication * 10) / 10,
-        social: Math.round(classAverages.social * 10) / 10,
-        confidence: Math.round(classAverages.confidence * 10) / 10,
-        cognitive: Math.round(classAverages.cognitive * 10) / 10,
-        physical: Math.round(classAverages.physical * 10) / 10,
-        overall: Math.round(classAverages.overall * 10) / 10,
-      } : null,
+      classAverages,
       needsAttention,
       topPerformers,
       assessedCount: studentsWithScores.length,
@@ -114,15 +127,41 @@ export async function GET(
   }
 }
 
-function getWeakestArea(score: { creativity: number; communication: number; social: number; confidence: number; cognitive: number; physical: number }): string {
+function getWeakestArea(score: {
+  creativity: number; communication: number; social: number;
+  confidence: number; cognitive: number; physical: number;
+}): string {
   const areas = [
     { name: 'Creativity', value: score.creativity },
     { name: 'Communication', value: score.communication },
-    { name: 'Social', value: score.social },
+    { name: 'Social Skills', value: score.social },
     { name: 'Confidence', value: score.confidence },
     { name: 'Cognitive', value: score.cognitive },
     { name: 'Physical', value: score.physical },
   ];
   areas.sort((a, b) => a.value - b.value);
+  return areas[0].name;
+}
+
+function getWeakestScore(score: {
+  creativity: number; communication: number; social: number;
+  confidence: number; cognitive: number; physical: number;
+}): number {
+  return Math.min(score.creativity, score.communication, score.social, score.confidence, score.cognitive, score.physical);
+}
+
+function getStrongestArea(score: {
+  creativity: number; communication: number; social: number;
+  confidence: number; cognitive: number; physical: number;
+}): string {
+  const areas = [
+    { name: 'Creativity', value: score.creativity },
+    { name: 'Communication', value: score.communication },
+    { name: 'Social Skills', value: score.social },
+    { name: 'Confidence', value: score.confidence },
+    { name: 'Cognitive', value: score.cognitive },
+    { name: 'Physical', value: score.physical },
+  ];
+  areas.sort((a, b) => b.value - a.value);
   return areas[0].name;
 }
