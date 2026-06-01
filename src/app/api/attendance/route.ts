@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 
 // GET /api/attendance — Get attendance records (filter by date, class)
 export async function GET(request: NextRequest) {
   try {
     const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    if (!authUser) return unauthorized();
 
     const searchParams = request.nextUrl.searchParams;
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
     const classId = searchParams.get('classId') || '';
-    const branchId = searchParams.get('branchId') || authUser.branchId || '';
     const status = searchParams.get('status') || '';
     const type = searchParams.get('type') || 'student'; // student or staff
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
 
     const dateStart = new Date(date);
     dateStart.setHours(0, 0, 0, 0);
@@ -34,17 +29,13 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           teacher: {
-            select: { id: true, firstName: true, lastName: true, employeeId: true, branchId: true, staffType: true },
+            select: { id: true, firstName: true, lastName: true, branchId: true, status: true },
           },
         },
         orderBy: { createdAt: 'desc' },
       });
 
-      const filtered = branchId
-        ? attendance.filter(a => a.teacher.branchId === branchId)
-        : attendance;
-
-      return NextResponse.json({ attendance: filtered, date, type: 'staff' });
+      return NextResponse.json({ attendance, date, type: 'staff' });
     }
 
     // Student attendance
@@ -58,7 +49,7 @@ export async function GET(request: NextRequest) {
       include: {
         student: {
           select: {
-            id: true, firstName: true, lastName: true, admissionNo: true,
+            id: true, firstName: true, lastName: true, rollNumber: true,
             branchId: true, classId: true,
             class: { select: { id: true, name: true } },
           },
@@ -67,10 +58,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Filter by branch and class
-    if (branchId) {
-      attendance = attendance.filter(a => a.student.branchId === branchId);
-    }
+    // Filter by class
     if (classId) {
       attendance = attendance.filter(a => a.student.classId === classId);
     }
@@ -86,9 +74,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const authUser = getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    if (!authUser) return unauthorized();
 
     const body = await request.json();
     const { type = 'student', records } = body;
@@ -103,9 +89,8 @@ export async function POST(request: NextRequest) {
     const results: { success: boolean; id?: string; error?: string }[] = [];
 
     if (type === 'staff') {
-      // Bulk staff attendance
       for (const record of records) {
-        const { teacherId, date, status, method, checkInTime, checkOutTime, remarks, workingHours } = record;
+        const { teacherId, date, status, method, checkInTime, checkOutTime } = record;
         if (!teacherId || !date || !status) {
           results.push({ success: false, error: 'teacherId, date, and status are required' });
           continue;
@@ -120,20 +105,16 @@ export async function POST(request: NextRequest) {
               teacherId,
               date: new Date(date),
               status,
-              method: method || 'Manual',
-              checkInTime: checkInTime ? new Date(checkInTime) : undefined,
-              checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
-              remarks,
-              workingHours,
+              method: method || 'MANUAL',
+              checkInTime,
+              checkOutTime,
               markedBy: authUser.userId,
             },
             update: {
               status,
-              method: method || 'Manual',
-              checkInTime: checkInTime ? new Date(checkInTime) : undefined,
-              checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
-              remarks,
-              workingHours,
+              method: method || 'MANUAL',
+              checkInTime,
+              checkOutTime,
             },
           });
           results.push({ success: true, id: attendance.id });
@@ -142,9 +123,9 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      // Bulk student attendance
+      // Student attendance
       for (const record of records) {
-        const { studentId, date, status, method, checkInTime, checkOutTime, remarks } = record;
+        const { studentId, date, status, method, checkInTime, checkOutTime } = record;
         if (!studentId || !date || !status) {
           results.push({ success: false, error: 'studentId, date, and status are required' });
           continue;
@@ -159,18 +140,16 @@ export async function POST(request: NextRequest) {
               studentId,
               date: new Date(date),
               status,
-              method: method || 'Manual',
-              checkInTime: checkInTime ? new Date(checkInTime) : undefined,
-              checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
-              remarks,
+              method: method || 'MANUAL',
+              checkInTime,
+              checkOutTime,
               markedBy: authUser.userId,
             },
             update: {
               status,
-              method: method || 'Manual',
-              checkInTime: checkInTime ? new Date(checkInTime) : undefined,
-              checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
-              remarks,
+              method: method || 'MANUAL',
+              checkInTime,
+              checkOutTime,
             },
           });
           results.push({ success: true, id: attendance.id });

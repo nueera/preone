@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 
-// POST /api/fees/payments — Record payment
+// POST /api/fees/payments — Record payment against an invoice
 export async function POST(request: NextRequest) {
   try {
     const user = requireAdmin(request);
@@ -11,69 +11,68 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      invoiceId, amount, paymentMethod, transactionRef, bankName,
-      chequeNo, chequeDate, paidBy, paidByName, notes,
+      invoiceId, amount, method, transactionRef, bankName,
+      chequeNo, notes, paymentDate,
     } = body;
 
-    if (!invoiceId || !amount || !paymentMethod) {
+    if (!invoiceId || !amount || !method) {
       return NextResponse.json(
-        { error: 'invoiceId, amount, and paymentMethod are required' },
+        { error: 'invoiceId, amount, and method are required' },
         { status: 400 }
       );
     }
 
-    // Get invoice
+    // Get invoice with payments
     const invoice = await db.invoice.findUnique({
       where: { id: invoiceId },
+      include: { payments: true, student: { select: { id: true, firstName: true, lastName: true } } },
     });
 
     if (!invoice) {
       return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
+    const payAmount = parseFloat(amount);
+
     // Create payment
     const payment = await db.payment.create({
       data: {
         invoiceId,
-        amount,
-        paymentMethod,
-        transactionRef,
-        bankName,
-        chequeNo,
-        chequeDate: chequeDate ? new Date(chequeDate) : undefined,
-        status: 'Success',
-        paidBy,
-        paidByName,
-        receivedBy: user.userId,
-        notes,
+        studentId: invoice.studentId,
+        amount: payAmount,
+        method,
+        transactionRef: transactionRef || null,
+        chequeNo: chequeNo || null,
+        bankName: bankName || null,
+        paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
+        notes: notes || null,
       },
     });
 
     // Create receipt
-    const receiptNo = `RCT-${Date.now()}-${randomBytes(3).toString('hex').toUpperCase()}`;
+    const receiptNo = `REC-${new Date().toISOString().slice(0, 7).replace('-', '')}-${randomBytes(3).toString('hex').toUpperCase()}`;
     await db.receipt.create({
       data: {
-        paymentId: payment.id,
+        invoiceId,
         receiptNo,
-        amount,
-        issuedBy: user.userId,
+        amount: payAmount,
       },
     });
 
-    // Update invoice paid amount and status
-    const newPaidAmount = invoice.paidAmount + amount;
-    let newStatus = invoice.status;
-    if (newPaidAmount >= invoice.totalAmount) {
-      newStatus = 'Paid';
-    } else if (newPaidAmount > 0) {
-      newStatus = 'Partial';
+    // Update invoice status
+    const totalPaid = invoice.payments.reduce((sum, p) => sum + p.amount, 0) + payAmount;
+    let newStatus: string = invoice.status;
+    if (totalPaid >= invoice.netAmount) {
+      newStatus = 'PAID';
+    } else if (totalPaid > 0) {
+      newStatus = 'PARTIAL';
     }
 
     await db.invoice.update({
       where: { id: invoiceId },
       data: {
-        paidAmount: newPaidAmount,
         status: newStatus,
+        paidDate: newStatus === 'PAID' ? new Date() : invoice.paidDate,
       },
     });
 

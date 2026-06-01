@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { requireAdmin, unauthorized } from '@/lib/auth';
 
-// GET /api/fees/structures — Fee structures
+// GET /api/fees/structures — Fee structures list
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type') || '';
@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: [{ type: 'asc' }, { name: 'asc' }],
       include: {
-        class: { select: { id: true, name: true, program: { select: { name: true } } } },
         _count: { select: { invoices: true } },
       },
     });
@@ -28,6 +27,45 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ feeStructures });
   } catch (error) {
     console.error('Fee structures error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// POST /api/fees/structures — Create fee structure
+export async function POST(request: NextRequest) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+
+    const body = await request.json();
+    const { name, type, amount, frequency, classId, programId, description } = body;
+
+    if (!name || !type || !amount || !frequency) {
+      return NextResponse.json(
+        { error: 'name, type, amount, and frequency are required' },
+        { status: 400 }
+      );
+    }
+
+    const feeStructure = await db.feeStructure.create({
+      data: {
+        name,
+        type,
+        amount: parseFloat(amount),
+        frequency,
+        classId: classId || null,
+        programId: programId || null,
+        description: description || null,
+        isActive: true,
+      },
+    });
+
+    return NextResponse.json(
+      { message: 'Fee structure created successfully', feeStructure },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Create fee structure error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

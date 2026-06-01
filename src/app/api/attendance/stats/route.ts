@@ -15,15 +15,13 @@ export async function GET(request: NextRequest) {
     let targetDate = dateParam ? new Date(dateParam) : new Date();
     let dateStr = targetDate.toISOString().split('T')[0];
 
-    // If no date param provided and today has no data, find the most recent date with attendance
+    const dateStart = new Date(dateStr + 'T00:00:00.000Z');
+    const dateEnd = new Date(dateStr + 'T23:59:59.999Z');
+
+    // If no date param and today has no data, find most recent date with attendance
     if (!dateParam) {
       const todayCount = await db.studentAttendance.count({
-        where: {
-          date: {
-            gte: new Date(dateStr + 'T00:00:00.000Z'),
-            lte: new Date(dateStr + 'T23:59:59.999Z'),
-          },
-        },
+        where: { date: { gte: dateStart, lte: dateEnd } },
       });
 
       if (todayCount === 0) {
@@ -33,19 +31,16 @@ export async function GET(request: NextRequest) {
         });
         if (recentAttendance) {
           dateStr = recentAttendance.date.toISOString().split('T')[0];
-          targetDate = new Date(dateStr + 'T00:00:00.000Z');
         }
       }
     }
 
+    const start = new Date(dateStr + 'T00:00:00.000Z');
+    const end = new Date(dateStr + 'T23:59:59.999Z');
+
     // Student attendance stats
     const studentAttendance = await db.studentAttendance.findMany({
-      where: {
-        date: {
-          gte: new Date(dateStr + 'T00:00:00.000Z'),
-          lte: new Date(dateStr + 'T23:59:59.999Z'),
-        },
-      },
+      where: { date: { gte: start, lte: end } },
       include: {
         student: {
           select: { branchId: true, classId: true },
@@ -53,19 +48,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Filter by class if needed
     let filteredStudentAttendance = studentAttendance;
     if (classId) {
-      filteredStudentAttendance = filteredStudentAttendance.filter(
-        a => a.student.classId === classId
-      );
+      filteredStudentAttendance = filteredStudentAttendance.filter(a => a.student.classId === classId);
     }
 
     const studentPresent = filteredStudentAttendance.filter(a => a.status === 'PRESENT').length;
     const studentAbsent = filteredStudentAttendance.filter(a => a.status === 'ABSENT').length;
     const studentLate = filteredStudentAttendance.filter(a => a.status === 'LATE').length;
 
-    // Get total active students
     const studentWhere: Record<string, unknown> = { status: 'ACTIVE' };
     if (classId) studentWhere.classId = classId;
     const totalActiveStudents = await db.student.count({ where: studentWhere });
@@ -74,12 +65,7 @@ export async function GET(request: NextRequest) {
 
     // Staff attendance stats
     const staffAttendance = await db.staffAttendance.findMany({
-      where: {
-        date: {
-          gte: new Date(dateStr + 'T00:00:00.000Z'),
-          lte: new Date(dateStr + 'T23:59:59.999Z'),
-        },
-      },
+      where: { date: { gte: start, lte: end } },
     });
 
     const staffPresent = staffAttendance.filter(a => a.status === 'PRESENT').length;
@@ -88,6 +74,9 @@ export async function GET(request: NextRequest) {
 
     const totalActiveStaff = await db.teacher.count({
       where: { status: 'ACTIVE' },
+    });
+    const staffOnLeave = await db.teacher.count({
+      where: { status: 'ON_LEAVE' },
     });
 
     // Class-wise breakdown
@@ -98,28 +87,31 @@ export async function GET(request: NextRequest) {
     });
 
     const classWiseStats = classes.map(cls => {
-      const classAttendance = filteredStudentAttendance.filter(
-        a => a.student.classId === cls.id
-      );
+      const classAttendance = studentAttendance.filter(a => a.student.classId === cls.id);
       const present = classAttendance.filter(a => a.status === 'PRESENT').length;
       const absent = classAttendance.filter(a => a.status === 'ABSENT').length;
       const late = classAttendance.filter(a => a.status === 'LATE').length;
+      const total = cls._count.students;
       return {
         classId: cls.id,
         className: cls.name,
-        totalStudents: cls._count.students,
+        total,
         present,
         absent,
         late,
-        unmarked: cls._count.students - classAttendance.length,
-        attendanceRate: cls._count.students > 0
-          ? Math.round((present / cls._count.students) * 100)
-          : 0,
+        unmarked: total - classAttendance.length,
+        rate: total > 0 ? Math.round(((present + late) / total) * 100) : 0,
       };
     });
 
+    // Overall rate
+    const overallRate = totalActiveStudents > 0
+      ? Math.round(((studentPresent + studentLate) / totalActiveStudents) * 100)
+      : 0;
+
     return NextResponse.json({
       date: dateStr,
+      classes: classWiseStats,
       students: {
         total: totalActiveStudents,
         marked: filteredStudentAttendance.length,
@@ -127,20 +119,19 @@ export async function GET(request: NextRequest) {
         present: studentPresent,
         absent: studentAbsent,
         late: studentLate,
-        attendanceRate: totalActiveStudents > 0
-          ? Math.round((studentPresent / totalActiveStudents) * 100)
-          : 0,
+        attendanceRate: overallRate,
       },
       staff: {
-        total: totalActiveStaff,
+        total: totalActiveStaff + staffOnLeave,
         present: staffPresent,
         absent: staffAbsent,
         late: staffLate,
+        onLeave: staffOnLeave,
         attendanceRate: totalActiveStaff > 0
           ? Math.round((staffPresent / totalActiveStaff) * 100)
           : 0,
       },
-      classWise: classWiseStats,
+      overall: { rate: overallRate },
     });
   } catch (error) {
     console.error('Attendance stats error:', error);
