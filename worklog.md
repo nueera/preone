@@ -58,3 +58,29 @@ Stage Summary:
 - 1 new API: GET /api/teacher/students/[studentId]
 - Fixed bug across 6 existing teacher API routes: Role.Teacher → Role.TEACHER
 - Key data verified: Teacher Kavitha Raman → Nursery-A class → 4 students with growth scores, parents, medical records
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Build Settings module + Auth Guard + Shared Components for PreOne Teacher Portal
+
+Work Log:
+- Created /src/lib/api-auth.ts — requireTeacher helper with full DB lookup (teacher + classId + classInfo)
+- Created /src/lib/teacher-api.ts — Shared API client (teacherFetch, teacherGet, teacherPost, teacherPatch, teacherPut, teacherDelete)
+- Created /src/lib/teacher-auth.tsx — TeacherAuthContext provider (reads token, fetches profile, provides teacher data to all pages)
+- Created /src/components/providers.tsx — React Query (TanStack Query) provider setup
+- Created /src/hooks/use-teacher.ts — React Query hooks (useTeacherClass, useMyStudents, useTodayAttendance, useTeacherSchedule, useLeaveBalance, useNotificationPreferences, useUpdateProfile, useChangePassword, useUpdateNotificationPrefs)
+- Created /src/app/api/teacher/profile/route.ts — GET (full profile with class/branch/school) + PATCH (phone, address, photo)
+- Created /src/app/api/teacher/change-password/route.ts — POST (verify current, hash new, update User.password)
+- Created /src/app/api/teacher/notification-preferences/route.ts — GET + PATCH (stored in SchoolSetting with key teacher_notifications_{teacherId})
+- Created /src/app/teacher/settings/page.tsx — Two tabs: Profile (photo upload, edit dialog, profile card, detailed view, change password) + Notifications (6 toggle types with push/email switches)
+- Updated /src/app/teacher/layout.tsx — Wrapped with QueryProvider + TeacherAuthProvider
+
+Stage Summary:
+- 3 API route files created (5 endpoints total: GET/PATCH profile, POST change-password, GET/PATCH notification-preferences)
+- 4 shared utility files created (api-auth, teacher-api, teacher-auth, providers)
+- 1 hooks file created with 9 React Query hooks
+- 1 settings page with Profile + Notifications tabs
+- Teacher layout now has React Query + Auth Context
+- Notification preferences stored as JSON in SchoolSetting (no schema migration needed)
+- Build succeeds with no new TypeScript errors

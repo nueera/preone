@@ -3,11 +3,14 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { TeacherSidebar } from '@/components/teacher-sidebar';
 import { TeacherHeader } from '@/components/teacher-header';
+import { QueryProvider } from '@/components/providers';
+import { TeacherAuthProvider } from '@/lib/teacher-auth';
 
 /**
  * Teacher Layout — Wraps the PreOne teacher portal.
- * Provides the sidebar + header + main content structure.
- * Auth guard is handled by middleware.
+ * Provides: React Query, Teacher Auth Context, Sidebar + Header + Main Content.
+ * Auth guard is handled by middleware (token check in cookies).
+ * Client-side auth context provides teacher data to all child pages.
  */
 export default function TeacherLayout({
   children,
@@ -15,14 +18,18 @@ export default function TeacherLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <TeacherSidebar />
-      <div className="flex flex-1 flex-col min-h-screen">
-        <TeacherHeader />
-        <main className="flex-1 bg-gray-50 p-6 overflow-auto dark:bg-gray-950">
-          {children}
-        </main>
-      </div>
-    </SidebarProvider>
+    <QueryProvider>
+      <TeacherAuthProvider>
+        <SidebarProvider>
+          <TeacherSidebar />
+          <div className="flex flex-1 flex-col min-h-screen">
+            <TeacherHeader />
+            <main className="flex-1 bg-gray-50 p-6 overflow-auto dark:bg-gray-950">
+              {children}
+            </main>
+          </div>
+        </SidebarProvider>
+      </TeacherAuthProvider>
+    </QueryProvider>
   );
 }
