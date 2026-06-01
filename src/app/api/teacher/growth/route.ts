@@ -2,16 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
 
-// GET /api/teacher/growth — Get class-wide growth data
+// GET /api/teacher/growth — Get class-wide growth data with averages, needs attention, top performers
 export async function GET(request: NextRequest) {
   try {
     const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
-    const classId = searchParams.get('classId') || '';
     const period = searchParams.get('period') || '';
-    const studentId = searchParams.get('studentId') || '';
 
     // Find the teacher profile
     const teacher = await db.teacher.findUnique({
@@ -23,62 +21,101 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Teacher profile not found' }, { status: 404 });
     }
 
-    // If no classId provided, find teacher's assigned class
-    let effectiveClassId = classId;
-    if (!effectiveClassId) {
-      const assignedClass = await db.class.findFirst({
-        where: { teacherId: teacher.id },
-        select: { id: true },
-      });
-      effectiveClassId = assignedClass?.id || '';
-    }
-
-    const where: Record<string, unknown> = {};
-
-    if (studentId) {
-      where.studentId = studentId;
-    } else if (effectiveClassId) {
-      where.student = { classId: effectiveClassId };
-    }
-
-    if (period) {
-      where.period = period;
-    }
-
-    const growthScores = await db.growthScore.findMany({
-      where,
-      include: {
-        student: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            photo: true,
-            classId: true,
-            class: { select: { id: true, name: true } },
-          },
-        },
-      },
-      orderBy: { student: { firstName: 'asc' } },
+    // Find teacher's assigned class
+    const assignedClass = await db.class.findFirst({
+      where: { teacherId: teacher.id },
+      select: { id: true, name: true },
     });
 
-    // Calculate class averages
-    let classAverages = null;
-    if (growthScores.length > 0) {
-      const sum = growthScores.reduce(
-        (acc, g) => ({
-          creativity: acc.creativity + g.creativity,
-          communication: acc.communication + g.communication,
-          social: acc.social + g.social,
-          confidence: acc.confidence + g.confidence,
-          cognitive: acc.cognitive + g.cognitive,
-          physical: acc.physical + g.physical,
-          overall: acc.overall + (g.overall || 0),
+    if (!assignedClass) {
+      return NextResponse.json({
+        period: period || null,
+        classAverage: null,
+        students: [],
+        needsAttention: [],
+        topPerformers: [],
+        classId: null,
+        className: null,
+      });
+    }
+
+    // Get all students in the class
+    const students = await db.student.findMany({
+      where: { classId: assignedClass.id, status: 'ACTIVE' },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        photo: true,
+        rollNumber: true,
+        growthScores: {
+          where: period ? { period } : undefined,
+          select: {
+            id: true,
+            period: true,
+            creativity: true,
+            communication: true,
+            social: true,
+            confidence: true,
+            cognitive: true,
+            physical: true,
+            overall: true,
+            comments: true,
+            updatedAt: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+      orderBy: { firstName: 'asc' },
+    });
+
+    // Build student score list
+    const studentScores = students.map((s) => {
+      const g = s.growthScores[0];
+      const scores = g
+        ? {
+            creativity: g.creativity,
+            communication: g.communication,
+            social: g.social,
+            confidence: g.confidence,
+            cognitive: g.cognitive,
+            physical: g.physical,
+            overall: g.overall ?? Math.round((g.creativity + g.communication + g.social + g.confidence + g.cognitive + g.physical) / 6),
+          }
+        : null;
+
+      return {
+        studentId: s.id,
+        studentName: `${s.firstName} ${s.lastName}`,
+        studentPhoto: s.photo,
+        rollNumber: s.rollNumber,
+        period: g?.period || null,
+        scores,
+        comments: g?.comments || null,
+        updatedAt: g?.updatedAt || null,
+      };
+    });
+
+    // Calculate class averages (only for students with scores)
+    const scoredStudents = studentScores.filter((s) => s.scores !== null);
+    let classAverage = null;
+
+    if (scoredStudents.length > 0) {
+      const n = scoredStudents.length;
+      const sum = scoredStudents.reduce(
+        (acc, s) => ({
+          creativity: acc.creativity + (s.scores!.creativity || 0),
+          communication: acc.communication + (s.scores!.communication || 0),
+          social: acc.social + (s.scores!.social || 0),
+          confidence: acc.confidence + (s.scores!.confidence || 0),
+          cognitive: acc.cognitive + (s.scores!.cognitive || 0),
+          physical: acc.physical + (s.scores!.physical || 0),
+          overall: acc.overall + (s.scores!.overall || 0),
         }),
         { creativity: 0, communication: 0, social: 0, confidence: 0, cognitive: 0, physical: 0, overall: 0 }
       );
-      const n = growthScores.length;
-      classAverages = {
+      classAverage = {
         creativity: Math.round((sum.creativity / n) * 10) / 10,
         communication: Math.round((sum.communication / n) * 10) / 10,
         social: Math.round((sum.social / n) * 10) / 10,
@@ -89,11 +126,63 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    // Needs Attention: students with any dimension < 40
+    const needsAttention: { studentId: string; studentName: string; dimension: string; score: number }[] = [];
+    for (const s of scoredStudents) {
+      const dims: [string, number][] = [
+        ['Creativity', s.scores!.creativity],
+        ['Communication', s.scores!.communication],
+        ['Social', s.scores!.social],
+        ['Confidence', s.scores!.confidence],
+        ['Cognitive', s.scores!.cognitive],
+        ['Physical', s.scores!.physical],
+      ];
+      for (const [dimension, score] of dims) {
+        if (score < 40) {
+          needsAttention.push({
+            studentId: s.studentId,
+            studentName: s.studentName,
+            dimension,
+            score,
+          });
+        }
+      }
+    }
+
+    // Top Performers: students with overall > 80
+    const topPerformers = scoredStudents
+      .filter((s) => (s.scores!.overall || 0) > 80)
+      .map((s) => {
+        // Find top dimension
+        const dims: [string, number][] = [
+          ['Creativity', s.scores!.creativity],
+          ['Communication', s.scores!.communication],
+          ['Social', s.scores!.social],
+          ['Confidence', s.scores!.confidence],
+          ['Cognitive', s.scores!.cognitive],
+          ['Physical', s.scores!.physical],
+        ];
+        const top = dims.reduce((a, b) => (b[1] > a[1] ? b : a), dims[0]);
+        return {
+          studentId: s.studentId,
+          studentName: s.studentName,
+          overall: s.scores!.overall,
+          topDimension: top[0],
+          topScore: top[1],
+        };
+      })
+      .sort((a, b) => b.overall - a.overall);
+
     return NextResponse.json({
-      growthScores,
-      classAverages,
-      count: growthScores.length,
-      classId: effectiveClassId,
+      period: period || null,
+      classAverage,
+      students: studentScores,
+      needsAttention,
+      topPerformers,
+      classId: assignedClass.id,
+      className: assignedClass.name,
+      totalStudents: students.length,
+      assessedCount: scoredStudents.length,
     });
   } catch (error) {
     console.error('Get growth scores error:', error);
@@ -101,7 +190,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/teacher/growth — Update growth score for a student
+// POST /api/teacher/growth — Upsert a single growth score for a student
 export async function POST(request: NextRequest) {
   try {
     const user = requireRole(request, Role.TEACHER);
@@ -126,7 +215,6 @@ export async function POST(request: NextRequest) {
       confidence,
       cognitive,
       physical,
-      overall,
       comments,
     } = body;
 
@@ -137,26 +225,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify student belongs to teacher's class
+    const assignedClass = await db.class.findFirst({
+      where: { teacherId: teacher.id },
+      select: { id: true },
+    });
+
+    if (!assignedClass) {
+      return NextResponse.json({ error: 'No class assigned' }, { status: 403 });
+    }
+
+    const student = await db.student.findFirst({
+      where: { id: studentId, classId: assignedClass.id },
+      select: { id: true },
+    });
+
+    if (!student) {
+      return NextResponse.json({ error: 'Student not found in your class' }, { status: 404 });
+    }
+
     // Validate score ranges (0-100)
-    const scores = { creativity, communication, social, confidence, cognitive, physical, overall };
+    const scores = { creativity, communication, social, confidence, cognitive, physical };
     for (const [key, value] of Object.entries(scores)) {
-      if (value !== undefined && (value < 0 || value > 100)) {
+      if (value !== undefined && (typeof value !== 'number' || value < 0 || value > 100)) {
         return NextResponse.json(
-          { error: `${key} must be between 0 and 100` },
+          { error: `${key} must be a number between 0 and 100` },
           { status: 400 }
         );
       }
     }
 
-    // Compute overall if not provided
-    const providedScores = [creativity, communication, social, confidence, cognitive, physical].filter(
-      (v): v is number => v !== undefined
+    // Compute overall as average of 6 dimensions
+    const dims = [creativity, communication, social, confidence, cognitive, physical].map((v) =>
+      typeof v === 'number' ? v : 0
     );
-    const computedOverall =
-      overall ??
-      (providedScores.length > 0
-        ? Math.round((providedScores.reduce((a, b) => a + b, 0) / providedScores.length) * 10) / 10
-        : 0);
+    const computedOverall = Math.round((dims.reduce((a, b) => a + b, 0) / dims.length) * 10) / 10;
 
     const growthScore = await db.growthScore.upsert({
       where: {
@@ -206,7 +309,7 @@ export async function POST(request: NextRequest) {
         message: 'Growth score saved successfully',
         growthScore,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error('Save growth score error:', error);
