@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized, forbidden } from '@/lib/auth';
+import { getAuthUser, unauthorized, forbidden, requireAdmin } from '@/lib/auth';
 
-// GET /api/teachers/[id] — Get teacher details
+// GET /api/teachers/[id] — Get teacher details with all relations
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -21,10 +21,10 @@ export async function GET(
         assignedClass: { select: { id: true, name: true, capacity: true } },
         qualifications: { orderBy: { year: 'desc' } },
         workSchedules: { orderBy: { dayOfWeek: 'asc' } },
-        reviews: { orderBy: { reviewDate: 'desc' }, take: 5 },
-        leaves: { orderBy: { startDate: 'desc' }, take: 10 },
-        staffAttendance: { orderBy: { date: 'desc' }, take: 30 },
-        salaries: { orderBy: { month: 'desc' }, take: 12 },
+        reviews: { orderBy: { reviewDate: 'desc' }, take: 20 },
+        leaves: { orderBy: { startDate: 'desc' }, take: 30 },
+        staffAttendance: { orderBy: { date: 'desc' }, take: 90 },
+        salaries: { orderBy: [{ year: 'desc' }, { month: 'desc' }], take: 24 },
       },
     });
 
@@ -49,8 +49,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -60,20 +60,40 @@ export async function PATCH(
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
 
-    if (user.branchId && existing.branchId !== user.branchId) {
-      return forbidden('You do not have access to this teacher');
-    }
-
     const updateData: Record<string, unknown> = {};
     const allowedFields = [
       'firstName', 'lastName', 'phone', 'email', 'dob', 'gender',
       'photo', 'address', 'qualification', 'specialization',
-      'experience', 'status', 'salary', 'branchId',
+      'experience', 'status', 'salary', 'branchId', 'joiningDate',
     ];
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = ['dob'].includes(field) ? new Date(body[field]) : body[field];
+        updateData[field] = ['dob', 'joiningDate'].includes(field) ? new Date(body[field]) : body[field];
+      }
+    }
+
+    // Handle class assignment
+    if (body.classId !== undefined) {
+      // Remove old class assignment
+      if (existing.assignedClass) {
+        // Get current assigned class
+        const currentClass = await db.class.findFirst({
+          where: { teacherId: existing.id },
+        });
+        if (currentClass) {
+          await db.class.update({
+            where: { id: currentClass.id },
+            data: { teacherId: null },
+          });
+        }
+      }
+      // Assign new class
+      if (body.classId) {
+        await db.class.update({
+          where: { id: body.classId },
+          data: { teacherId: existing.id },
+        });
       }
     }
 
@@ -93,14 +113,14 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/teachers/[id] — Soft delete
+// DELETE /api/teachers/[id] — Soft delete (set status INACTIVE)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
 
@@ -109,14 +129,29 @@ export async function DELETE(
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
 
-    if (user.branchId && existing.branchId !== user.branchId) {
-      return forbidden('You do not have access to this teacher');
-    }
-
     const teacher = await db.teacher.update({
       where: { id },
       data: { status: 'INACTIVE' },
     });
+
+    // Also deactivate the user account
+    if (teacher.userId) {
+      await db.user.update({
+        where: { id: teacher.userId },
+        data: { isActive: false },
+      });
+    }
+
+    // Unassign from class
+    const assignedClass = await db.class.findFirst({
+      where: { teacherId: teacher.id },
+    });
+    if (assignedClass) {
+      await db.class.update({
+        where: { id: assignedClass.id },
+        data: { teacherId: null },
+      });
+    }
 
     return NextResponse.json({
       message: 'Teacher deactivated successfully',

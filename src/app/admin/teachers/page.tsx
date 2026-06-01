@@ -2,21 +2,20 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
 import {
   Plus,
-  Upload,
   Search,
   X,
-  GraduationCap,
+  Users,
   MoreHorizontal,
   Eye,
   Pencil,
-  ArrowRightLeft,
-  Trash2,
+  IndianRupee,
+  UserX,
   ChevronLeft,
   ChevronRight,
   Filter,
+  Phone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,64 +46,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AddStudentDialog } from '@/components/add-student-dialog';
-import { TransferStudentDialog } from '@/components/transfer-student-dialog';
+import { AddTeacherDialog } from '@/components/add-teacher-dialog';
 
 // ── Types ──
+interface BranchInfo {
+  id: string;
+  name: string;
+}
+
 interface ClassInfo {
   id: string;
   name: string;
-  program: { id: string; name: string };
 }
 
-interface PrimaryParent {
+interface Teacher {
   id: string;
   firstName: string;
   lastName: string;
+  email: string;
   phone: string;
-  email?: string;
-  relation: string;
-}
-
-interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  dob: string;
-  gender: string;
-  bloodGroup?: string | null;
-  aadhaarNumber?: string | null;
-  photo?: string | null;
-  admissionDate: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'GRADUATED' | 'TRANSFERRED';
-  rollNumber?: string | null;
-  classId?: string | null;
-  class: ClassInfo | null;
-  primaryParent: PrimaryParent | null;
-}
-
-interface ProgramGroup {
-  id: string;
-  name: string;
-  classes: { id: string; name: string; _count: { students: number } }[];
+  dob: string | null;
+  gender: string | null;
+  qualification: string | null;
+  specialization: string | null;
+  experience: number;
+  photo: string | null;
+  status: 'ACTIVE' | 'ON_LEAVE' | 'INACTIVE';
+  salary: number | null;
+  joiningDate: string;
+  branchId: string | null;
+  branch: BranchInfo | null;
+  assignedClass: ClassInfo | null;
+  _count: {
+    qualifications: number;
+    leaves: number;
+  };
 }
 
 // ── Status badge colors ──
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  ON_LEAVE: 'bg-amber-50 text-amber-700 border-amber-200',
   INACTIVE: 'bg-gray-50 text-gray-600 border-gray-200',
-  GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
-  TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
 };
 
 const STATUS_LABELS: Record<string, string> = {
   ACTIVE: 'Active',
+  ON_LEAVE: 'On Leave',
   INACTIVE: 'Inactive',
-  GRADUATED: 'Graduated',
-  TRANSFERRED: 'Transferred',
 };
 
-const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
+const QUALIFICATIONS = ['B.Ed', 'D.Ed', 'M.Ed', 'B.El.Ed', 'Other'];
 
 // ── Auth helper ──
 function getToken(): string | null {
@@ -112,24 +104,21 @@ function getToken(): string | null {
   return localStorage.getItem('preone_token');
 }
 
-export default function StudentsListPage() {
+export default function TeachersListPage() {
   const router = useRouter();
 
   // ── State ──
-  const [students, setStudents] = useState<Student[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [classId, setClassId] = useState('');
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['ACTIVE']);
-  const [selectedBloodGroups, setSelectedBloodGroups] = useState<string[]>([]);
-  const [gender, setGender] = useState('All');
-  const [programs, setPrograms] = useState<ProgramGroup[]>([]);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [qualificationFilter, setQualificationFilter] = useState('');
+  const [branchFilter, setBranchFilterVal] = useState('');
+  const [branches, setBranches] = useState<BranchInfo[]>([]);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [sortField, setSortField] = useState<string>('createdAt');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -144,27 +133,27 @@ export default function StudentsListPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // ── Fetch programs/classes for filter ──
+  // ── Fetch branches for filter ──
   useEffect(() => {
-    async function fetchClasses() {
+    async function fetchBranches() {
       try {
         const token = getToken();
-        const res = await fetch('/api/classes', {
+        const res = await fetch('/api/dashboard/stats', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
-          setPrograms(data.programs || []);
+          // Use school data if available
         }
       } catch (err) {
-        console.error('Failed to fetch classes:', err);
+        console.error('Failed to fetch branches:', err);
       }
     }
-    fetchClasses();
+    // For now, we'll get branches from the teachers data
   }, []);
 
-  // ── Fetch students ──
-  const fetchStudents = useCallback(async () => {
+  // ── Fetch teachers ──
+  const fetchTeachers = useCallback(async () => {
     setLoading(true);
     try {
       const token = getToken();
@@ -173,30 +162,35 @@ export default function StudentsListPage() {
         limit: limit.toString(),
       });
       if (debouncedSearch) params.set('search', debouncedSearch);
-      if (classId) params.set('classId', classId);
-      if (selectedStatuses.length > 0) params.set('status', selectedStatuses.join(','));
-      if (gender && gender !== 'All') params.set('gender', gender);
-      if (selectedBloodGroups.length > 0) params.set('bloodGroup', selectedBloodGroups.join(','));
+      if (statusFilter) params.set('status', statusFilter);
+      if (qualificationFilter) params.set('qualification', qualificationFilter);
+      if (branchFilter) params.set('branchId', branchFilter);
 
-      const res = await fetch(`/api/students?${params}`, {
+      const res = await fetch(`/api/teachers?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
         const data = await res.json();
-        setStudents(data.students || []);
-        setTotal(data.total || 0);
+        setTeachers(data.teachers || []);
+        setTotal(data.pagination?.total || 0);
+        // Collect unique branches from data
+        const branchSet = new Map<string, string>();
+        (data.teachers || []).forEach((t: Teacher) => {
+          if (t.branch) branchSet.set(t.branch.id, t.branch.name);
+        });
+        setBranches(Array.from(branchSet, ([id, name]) => ({ id, name })));
       }
     } catch (err) {
-      console.error('Failed to fetch students:', err);
+      console.error('Failed to fetch teachers:', err);
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedSearch, classId, selectedStatuses, gender, selectedBloodGroups]);
+  }, [page, debouncedSearch, statusFilter, qualificationFilter, branchFilter]);
 
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    fetchTeachers();
+  }, [fetchTeachers]);
 
   // ── Handlers ──
   const handleSort = (field: string) => {
@@ -211,49 +205,30 @@ export default function StudentsListPage() {
   const clearFilters = () => {
     setSearch('');
     setDebouncedSearch('');
-    setClassId('');
-    setSelectedStatuses(['ACTIVE']);
-    setSelectedBloodGroups([]);
-    setGender('All');
+    setStatusFilter('');
+    setQualificationFilter('');
+    setBranchFilterVal('');
     setPage(1);
   };
 
-  const toggleStatus = (status: string) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
-    );
-    setPage(1);
-  };
-
-  const toggleBloodGroup = (bg: string) => {
-    setSelectedBloodGroups((prev) =>
-      prev.includes(bg)
-        ? prev.filter((b) => b !== bg)
-        : [...prev, bg]
-    );
-    setPage(1);
-  };
-
-  const handleDelete = async (student: Student) => {
-    if (!confirm(`Deactivate ${student.firstName} ${student.lastName}?`)) return;
+  const handleDeactivate = async (teacher: Teacher) => {
+    if (!confirm(`Deactivate ${teacher.firstName} ${teacher.lastName}?`)) return;
     try {
       const token = getToken();
-      await fetch(`/api/students/${student.id}`, {
+      await fetch(`/api/teachers/${teacher.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchStudents();
+      fetchTeachers();
     } catch (err) {
-      console.error('Delete failed:', err);
+      console.error('Deactivate failed:', err);
     }
   };
 
   const totalPages = Math.ceil(total / limit);
 
-  // ── Sort students client-side ──
-  const sortedStudents = [...students].sort((a, b) => {
+  // ── Sort teachers client-side ──
+  const sortedTeachers = [...teachers].sort((a, b) => {
     let valA: string | number = '';
     let valB: string | number = '';
 
@@ -262,21 +237,25 @@ export default function StudentsListPage() {
         valA = a.firstName;
         valB = b.firstName;
         break;
-      case 'lastName':
-        valA = a.lastName;
-        valB = b.lastName;
+      case 'qualification':
+        valA = a.qualification || '';
+        valB = b.qualification || '';
+        break;
+      case 'specialization':
+        valA = a.specialization || '';
+        valB = b.specialization || '';
+        break;
+      case 'assignedClass':
+        valA = a.assignedClass?.name || '';
+        valB = b.assignedClass?.name || '';
+        break;
+      case 'experience':
+        valA = a.experience;
+        valB = b.experience;
         break;
       case 'status':
         valA = a.status;
         valB = b.status;
-        break;
-      case 'dob':
-        valA = new Date(a.dob).getTime();
-        valB = new Date(b.dob).getTime();
-        break;
-      case 'className':
-        valA = a.class?.name || '';
-        valB = b.class?.name || '';
         break;
       default:
         return 0;
@@ -287,9 +266,10 @@ export default function StudentsListPage() {
     return 0;
   });
 
-  // ── Get initials ──
   const getInitials = (first: string, last: string) =>
     `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+
+  const hasActiveFilters = debouncedSearch || statusFilter || qualificationFilter || branchFilter;
 
   return (
     <div className="space-y-6">
@@ -297,27 +277,17 @@ export default function StudentsListPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Students
+            Teachers & Staff
           </h1>
-          <p className="text-sm text-muted-foreground">Manage all students</p>
+          <p className="text-sm text-muted-foreground">Manage teachers and staff members</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => router.push('/admin/students/import')}
-          >
-            <Upload className="h-4 w-4" />
-            Import CSV
-          </Button>
-          <Button
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-            onClick={() => setAddDialogOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Add Student
-          </Button>
-        </div>
+        <Button
+          className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+          onClick={() => setAddDialogOpen(true)}
+        >
+          <Plus className="h-4 w-4" />
+          Add Teacher
+        </Button>
       </div>
 
       {/* ── Filters Row ── */}
@@ -331,7 +301,7 @@ export default function StudentsListPage() {
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search by name or parent..."
+              placeholder="Search by name, qualification, specialization..."
               className="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -346,34 +316,17 @@ export default function StudentsListPage() {
             )}
           </div>
 
-          {/* Class Filter */}
-          <Select value={classId} onValueChange={(v) => { setClassId(v === 'ALL' ? '' : v); setPage(1); }}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All Classes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Classes</SelectItem>
-              {programs.map((program) => (
-                <SelectGroup key={program.id}>
-                  <SelectLabel>{program.name}</SelectLabel>
-                  {program.classes.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.name} ({cls._count.students})
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
-            </SelectContent>
-          </Select>
-
           {/* Status Filter */}
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(STATUS_LABELS).map(([key, label]) => (
               <button
                 key={key}
-                onClick={() => toggleStatus(key)}
+                onClick={() => {
+                  setStatusFilter(statusFilter === key ? '' : key);
+                  setPage(1);
+                }}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                  selectedStatuses.includes(key)
+                  statusFilter === key
                     ? STATUS_COLORS[key]
                     : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
                 }`}
@@ -383,67 +336,57 @@ export default function StudentsListPage() {
             ))}
           </div>
 
-          {/* Gender Filter */}
-          <div className="flex gap-1.5">
-            {['All', 'Male', 'Female'].map((g) => (
-              <button
-                key={g}
-                onClick={() => { setGender(g); setPage(1); }}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                  gender === g
-                    ? 'bg-purple-50 text-purple-700 border-purple-200'
-                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
-
-          {/* Blood Group Filter */}
+          {/* Qualification Filter */}
           <Select
+            value={qualificationFilter}
             onValueChange={(v) => {
-              toggleBloodGroup(v);
+              setQualificationFilter(v === 'ALL' ? '' : v);
+              setPage(1);
             }}
           >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Blood Group" />
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Qualification" />
             </SelectTrigger>
             <SelectContent>
-              {BLOOD_GROUPS.map((bg) => (
-                <SelectItem key={bg} value={bg}>
-                  {bg}
-                  {selectedBloodGroups.includes(bg) ? ' ✓' : ''}
-                </SelectItem>
+              <SelectItem value="ALL">All Qualifications</SelectItem>
+              {QUALIFICATIONS.map((q) => (
+                <SelectItem key={q} value={q}>{q}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Branch Filter */}
+          {branches.length > 0 && (
+            <Select
+              value={branchFilter}
+              onValueChange={(v) => {
+                setBranchFilterVal(v === 'ALL' ? '' : v);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Branches" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Branches</SelectItem>
+                {branches.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
           {/* Clear Filters */}
-          {(debouncedSearch || classId || selectedStatuses.length !== 1 || selectedStatuses[0] !== 'ACTIVE' || selectedBloodGroups.length > 0 || gender !== 'All') && (
+          {hasActiveFilters && (
             <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={clearFilters}>
               <X className="h-3 w-3" />
               Clear
             </Button>
           )}
         </div>
-
-        {/* Active Blood Group Tags */}
-        {selectedBloodGroups.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {selectedBloodGroups.map((bg) => (
-              <Badge key={bg} variant="secondary" className="gap-1 text-xs">
-                {bg}
-                <button onClick={() => toggleBloodGroup(bg)}>
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* ── Students Table ── */}
+      {/* ── Teachers Table ── */}
       <div className="rounded-xl border bg-white shadow-sm dark:bg-gray-900">
         <div className="overflow-x-auto">
           <Table>
@@ -451,124 +394,141 @@ export default function StudentsListPage() {
               <TableRow>
                 <TableHead className="w-12">Photo</TableHead>
                 <TableHead
-                  className="cursor-pointer select-none min-w-[160px]"
+                  className="cursor-pointer select-none"
                   onClick={() => handleSort('firstName')}
                 >
                   Name {sortField === 'firstName' && (sortDir === 'asc' ? '↑' : '↓')}
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[120px]"
-                  onClick={() => handleSort('className')}
+                  className="cursor-pointer select-none w-[150px]"
+                  onClick={() => handleSort('qualification')}
                 >
-                  Class {sortField === 'className' && (sortDir === 'asc' ? '↑' : '↓')}
+                  Qualification {sortField === 'qualification' && (sortDir === 'asc' ? '↑' : '↓')}
                 </TableHead>
-                <TableHead className="w-[150px]">Parent</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none w-[150px]"
+                  onClick={() => handleSort('specialization')}
+                >
+                  Specialization {sortField === 'specialization' && (sortDir === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none w-[120px]"
+                  onClick={() => handleSort('assignedClass')}
+                >
+                  Assigned Class {sortField === 'assignedClass' && (sortDir === 'asc' ? '↑' : '↓')}
+                </TableHead>
                 <TableHead className="w-[120px]">Phone</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none w-[80px]"
+                  onClick={() => handleSort('experience')}
+                >
+                  Exp. {sortField === 'experience' && (sortDir === 'asc' ? '↑' : '↓')}
+                </TableHead>
                 <TableHead
                   className="cursor-pointer select-none w-[100px]"
                   onClick={() => handleSort('status')}
                 >
                   Status {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
                 </TableHead>
-                <TableHead
-                  className="cursor-pointer select-none w-[100px]"
-                  onClick={() => handleSort('dob')}
-                >
-                  DOB {sortField === 'dob' && (sortDir === 'asc' ? '↑' : '↓')}
-                </TableHead>
                 <TableHead className="w-[80px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                // Loading skeletons
                 Array.from({ length: 8 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-10" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
                   </TableRow>
                 ))
-              ) : sortedStudents.length === 0 ? (
+              ) : sortedTeachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-48 text-center">
+                  <TableCell colSpan={9} className="h-48 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <GraduationCap className="h-12 w-12 text-muted-foreground/30" />
-                      <p className="text-muted-foreground">No students found</p>
+                      <Users className="h-12 w-12 text-muted-foreground/30" />
+                      <p className="text-muted-foreground">No teachers found</p>
                       <Button
                         className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
                         onClick={() => setAddDialogOpen(true)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Student
+                        Add Teacher
                       </Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                sortedStudents.map((student) => (
+                sortedTeachers.map((teacher) => (
                   <TableRow
-                    key={student.id}
+                    key={teacher.id}
                     className="cursor-pointer table-row-preone"
-                    onClick={() => router.push(`/admin/students/${student.id}`)}
+                    onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
                   >
                     <TableCell>
                       <Avatar className="h-9 w-9">
                         <AvatarFallback className="bg-purple-50 text-purple-700 text-xs font-semibold">
-                          {getInitials(student.firstName, student.lastName)}
+                          {getInitials(teacher.firstName, teacher.lastName)}
                         </AvatarFallback>
                       </Avatar>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-gray-900 dark:text-gray-100">
-                        {student.firstName} {student.lastName}
+                        {teacher.firstName} {teacher.lastName}
                       </div>
-                      {student.rollNumber && (
-                        <div className="text-xs text-muted-foreground">
-                          #{student.rollNumber}
-                        </div>
+                      <div className="text-xs text-muted-foreground">{teacher.email}</div>
+                    </TableCell>
+                    <TableCell>
+                      {teacher.qualification ? (
+                        <Badge variant="secondary" className="text-xs">
+                          {teacher.qualification}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {student.class ? (
+                      <span className="text-sm text-muted-foreground">
+                        {teacher.specialization || '—'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {teacher.assignedClass ? (
                         <Badge variant="secondary" className="text-xs">
-                          {student.class.name}
+                          {teacher.assignedClass.name}
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">Unassigned</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {student.primaryParent ? (
-                        <div className="text-sm">
-                          {student.primaryParent.firstName} {student.primaryParent.lastName}
-                        </div>
+                      {teacher.phone ? (
+                        <a
+                          href={`tel:${teacher.phone}`}
+                          className="text-sm text-purple-600 hover:underline inline-flex items-center gap-1"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Phone className="h-3 w-3" />
+                          {teacher.phone}
+                        </a>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      {student.primaryParent?.phone ? (
-                        <span className="text-sm text-muted-foreground">
-                          {student.primaryParent.phone}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${STATUS_COLORS[student.status]}`}>
-                        {STATUS_LABELS[student.status]}
-                      </span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground">
-                        {format(new Date(student.dob), 'dd MMM yyyy')}
+                        {teacher.experience} yrs
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${STATUS_COLORS[teacher.status]}`}>
+                        {STATUS_LABELS[teacher.status]}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -582,7 +542,7 @@ export default function StudentsListPage() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/admin/students/${student.id}`);
+                              router.push(`/admin/teachers/${teacher.id}`);
                             }}
                           >
                             <Eye className="mr-2 h-4 w-4" />
@@ -591,7 +551,7 @@ export default function StudentsListPage() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/admin/students/${student.id}`);
+                              router.push(`/admin/teachers/${teacher.id}`);
                             }}
                           >
                             <Pencil className="mr-2 h-4 w-4" />
@@ -600,23 +560,22 @@ export default function StudentsListPage() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedStudent(student);
-                              setTransferDialogOpen(true);
+                              router.push(`/admin/teachers/${teacher.id}?tab=salary`);
                             }}
                           >
-                            <ArrowRightLeft className="mr-2 h-4 w-4" />
-                            Transfer
+                            <IndianRupee className="mr-2 h-4 w-4" />
+                            Manage Salary
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(student);
+                              handleDeactivate(teacher);
                             }}
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
+                            <UserX className="mr-2 h-4 w-4" />
+                            Deactivate
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -632,7 +591,7 @@ export default function StudentsListPage() {
         {!loading && total > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total} students
+              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total} teachers
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -659,20 +618,12 @@ export default function StudentsListPage() {
         )}
       </div>
 
-      {/* ── Dialogs ── */}
-      <AddStudentDialog
+      {/* ── Add Teacher Dialog ── */}
+      <AddTeacherDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-        onStudentCreated={fetchStudents}
+        onTeacherCreated={fetchTeachers}
       />
-      {selectedStudent && (
-        <TransferStudentDialog
-          open={transferDialogOpen}
-          onOpenChange={setTransferDialogOpen}
-          student={selectedStudent}
-          onTransferred={fetchStudents}
-        />
-      )}
     </div>
   );
 }

@@ -235,3 +235,33 @@ Stage Summary:
 - Database seeded with realistic demo data
 - Login credentials: admin@preone.com / admin123
 - Build: ✓ Clean (0 errors, 0 warnings)
+---
+Task ID: teachers-module
+Agent: main
+Task: Build complete Teachers module for PreOne Admin Portal
+
+Work Log:
+- Explored existing project structure, Prisma schema, auth patterns, and student module as reference
+- Updated /api/teachers/route.ts with enhanced filters (status, qualification, branchId, search)
+- Updated /api/teachers/[id]/route.ts with class assignment handling, user deactivation on soft delete
+- Created /api/teachers/[id]/salary/route.ts (GET salary records, POST process monthly salary)
+- Created /api/teachers/[id]/leaves/route.ts (GET leaves with balance, POST apply leave)
+- Created /api/teachers/[id]/leaves/[leaveId]/route.ts (PATCH approve/reject/cancel leave)
+- Created /api/teachers/[id]/reviews/route.ts (GET reviews, POST add performance review)
+- Created /admin/teachers/page.tsx - Teachers list with filters, table, pagination, status badges
+- Created /components/add-teacher-dialog.tsx - Full form with validation, photo upload, specialization multi-select
+- Created /admin/teachers/[id]/page.tsx - Teacher detail with 6 tabs:
+  - Profile: Personal & Professional info cards
+  - Schedule: Weekly timetable grid (Mon-Sat × 8AM-3PM)
+  - Attendance: Monthly calendar with stats (present/absent/late/rate)
+  - Salary: Current salary card, history table, process salary dialog, increment dialog
+  - Leaves: Balance cards, leave history table, approve/reject actions, apply leave dialog
+  - Performance: Overall rating, review cards with star display, add review dialog with sliders
+- Build passes with 0 errors, 0 warnings
+
+Stage Summary:
+- Complete Teachers module with 7 API routes and 3 frontend pages/components
+- All routes verify ADMIN role via requireAdmin
+- Salary processing with auto net-pay calculation
+- Leave management with approve/reject workflow
+- Performance reviews with 5-dimension slider ratings
