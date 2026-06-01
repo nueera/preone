@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // POST /api/teacher/attendance/mark — Mark attendance for students
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     // Find the teacher profile

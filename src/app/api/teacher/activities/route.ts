@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // GET /api/teacher/activities — Get teacher's activities
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/activities — Create new activity
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const body = await request.json();

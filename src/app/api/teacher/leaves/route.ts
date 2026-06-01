@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // GET /api/teacher/leaves — Get teacher's leave history and balance
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     // Find the teacher profile
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/leaves — Apply for leave
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     // Find the teacher profile

@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // GET /api/teacher/daily-updates — Get daily updates for a class on a date
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/daily-updates — Create/update daily update for a student
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     // Find the teacher profile

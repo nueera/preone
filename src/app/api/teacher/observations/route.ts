@@ -5,7 +5,7 @@ import { requireRole, Role } from '@/lib/auth';
 // GET /api/teacher/observations — Get observations for class or student
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     const searchParams = request.nextUrl.searchParams;
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 // POST /api/teacher/observations — Create new observation
 export async function POST(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Teacher);
+    const user = requireRole(request, Role.TEACHER);
     if (user instanceof NextResponse) return user;
 
     // Find the teacher profile
