@@ -23,47 +23,65 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Teacher profile not found' }, { status: 404 });
     }
 
-    // Get all work schedule records for the teacher
+    // Get all work schedule records for the teacher, sorted by dayOfWeek then startTime
     const schedules = await db.workSchedule.findMany({
       where: { teacherId: teacher.id },
-      orderBy: { dayOfWeek: 'asc' },
+      orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
     });
 
-    // Format day names for readability
+    // If no schedules exist, return empty state
+    if (schedules.length === 0) {
+      return NextResponse.json({
+        teacher: {
+          id: teacher.id,
+          firstName: teacher.firstName,
+          lastName: teacher.lastName,
+        },
+        schedule: [],
+        todaySchedule: [],
+        hasSchedule: false,
+      });
+    }
+
+    // Build schedule array grouped by day
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    // Build a complete week schedule (even if some days have no records)
-    const weeklySchedule = dayNames.map((name, index) => {
-      const schedule = schedules.find(s => s.dayOfWeek === index);
-      return {
-        dayOfWeek: index,
-        dayName: name,
-        startTime: schedule?.startTime || null,
-        endTime: schedule?.endTime || null,
-        isOff: schedule?.isOff ?? (index === 0), // Default: Sunday is off
-        id: schedule?.id || null,
-      };
-    });
+    // Return flat list of schedule entries as the spec requests
+    const schedule = schedules.map((s) => ({
+      id: s.id,
+      dayOfWeek: s.dayOfWeek,
+      dayName: dayNames[s.dayOfWeek] || 'Unknown',
+      startTime: s.startTime,
+      endTime: s.endTime,
+      subject: s.subject || null,
+      classId: s.classId || null,
+    }));
 
-    // Also get today's schedule specifically
+    // Also get today's schedule
     const today = new Date().getDay(); // 0-6
-    const todaySchedule = weeklySchedule.find(s => s.dayOfWeek === today) || null;
+    const todaySchedule = schedules
+      .filter((s) => s.dayOfWeek === today)
+      .map((s) => ({
+        id: s.id,
+        startTime: s.startTime,
+        endTime: s.endTime,
+        subject: s.subject || null,
+      }));
 
-    // Get working hours info
-    const workingDays = weeklySchedule.filter(s => !s.isOff && s.startTime && s.endTime);
-    const totalWorkingDays = workingDays.length;
+    // Build weekly grid format (days as columns, time slots as rows)
+    const allTimeSlots = [...new Set(schedules.map((s) => s.startTime))].sort();
+    const workingDays = [...new Set(schedules.map((s) => s.dayOfWeek))].sort((a, b) => a - b);
 
-    // Calculate total weekly working hours (rough estimate)
-    let totalWeeklyMinutes = 0;
-    for (const day of workingDays) {
-      if (day.startTime && day.endTime) {
-        const [startH, startM] = day.startTime.split(':').map(Number);
-        const [endH, endM] = day.endTime.split(':').map(Number);
-        if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM)) {
-          totalWeeklyMinutes += (endH * 60 + endM) - (startH * 60 + startM);
-        }
+    const weeklyGrid = allTimeSlots.map((time) => {
+      const row: Record<string, { startTime: string; endTime: string; subject: string | null } | null> = { time };
+      for (const day of workingDays) {
+        const entry = schedules.find((s) => s.dayOfWeek === day && s.startTime === time);
+        row[`day${day}`] = entry
+          ? { startTime: entry.startTime, endTime: entry.endTime, subject: entry.subject }
+          : null;
       }
-    }
+      return row;
+    });
 
     return NextResponse.json({
       teacher: {
@@ -71,13 +89,12 @@ export async function GET(request: NextRequest) {
         firstName: teacher.firstName,
         lastName: teacher.lastName,
       },
-      weeklySchedule,
+      schedule,
       todaySchedule,
-      summary: {
-        totalWorkingDays,
-        totalWeeklyHours: Math.round((totalWeeklyMinutes / 60) * 10) / 10,
-        totalWeeklyMinutes,
-      },
+      weeklyGrid,
+      workingDays,
+      allTimeSlots,
+      hasSchedule: true,
     });
   } catch (error) {
     console.error('Get teacher schedule error:', error);
