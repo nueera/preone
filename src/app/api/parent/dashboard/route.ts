@@ -100,13 +100,19 @@ export async function GET(request: NextRequest) {
         netAmount: true,
         status: true,
         dueDate: true,
+        payments: {
+          select: { amount: true },
+        },
       },
       orderBy: { dueDate: 'asc' },
     });
 
     const feesDue = invoices
-      .filter((i) => i.status === 'PENDING' || i.status === 'PARTIAL')
-      .reduce((sum, i) => sum + i.netAmount, 0);
+      .filter((i) => i.status === 'PENDING' || i.status === 'PARTIAL' || i.status === 'OVERDUE')
+      .reduce((sum, i) => {
+        const paid = (i as { payments: { amount: number }[] }).payments?.reduce((s, p) => s + p.amount, 0) || 0;
+        return sum + (i.netAmount - paid);
+      }, 0);
 
     const feesPaid = invoices
       .filter((i) => i.status === 'PAID')

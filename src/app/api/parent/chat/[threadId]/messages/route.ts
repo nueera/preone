@@ -19,23 +19,11 @@ export async function GET(
 
     const { threadId } = await params;
 
-    // Verify parent is a participant in this thread
-    const parentUser = await db.user.findFirst({
-      where: {
-        OR: [
-          { email: auth.parent.email || '' },
-          { email: auth.parent.phone },
-        ],
-        role: 'PARENT',
-      },
-    });
-
-    if (!parentUser) {
-      return NextResponse.json({ error: 'Parent user not found' }, { status: 404 });
-    }
+    // Use the userId from requireParent (already resolved)
+    const parentUserId = auth.userId;
 
     const participation = await db.chatParticipant.findFirst({
-      where: { threadId, userId: parentUser.id },
+      where: { threadId, userId: parentUserId },
     });
 
     if (!participation) {
@@ -46,20 +34,25 @@ export async function GET(
     const limit = parseInt(searchParams.get('limit') || '50');
     const before = searchParams.get('before'); // cursor for pagination
 
+    // Fetch messages with correct cursor-based pagination
+    // When loading older messages (before cursor), query desc then reverse for display
     const messages = await db.message.findMany({
       where: {
         threadId,
         ...(before ? { createdAt: { lt: new Date(before) } } : {}),
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: before ? 'desc' : 'asc' },
       take: limit,
     });
+
+    // Reverse for display order (oldest first) when using cursor
+    const displayMessages = before ? messages.reverse() : messages;
 
     // Mark unread messages from teacher as read
     await db.message.updateMany({
       where: {
         threadId,
-        senderId: { not: parentUser.id },
+        senderId: { not: parentUserId },
         isRead: false,
       },
       data: { isRead: true },
@@ -67,7 +60,7 @@ export async function GET(
 
     // Get teacher info for the thread
     const otherParticipant = await db.chatParticipant.findFirst({
-      where: { threadId, userId: { not: parentUser.id } },
+      where: { threadId, userId: { not: parentUserId } },
     });
 
     let teacherInfo = null;
@@ -90,7 +83,7 @@ export async function GET(
     return NextResponse.json({
       threadId,
       teacher: teacherInfo,
-      messages: messages.map(m => ({
+      messages: displayMessages.map(m => ({
         id: m.id,
         content: m.content,
         type: m.type,
@@ -121,23 +114,11 @@ export async function POST(
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
     }
 
-    // Verify parent is a participant in this thread
-    const parentUser = await db.user.findFirst({
-      where: {
-        OR: [
-          { email: auth.parent.email || '' },
-          { email: auth.parent.phone },
-        ],
-        role: 'PARENT',
-      },
-    });
-
-    if (!parentUser) {
-      return NextResponse.json({ error: 'Parent user not found' }, { status: 404 });
-    }
+    // Use the userId from requireParent (already resolved)
+    const parentUserId = auth.userId;
 
     const participation = await db.chatParticipant.findFirst({
-      where: { threadId, userId: parentUser.id },
+      where: { threadId, userId: parentUserId },
     });
 
     if (!participation) {
@@ -148,7 +129,7 @@ export async function POST(
     const message = await db.message.create({
       data: {
         threadId,
-        senderId: parentUser.id,
+        senderId: parentUserId,
         content: content.trim(),
         type,
         isRead: false,
@@ -163,7 +144,7 @@ export async function POST(
 
     // Create notification for teacher
     const otherParticipant = await db.chatParticipant.findFirst({
-      where: { threadId, userId: { not: parentUser.id } },
+      where: { threadId, userId: { not: parentUserId } },
     });
 
     if (otherParticipant) {
@@ -173,7 +154,7 @@ export async function POST(
           title: 'New Message',
           message: `${auth.parent.firstName} ${auth.parent.lastName} sent you a message`,
           type: 'CHAT',
-          actionUrl: `/parent/communication?thread=${threadId}`,
+          actionUrl: `/teacher/communication?thread=${threadId}`,
         },
       });
     }

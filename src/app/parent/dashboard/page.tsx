@@ -34,7 +34,6 @@ import {
 } from 'recharts';
 import { useParentAuth } from '@/lib/parent-auth';
 import { parentFetch } from '@/lib/parent-api';
-import { toast } from '@/hooks/use-toast';
 
 // ============================================================
 // TYPES

@@ -111,16 +111,6 @@ function getFeeTypeLabel(type: string): string {
   return labels[type] || type;
 }
 
-function getFrequencyLabel(freq: string): string {
-  const labels: Record<string, string> = {
-    MONTHLY: 'Monthly',
-    QUARTERLY: 'Quarterly',
-    HALF_YEARLY: 'Half-Yearly',
-    ANNUAL: 'Annual',
-  };
-  return labels[freq] || freq;
-}
-
 function daysUntilDue(dueDate: string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);

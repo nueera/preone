@@ -1017,3 +1017,19 @@ export function useChangePassword() {
     }) => parentPost<{ message: string }>('/api/parent/change-password', data),
   });
 }
+
+// ============================================================
+// useAcknowledgeObservation — Acknowledge a shared observation
+// ============================================================
+
+export function useAcknowledgeObservation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, comment }: { id: string; comment?: string }) =>
+      parentPatch<{ message: string }>(`/api/parent/observations/${id}/acknowledge`, { comment }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: parentKeys.observations });
+    },
+  });
+}

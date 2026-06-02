@@ -432,6 +432,7 @@ model FeeStructure {
   isActive    Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  invoices    Invoice[]
 }
 
 enum InvoiceStatus {
@@ -457,6 +458,7 @@ model Invoice {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   student        Student       @relation(fields: [studentId], references: [id])
+  feeStructure   FeeStructure? @relation(fields: [feeStructureId], references: [id])
   payments       Payment[]
   receipt        Receipt?
   refund         Refund?

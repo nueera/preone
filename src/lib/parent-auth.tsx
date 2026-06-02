@@ -15,7 +15,7 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { parentFetch, getSelectedChildId, setSelectedChildId } from '@/lib/parent-api';
 
 // ============================================================

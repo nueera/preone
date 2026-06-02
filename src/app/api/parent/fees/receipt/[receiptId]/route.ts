@@ -81,14 +81,19 @@ export async function GET(
       );
     }
 
-    // ── Fetch branch info for the receipt header ──
+    // ── Fetch branch info with school logo for the receipt header ──
     const branch = await db.branch.findFirst({
       select: {
         id: true,
         name: true,
         address: true,
         phone: true,
-        logo: true,
+        school: {
+          select: {
+            name: true,
+            logo: true,
+          },
+        },
       },
     });
 
@@ -141,7 +146,8 @@ export async function GET(
             name: branch.name,
             address: branch.address,
             phone: branch.phone,
-            logo: branch.logo,
+            schoolName: branch.school?.name || null,
+            logo: branch.school?.logo || null,
           }
         : null,
     };

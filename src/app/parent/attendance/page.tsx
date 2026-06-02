@@ -10,7 +10,6 @@
 // ============================================================
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   ChevronLeft, ChevronDown, ChevronRight,
   CheckCircle2, XCircle, Clock, BarChart3,
@@ -632,7 +631,6 @@ function AttendanceLoadingSkeleton() {
 // ============================================================
 
 export default function ParentAttendancePage() {
-  const router = useRouter();
   const { selectedChildId, selectedChild, children, selectChild } = useParentAuth();
 
   // Month/year state — default to current month

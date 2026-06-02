@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useParentAuth } from '@/lib/parent-auth';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   useParentProfile,
   useUpdateProfile,
@@ -140,13 +140,9 @@ function ProfileTab() {
       await updateProfile.mutateAsync(formData);
       setIsEditing(false);
       await refresh();
-      toast({ title: 'Profile Updated', description: 'Your profile has been saved successfully.' });
+      toast.success('Profile updated successfully');
     } catch (error: unknown) {
-      toast({
-        title: 'Update Failed',
-        description: error instanceof Error ? error.message : 'Could not update profile.',
-        variant: 'destructive',
-      });
+      toast.error(error instanceof Error ? error.message : 'Could not update profile');
     }
   }, [formData, updateProfile, refresh]);
 
@@ -155,7 +151,7 @@ function ProfileTab() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File Too Large', description: 'Photo must be under 5MB.', variant: 'destructive' });
+      toast.error('Photo must be under 5MB');
       return;
     }
 
@@ -165,9 +161,9 @@ function ProfileTab() {
         const base64 = reader.result as string;
         await updateProfile.mutateAsync({ photo: base64 });
         await refresh();
-        toast({ title: 'Photo Updated', description: 'Your profile photo has been updated.' });
+        toast.success('Profile photo updated');
       } catch {
-        toast({ title: 'Upload Failed', description: 'Could not update photo.', variant: 'destructive' });
+        toast.error('Could not update photo');
       }
     };
     reader.readAsDataURL(file);
@@ -417,13 +413,13 @@ function KycTab() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File Too Large', description: 'Document must be under 5MB.', variant: 'destructive' });
+      toast.error('Document must be under 5MB');
       return;
     }
 
     const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
     if (!validTypes.includes(file.type)) {
-      toast({ title: 'Invalid Format', description: 'Accepted: JPG, PNG, PDF.', variant: 'destructive' });
+      toast.error('Invalid format — Accepted: JPG, PNG, PDF');
       return;
     }
 
@@ -440,15 +436,11 @@ function KycTab() {
         const base64 = reader.result as string;
         await uploadKyc.mutateAsync({ documentType: docType, document: base64 });
         setSelectedFiles((prev) => ({ ...prev, [docType]: null }));
-        toast({ title: 'Document Uploaded', description: `${formatDocType(docType)} submitted for verification.` });
+        toast.success(`${formatDocType(docType)} submitted for verification`);
       };
       reader.readAsDataURL(file);
     } catch (error: unknown) {
-      toast({
-        title: 'Upload Failed',
-        description: error instanceof Error ? error.message : 'Could not upload document.',
-        variant: 'destructive',
-      });
+      toast.error(error instanceof Error ? error.message : 'Could not upload document');
     }
   }, [selectedFiles, uploadKyc]);
 
@@ -458,7 +450,7 @@ function KycTab() {
       .map(([type]) => type);
 
     if (pendingTypes.length === 0) {
-      toast({ title: 'No Documents', description: 'Please select at least one document to upload.' });
+      toast.error('Please select at least one document to upload');
       return;
     }
 
@@ -880,7 +872,7 @@ function ChangePasswordTab() {
         currentPassword: form.currentPassword,
         newPassword: form.newPassword,
       });
-      toast({ title: 'Password Changed', description: 'Please log in with your new password.' });
+      toast.success('Password changed — please log in with your new password');
       // Redirect to login after a short delay
       setTimeout(() => {
         localStorage.removeItem('preone_token');
@@ -888,11 +880,7 @@ function ChangePasswordTab() {
         window.location.href = '/login';
       }, 1500);
     } catch (error: unknown) {
-      toast({
-        title: 'Password Change Failed',
-        description: error instanceof Error ? error.message : 'Could not change password.',
-        variant: 'destructive',
-      });
+      toast.error(error instanceof Error ? error.message : 'Could not change password');
     }
   }, [form, validate, changePassword]);
 

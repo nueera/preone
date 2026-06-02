@@ -340,9 +340,6 @@ function TodayUpdateCard({ update, childName }: { update: DailyUpdateData; child
                   💧
                 </span>
               ))}
-              {Array.from({ length: Math.max(0, MAX_WATER - update.waterGlasses) }).map((_, i) => (
-                <span key={`empty-${i}`} className="text-base opacity-30">⚪</span>
-              ))}
             </div>
           </div>
 

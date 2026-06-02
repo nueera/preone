@@ -32,6 +32,7 @@ import {
 import { useParentAuth } from '@/lib/parent-auth';
 import {
   useParentObservations,
+  useAcknowledgeObservation,
   type ObservationData,
 } from '@/hooks/use-parent';
 
@@ -403,25 +404,22 @@ function ObservationsPageContent() {
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
 
-  // Local ack state (UI-only, no API)
-  const [ackedIds, setAckedIds] = useState<Set<string>>(new Set());
+  // Acknowledge mutation (persists to API)
+  const acknowledgeMutation = useAcknowledgeObservation();
 
   const handleAcknowledge = useCallback((id: string) => {
-    setAckedIds((prev) => new Set(prev).add(id));
-  }, []);
+    acknowledgeMutation.mutate({ id });
+  }, [acknowledgeMutation]);
 
   const childName = selectedChild
     ? `${selectedChild.firstName} ${selectedChild.lastName}`
     : 'Child';
 
-  // Derived data
+  // Derived data — observations use parentAck from API directly
   const observations = useMemo(() => {
     if (!data?.observations) return [];
-    return data.observations.map((obs) => ({
-      ...obs,
-      parentAck: ackedIds.has(obs.id) ? true : obs.parentAck,
-    }));
-  }, [data?.observations, ackedIds]);
+    return data.observations;
+  }, [data?.observations]);
 
   const total = data?.total ?? 0;
   const categories = data?.categories ?? {};
