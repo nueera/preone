@@ -105,3 +105,27 @@ Stage Summary:
 - API auth foundation (requireParent + verifyChildAccess) now enables all remaining parent API routes to work
 - React Query hooks established for parent portal data fetching
 - Build passes: /parent/children (static), /parent/children/[childId] (dynamic)
+
+---
+Task ID: parent-attendance-module
+Agent: Main Agent
+Task: Build Attendance module for PreOne Parent Portal
+
+Work Log:
+- Enhanced /src/app/api/parent/attendance/route.ts — Rewrote to support childId, month (1-12), year (YYYY) params; returns stats (present/absent/late/workingDays/rate), daily records with duration calculation, and 6-month trend data; includes future month protection and robust date parsing
+- Added useParentAttendance hook to /src/hooks/use-parent.ts — Includes AttendanceStats, AttendanceRecord, AttendanceTrendPoint, AttendanceData types; uses parentKeys.attendance query key factory; 1-minute stale time
+- Built /src/app/parent/attendance/page.tsx — Full attendance page with:
+  - Page header with child switcher dropdown (for multi-child parents)
+  - 4 stats cards: Rate (color-coded green/yellow/red), Present, Absent, Late
+  - Custom calendar view: color-coded days (green=PRESENT, red=ABSENT, yellow=LATE, gray=no data/weekend, white=future), tooltips on hover showing date/status/times, legend
+  - Month navigation: prev/next buttons + MonthYear dropdown picker (prevents future months)
+  - Trend chart: Recharts LineChart with 6-month data, 75% reference line, tooltips
+  - Details table: sortable by date, status badges, check-in/out times, duration, expand/collapse (>7 records), CSV export button
+  - Loading skeleton, error state with retry
+
+Stage Summary:
+- 3 files created/modified for the Attendance module
+- API supports comprehensive data: monthly stats, daily records with duration, 6-month trend
+- Calendar view is fully custom (no external calendar dependency)
+- CSV export generates downloadable attendance report
+- Build passes with zero new TypeScript errors

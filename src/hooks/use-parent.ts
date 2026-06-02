@@ -203,6 +203,68 @@ interface DashboardData {
   }>;
 }
 
+// ============================================================
+// Attendance Types
+// ============================================================
+
+export interface AttendanceStats {
+  present: number;
+  absent: number;
+  late: number;
+  workingDays: number;
+  rate: number;
+}
+
+export interface AttendanceRecord {
+  date: string;
+  status: string;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  duration: string | null;
+}
+
+export interface AttendanceTrendPoint {
+  month: string;
+  rate: number;
+}
+
+export interface AttendanceData {
+  childId: string;
+  childName: string;
+  month: number;
+  year: number;
+  stats: AttendanceStats;
+  records: AttendanceRecord[];
+  trend: AttendanceTrendPoint[];
+}
+
+// ============================================================
+// useParentAttendance — Get attendance for a child in a month
+// ============================================================
+
+export function useParentAttendance(
+  childId: string | null,
+  month?: number,
+  year?: number
+) {
+  return useQuery({
+    queryKey: parentKeys.attendance(childId || '', month && year ? `${year}-${String(month).padStart(2, '0')}` : undefined),
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      if (month) params.set('month', String(month));
+      if (year) params.set('year', String(year));
+      return parentGet<AttendanceData>(`/api/parent/attendance?${params.toString()}`);
+    },
+    enabled: !!childId,
+    staleTime: 60 * 1000, // 1 minute
+  });
+}
+
+// ============================================================
+// useParentDashboard — Get dashboard data
+// ============================================================
+
 export function useParentDashboard(childId?: string | null) {
   return useQuery({
     queryKey: parentKeys.dashboard(childId || undefined),
