@@ -142,6 +142,99 @@ export function useParentChild(childId: string | null) {
 }
 
 // ============================================================
+// Fees Types
+// ============================================================
+
+export interface FeeOverview {
+  totalDue: number;
+  totalPaid: number;
+  totalPending: number;
+  totalOverdue: number;
+}
+
+export interface FeeStructureInfo {
+  id: string;
+  name: string;
+  type: string;
+  frequency: string;
+  amount: number;
+}
+
+export interface PaymentInfo {
+  id: string;
+  amount: number;
+  method: string;
+  transactionRef: string | null;
+  paymentDate: string;
+}
+
+export interface InvoiceInfo {
+  id: string;
+  invoiceNo: string;
+  description: string | null;
+  amount: number;
+  discount: number;
+  netAmount: number;
+  status: string;
+  dueDate: string;
+  paidDate: string | null;
+  feeStructure: FeeStructureInfo | null;
+  payments: PaymentInfo[];
+  receipt: {
+    id: string;
+    receiptNo: string;
+    amount: number;
+  } | null;
+}
+
+export interface PaymentHistoryItem {
+  id: string;
+  amount: number;
+  method: string;
+  transactionRef: string | null;
+  paymentDate: string;
+  invoiceNo: string;
+  description: string | null;
+  receiptNo: string | null;
+}
+
+export interface UpcomingDue {
+  invoiceNo: string;
+  description: string | null;
+  amount: number;
+  dueDate: string;
+}
+
+export interface OverdueDue extends UpcomingDue {
+  daysOverdue: number;
+}
+
+export interface FeesData {
+  childId: string;
+  childName: string;
+  className: string | null;
+  overview: FeeOverview;
+  invoices: InvoiceInfo[];
+  payments: PaymentHistoryItem[];
+  upcomingDues: UpcomingDue[];
+  overdueDues: OverdueDue[];
+}
+
+// ============================================================
+// useParentFees — Get fees data for a child
+// ============================================================
+
+export function useParentFees(childId: string | null) {
+  return useQuery({
+    queryKey: parentKeys.fees(childId || ''),
+    queryFn: () =>
+      parentGet<FeesData>(`/api/parent/fees?childId=${childId}`),
+    enabled: !!childId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
 // useParentDashboard — Get dashboard data
 // ============================================================
 

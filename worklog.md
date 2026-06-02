@@ -129,3 +129,28 @@ Stage Summary:
 - Calendar view is fully custom (no external calendar dependency)
 - CSV export generates downloadable attendance report
 - Build passes with zero new TypeScript errors
+
+---
+Task ID: parent-fees-module
+Agent: Main Agent
+Task: Build Fees module for PreOne Parent Portal
+
+Work Log:
+- Enhanced /src/app/api/parent/fees/route.ts — Complete rewrite with childId param; returns overview stats (totalDue/totalPaid/totalPending/totalOverdue), invoices with payments+receipt+feeStructure, payment history with receipt numbers, upcoming dues (PENDING with future due date), overdue dues (OVERDUE or PENDING past due date with daysOverdue calculation)
+- Created /src/app/api/parent/fees/receipt/[receiptId]/route.ts — Receipt detail endpoint that verifies receipt belongs to parent's child; returns receipt info, invoice details, student info, payment method/ref
+- Added fees types and useParentFees hook to /src/hooks/use-parent.ts — FeeOverview, FeeStructureInfo, PaymentInfo, InvoiceInfo, PaymentHistoryItem, UpcomingDue, OverdueDue, FeesData types; 2-minute stale time
+- Built /src/app/parent/fees/page.tsx — Full fees page with:
+  - Fee Overview Cards: Total Due (sky), Total Paid (green), Pending (amber), Overdue (red with ring if >0)
+  - Fee Breakdown Donut Chart: Recharts PieChart with paid/pending/overdue segments, center total, color legend
+  - Invoice List: Filterable (All/Paid/Pending/Overdue/Partial/Cancelled), status badges (Overdue pulsing), Receipt button for paid invoices, Pay Now button for pending/overdue
+  - Payment History Timeline: Timeline with green checkmarks, amount, date, invoice reference, method+ref, receipt number, expandable (5 initially)
+  - Upcoming Due Dates: Sorted by due date, Pay button; Overdue alert banner with days overdue count
+  - Receipt Dialog: School header, receipt details, fee breakdown with discount, payment method, Print/Download PDF buttons (PDF placeholder)
+  - Child switcher, loading skeleton, error state with retry
+
+Stage Summary:
+- 4 files created/modified for the Fees module
+- API supports comprehensive data: overview stats, invoices with relations, payment history, upcoming/overdue dues
+- Receipt API endpoint with parent-child ownership verification
+- Build passes with zero new TypeScript errors
+- Routes: /api/parent/fees, /api/parent/fees/receipt/[receiptId], /parent/fees
