@@ -235,6 +235,71 @@ export function useParentFees(childId: string | null) {
 }
 
 // ============================================================
+// Receipt Types
+// ============================================================
+
+export interface ReceiptData {
+  id: string;
+  receiptNo: string;
+  amount: number;
+  createdAt: string;
+  invoice: {
+    id: string;
+    invoiceNo: string;
+    description: string | null;
+    amount: number;
+    discount: number;
+    netAmount: number;
+    status: string;
+    dueDate: string;
+    paidDate: string | null;
+    feeStructure: {
+      name: string;
+      type: string;
+      frequency: string;
+    } | null;
+    student: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      rollNumber: string | null;
+      className: string | null;
+      programName: string | null;
+    };
+    payments: Array<{
+      id: string;
+      amount: number;
+      method: string;
+      transactionRef: string | null;
+      chequeNo: string | null;
+      bankName: string | null;
+      paymentDate: string;
+      notes: string | null;
+    }>;
+  };
+  branch: {
+    name: string;
+    address: string | null;
+    phone: string | null;
+    logo: string | null;
+  } | null;
+}
+
+// ============================================================
+// useParentReceipt — Get receipt details by receipt ID
+// ============================================================
+
+export function useParentReceipt(receiptId: string | null) {
+  return useQuery({
+    queryKey: ['parent', 'receipt', receiptId] as const,
+    queryFn: () =>
+      parentGet<{ receipt: ReceiptData }>(`/api/parent/fees/receipt/${receiptId}`),
+    enabled: !!receiptId,
+    staleTime: 5 * 60 * 1000, // 5 minutes — receipts don't change
+  });
+}
+
+// ============================================================
 // useParentDashboard — Get dashboard data
 // ============================================================
 

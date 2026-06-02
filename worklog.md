@@ -154,3 +154,32 @@ Stage Summary:
 - Receipt API endpoint with parent-child ownership verification
 - Build passes with zero new TypeScript errors
 - Routes: /api/parent/fees, /api/parent/fees/receipt/[receiptId], /parent/fees
+
+---
+Task ID: 3
+Agent: main
+Task: Build Fees module for PreOne Parent Portal
+
+Work Log:
+- Reviewed Prisma schema for Invoice, Payment, FeeStructure, Receipt models and related enums (InvoiceStatus, PaymentMethod, FeeType, FeeFrequency)
+- Created /src/app/api/parent/fees/route.ts — GET API with childId param, returns overview stats, invoices with feeStructure/payments/receipt, payment history, upcoming dues, and overdue dues
+- Created /src/app/api/parent/fees/receipt/[receiptId]/route.ts — Receipt detail API with parent access verification, returns full receipt with invoice, payment, student, and branch info
+- Added ReceiptData type and useParentReceipt hook to /src/hooks/use-parent.ts
+- Created /src/app/parent/fees/page.tsx — Full fees page with:
+  - 4 overview cards (Total Due, Total Paid, Pending, Overdue)
+  - Donut chart (PieChart from Recharts) for fee breakdown
+  - Invoice list with search, status filter, and status badges
+  - Payment history timeline with receipt view buttons
+  - Upcoming dues and overdue dues sections with warnings
+  - Receipt view dialog with print/download functionality
+  - Child switcher dropdown for multi-child parents
+  - Loading skeleton and error states
+  - Suspense boundary wrapper
+- Build passed successfully with no errors
+
+Stage Summary:
+- Fees module complete with 2 API routes and 1 page component
+- All Prisma enum values use UPPERCASE (PENDING, PAID, OVERDUE, PARTIAL, CANCELLED)
+- Auth pattern: requireParent() + verifyChildAccess() consistent with other parent modules
+- Receipt dialog fetches data on-demand via useParentReceipt hook
+- Parent theme maintained: sky-500 → blue-500 gradient, 24px border radius

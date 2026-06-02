@@ -1,9 +1,8 @@
 // ============================================================
 // PreOne — GET /api/parent/fees
-// Complete fee data for a parent's child
-// Returns: overview stats, invoices with payments,
-// payment history, upcoming dues, overdue items
+// Fee details, invoices, payment history for parent's children
 // Query params: childId (required)
+// Returns: overview stats, invoices, payments, upcomingDues, overdueDues
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,67 +17,74 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
 
-    // Determine target child
-    let targetChildId = auth.childIds[0];
-    if (childId) {
-      const accessError = verifyChildAccess(auth, childId);
-      if (accessError) return accessError;
-      targetChildId = childId;
+    if (!childId) {
+      return NextResponse.json(
+        { error: 'childId query parameter is required' },
+        { status: 400 }
+      );
     }
 
-    if (!targetChildId) {
-      return NextResponse.json({
-        childId: null,
-        childName: '',
-        className: null,
-        overview: { totalDue: 0, totalPaid: 0, totalPending: 0, totalOverdue: 0 },
-        invoices: [],
-        payments: [],
-        upcomingDues: [],
-        overdueDues: [],
-      });
-    }
+    // Verify this child belongs to this parent
+    const accessError = verifyChildAccess(auth, childId);
+    if (accessError) return accessError;
 
-    // Get child info
-    const childInfo = auth.children.find((c) => c.id === targetChildId);
+    // Get child info from auth children
+    const childInfo = auth.children.find((c) => c.id === childId);
+    const childName = childInfo
+      ? `${childInfo.firstName} ${childInfo.lastName}`
+      : '';
+    const className = childInfo?.class?.name || null;
 
-    // ── Fetch all invoices for the child ──
+    // ── Fetch all invoices for this child with feeStructure, payments, and receipt ──
     const invoices = await db.invoice.findMany({
-      where: { studentId: targetChildId },
+      where: { studentId: childId },
       include: {
+        feeStructure: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            frequency: true,
+            amount: true,
+          },
+        },
         payments: {
+          select: {
+            id: true,
+            amount: true,
+            method: true,
+            transactionRef: true,
+            paymentDate: true,
+          },
           orderBy: { paymentDate: 'desc' },
         },
         receipt: {
-          select: { id: true, receiptNo: true, amount: true },
+          select: {
+            id: true,
+            receiptNo: true,
+            amount: true,
+          },
         },
       },
-      orderBy: { dueDate: 'asc' },
+      orderBy: { dueDate: 'desc' },
     });
 
-    // ── Get fee structure details ──
-    const feeStructureIds = invoices
-      .map((i) => i.feeStructureId)
-      .filter((id): id is string => !!id);
-
-    const feeStructures = feeStructureIds.length > 0
-      ? await db.feeStructure.findMany({
-          where: { id: { in: feeStructureIds } },
-          select: { id: true, name: true, type: true, frequency: true, amount: true },
-        })
-      : [];
-
-    const feeStructureMap = new Map(feeStructures.map((fs) => [fs.id, fs]));
-
     // ── Calculate overview stats ──
-    const totalDue = invoices.reduce((sum, i) => sum + i.netAmount, 0);
+    const totalDue = invoices
+      .filter((inv) => inv.status === 'PENDING' || inv.status === 'PARTIAL' || inv.status === 'OVERDUE')
+      .reduce((sum, inv) => sum + inv.netAmount, 0);
+
     const totalPaid = invoices
-      .filter((i) => i.status === 'PAID')
-      .reduce((sum, i) => sum + i.netAmount, 0);
+      .filter((inv) => inv.status === 'PAID')
+      .reduce((sum, inv) => sum + inv.netAmount, 0);
+
+    const totalPending = invoices
+      .filter((inv) => inv.status === 'PENDING' || inv.status === 'PARTIAL')
+      .reduce((sum, inv) => sum + inv.netAmount, 0);
+
     const totalOverdue = invoices
-      .filter((i) => i.status === 'OVERDUE')
-      .reduce((sum, i) => sum + i.netAmount, 0);
-    const totalPending = totalDue - totalPaid - totalOverdue;
+      .filter((inv) => inv.status === 'OVERDUE')
+      .reduce((sum, inv) => sum + inv.netAmount, 0);
 
     // ── Format invoices ──
     const formattedInvoices = invoices.map((inv) => ({
@@ -90,8 +96,16 @@ export async function GET(request: NextRequest) {
       netAmount: inv.netAmount,
       status: inv.status,
       dueDate: inv.dueDate.toISOString().split('T')[0],
-      paidDate: inv.paidDate?.toISOString().split('T')[0] || null,
-      feeStructure: inv.feeStructureId ? feeStructureMap.get(inv.feeStructureId) || null : null,
+      paidDate: inv.paidDate ? inv.paidDate.toISOString().split('T')[0] : null,
+      feeStructure: inv.feeStructure
+        ? {
+            id: inv.feeStructure.id,
+            name: inv.feeStructure.name,
+            type: inv.feeStructure.type,
+            frequency: inv.feeStructure.frequency,
+            amount: inv.feeStructure.amount,
+          }
+        : null,
       payments: inv.payments.map((p) => ({
         id: p.id,
         amount: p.amount,
@@ -108,18 +122,24 @@ export async function GET(request: NextRequest) {
         : null,
     }));
 
-    // ── Payment History (all payments for the child, newest first) ──
+    // ── Fetch all payments for this child (for payment history timeline) ──
     const allPayments = await db.payment.findMany({
-      where: { studentId: targetChildId },
+      where: { studentId: childId },
       include: {
         invoice: {
-          select: { invoiceNo: true, description: true },
+          select: {
+            invoiceNo: true,
+            description: true,
+            receipt: {
+              select: { receiptNo: true },
+            },
+          },
         },
       },
       orderBy: { paymentDate: 'desc' },
     });
 
-    const formattedPayments = allPayments.map((p) => ({
+    const paymentHistory = allPayments.map((p) => ({
       id: p.id,
       amount: p.amount,
       method: p.method,
@@ -127,53 +147,42 @@ export async function GET(request: NextRequest) {
       paymentDate: p.paymentDate.toISOString().split('T')[0],
       invoiceNo: p.invoice.invoiceNo,
       description: p.invoice.description,
-      receiptNo: null as string | null, // Will be populated from invoice receipt
+      receiptNo: p.invoice.receipt?.receiptNo || null,
     }));
 
-    // Attach receipt numbers to payments
-    const invoiceReceiptMap = new Map(
-      invoices
-        .filter((inv) => inv.receipt)
-        .map((inv) => [inv.id, inv.receipt!.receiptNo])
-    );
-    for (const p of allPayments) {
-      const receiptNo = invoiceReceiptMap.get(p.invoiceId) || null;
-      const formattedPayment = formattedPayments.find((fp) => fp.id === p.id);
-      if (formattedPayment) {
-        formattedPayment.receiptNo = receiptNo;
-      }
-    }
-
-    // ── Upcoming Dues (PENDING or PARTIAL invoices with future due date) ──
+    // ── Upcoming dues (PENDING/PARTIAL with future due date) ──
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const upcomingDues = invoices
-      .filter((inv) => {
-        const dueDate = new Date(inv.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
-        return (inv.status === 'PENDING' || inv.status === 'PARTIAL') && dueDate >= today;
-      })
+      .filter((inv) =>
+        (inv.status === 'PENDING' || inv.status === 'PARTIAL') &&
+        new Date(inv.dueDate) >= today
+      )
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
       .map((inv) => ({
         invoiceNo: inv.invoiceNo,
         description: inv.description,
         amount: inv.netAmount,
         dueDate: inv.dueDate.toISOString().split('T')[0],
-      }))
-      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+      }));
 
-    // ── Overdue Dues (PENDING invoices past due date) ──
+    // ── Overdue dues (PENDING/PARTIAL/OVERDUE with past due date) ──
     const overdueDues = invoices
       .filter((inv) => {
         const dueDate = new Date(inv.dueDate);
         dueDate.setHours(0, 0, 0, 0);
-        return (inv.status === 'OVERDUE' || (inv.status === 'PENDING' && dueDate < today));
+        return (
+          (inv.status === 'PENDING' || inv.status === 'PARTIAL' || inv.status === 'OVERDUE') &&
+          dueDate < today
+        );
       })
       .map((inv) => {
         const dueDate = new Date(inv.dueDate);
         dueDate.setHours(0, 0, 0, 0);
         const diffMs = today.getTime() - dueDate.getTime();
         const daysOverdue = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
         return {
           invoiceNo: inv.invoiceNo,
           description: inv.description,
@@ -181,17 +190,21 @@ export async function GET(request: NextRequest) {
           dueDate: inv.dueDate.toISOString().split('T')[0],
           daysOverdue,
         };
-      });
+      })
+      .sort((a, b) => b.daysOverdue - a.daysOverdue);
 
     return NextResponse.json({
-      childId: targetChildId,
-      childName: childInfo
-        ? `${childInfo.firstName} ${childInfo.lastName}`
-        : '',
-      className: childInfo?.class?.name || null,
-      overview: { totalDue, totalPaid, totalPending, totalOverdue },
+      childId,
+      childName,
+      className,
+      overview: {
+        totalDue,
+        totalPaid,
+        totalPending,
+        totalOverdue,
+      },
       invoices: formattedInvoices,
-      payments: formattedPayments,
+      payments: paymentHistory,
       upcomingDues,
       overdueDues,
     });
