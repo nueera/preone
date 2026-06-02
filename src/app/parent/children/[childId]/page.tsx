@@ -29,6 +29,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useParentAuth } from '@/lib/parent-auth';
 import { useParentChild, type ChildDetail } from '@/hooks/use-parent';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // HELPERS
@@ -115,7 +117,7 @@ function PersonalInfoTab({ child }: { child: ChildDetail }) {
     <Card className="rounded-3xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <User className="h-4 w-4 text-sky-600" />
+          <User className="h-4 w-4 text-portal-600" />
           Personal Information
         </CardTitle>
       </CardHeader>
@@ -163,10 +165,10 @@ function ParentGuardianTab({ child }: { child: ChildDetail }) {
   return (
     <div className="space-y-4">
       {child.parents.map((p) => (
-        <Card key={p.id} className={`rounded-3xl ${p.isPrimary ? 'ring-2 ring-sky-200' : ''}`}>
+        <Card key={p.id} className={`rounded-3xl ${p.isPrimary ? 'ring-2 ring-portal-200' : ''}`}>
           <CardContent className="p-5">
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-2xl shrink-0">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-portal-50 text-2xl shrink-0">
                 {getRelationIcon(p.relation)}
               </div>
               <div className="flex-1 min-w-0">
@@ -175,7 +177,7 @@ function ParentGuardianTab({ child }: { child: ChildDetail }) {
                     {p.firstName} {p.lastName}
                   </h4>
                   {p.isPrimary && (
-                    <Badge className="bg-sky-100 text-sky-700 text-[9px] border border-sky-200">
+                    <Badge className={`${theme.selectedClass} text-[9px] border border-portal-200`}>
                       Primary Contact
                     </Badge>
                   )}
@@ -192,13 +194,13 @@ function ParentGuardianTab({ child }: { child: ChildDetail }) {
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {p.phone && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-3.5 w-3.5 text-sky-500 shrink-0" />
+                      <Phone className="h-3.5 w-3.5 text-portal-500 shrink-0" />
                       <span>{p.phone}</span>
                     </div>
                   )}
                   {p.email && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-3.5 w-3.5 text-sky-500 shrink-0" />
+                      <Mail className="h-3.5 w-3.5 text-portal-500 shrink-0" />
                       <span className="truncate">{p.email}</span>
                     </div>
                   )}
@@ -315,7 +317,7 @@ function MedicalTab({ child }: { child: ChildDetail }) {
       <Card className="rounded-3xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Stethoscope className="h-4 w-4 text-sky-600" />
+            <Stethoscope className="h-4 w-4 text-portal-600" />
             Medical Information
           </CardTitle>
         </CardHeader>
@@ -407,7 +409,7 @@ function MedicalTab({ child }: { child: ChildDetail }) {
         <Card className="rounded-3xl">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Clock className="h-4 w-4 text-sky-600" />
+              <Clock className="h-4 w-4 text-portal-600" />
               Medical Record History
             </CardTitle>
           </CardHeader>
@@ -455,7 +457,7 @@ function SiblingsTab({ child }: { child: ChildDetail }) {
     <Card className="rounded-3xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <Heart className="h-4 w-4 text-sky-600" />
+          <Heart className="h-4 w-4 text-portal-600" />
           Siblings in School
         </CardTitle>
       </CardHeader>
@@ -467,8 +469,8 @@ function SiblingsTab({ child }: { child: ChildDetail }) {
                 key={sibling.id}
                 className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
               >
-                <Avatar className="h-12 w-12 border-2 border-sky-200">
-                  <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-sm font-bold">
+                <Avatar className="h-12 w-12 border-2 border-portal-200">
+                  <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-sm font-bold`}>
                     {sibling.firstName[0]}{sibling.lastName[0]}
                   </AvatarFallback>
                 </Avatar>
@@ -527,7 +529,7 @@ function ClassTeacherTab({ child }: { child: ChildDetail }) {
     <Card className="rounded-3xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <GraduationCap className="h-4 w-4 text-sky-600" />
+          <GraduationCap className="h-4 w-4 text-portal-600" />
           Class Teacher
         </CardTitle>
       </CardHeader>
@@ -535,9 +537,9 @@ function ClassTeacherTab({ child }: { child: ChildDetail }) {
         {teacher ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20 border-2 border-sky-200">
+              <Avatar className="h-20 w-20 border-2 border-portal-200">
                 <AvatarImage src={teacher.photo || undefined} />
-                <AvatarFallback className="bg-gradient-to-br from-emerald-400 to-teal-500 text-white text-xl font-bold">
+                <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-xl font-bold`}>
                   {teacher.firstName[0]}{teacher.lastName[0]}
                 </AvatarFallback>
               </Avatar>
@@ -584,7 +586,7 @@ function ClassTeacherTab({ child }: { child: ChildDetail }) {
             </div>
 
             <Button
-              className="w-full bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-xl hover:from-sky-600 hover:to-blue-600"
+              className={`w-full bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass}`}
               onClick={() => router.push(`/parent/communication?teacher=${teacher.id}`)}
             >
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -695,9 +697,9 @@ export default function ChildDetailPage({
       <Card className="rounded-3xl">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-            <Avatar className="h-28 w-28 border-4 border-sky-200 shrink-0">
+            <Avatar className="h-28 w-28 border-4 border-portal-200 shrink-0">
               <AvatarImage src={child.photo || undefined} />
-              <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-3xl font-bold">
+              <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-3xl font-bold`}>
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -705,7 +707,7 @@ export default function ChildDetailPage({
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
                 <h1 className="text-2xl font-bold">{fullName}</h1>
                 {isActiveChild && (
-                  <Badge className="bg-sky-100 text-sky-700 text-[9px] border border-sky-200">
+                  <Badge className={`${theme.selectedClass} text-[9px] border border-portal-200`}>
                     Active
                   </Badge>
                 )}
@@ -731,7 +733,7 @@ export default function ChildDetailPage({
             <div className="shrink-0">
               {!isActiveChild && (
                 <Button
-                  className="bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-xl hover:from-sky-600 hover:to-blue-600"
+                  className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass}`}
                   onClick={() => selectChild(childId)}
                 >
                   <UserCheck className="h-4 w-4 mr-2" />

@@ -34,6 +34,8 @@ import {
 } from 'recharts';
 import { useParentAuth } from '@/lib/parent-auth';
 import { parentFetch } from '@/lib/parent-api';
+import { PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // TYPES
@@ -289,7 +291,7 @@ export default function ParentDashboard() {
   return (
     <div className="space-y-6">
       {/* ── Welcome Section ── */}
-      <Card className="rounded-3xl border-0 bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-lg">
+      <Card className={`rounded-3xl border-0 bg-gradient-to-r ${theme.btnGradientClass} text-white shadow-lg`}>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -362,7 +364,7 @@ export default function ParentDashboard() {
           <div className="flex items-center gap-4">
             <Avatar className="h-14 w-14 border-2 border-sky-200">
               <AvatarImage src={child.photo || undefined} />
-              <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-lg font-bold">
+              <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-lg font-bold`}>
                 {child.firstName[0]}{child.lastName[0]}
               </AvatarFallback>
             </Avatar>
@@ -467,9 +469,9 @@ export default function ParentDashboard() {
 
               {/* Highlights */}
               {todayUpdate.highlights && (
-                <div className="p-3 bg-sky-50 rounded-xl border border-sky-100">
-                  <p className="text-xs font-medium text-sky-700 mb-1">📝 Highlights</p>
-                  <p className="text-sm text-sky-800">{todayUpdate.highlights}</p>
+                <div className={`p-3 rounded-xl border border-portal-200 ${theme.selectedClass}`}>
+                  <p className="text-xs font-medium mb-1">📝 Highlights</p>
+                  <p className="text-sm">{todayUpdate.highlights}</p>
                 </div>
               )}
 
@@ -594,7 +596,7 @@ export default function ParentDashboard() {
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-xl hover:from-sky-600 hover:to-blue-600 text-xs"
+                    className={`flex-1 bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass} text-xs`}
                     onClick={() => router.push('/parent/fees')}
                   >
                     <CreditCard className="h-3 w-3 mr-1" />
@@ -693,21 +695,21 @@ export default function ParentDashboard() {
                 <div className="h-52">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={growthRadarData}>
-                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarGrid stroke={CHART_PALETTE.grid} />
                       <PolarAngleAxis
                         dataKey="subject"
-                        tick={{ fontSize: 10, fill: '#6b7280' }}
+                        tick={{ fontSize: 10, fill: CHART_PALETTE.axis }}
                       />
                       <PolarRadiusAxis
                         angle={90}
                         domain={[0, 100]}
-                        tick={{ fontSize: 8, fill: '#9ca3af' }}
+                        tick={{ fontSize: 8, fill: CHART_PALETTE.axisLight }}
                       />
                       <Radar
                         name="Score"
                         dataKey="value"
-                        stroke="#0ea5e9"
-                        fill="#0ea5e9"
+                        stroke={CHART_PALETTE.series[1]}
+                        fill={CHART_PALETTE.series[1]}
                         fillOpacity={0.2}
                         strokeWidth={2}
                       />
@@ -761,7 +763,7 @@ export default function ParentDashboard() {
                 { label: "View Today's Update", icon: Sun, href: '/parent/daily-updates', color: 'from-amber-500 to-orange-500' },
                 { label: 'Pay Fees', icon: IndianRupee, href: '/parent/fees', color: 'from-red-500 to-rose-500' },
                 { label: 'View Growth Report', icon: BarChart3, href: '/parent/growth', color: 'from-violet-500 to-purple-500' },
-                { label: 'Chat with Teacher', icon: MessageSquare, href: '/parent/communication', color: 'from-sky-500 to-blue-500' },
+                { label: 'Chat with Teacher', icon: MessageSquare, href: '/parent/communication', color: theme.btnGradientClass },
               ].map((action) => (
                 <Card
                   key={action.label}
@@ -789,7 +791,7 @@ export default function ParentDashboard() {
                       className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors"
                     >
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-sky-100 text-sky-700 text-xs">
+                        <AvatarFallback className={`${theme.avatarFallbackClass} text-xs`}>
                           {sibling.firstName[0]}{sibling.lastName[0]}
                         </AvatarFallback>
                       </Avatar>

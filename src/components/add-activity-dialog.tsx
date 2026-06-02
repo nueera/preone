@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { ACTIVITY_COLORS } from '@/lib/theme-tokens';
 
 // ── Constants ──
 const ACTIVITY_TYPES = [

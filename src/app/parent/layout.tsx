@@ -25,7 +25,7 @@ export default function ParentLayout({
           <ParentSidebar />
           <div className="flex flex-1 flex-col min-h-screen">
             <ParentHeader />
-            <main className="flex-1 bg-gray-50 p-6 overflow-auto dark:bg-gray-950 pb-24 md:pb-6">
+            <main className="flex-1 bg-background p-6 overflow-auto pb-24 md:pb-6" data-portal="parent">
               {children}
             </main>
           </div>

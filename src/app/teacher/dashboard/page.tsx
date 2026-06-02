@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { PORTAL_THEMES, ACTIVITY_COLORS, ATTENDANCE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ============================================================
 // TYPES
@@ -104,15 +106,15 @@ function formatTime(time: string): string {
 }
 
 const ACTIVITY_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  ART: { label: 'Art', color: 'bg-pink-100 text-pink-700' },
-  MUSIC: { label: 'Music', color: 'bg-purple-100 text-purple-700' },
-  DANCE: { label: 'Dance', color: 'bg-orange-100 text-orange-700' },
-  SPORTS: { label: 'Sports', color: 'bg-green-100 text-green-700' },
-  ACADEMIC: { label: 'Academic', color: 'bg-blue-100 text-blue-700' },
-  OUTDOOR: { label: 'Outdoor', color: 'bg-teal-100 text-teal-700' },
-  INDOOR: { label: 'Indoor', color: 'bg-indigo-100 text-indigo-700' },
-  CRAFT: { label: 'Craft', color: 'bg-yellow-100 text-yellow-700' },
-  SCHEDULE: { label: 'Schedule', color: 'bg-emerald-100 text-emerald-700' },
+  ART: { label: 'Art', color: `${ACTIVITY_COLORS.ART?.bg || 'bg-pink-100'} ${ACTIVITY_COLORS.ART?.text || 'text-pink-700'}` },
+  MUSIC: { label: 'Music', color: `${ACTIVITY_COLORS.MUSIC?.bg || 'bg-purple-100'} ${ACTIVITY_COLORS.MUSIC?.text || 'text-purple-700'}` },
+  DANCE: { label: 'Dance', color: `${ACTIVITY_COLORS.DANCE?.bg || 'bg-orange-100'} ${ACTIVITY_COLORS.DANCE?.text || 'text-orange-700'}` },
+  SPORTS: { label: 'Sports', color: `${ACTIVITY_COLORS.SPORTS?.bg || 'bg-green-100'} ${ACTIVITY_COLORS.SPORTS?.text || 'text-green-700'}` },
+  ACADEMIC: { label: 'Academic', color: `${ACTIVITY_COLORS.OTHER?.bg || 'bg-blue-100'} ${ACTIVITY_COLORS.OTHER?.text || 'text-blue-700'}` },
+  OUTDOOR: { label: 'Outdoor', color: `${ACTIVITY_COLORS.OUTDOOR?.bg || 'bg-teal-100'} ${ACTIVITY_COLORS.OUTDOOR?.text || 'text-teal-700'}` },
+  INDOOR: { label: 'Indoor', color: `${ACTIVITY_COLORS.INDOOR?.bg || 'bg-indigo-100'} ${ACTIVITY_COLORS.INDOOR?.text || 'text-indigo-700'}` },
+  CRAFT: { label: 'Craft', color: `${ACTIVITY_COLORS.CRAFT?.bg || 'bg-yellow-100'} ${ACTIVITY_COLORS.CRAFT?.text || 'text-yellow-700'}` },
+  SCHEDULE: { label: 'Schedule', color: `${theme.selectedClass}` },
 };
 
 const SCHEDULE_ICONS: Record<string, string> = {
@@ -237,21 +239,21 @@ export default function TeacherDashboard() {
   return (
     <div className="space-y-6">
       {/* ── Welcome Section ── */}
-      <Card className="rounded-3xl border-0 bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg">
+      <Card className={`rounded-3xl border-0 bg-gradient-to-r ${theme.btnGradientClass} text-white shadow-lg`}>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">
                 {greeting}, {teacher.firstName}! 👋
               </h1>
-              <p className="text-emerald-100 mt-1">
+              <p className="text-white/80 mt-1">
                 {assignedClass
                   ? `Class: ${assignedClass.name} | ${assignedClass.studentCount} Students | ${assignedClass.program.name}`
                   : 'No class assigned yet'}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-emerald-100">
+              <p className="text-sm text-white/80">
                 {new Date().toLocaleDateString('en-IN', {
                   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                 })}
@@ -323,7 +325,7 @@ export default function TeacherDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-600" />
+                <Clock className="h-4 w-4 text-portal-600" />
                 Today&apos;s Schedule
               </CardTitle>
               <Badge variant="outline" className="text-[10px]">
@@ -342,7 +344,7 @@ export default function TeacherDashboard() {
                       key={item.id || idx}
                       className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
                         isCurrent
-                          ? 'bg-emerald-50 border border-emerald-200 shadow-sm'
+                          ? `${theme.selectedClass} border border-emerald-200 shadow-sm`
                           : isPast
                           ? 'opacity-50'
                           : 'hover:bg-gray-50'
@@ -350,7 +352,7 @@ export default function TeacherDashboard() {
                     >
                       <span className="text-lg shrink-0">{getScheduleIcon(item.subject)}</span>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isCurrent ? 'text-emerald-700' : ''}`}>
+                        <p className={`text-sm font-medium truncate ${isCurrent ? 'text-portal-700' : ''}`}>
                           {item.subject}
                         </p>
                         <p className="text-[10px] text-muted-foreground">
@@ -358,7 +360,7 @@ export default function TeacherDashboard() {
                         </p>
                       </div>
                       {isCurrent && (
-                        <Badge className="bg-emerald-500 text-white text-[9px] shrink-0">Now</Badge>
+                        <Badge className="bg-portal-600 text-white text-[9px] shrink-0">Now</Badge>
                       )}
                       {ACTIVITY_TYPE_CONFIG[item.type] && item.type !== 'SCHEDULE' && (
                         <Badge variant="outline" className={`text-[9px] shrink-0 ${ACTIVITY_TYPE_CONFIG[item.type]?.color}`}>
@@ -383,7 +385,7 @@ export default function TeacherDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-emerald-600" />
+                <CheckSquare className="h-4 w-4 text-portal-600" />
                 Attendance Quick View
               </CardTitle>
               <span className="text-xs text-muted-foreground">
@@ -398,9 +400,9 @@ export default function TeacherDashboard() {
                 <div className="flex items-center justify-center">
                   <div className="relative w-32 h-32">
                     <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="#f0f0f0" strokeWidth="10" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke={CHART_PALETTE.gridLight} strokeWidth="10" />
                       <circle
-                        cx="60" cy="60" r="50" fill="none" stroke="#10b981" strokeWidth="10"
+                        cx="60" cy="60" r="50" fill="none" stroke={ATTENDANCE_COLORS.PRESENT.hex} strokeWidth="10"
                         strokeDasharray={`${(attendance.present / Math.max(attendance.total, 1)) * 314} 314`}
                         strokeLinecap="round"
                       />
@@ -414,21 +416,21 @@ export default function TeacherDashboard() {
 
                 {/* Stats row */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-2 bg-emerald-50 rounded-xl">
-                    <p className="text-lg font-bold text-emerald-600">{attendance.present}</p>
+                  <div className={`text-center p-2 ${ATTENDANCE_COLORS.PRESENT.bg} rounded-xl`}>
+                    <p className={`text-lg font-bold ${ATTENDANCE_COLORS.PRESENT.text}`}>{attendance.present}</p>
                     <p className="text-[10px] text-emerald-700">Present</p>
                   </div>
-                  <div className="text-center p-2 bg-red-50 rounded-xl">
-                    <p className="text-lg font-bold text-red-600">{attendance.absent}</p>
+                  <div className={`text-center p-2 ${ATTENDANCE_COLORS.ABSENT.bg} rounded-xl`}>
+                    <p className={`text-lg font-bold ${ATTENDANCE_COLORS.ABSENT.text}`}>{attendance.absent}</p>
                     <p className="text-[10px] text-red-700">Absent</p>
                   </div>
-                  <div className="text-center p-2 bg-amber-50 rounded-xl">
-                    <p className="text-lg font-bold text-amber-600">{attendance.late}</p>
+                  <div className={`text-center p-2 ${ATTENDANCE_COLORS.LATE.bg} rounded-xl`}>
+                    <p className={`text-lg font-bold ${ATTENDANCE_COLORS.LATE.text}`}>{attendance.late}</p>
                     <p className="text-[10px] text-amber-700">Late</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-emerald-600 text-sm">
+                <div className="flex items-center gap-2 text-portal-600 text-sm">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>Attendance marked today</span>
                 </div>
@@ -441,7 +443,7 @@ export default function TeacherDashboard() {
                 <p className="text-sm text-muted-foreground">Attendance not yet marked</p>
                 <Button
                   onClick={() => router.push('/teacher/attendance')}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600"
+                  className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass}`}
                 >
                   <Zap className="h-4 w-4 mr-2" />
                   Mark Attendance Now
@@ -457,13 +459,13 @@ export default function TeacherDashboard() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Activity className="h-4 w-4 text-emerald-600" />
+              <Activity className="h-4 w-4 text-portal-600" />
               Recent Activities
             </CardTitle>
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs text-emerald-600 hover:text-emerald-700 rounded-xl"
+              className="text-xs text-portal-600 hover:text-portal-700 rounded-xl"
               onClick={() => router.push('/teacher/activities')}
             >
               View All <ArrowRight className="h-3 w-3 ml-1" />
@@ -504,12 +506,12 @@ export default function TeacherDashboard() {
       {/* ── Quick Actions Grid ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Mark Attendance', icon: CheckSquare, href: '/teacher/attendance', color: 'from-emerald-500 to-emerald-600' },
-          { label: 'Daily Update', icon: Sun, href: '/teacher/daily-updates', color: 'from-amber-500 to-orange-500' },
-          { label: 'Add Observation', icon: Eye, href: '/teacher/observations', color: 'from-blue-500 to-indigo-500' },
-          { label: 'Create Activity', icon: Palette, href: '/teacher/activities', color: 'from-pink-500 to-rose-500' },
-          { label: 'Update Growth', icon: TrendingUp, href: '/teacher/growth', color: 'from-violet-500 to-purple-500' },
-          { label: 'Apply Leave', icon: Calendar, href: '/teacher/schedule', color: 'from-teal-500 to-cyan-500' },
+          { label: 'Mark Attendance', icon: CheckSquare, href: '/teacher/attendance', color: `${theme.btnGradientClass}` },
+          { label: 'Daily Update', icon: Sun, href: '/teacher/daily-updates', color: `from-amber-500 to-orange-500` },
+          { label: 'Add Observation', icon: Eye, href: '/teacher/observations', color: `from-blue-500 to-indigo-500` },
+          { label: 'Create Activity', icon: Palette, href: '/teacher/activities', color: `from-pink-500 to-rose-500` },
+          { label: 'Update Growth', icon: TrendingUp, href: '/teacher/growth', color: `from-violet-500 to-purple-500` },
+          { label: 'Apply Leave', icon: Calendar, href: '/teacher/schedule', color: `from-teal-500 to-cyan-500` },
         ].map((action) => (
           <Card
             key={action.label}

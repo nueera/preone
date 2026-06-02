@@ -41,6 +41,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 interface ScheduleEntry {
@@ -100,8 +102,8 @@ interface LeavesData {
 
 // ── Subject Color Config ──
 const SUBJECT_COLORS: Record<string, { bg: string; text: string; border: string; emoji: string }> = {
-  circle:    { bg: 'bg-emerald-50',  text: 'text-emerald-700',  border: 'border-emerald-200',  emoji: '🎒' },
-  morning:   { bg: 'bg-emerald-50',  text: 'text-emerald-700',  border: 'border-emerald-200',  emoji: '🎒' },
+  circle:    { bg: 'bg-portal-50',  text: 'text-portal-700',  border: 'border-portal-200',  emoji: '🎒' },
+  morning:   { bg: 'bg-portal-50',  text: 'text-portal-700',  border: 'border-portal-200',  emoji: '🎒' },
   language:  { bg: 'bg-blue-50',     text: 'text-blue-700',     border: 'border-blue-200',     emoji: '📚' },
   lang:      { bg: 'bg-blue-50',     text: 'text-blue-700',     border: 'border-blue-200',     emoji: '📚' },
   literacy:  { bg: 'bg-blue-50',     text: 'text-blue-700',     border: 'border-blue-200',     emoji: '📚' },
@@ -149,7 +151,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 const BALANCE_COLORS: Record<string, { bar: string; bg: string; text: string; accent: string }> = {
   casual:  { bar: 'bg-blue-500',  bg: 'bg-blue-50',  text: 'text-blue-700',  accent: 'text-blue-600' },
   sick:    { bar: 'bg-red-500',   bg: 'bg-red-50',   text: 'text-red-700',   accent: 'text-red-600' },
-  earned:  { bar: 'bg-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700', accent: 'text-emerald-600' },
+  earned:  { bar: 'bg-portal-500', bg: 'bg-portal-50', text: 'text-portal-700', accent: 'text-portal-600' },
 };
 
 // ── Helpers ──
@@ -388,7 +390,7 @@ function ScheduleContent() {
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Schedule</h3>
         <p className="text-gray-500 mb-4">{scheduleError}</p>
-        <Button onClick={fetchSchedule} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl">Retry</Button>
+        <Button onClick={fetchSchedule} className="bg-portal-600 hover:bg-portal-700 rounded-xl">Retry</Button>
       </div>
     );
   }
@@ -403,7 +405,7 @@ function ScheduleContent() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-emerald-500" />
+                <Calendar className="h-5 w-5 text-portal-500" />
                 Schedule & Leave
               </h1>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -412,7 +414,7 @@ function ScheduleContent() {
             </div>
             {activeTab === 'leaves' && (
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm"
+                className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm"
                 onClick={() => setShowApplyDialog(true)}
               >
                 <Plus className="h-4 w-4 mr-1" /> Apply Leave
@@ -461,12 +463,12 @@ function ScheduleContent() {
                           <th
                             key={day}
                             className={`py-2.5 px-2 text-center font-medium border-b border-gray-200 min-w-[90px] ${
-                              day === today ? 'bg-emerald-50 text-emerald-700' : 'text-gray-500'
+                              day === today ? 'bg-portal-50 text-portal-700' : 'text-gray-500'
                             }`}
                           >
                             <div>{DAY_SHORT[day]}</div>
                             {day === today && (
-                              <div className="text-[9px] font-normal text-emerald-500">Today</div>
+                              <div className="text-[9px] font-normal text-portal-500">Today</div>
                             )}
                           </th>
                         ))}
@@ -490,17 +492,17 @@ function ScheduleContent() {
                           <tr
                             key={time}
                             className={`${
-                              isCurrentTimeRow ? 'bg-emerald-50/50' : ''
+                              isCurrentTimeRow ? 'bg-portal-50/50' : ''
                             } hover:bg-gray-50/50`}
                           >
                             <td
                               className={`sticky left-0 z-10 py-1.5 px-3 text-[10px] font-mono text-gray-500 border-r border-b border-gray-100 bg-white ${
-                                isCurrentTimeRow ? 'bg-emerald-50' : ''
+                                isCurrentTimeRow ? 'bg-portal-50' : ''
                               }`}
                             >
                               {time}
                               {isCurrentTimeRow && (
-                                <div className="absolute left-0 w-full h-0.5 bg-emerald-500 -ml-3 mt-1" />
+                                <div className="absolute left-0 w-full h-0.5 bg-portal-500 -ml-3 mt-1" />
                               )}
                             </td>
                             {scheduleGrid.workingDays.map((day) => {
@@ -522,7 +524,7 @@ function ScheduleContent() {
                                 <td
                                   key={`${day}-${time}`}
                                   className={`py-1 px-1.5 border-b border-gray-50 ${
-                                    day === today ? 'bg-emerald-50/30' : ''
+                                    day === today ? 'bg-portal-50/30' : ''
                                   }`}
                                 >
                                   <div
@@ -553,7 +555,7 @@ function ScheduleContent() {
             <Card className="border-0 shadow-md mt-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-emerald-600" />
+                  <Clock className="h-4 w-4 text-portal-600" />
                   Today&apos;s Schedule
                 </CardTitle>
               </CardHeader>
@@ -598,7 +600,7 @@ function ScheduleContent() {
               <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Leaves</h3>
               <p className="text-gray-500 mb-4">{leavesError}</p>
-              <Button onClick={fetchLeaves} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl">Retry</Button>
+              <Button onClick={fetchLeaves} className="bg-portal-600 hover:bg-portal-700 rounded-xl">Retry</Button>
             </div>
           ) : leavesData ? (
             <>
@@ -642,11 +644,11 @@ function ScheduleContent() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-emerald-600" />
+                      <Clock className="h-4 w-4 text-portal-600" />
                       Leave History
                     </CardTitle>
                     <Button
-                      className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-xs h-8"
+                      className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs h-8"
                       onClick={() => setShowApplyDialog(true)}
                     >
                       <Plus className="h-3.5 w-3.5 mr-1" /> Apply Leave
@@ -660,7 +662,7 @@ function ScheduleContent() {
                       <h3 className="text-sm font-semibold text-gray-900 mb-1">No Leave History</h3>
                       <p className="text-xs text-gray-500 mb-4">You haven&apos;t applied for any leaves yet</p>
                       <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-xs"
+                        className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs"
                         onClick={() => setShowApplyDialog(true)}
                       >
                         <Plus className="h-3.5 w-3.5 mr-1" /> Apply Leave
@@ -727,7 +729,7 @@ function ScheduleContent() {
                   {leavesData.leaves.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-500">
                       <span>Total: <strong className="text-gray-700">{leavesData.summary.totalLeaves}</strong></span>
-                      <span>Approved: <strong className="text-emerald-600">{leavesData.summary.approvedCount}</strong></span>
+                      <span>Approved: <strong className="text-portal-600">{leavesData.summary.approvedCount}</strong></span>
                       <span>Pending: <strong className="text-amber-600">{leavesData.summary.pendingCount}</strong></span>
                       <span>Rejected: <strong className="text-red-600">{leavesData.summary.rejectedCount}</strong></span>
                       <span>Days Used: <strong className="text-gray-700">{leavesData.summary.totalDaysUsed}</strong></span>
@@ -747,7 +749,7 @@ function ScheduleContent() {
         <DialogContent className="sm:max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-emerald-600" />
+              <Plus className="h-5 w-5 text-portal-600" />
               Apply for Leave
             </DialogTitle>
             <DialogDescription>
@@ -860,7 +862,7 @@ function ScheduleContent() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
               onClick={handleApplyLeave}
               disabled={applying || !applyForm.leaveType || !applyForm.startDate || !applyForm.endDate || applyForm.reason.trim().length < 10}
             >

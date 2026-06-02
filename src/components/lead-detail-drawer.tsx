@@ -49,6 +49,9 @@ import {
 } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES, CRM_COLORS, PRIORITY_COLORS as THEME_PRIORITY_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.admin;
 import {
   Dialog,
   DialogContent,
@@ -97,20 +100,20 @@ interface LeadDetailDrawerProps {
   onLeadUpdated: () => void;
 }
 
-// ── Constants ──
+// ── Constants — using centralized theme tokens ──
 const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string }> = {
-  NEW: { label: 'New', color: '#9ca3af', cardBg: 'bg-gray-50' },
-  CONTACTED: { label: 'Contacted', color: '#3b82f6', cardBg: 'bg-blue-50' },
-  VISITED: { label: 'Visited', color: '#8b5cf6', cardBg: 'bg-purple-50' },
-  APPLIED: { label: 'Applied', color: '#f59e0b', cardBg: 'bg-yellow-50' },
-  ENROLLED: { label: 'Enrolled', color: '#10b981', cardBg: 'bg-green-50' },
-  LOST: { label: 'Lost', color: '#ef4444', cardBg: 'bg-red-50' },
+  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af', cardBg: CRM_COLORS.NEW?.bg ?? 'bg-gray-50' },
+  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#3b82f6', cardBg: CRM_COLORS.CONTACTED?.bg ?? 'bg-blue-50' },
+  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#8b5cf6', cardBg: 'bg-purple-50' },
+  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f59e0b', cardBg: 'bg-yellow-50' },
+  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED?.hex ?? '#10b981', cardBg: CRM_COLORS.ENROLLED?.bg ?? 'bg-green-50' },
+  LOST: { label: 'Lost', color: CRM_COLORS.LOST?.hex ?? '#9ca3af', cardBg: 'bg-red-50' },
 };
 
 const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50 border-red-200' },
-  NORMAL: { label: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
+  HIGH: { label: 'High', color: THEME_PRIORITY_COLORS.HIGH?.text ?? 'text-red-600', bg: 'bg-red-50 border-red-200' },
+  NORMAL: { label: 'Medium', color: THEME_PRIORITY_COLORS.MEDIUM?.text ?? 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200' },
+  LOW: { label: 'Low', color: THEME_PRIORITY_COLORS.LOW?.text ?? 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -829,7 +832,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                           className={cn(
                             'rounded-full px-2.5 py-1 text-xs font-medium border transition-colors',
                             editForm.programInterest.includes(program)
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
+                              ? theme.selectedClass
                               : 'bg-white text-gray-400 border-gray-200'
                           )}
                         >
@@ -1024,7 +1027,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                                 'text-[10px] h-4',
                                 fu.outcome === 'Enrolled' ? 'border-green-200 text-green-700 bg-green-50' :
                                 fu.outcome === 'Not Interested' ? 'border-red-200 text-red-700 bg-red-50' :
-                                fu.outcome === 'Visited' ? 'border-purple-200 text-purple-700 bg-purple-50' :
+                                fu.outcome === 'Visited' ? `border-purple-200 ${theme.selectedClass}` :
                                 ''
                               )}
                             >

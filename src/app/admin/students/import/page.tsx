@@ -22,6 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ParsedRow {
@@ -237,7 +239,7 @@ export default function ImportStudentsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-purple-500" />
+            <FileSpreadsheet className="h-5 w-5 text-portal-500" />
             Upload CSV File
           </CardTitle>
         </CardHeader>
@@ -253,7 +255,7 @@ export default function ImportStudentsPage() {
             onDrop={handleDrop}
             className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
               dragOver
-                ? 'border-purple-400 bg-purple-50'
+                ? 'border-portal-400 bg-portal-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >

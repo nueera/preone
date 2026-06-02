@@ -41,6 +41,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { AddActivityDialog } from '@/components/add-activity-dialog';
 import { ActivityDetailDialog } from '@/components/activity-detail-dialog';
+import { PORTAL_THEMES, ACTIVITY_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ActivityClass {
@@ -73,25 +75,25 @@ interface Activity {
 
 // ── Constants ──
 const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  ART: { label: 'Art', color: 'text-pink-700', bg: 'bg-pink-50 border-pink-200' },
-  MUSIC: { label: 'Music', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
-  DANCE: { label: 'Dance', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
-  SPORTS: { label: 'Sports', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
+  ART: { label: 'Art', color: ACTIVITY_COLORS.ART.text, bg: `${ACTIVITY_COLORS.ART.bg} border-pink-200` },
+  MUSIC: { label: 'Music', color: ACTIVITY_COLORS.MUSIC.text, bg: `${ACTIVITY_COLORS.MUSIC.bg} border-purple-200` },
+  DANCE: { label: 'Dance', color: ACTIVITY_COLORS.DANCE.text, bg: `${ACTIVITY_COLORS.DANCE.bg} border-orange-200` },
+  SPORTS: { label: 'Sports', color: ACTIVITY_COLORS.SPORTS.text, bg: `${ACTIVITY_COLORS.SPORTS.bg} border-green-200` },
   ACADEMIC: { label: 'Academic', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
-  OUTDOOR: { label: 'Outdoor', color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
-  INDOOR: { label: 'Indoor', color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },
-  CRAFT: { label: 'Craft', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200' },
+  OUTDOOR: { label: 'Outdoor', color: ACTIVITY_COLORS.OUTDOOR.text, bg: `${ACTIVITY_COLORS.OUTDOOR.bg} border-teal-200` },
+  INDOOR: { label: 'Indoor', color: ACTIVITY_COLORS.INDOOR.text, bg: `${ACTIVITY_COLORS.INDOOR.bg} border-indigo-200` },
+  CRAFT: { label: 'Craft', color: ACTIVITY_COLORS.CRAFT.text, bg: `${ACTIVITY_COLORS.CRAFT.bg} border-yellow-200` },
 };
 
 const TYPE_DOT_COLORS: Record<string, string> = {
-  ART: '#ec4899',
-  MUSIC: '#8b5cf6',
-  DANCE: '#f97316',
-  SPORTS: '#22c55e',
-  ACADEMIC: '#3b82f6',
-  OUTDOOR: '#14b8a6',
-  INDOOR: '#6366f1',
-  CRAFT: '#eab308',
+  ART: ACTIVITY_COLORS.ART.hex,
+  MUSIC: ACTIVITY_COLORS.MUSIC.hex,
+  DANCE: ACTIVITY_COLORS.DANCE.hex,
+  SPORTS: ACTIVITY_COLORS.SPORTS.hex,
+  ACADEMIC: ACTIVITY_COLORS.ACADEMIC.hex,
+  OUTDOOR: ACTIVITY_COLORS.OUTDOOR.hex,
+  INDOOR: ACTIVITY_COLORS.INDOOR.hex,
+  CRAFT: ACTIVITY_COLORS.CRAFT.hex,
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -251,14 +253,14 @@ export default function ActivitiesPage() {
               <div
                 key={dateKey}
                 className={cn(
-                  'min-h-[100px] border-b border-r p-1 cursor-pointer hover:bg-purple-50/30 transition-colors',
-                  isToday && 'bg-purple-50/50'
+                  'min-h-[100px] border-b border-r p-1 cursor-pointer hover:bg-portal-50/30 transition-colors',
+                  isToday && 'bg-portal-50/50'
                 )}
                 onClick={() => handleDateClick(day)}
               >
                 <div className={cn(
                   'text-xs font-medium mb-1 h-6 w-6 flex items-center justify-center rounded-full',
-                  isToday ? 'bg-purple-600 text-white' : 'text-gray-600'
+                  isToday ? 'bg-portal-600 text-white' : 'text-gray-600'
                 )}>
                   {format(day, 'd')}
                 </div>
@@ -269,7 +271,7 @@ export default function ActivitiesPage() {
                       <div
                         key={activity.id}
                         className="text-[10px] px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80"
-                        style={{ backgroundColor: (TYPE_DOT_COLORS[activity.type] || '#9ca3af') + '20', color: TYPE_DOT_COLORS[activity.type] }}
+                        style={{ backgroundColor: (TYPE_DOT_COLORS[activity.type] || ACTIVITY_COLORS.OTHER.hex) + '20', color: TYPE_DOT_COLORS[activity.type] }}
                         onClick={(e) => { e.stopPropagation(); handleActivityClick(activity); }}
                       >
                         {activity.title}
@@ -294,7 +296,7 @@ export default function ActivitiesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Palette className="h-6 w-6 text-purple-600" />
+            <Palette className="h-6 w-6 text-portal-600" />
             Activities
           </h1>
           <p className="text-sm text-gray-500 mt-1">Manage activities, events, and programs for your preschool</p>
@@ -462,7 +464,7 @@ export default function ActivitiesPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" className="h-7 text-xs text-purple-600" onClick={(e) => { e.stopPropagation(); handleActivityClick(activity); }}>
+                        <Button variant="ghost" size="sm" className="h-7 text-xs text-portal-600" onClick={(e) => { e.stopPropagation(); handleActivityClick(activity); }}>
                           <Eye className="h-3.5 w-3.5" />
                         </Button>
                       </TableCell>

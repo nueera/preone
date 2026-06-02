@@ -49,18 +49,20 @@ import {
   type ChatThreadData,
   type ChatMessageData,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, COMMUNICATION_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS — Badge Configs
 // ============================================================
 
 const TYPE_BADGES: Record<string, { label: string; class: string }> = {
-  GENERAL: { label: 'General', class: 'bg-sky-100 text-sky-700' },
+  GENERAL: { label: 'General', class: `${COMMUNICATION_COLORS.ANNOUNCEMENT?.bg ?? 'bg-sky-100'} ${COMMUNICATION_COLORS.ANNOUNCEMENT?.text ?? 'text-sky-700'}` },
   HOLIDAY: { label: 'Holiday', class: 'bg-purple-100 text-purple-700' },
-  EVENT:   { label: 'Event',   class: 'bg-emerald-100 text-emerald-700' },
-  URGENT:  { label: 'Urgent',  class: 'bg-red-100 text-red-700' },
+  EVENT:   { label: 'Event',   class: `${COMMUNICATION_COLORS.MESSAGE?.bg ?? 'bg-emerald-100'} ${COMMUNICATION_COLORS.MESSAGE?.text ?? 'text-emerald-700'}` },
+  URGENT:  { label: 'Urgent',  class: `${COMMUNICATION_COLORS.ALERT?.bg ?? 'bg-red-100'} ${COMMUNICATION_COLORS.ALERT?.text ?? 'text-red-700'}` },
   ACADEMIC:{ label: 'Academic',class: 'bg-blue-100 text-blue-700' },
-  FEE:     { label: 'Fee',     class: 'bg-amber-100 text-amber-700' },
+  FEE:     { label: 'Fee',     class: `${COMMUNICATION_COLORS.REMINDER?.bg ?? 'bg-amber-100'} ${COMMUNICATION_COLORS.REMINDER?.text ?? 'text-amber-700'}` },
 };
 
 const PRIORITY_BADGES: Record<string, { label: string; class: string }> = {
@@ -221,7 +223,7 @@ function CommunicationContent() {
   return (
     <div className="space-y-6">
       {/* ── Page Header ── */}
-      <Card className="rounded-3xl border-0 bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-lg">
+      <Card className={`rounded-3xl border-0 bg-gradient-to-r ${theme.btnGradientClass} text-white shadow-lg`}>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -290,9 +292,9 @@ function CommunicationContent() {
           size="sm"
           className={`rounded-xl text-xs ${
             activeTab === 'announcements'
-              ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:from-sky-600 hover:to-blue-600 shadow-sm'
+              ? `bg-gradient-to-r ${theme.btnGradientClass} text-white hover:${theme.btnGradientHoverClass} shadow-sm`
               : 'hover:bg-sky-50 hover:text-sky-700'
-          }`}
+          }}`}
           onClick={() => handleTabSwitch('announcements')}
         >
           <Megaphone className="h-3.5 w-3.5 mr-1.5" />
@@ -303,9 +305,9 @@ function CommunicationContent() {
           size="sm"
           className={`rounded-xl text-xs ${
             activeTab === 'chat'
-              ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:from-sky-600 hover:to-blue-600 shadow-sm'
+              ? `bg-gradient-to-r ${theme.btnGradientClass} text-white hover:${theme.btnGradientHoverClass} shadow-sm`
               : 'hover:bg-sky-50 hover:text-sky-700'
-          }`}
+          }}`}
           onClick={() => handleTabSwitch('chat')}
         >
           <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
@@ -980,7 +982,7 @@ function ChatWindow({
           />
           <Button
             size="icon"
-            className="h-10 w-10 rounded-xl bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white flex-shrink-0"
+            className={`h-10 w-10 rounded-xl bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white flex-shrink-0`}
             onClick={handleSend}
             disabled={!messageInput.trim() || sendMessageMutation.isPending}
           >
@@ -1038,7 +1040,7 @@ function ChatMessageBubble({
 function ChatEmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center">
+      <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${theme.cardGradientClass} flex items-center justify-center`}>
         <MessageCircle className="h-10 w-10 text-sky-400" />
       </div>
       <div className="text-center space-y-2">

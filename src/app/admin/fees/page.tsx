@@ -66,6 +66,8 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES, FEE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface FeeStructure {
@@ -113,10 +115,10 @@ interface StudentOption {
 }
 
 const INVOICE_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  PARTIAL: 'bg-sky-50 text-sky-700 border-sky-200',
-  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  OVERDUE: 'bg-red-50 text-red-700 border-red-200',
+  PENDING: `${FEE_COLORS.PENDING.bg} ${FEE_COLORS.PENDING.text} border-amber-200`,
+  PARTIAL: `${FEE_COLORS.PARTIAL.bg} ${FEE_COLORS.PARTIAL.text} border-yellow-200`,
+  PAID: `${FEE_COLORS.PAID.bg} ${FEE_COLORS.PAID.text} border-emerald-200`,
+  OVERDUE: `${FEE_COLORS.OVERDUE.bg} ${FEE_COLORS.OVERDUE.text} border-red-200`,
   CANCELLED: 'bg-gray-50 text-gray-600 border-gray-200',
 };
 
@@ -428,9 +430,9 @@ export default function FeesPage() {
 
   // ── Pie chart data ──
   const pieData = [
-    { name: 'Collected', value: overview.totalCollected, color: '#10b981' },
-    { name: 'Pending', value: overview.totalPending - (overview.statusBreakdown?.OVERDUE?.amount || 0), color: '#f59e0b' },
-    { name: 'Overdue', value: overview.statusBreakdown?.OVERDUE?.amount || 0, color: '#ef4444' },
+    { name: 'Collected', value: overview.totalCollected, color: FEE_COLORS.PAID.hex },
+    { name: 'Pending', value: overview.totalPending - (overview.statusBreakdown?.OVERDUE?.amount || 0), color: FEE_COLORS.PENDING.hex },
+    { name: 'Overdue', value: overview.statusBreakdown?.OVERDUE?.amount || 0, color: FEE_COLORS.OVERDUE.hex },
   ].filter(d => d.value > 0);
 
   const totalPages = Math.ceil(invoiceTotal / limit);
@@ -479,7 +481,7 @@ export default function FeesPage() {
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">Collection Rate</p>
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold text-purple-700">{overview.collectionRate}%</p>
+              <p className="text-2xl font-bold text-portal-700">{overview.collectionRate}%</p>
               <TrendingUp className="h-5 w-5 text-emerald-500" />
             </div>
           </CardContent>
@@ -736,14 +738,14 @@ export default function FeesPage() {
               <button
                 onClick={() => setGenerateMode('single')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'single' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-white text-gray-500 border-gray-200')}
+                  generateMode === 'single' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-white text-gray-500 border-gray-200')}
               >
                 Single Invoice
               </button>
               <button
                 onClick={() => setGenerateMode('bulk')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'bulk' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-white text-gray-500 border-gray-200')}
+                  generateMode === 'bulk' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-white text-gray-500 border-gray-200')}
               >
                 Bulk Invoice
               </button>
@@ -767,7 +769,7 @@ export default function FeesPage() {
                       {students.slice(0, 8).map((s) => (
                         <button
                           key={s.id}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-purple-50 flex items-center justify-between"
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-portal-50 flex items-center justify-between"
                           onClick={() => {
                             setGenerateForm((p) => ({ ...p, studentId: s.id, searchStudent: `${s.firstName} ${s.lastName}` }));
                             setStudents([]);

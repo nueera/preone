@@ -24,7 +24,7 @@ export default function TeacherLayout({
           <TeacherSidebar />
           <div className="flex flex-1 flex-col min-h-screen">
             <TeacherHeader />
-            <main className="flex-1 bg-gray-50 p-6 overflow-auto dark:bg-gray-950">
+            <main className="flex-1 bg-background p-6 overflow-auto" data-portal="teacher">
               {children}
             </main>
           </div>

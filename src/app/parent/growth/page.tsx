@@ -43,18 +43,20 @@ import {
   useParentGrowth,
   type EnhancedGrowthResponse,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, GROWTH_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS
 // ============================================================
 
 const DIMENSIONS = [
-  { key: 'creativity', label: 'Creativity', color: '#a855f7', bgLight: 'bg-purple-100', textColor: 'text-purple-600' },
-  { key: 'communication', label: 'Communication', color: '#3b82f6', bgLight: 'bg-blue-100', textColor: 'text-blue-600' },
-  { key: 'social', label: 'Social', color: '#10b981', bgLight: 'bg-emerald-100', textColor: 'text-emerald-600' },
-  { key: 'confidence', label: 'Confidence', color: '#f59e0b', bgLight: 'bg-amber-100', textColor: 'text-amber-600' },
-  { key: 'cognitive', label: 'Cognitive', color: '#0ea5e9', bgLight: 'bg-sky-100', textColor: 'text-sky-600' },
-  { key: 'physical', label: 'Physical', color: '#f43f5e', bgLight: 'bg-rose-100', textColor: 'text-rose-600' },
+  { key: 'creativity', label: 'Creativity', color: GROWTH_COLORS.creativity.hex, bgLight: GROWTH_COLORS.creativity.bg, textColor: GROWTH_COLORS.creativity.text },
+  { key: 'communication', label: 'Communication', color: GROWTH_COLORS.communication.hex, bgLight: GROWTH_COLORS.communication.bg, textColor: GROWTH_COLORS.communication.text },
+  { key: 'social', label: 'Social', color: GROWTH_COLORS.social.hex, bgLight: GROWTH_COLORS.social.bg, textColor: GROWTH_COLORS.social.text },
+  { key: 'confidence', label: 'Confidence', color: CHART_PALETTE.series[3], bgLight: 'bg-amber-100', textColor: 'text-amber-600' },
+  { key: 'cognitive', label: 'Cognitive', color: GROWTH_COLORS.cognitive.hex, bgLight: GROWTH_COLORS.cognitive.bg, textColor: GROWTH_COLORS.cognitive.text },
+  { key: 'physical', label: 'Physical', color: GROWTH_COLORS.physical.hex, bgLight: GROWTH_COLORS.physical.bg, textColor: GROWTH_COLORS.physical.text },
 ] as const;
 
 const PERIODS = [
@@ -65,8 +67,8 @@ const PERIODS = [
   { key: 'ANNUAL', label: 'Annual' },
 ] as const;
 
-const CHILD_RADAR_COLOR = '#0ea5e9';
-const CLASS_AVG_COLOR = '#9ca3af';
+const CHILD_RADAR_COLOR = CHART_PALETTE.series[1];
+const CLASS_AVG_COLOR = CHART_PALETTE.axisLight;
 
 const CATEGORY_ICONS: Record<string, string> = {
   Physical: '🏃',
@@ -185,15 +187,15 @@ function GrowthRadarChart({
         <div className="h-[340px] sm:h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
-              <PolarGrid stroke="#e5e7eb" />
+              <PolarGrid stroke={CHART_PALETTE.grid} />
               <PolarAngleAxis
                 dataKey="dimension"
-                tick={{ fontSize: 11, fill: '#6b7280' }}
+                tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
               />
               <PolarRadiusAxis
                 angle={30}
                 domain={[0, 100]}
-                tick={{ fontSize: 9, fill: '#9ca3af' }}
+                tick={{ fontSize: 9, fill: CHART_PALETTE.axisLight }}
                 tickCount={6}
               />
               <Radar
@@ -224,7 +226,7 @@ function GrowthRadarChart({
               <RechartsTooltip
                 contentStyle={{
                   borderRadius: '12px',
-                  border: '1px solid #e5e7eb',
+                  border: `1px solid ${CHART_PALETTE.grid}`,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   fontSize: '12px',
                 }}
@@ -398,21 +400,21 @@ function GrowthTrendChart({
         <div className="h-[300px] sm:h-[340px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.grid} />
               <XAxis
                 dataKey="period"
-                tick={{ fontSize: 11, fill: '#6b7280' }}
-                axisLine={{ stroke: '#d1d5db' }}
+                tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
+                axisLine={{ stroke: CHART_PALETTE.grid }}
               />
               <YAxis
                 domain={[0, 100]}
-                tick={{ fontSize: 11, fill: '#6b7280' }}
-                axisLine={{ stroke: '#d1d5db' }}
+                tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
+                axisLine={{ stroke: CHART_PALETTE.grid }}
               />
               <RechartsTooltip
                 contentStyle={{
                   borderRadius: '12px',
-                  border: '1px solid #e5e7eb',
+                  border: `1px solid ${CHART_PALETTE.grid}`,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   fontSize: '12px',
                 }}
@@ -437,9 +439,9 @@ function GrowthTrendChart({
                   type="monotone"
                   dataKey="overall"
                   name="Overall"
-                  stroke="#0ea5e9"
+                  stroke={CHART_PALETTE.series[1]}
                   strokeWidth={3}
-                  dot={{ r: 4, fill: '#0ea5e9', stroke: '#fff', strokeWidth: 2 }}
+                  dot={{ r: 4, fill: CHART_PALETTE.series[1], stroke: '#fff', strokeWidth: 2 }}
                   activeDot={{ r: 6 }}
                 />
               )}

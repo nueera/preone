@@ -40,6 +40,8 @@ import {
   useParentAttendance,
   type AttendanceRecord,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, ATTENDANCE_COLORS, FEE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS
@@ -83,25 +85,16 @@ function getStatusIcon(status: string): string {
 }
 
 function getStatusBg(status: string): string {
-  switch (status) {
-    case 'PRESENT': return 'bg-emerald-100 text-emerald-700';
-    case 'ABSENT': return 'bg-red-100 text-red-700';
-    case 'LATE': return 'bg-amber-100 text-amber-700';
-    default: return 'bg-gray-100 text-gray-500';
-  }
+  const colors = ATTENDANCE_COLORS[status];
+  if (colors) return `${colors.bg} ${colors.text}`;
+  return 'bg-gray-100 text-gray-500';
 }
 
 function getStatusBadge(status: string) {
-  switch (status) {
-    case 'PRESENT':
-      return <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">✅ Present</Badge>;
-    case 'ABSENT':
-      return <Badge className="bg-red-100 text-red-700 border-red-200 text-[10px]">❌ Absent</Badge>;
-    case 'LATE':
-      return <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">⏰ Late</Badge>;
-    default:
-      return <Badge variant="outline" className="text-[10px]">{status}</Badge>;
-  }
+  const colors = ATTENDANCE_COLORS[status];
+  const icons: Record<string, string> = { PRESENT: '✅', ABSENT: '❌', LATE: '⏰' };
+  if (colors) return <Badge className={`${colors.bg} ${colors.text} border-emerald-200 text-[10px]`}>{icons[status] || '•'} {status.charAt(0) + status.slice(1).toLowerCase()}</Badge>;
+  return <Badge variant="outline" className="text-[10px]">{status}</Badge>;
 }
 
 function getRateColor(rate: number): string {
@@ -321,13 +314,13 @@ function AttendanceCalendar({
         {/* Legend */}
         <div className="flex items-center gap-4 flex-wrap pt-2">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="w-4 h-4 rounded bg-emerald-100" /> Present
+            <div className={`w-4 h-4 rounded ${ATTENDANCE_COLORS.PRESENT?.bg || 'bg-emerald-100'}`} /> Present
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="w-4 h-4 rounded bg-red-100" /> Absent
+            <div className={`w-4 h-4 rounded ${ATTENDANCE_COLORS.ABSENT?.bg || 'bg-red-100'}`} /> Absent
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="w-4 h-4 rounded bg-amber-100" /> Late
+            <div className={`w-4 h-4 rounded ${ATTENDANCE_COLORS.LATE?.bg || 'bg-amber-100'}`} /> Late
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <div className="w-4 h-4 rounded bg-gray-50 border border-gray-100" /> No Data
@@ -356,22 +349,22 @@ function AttendanceTrendChart({ trend }: { trend: Array<{ month: string; rate: n
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.grid} />
                 <XAxis
                   dataKey="month"
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#d1d5db' }}
+                  tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
+                  axisLine={{ stroke: CHART_PALETTE.grid }}
                 />
                 <YAxis
                   domain={[0, 100]}
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  axisLine={{ stroke: '#d1d5db' }}
+                  tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
+                  axisLine={{ stroke: CHART_PALETTE.grid }}
                   tickFormatter={(v: number) => `${v}%`}
                 />
                 <RechartsTooltip
                   contentStyle={{
                     borderRadius: '12px',
-                    border: '1px solid #e5e7eb',
+                    border: `1px solid ${CHART_PALETTE.grid}`,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     fontSize: '12px',
                   }}
@@ -379,22 +372,22 @@ function AttendanceTrendChart({ trend }: { trend: Array<{ month: string; rate: n
                 />
                 <ReferenceLine
                   y={75}
-                  stroke="#ef4444"
+                    stroke={FEE_COLORS.OVERDUE.hex}
                   strokeDasharray="5 5"
                   label={{
                     value: 'Min 75%',
                     position: 'right',
-                    fill: '#ef4444',
+                    fill: FEE_COLORS.OVERDUE.hex,
                     fontSize: 10,
                   }}
                 />
                 <Line
                   type="monotone"
                   dataKey="rate"
-                  stroke="#0ea5e9"
+                  stroke={CHART_PALETTE.series[1]}
                   strokeWidth={2.5}
-                  dot={{ fill: '#0ea5e9', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: '#0ea5e9', strokeWidth: 2, fill: '#fff' }}
+                  dot={{ fill: CHART_PALETTE.series[1], strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: CHART_PALETTE.series[1], strokeWidth: 2, fill: '#fff' }}
                 />
               </LineChart>
             </ResponsiveContainer>

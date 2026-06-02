@@ -39,6 +39,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { PORTAL_THEMES, ATTENDANCE_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 interface GrowthScore {
@@ -283,7 +285,7 @@ export default function MyClassPage() {
         <p className="text-gray-500 mb-4">{error}</p>
         <Button
           onClick={() => window.location.reload()}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl`}
         >
           Retry
         </Button>
@@ -312,10 +314,7 @@ export default function MyClassPage() {
       <Card className="overflow-hidden border-0 shadow-md">
         {/* Banner gradient */}
         <div
-          className="relative h-32"
-          style={{
-            background: 'linear-gradient(135deg, #059669 0%, #0d9488 50%, #0ea5e9 100%)',
-          }}
+          className="relative h-32 bg-portal-gradient"
         >
           {/* Placeholder pattern for class photo/banner */}
           <div className="absolute inset-0 opacity-10">
@@ -335,7 +334,7 @@ export default function MyClassPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Badge
                 variant="secondary"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl"
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm ${theme.selectedClass} border border-emerald-200 rounded-xl`}
               >
                 <Users className="h-3.5 w-3.5" />
                 {students.length} Students
@@ -383,7 +382,7 @@ export default function MyClassPage() {
               onClick={() => setViewMode('grid')}
               className={`rounded-none px-3 ${
                 viewMode === 'grid'
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  ? 'bg-portal-600 hover:bg-portal-700 text-white'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -395,7 +394,7 @@ export default function MyClassPage() {
               onClick={() => setViewMode('list')}
               className={`rounded-none px-3 ${
                 viewMode === 'list'
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  ? 'bg-portal-600 hover:bg-portal-700 text-white'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -509,11 +508,11 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
       <CardContent className="p-5">
         {/* Avatar + Name */}
         <div className="flex flex-col items-center text-center">
-          <Avatar className="h-16 w-16 mb-3 ring-2 ring-emerald-100">
+          <Avatar className="h-16 w-16 mb-3 ring-2 ring-portal-100">
             {student.photo ? (
               <AvatarImage src={student.photo} alt={student.firstName} />
             ) : (
-              <AvatarFallback className="bg-emerald-50 text-emerald-700 text-lg font-semibold">
+              <AvatarFallback className={`${theme.avatarFallbackClass} text-lg font-semibold`}>
                 {initials}
               </AvatarFallback>
             )}
@@ -547,7 +546,7 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
                 <AlertTriangle className="h-2.5 w-2.5 mr-0.5" /> Alert
               </Badge>
             ) : (
-              <span className="flex items-center gap-0.5 text-emerald-600">
+              <span className="flex items-center gap-0.5 text-portal-600">
                 <CheckCircle2 className="h-3 w-3" /> Clear
               </span>
             )}
@@ -582,7 +581,7 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
         <Button
           variant="outline"
           size="sm"
-          className="w-full mt-4 text-xs rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+          className={`w-full mt-4 text-xs rounded-xl ${theme.selectedClass} border border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800`}
           onClick={(e) => { e.stopPropagation(); onClick(); }}
         >
           View Profile
@@ -600,7 +599,7 @@ function StudentRow({ student, onClick }: { student: Student; onClick: () => voi
 
   return (
     <TableRow
-      className="cursor-pointer hover:bg-emerald-50/40 transition-colors"
+      className="cursor-pointer hover:bg-portal-50/40 transition-colors"
       onClick={onClick}
     >
       <TableCell>
@@ -608,7 +607,7 @@ function StudentRow({ student, onClick }: { student: Student; onClick: () => voi
           {student.photo ? (
             <AvatarImage src={student.photo} alt={student.firstName} />
           ) : (
-            <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+            <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
               {initials}
             </AvatarFallback>
           )}
@@ -655,14 +654,14 @@ function StudentRow({ student, onClick }: { student: Student; onClick: () => voi
             <AlertTriangle className="h-2.5 w-2.5 mr-0.5" /> Alert
           </Badge>
         ) : (
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+          <CheckCircle2 className="h-4 w-4 text-portal-500" />
         )}
       </TableCell>
       <TableCell className="text-right">
         <Button
           variant="ghost"
           size="sm"
-          className="text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-xl"
+          className={`text-xs ${theme.selectedClass} hover:bg-emerald-50 rounded-xl`}
           onClick={(e) => { e.stopPropagation(); onClick(); }}
         >
           View

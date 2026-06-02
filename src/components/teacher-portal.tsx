@@ -44,6 +44,9 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
 } from 'recharts';
+import { PORTAL_THEMES, ATTENDANCE_COLORS as THEME_ATTENDANCE_COLORS, GROWTH_COLORS, CHART_PALETTE, getChartColor } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.teacher;
 
 // ============================================================
 // TYPES
@@ -201,9 +204,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const ATTENDANCE_COLORS = {
-  PRESENT: 'bg-emerald-100 border-emerald-400 text-emerald-800',
-  ABSENT: 'bg-rose-100 border-rose-400 text-rose-800',
-  LATE: 'bg-amber-100 border-amber-400 text-amber-800',
+  PRESENT: THEME_ATTENDANCE_COLORS.PRESENT ? `${THEME_ATTENDANCE_COLORS.PRESENT.bg} border-emerald-400 ${THEME_ATTENDANCE_COLORS.PRESENT.text}` : 'bg-emerald-100 border-emerald-400 text-emerald-800',
+  ABSENT: THEME_ATTENDANCE_COLORS.ABSENT ? `${THEME_ATTENDANCE_COLORS.ABSENT.bg} border-rose-400 ${THEME_ATTENDANCE_COLORS.ABSENT.text}` : 'bg-rose-100 border-rose-400 text-rose-800',
+  LATE: THEME_ATTENDANCE_COLORS.LATE ? `${THEME_ATTENDANCE_COLORS.LATE.bg} border-amber-400 ${THEME_ATTENDANCE_COLORS.LATE.text}` : 'bg-amber-100 border-amber-400 text-amber-800',
   UNMARKED: 'bg-gray-100 border-gray-300 text-gray-600',
 };
 
@@ -595,10 +598,10 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
   }, [attendanceRecords]);
 
   const attendancePieData = useMemo(() => [
-    { name: 'Present', value: attendanceSummary.present, color: '#10b981' },
-    { name: 'Absent', value: attendanceSummary.absent, color: '#ef4444' },
-    { name: 'Late', value: attendanceSummary.late, color: '#f59e0b' },
-    { name: 'Unmarked', value: attendanceSummary.unmarked, color: '#94a3b8' },
+    { name: 'Present', value: attendanceSummary.present, color: THEME_ATTENDANCE_COLORS.PRESENT?.hex ?? '#10b981' },
+    { name: 'Absent', value: attendanceSummary.absent, color: THEME_ATTENDANCE_COLORS.ABSENT?.hex ?? '#ef4444' },
+    { name: 'Late', value: attendanceSummary.late, color: THEME_ATTENDANCE_COLORS.LATE?.hex ?? '#f59e0b' },
+    { name: 'Unmarked', value: attendanceSummary.unmarked, color: CHART_PALETTE.axisLight },
   ].filter(d => d.value > 0), [attendanceSummary]);
 
   const filteredObservations = useMemo(() => {
@@ -641,7 +644,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-violet-400/30">
+        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-emerald-400/30">
           <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
         </div>
         {!sidebarCollapsed && (
@@ -699,7 +702,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
       <div className="px-3 py-3 border-t border-white/10">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 shrink-0">
-            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xs font-semibold">
+            <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-xs font-semibold`}>
               {teacherName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -754,7 +757,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             <h2 className="text-2xl font-bold tracking-tight">Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, {teacherName}! 👋</h2>
             <p className="text-muted-foreground mt-1">Here&apos;s what&apos;s happening with your class today.</p>
           </div>
-          <Badge variant="outline" className="text-violet-600 border-violet-300 bg-violet-50 px-3 py-1">
+          <Badge variant="outline" className="text-emerald-600 border-emerald-300 bg-emerald-50 px-3 py-1">
             <Clock className="h-3 w-3 mr-1" /> {new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })}
           </Badge>
         </div>
@@ -762,10 +765,10 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Class', value: className, icon: GraduationCap, textColor: 'text-violet-600', cardBg: 'bg-gradient-to-br from-violet-50 to-sky-50', iconBg: 'bg-gradient-to-br from-violet-100 to-sky-100' },
-            { label: 'Program', value: program, icon: BookOpen, textColor: 'text-sky-600', cardBg: 'bg-gradient-to-br from-sky-50 to-violet-50', iconBg: 'bg-gradient-to-br from-sky-100 to-violet-100' },
-            { label: 'Students', value: `${studentCount}${capacity ? `/${capacity}` : ''}`, icon: Users, textColor: 'text-violet-600', cardBg: 'bg-gradient-to-br from-violet-50 to-teal-50', iconBg: 'bg-gradient-to-br from-violet-100 to-teal-100' },
-            { label: 'Pending Updates', value: pendingUpdates, icon: Sun, textColor: 'text-sky-600', cardBg: 'bg-gradient-to-br from-sky-50 to-orange-50', iconBg: 'bg-gradient-to-br from-sky-100 to-orange-100' },
+            { label: 'Class', value: className, icon: GraduationCap, textColor: 'text-emerald-600', cardBg: `bg-gradient-to-br ${theme.cardGradientClass}`, iconBg: 'bg-gradient-to-br from-emerald-100 to-teal-100' },
+            { label: 'Program', value: program, icon: BookOpen, textColor: 'text-teal-600', cardBg: 'bg-gradient-to-br from-teal-50 to-emerald-50', iconBg: 'bg-gradient-to-br from-teal-100 to-emerald-100' },
+            { label: 'Students', value: `${studentCount}${capacity ? `/${capacity}` : ''}`, icon: Users, textColor: 'text-emerald-600', cardBg: 'bg-gradient-to-br from-emerald-50 to-teal-50', iconBg: 'bg-gradient-to-br from-emerald-100 to-teal-100' },
+            { label: 'Pending Updates', value: pendingUpdates, icon: Sun, textColor: 'text-teal-600', cardBg: 'bg-gradient-to-br from-teal-50 to-orange-50', iconBg: 'bg-gradient-to-br from-teal-100 to-orange-100' },
           ].map((stat) => (
             <Card key={stat.label} className="relative overflow-hidden rounded-3xl border-0 shadow-sm">
               <CardContent className={`p-4 ${stat.cardBg}`}>
@@ -792,7 +795,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <div className="space-y-3">
                   {todaySchedule.map((slot, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                      <div className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{slot.subject || slot.title || 'Activity'}</p>
                         <p className="text-xs text-muted-foreground">{slot.startTime || ''}{slot.endTime ? ` - ${slot.endTime}` : ''}</p>
@@ -821,14 +824,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={[
-                          { name: 'Present', value: todayAttendance.present || 0, color: '#10b981' },
-                          { name: 'Absent', value: todayAttendance.absent || 0, color: '#ef4444' },
-                          { name: 'Late', value: todayAttendance.late || 0, color: '#f59e0b' },
+                          { name: 'Present', value: todayAttendance.present || 0, color: THEME_ATTENDANCE_COLORS.PRESENT?.hex ?? '#10b981' },
+                          { name: 'Absent', value: todayAttendance.absent || 0, color: THEME_ATTENDANCE_COLORS.ABSENT?.hex ?? '#ef4444' },
+                          { name: 'Late', value: todayAttendance.late || 0, color: THEME_ATTENDANCE_COLORS.LATE?.hex ?? '#f59e0b' },
                         ].filter(d => d.value > 0)} dataKey="value" innerRadius={40} outerRadius={60} paddingAngle={4}>
                           {[
-                            { name: 'Present', value: todayAttendance.present || 0, color: '#10b981' },
-                            { name: 'Absent', value: todayAttendance.absent || 0, color: '#ef4444' },
-                            { name: 'Late', value: todayAttendance.late || 0, color: '#f59e0b' },
+                            { name: 'Present', value: todayAttendance.present || 0, color: THEME_ATTENDANCE_COLORS.PRESENT?.hex ?? '#10b981' },
+                            { name: 'Absent', value: todayAttendance.absent || 0, color: THEME_ATTENDANCE_COLORS.ABSENT?.hex ?? '#ef4444' },
+                            { name: 'Late', value: todayAttendance.late || 0, color: THEME_ATTENDANCE_COLORS.LATE?.hex ?? '#f59e0b' },
                           ].filter(d => d.value > 0).map((entry, i) => (
                             <Cell key={i} fill={entry.color} />
                           ))}
@@ -857,7 +860,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <CardTitle className="text-base">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={() => setActiveSection('attendance')}>
+              <Button className={`w-full justify-start bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={() => setActiveSection('attendance')}>
                 <ClipboardCheck className="h-4 w-4 mr-2" /> Mark Attendance
               </Button>
               <Button className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => setActiveSection('daily-updates')}>
@@ -880,8 +883,8 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="space-y-3">
                 {recentActivitiesList.slice(0, 5).map((act, i) => (
                   <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="p-2 rounded-lg bg-violet-50">
-                      <Activity className="h-3.5 w-3.5 text-violet-600" />
+                    <div className="p-2 rounded-lg bg-emerald-50">
+                      <Activity className="h-3.5 w-3.5 text-emerald-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{act.title || act.type || 'Activity'}</p>
@@ -922,7 +925,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
     return (
       <div className="space-y-6">
         {/* Class Header */}
-        <Card className="rounded-3xl bg-gradient-to-r from-violet-500/10 to-sky-500/10 border-violet-200/50">
+        <Card className={`rounded-3xl bg-gradient-to-r ${theme.cardGradientClass} border-emerald-200/50`}>
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -971,13 +974,13 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     {students.map((s) => (
                       <TableRow
                         key={s.id}
-                        className="cursor-pointer hover:bg-violet-50/50"
+                        className="cursor-pointer hover:bg-emerald-50/50"
                         onClick={() => { setSelectedStudent(s); setStudentDetailOpen(true); }}
                       >
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
+                              <AvatarFallback className={`${theme.avatarFallbackClass} text-xs`}>
                                 {s.firstName[0]}{s.lastName[0]}
                               </AvatarFallback>
                             </Avatar>
@@ -1028,7 +1031,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-violet-100 text-violet-700 text-xl">
+                    <AvatarFallback className={`${theme.avatarFallbackClass} text-xl`}>
                       {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -1091,7 +1094,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                       </div>
                       <div className="mt-2 text-center">
                         <p className="text-xs text-muted-foreground">Overall</p>
-                        <p className="text-xl font-bold text-violet-600">{Math.round(selectedStudent.growthScore.overall)}</p>
+                        <p className="text-xl font-bold text-emerald-600">{Math.round(selectedStudent.growthScore.overall)}</p>
                       </div>
                     </div>
                   </>
@@ -1154,7 +1157,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <XCircle className="h-3.5 w-3.5 mr-1" /> All Absent
               </Button>
               <div className="flex-1" />
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleMarkAttendance} disabled={attendanceSummary.unmarked === attendanceSummary.total}>
+              <Button className={`bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={handleMarkAttendance} disabled={attendanceSummary.unmarked === attendanceSummary.total}>
                 <CheckCircle2 className="h-4 w-4 mr-2" /> Save Attendance
               </Button>
             </div>
@@ -1262,7 +1265,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <>
                   {/* Food Section */}
                   <div>
-                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2"><Utensils className="h-4 w-4 text-violet-500" /> Food</h4>
+                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2"><Utensils className="h-4 w-4 text-emerald-500" /> Food</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(['breakfast', 'lunch', 'snacks'] as const).map(meal => (
                         <div key={meal} className="space-y-2">
@@ -1347,7 +1350,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                               onClick={() => setCurrentDailyUpdate(prev => prev ? { ...prev, morningMood: m } : prev)}
                               className={`px-2.5 py-1.5 rounded-lg text-xs border transition-all ${
                                 currentDailyUpdate.morningMood === m
-                                  ? 'bg-violet-100 border-violet-400 text-violet-700 font-medium'
+                                  ? 'bg-emerald-100 border-emerald-400 text-emerald-700 font-medium'
                                   : 'bg-background border-muted hover:bg-muted/50'
                               }`}
                             >
@@ -1440,7 +1443,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         <div key={u.id || u.studentId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
+                              <AvatarFallback className={`${theme.avatarFallbackClass} text-xs`}>
                                 {student?.firstName[0] || '?'}{student?.lastName[0] || ''}
                               </AvatarFallback>
                             </Avatar>
@@ -1494,11 +1497,11 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                           className={`p-3 rounded-xl border-2 text-center transition-all duration-300 hover:shadow-md ${
                             existing?.status === 'PUBLISHED' ? 'border-emerald-300 bg-emerald-50' :
                             existing?.status === 'DRAFT' ? 'border-amber-300 bg-amber-50' :
-                            'border-muted hover:border-violet-300'
+                            'border-muted hover:border-emerald-300'
                           }`}
                         >
                           <Avatar className="h-10 w-10 mx-auto mb-1.5">
-                            <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
+                            <AvatarFallback className={`${theme.avatarFallbackClass} text-xs`}>
                               {student.firstName[0]}{student.lastName[0]}
                             </AvatarFallback>
                           </Avatar>
@@ -1600,7 +1603,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 />
                 <Label className="text-xs">Share with parent</Label>
               </div>
-              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddObservation} disabled={!newObservation.studentId || !newObservation.content}>
+              <Button className={`w-full bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={handleAddObservation} disabled={!newObservation.studentId || !newObservation.content}>
                 <Plus className="h-4 w-4 mr-2" /> Add Observation
               </Button>
             </CardContent>
@@ -1645,7 +1648,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <Badge variant="outline" className={`text-[10px] ${
-                                obs.category === 'Behavior' ? 'border-violet-300 text-violet-600' :
+                                obs.category === 'Behavior' ? 'border-emerald-300 text-emerald-600' :
                                 obs.category === 'Academic' ? 'border-emerald-300 text-emerald-600' :
                                 obs.category === 'Social' ? 'border-blue-300 text-blue-600' :
                                 obs.category === 'Emotional' ? 'border-rose-300 text-rose-600' :
@@ -1758,7 +1761,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                   </div>
                 </div>
               </div>
-              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleAddActivity} disabled={!newActivity.title}>
+              <Button className={`w-full bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={handleAddActivity} disabled={!newActivity.title}>
                 <Plus className="h-4 w-4 mr-2" /> Add Activity
               </Button>
             </CardContent>
@@ -1778,8 +1781,8 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {filteredActivities.map((act, i) => {
                   const typeColors: Record<string, string> = {
-                    Art: 'bg-violet-100 text-violet-700', Music: 'bg-purple-100 text-purple-700',
-                    Dance: 'bg-pink-100 text-pink-700', Sports: 'bg-emerald-100 text-emerald-700',
+                    Art: 'bg-emerald-100 text-emerald-700', Music: 'bg-teal-100 text-teal-700',
+                    Dance: 'bg-orange-100 text-orange-700', Sports: 'bg-emerald-100 text-emerald-700',
                     Story: 'bg-blue-100 text-blue-700', Science: 'bg-teal-100 text-teal-700',
                     Celebration: 'bg-orange-100 text-orange-700', Other: 'bg-gray-100 text-gray-700',
                   };
@@ -1793,7 +1796,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                           <Badge variant="outline" className={`text-[10px] ${
                             act.status === 'Completed' ? 'text-emerald-600 border-emerald-300' :
                             act.status === 'Scheduled' ? 'text-blue-600 border-blue-300' :
-                            'text-violet-600 border-violet-300'
+                            'text-emerald-600 border-emerald-300'
                           }`}>
                             {act.status || 'Planned'}
                           </Badge>
@@ -1864,12 +1867,12 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <RadarChart data={growthRadarData}>
-                  <PolarGrid stroke="#e5e7eb" />
+                  <PolarGrid stroke={CHART_PALETTE.grid} />
                   <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <Radar name="Class Avg" dataKey="Class" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.2} strokeWidth={2} />
+                  <Radar name="Class Avg" dataKey="Class" stroke={theme.primary} fill={theme.primary} fillOpacity={0.2} strokeWidth={2} />
                   {selectedGrowthStudent && (
-                    <Radar name="Student" dataKey="Student" stroke="#10b981" fill="#10b981" fillOpacity={0.2} strokeWidth={2} />
+                    <Radar name="Student" dataKey="Student" stroke={getChartColor(2)} fill={getChartColor(2)} fillOpacity={0.2} strokeWidth={2} />
                   )}
                   <Legend />
                 </RadarChart>
@@ -1912,7 +1915,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                   />
                 </div>
               ))}
-              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleSaveGrowth} disabled={!growthEntry.studentId || !growthEntry.period}>
+              <Button className={`w-full bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={handleSaveGrowth} disabled={!growthEntry.studentId || !growthEntry.period}>
                 <Target className="h-4 w-4 mr-2" /> Save Growth Score
               </Button>
             </CardContent>
@@ -1923,20 +1926,20 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           {/* Needs Attention */}
           <Card className="rounded-3xl">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-violet-500" /> Needs Attention</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-emerald-500" /> Needs Attention</CardTitle>
             </CardHeader>
             <CardContent>
               {growthData?.needsAttention && growthData.needsAttention.length > 0 ? (
                 <div className="space-y-2">
                   {growthData.needsAttention.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-violet-50 border border-violet-200">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 border border-emerald-200">
                       <div>
                         <p className="text-sm font-medium">{s.name}</p>
-                        <p className="text-xs text-violet-600">Weak: {s.weakestArea}</p>
+                        <p className="text-xs text-emerald-600">Weak: {s.weakestArea}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-violet-600">{Math.round(s.overall)}</p>
-                        <p className="text-[10px] text-violet-500">overall</p>
+                        <p className="text-lg font-bold text-emerald-600">{Math.round(s.overall)}</p>
+                        <p className="text-[10px] text-emerald-500">overall</p>
                       </div>
                     </div>
                   ))}
@@ -1953,7 +1956,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
           {/* Top Performers */}
           <Card className="rounded-3xl">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2"><Award className="h-4 w-4 text-violet-500" /> Top Performers</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><Award className="h-4 w-4 text-emerald-500" /> Top Performers</CardTitle>
             </CardHeader>
             <CardContent>
               {growthData?.topPerformers && growthData.topPerformers.length > 0 ? (
@@ -2041,7 +2044,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         <p className="font-medium text-sm mb-2">{day}</p>
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                             09:00 - 10:30 • Circle Time & Learning
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -2100,7 +2103,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     <Label className="text-xs">Reason</Label>
                     <Textarea placeholder="Reason for leave..." className="min-h-[80px] text-sm" value={newLeave.reason} onChange={e => setNewLeave(prev => ({ ...prev, reason: e.target.value }))} />
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={handleApplyLeave} disabled={!newLeave.reason}>
+                  <Button className={`w-full bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={handleApplyLeave} disabled={!newLeave.reason}>
                     <Send className="h-4 w-4 mr-2" /> Apply Leave
                   </Button>
                 </CardContent>
@@ -2231,7 +2234,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         <Badge variant="outline" className={`text-[10px] shrink-0 ml-2 ${
                           a.priority === 'Urgent' ? 'text-rose-600 border-rose-300' :
                           a.priority === 'High' ? 'text-orange-600 border-orange-300' :
-                          'text-violet-600 border-violet-300'
+                          'text-emerald-600 border-emerald-300'
                         }`}>{a.priority}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{a.content}</p>
@@ -2302,14 +2305,14 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarFallback className="bg-violet-100 text-violet-700 text-xl">
+                  <AvatarFallback className={`${theme.avatarFallbackClass} text-xl`}>
                     {teacherName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <h3 className="font-semibold">{teacherName}</h3>
                   <p className="text-sm text-muted-foreground">{user.email}</p>
-                  <Badge className="mt-1 bg-emerald-100 text-emerald-700 border-0 text-xs">Teacher</Badge>
+                  <Badge className={`mt-1 ${theme.avatarFallbackClass} text-xs`}>Teacher</Badge>
                 </div>
               </div>
               <div className="space-y-2">
@@ -2328,7 +2331,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                 <Label className="text-xs">Qualification</Label>
                 <Input className="h-9 text-sm" placeholder="e.g., B.Ed, Montessori Certified" value={profileForm.qualification} onChange={e => setProfileForm(prev => ({ ...prev, qualification: e.target.value }))} />
               </div>
-              <Button className="w-full bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">
+              <Button className={`w-full bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`}>
                 <Edit className="h-4 w-4 mr-2" /> Update Profile
               </Button>
             </CardContent>

@@ -27,6 +27,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useParentAuth } from '@/lib/parent-auth';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.parent;
 
 // ── Auth user shape (from localStorage) ──
 interface AuthUser {
@@ -129,7 +132,7 @@ export function ParentHeader() {
             <span className="font-medium">
               {selectedChild.firstName} {selectedChild.lastName}
             </span>
-            <span className="text-sky-500">|</span>
+            <span className="text-sky-400">|</span>
             <span>{selectedChild.className || 'No class'}</span>
           </Badge>
         )}
@@ -149,7 +152,7 @@ export function ParentHeader() {
               className="flex items-center gap-2 px-2 h-9"
             >
               <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-sky-100 text-sky-700 text-xs font-semibold">
+                <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                   {userInitial}
                 </AvatarFallback>
               </Avatar>

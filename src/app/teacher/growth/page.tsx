@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
@@ -59,6 +60,8 @@ import {
   Tooltip,
 } from 'recharts';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, GROWTH_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 interface DimensionScore {
@@ -145,12 +148,12 @@ interface StudentDetail {
 
 // ── Dimension Config ──
 const DIMENSIONS = [
-  { key: 'creativity', label: 'Creativity', color: '#ec4899', bg: 'bg-pink-100', text: 'text-pink-700', icon: '🎨' },
-  { key: 'communication', label: 'Communication', color: '#3b82f6', bg: 'bg-blue-100', text: 'text-blue-700', icon: '💬' },
-  { key: 'social', label: 'Social Skills', color: '#10b981', bg: 'bg-emerald-100', text: 'text-emerald-700', icon: '🤝' },
-  { key: 'confidence', label: 'Confidence', color: '#f97316', bg: 'bg-orange-100', text: 'text-orange-700', icon: '💪' },
-  { key: 'cognitive', label: 'Cognitive', color: '#8b5cf6', bg: 'bg-purple-100', text: 'text-purple-700', icon: '🧠' },
-  { key: 'physical', label: 'Physical', color: '#14b8a6', bg: 'bg-teal-100', text: 'text-teal-700', icon: '🏃' },
+  { key: 'creativity', label: 'Creativity', color: GROWTH_COLORS.creativity.hex, bg: GROWTH_COLORS.creativity.bg, text: GROWTH_COLORS.creativity.text, icon: '🎨' },
+  { key: 'communication', label: 'Communication', color: GROWTH_COLORS.communication.hex, bg: GROWTH_COLORS.communication.bg, text: GROWTH_COLORS.communication.text, icon: '💬' },
+  { key: 'social', label: 'Social Skills', color: GROWTH_COLORS.social.hex, bg: GROWTH_COLORS.social.bg, text: GROWTH_COLORS.social.text, icon: '🤝' },
+  { key: 'confidence', label: 'Confidence', color: GROWTH_COLORS.physical.hex, bg: GROWTH_COLORS.physical.bg, text: GROWTH_COLORS.physical.text, icon: '💪' },
+  { key: 'cognitive', label: 'Cognitive', color: GROWTH_COLORS.cognitive.hex, bg: GROWTH_COLORS.cognitive.bg, text: GROWTH_COLORS.cognitive.text, icon: '🧠' },
+  { key: 'physical', label: 'Physical', color: GROWTH_COLORS.emotional.hex, bg: GROWTH_COLORS.emotional.bg, text: GROWTH_COLORS.emotional.text, icon: '🏃' },
 ] as const;
 
 type DimensionKey = (typeof DIMENSIONS)[number]['key'];
@@ -470,7 +473,7 @@ function GrowthContent() {
         <p className="text-gray-500 mb-4">{error}</p>
         <Button
           onClick={fetchClassData}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className="bg-portal-600 hover:bg-portal-700 rounded-xl"
         >
           Retry
         </Button>
@@ -486,7 +489,7 @@ function GrowthContent() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
+                <TrendingUp className="h-5 w-5 text-portal-500" />
                 Growth Assessment
               </h1>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -505,7 +508,7 @@ function GrowthContent() {
                 </SelectContent>
               </Select>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm"
+                className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm"
                 onClick={startBulkEntry}
               >
                 <ClipboardEdit className="h-4 w-4 mr-1" /> Bulk Entry
@@ -536,7 +539,7 @@ function GrowthContent() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-emerald-600" />
+                  <BarChart3 className="h-4 w-4 text-portal-600" />
                   Class Growth Radar — {selectedPeriod}
                 </CardTitle>
               </CardHeader>
@@ -544,21 +547,21 @@ function GrowthContent() {
                 {radarData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
                     <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
-                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarGrid stroke={CHART_PALETTE.grid} />
                       <PolarAngleAxis
                         dataKey="dimension"
-                        tick={{ fontSize: 11, fill: '#6b7280' }}
+                        tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
                       />
                       <PolarRadiusAxis
                         angle={90}
                         domain={[0, 100]}
-                        tick={{ fontSize: 9, fill: '#9ca3af' }}
+                        tick={{ fontSize: 9, fill: CHART_PALETTE.axisLight }}
                       />
                       <Radar
                         name="Class Average"
                         dataKey="classAverage"
-                        stroke="#10b981"
-                        fill="#10b981"
+                        stroke={CHART_PALETTE.series[2]}
+                        fill={CHART_PALETTE.series[2]}
                         fillOpacity={0.25}
                         strokeWidth={2}
                       />
@@ -579,13 +582,13 @@ function GrowthContent() {
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Users className="h-4 w-4 text-emerald-600" />
+                      <Users className="h-4 w-4 text-portal-600" />
                       Class Average — {selectedPeriod}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="text-3xl font-bold text-emerald-600">
+                      <div className="text-3xl font-bold text-portal-600">
                         {Math.round(data.classAverage.overall)}
                       </div>
                       <div>
@@ -652,9 +655,9 @@ function GrowthContent() {
 
               {/* Top Performers */}
               {data?.topPerformers && data.topPerformers.length > 0 && (
-                <Card className="border-0 shadow-md border-l-4 border-l-emerald-400">
+                <Card className="border-0 shadow-md border-l-4 border-l-portal-400">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-emerald-700">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-portal-700">
                       <Star className="h-4 w-4" />
                       Top Performers ({data.topPerformers.length})
                     </CardTitle>
@@ -662,19 +665,19 @@ function GrowthContent() {
                   <CardContent>
                     <div className="space-y-2">
                       {data.topPerformers.slice(0, 5).map((item, i) => (
-                        <div key={i} className="flex items-center justify-between bg-emerald-50 p-2.5 rounded-lg">
+                        <div key={i} className="flex items-center justify-between bg-portal-50 p-2.5 rounded-lg">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-semibold text-emerald-700">
+                            <div className="w-7 h-7 rounded-full bg-portal-100 flex items-center justify-center text-xs font-semibold text-portal-700">
                               {getInitials(item.studentName)}
                             </div>
                             <div>
                               <div className="text-xs font-medium text-gray-900">{item.studentName}</div>
                               <div className="text-[10px] text-gray-500">
-                                {item.topDimension}: <span className="text-emerald-600 font-semibold">{item.topScore}/100</span>
+                                {item.topDimension}: <span className="text-portal-600 font-semibold">{item.topScore}/100</span>
                               </div>
                             </div>
                           </div>
-                          <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px] px-2 py-0.5">
+                          <Badge className="bg-portal-100 text-portal-700 border-0 text-[10px] px-2 py-0.5">
                             {Math.round(item.overall)} Overall
                           </Badge>
                         </div>
@@ -708,7 +711,7 @@ function GrowthContent() {
                       {student.studentPhoto ? (
                         <AvatarImage src={student.studentPhoto} alt={student.studentName} />
                       ) : (
-                        <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                        <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                           {getInitials(student.studentName)}
                         </AvatarFallback>
                       )}
@@ -773,7 +776,7 @@ function GrowthContent() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-7 text-[11px] rounded-lg border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              className={`flex-1 h-7 text-[11px] rounded-lg ${theme.selectedClass} border-portal-200 hover:bg-portal-50`}
                       onClick={() => openScoreEntry(student)}
                     >
                       <ClipboardEdit className="h-3 w-3 mr-1" />
@@ -815,7 +818,7 @@ function GrowthContent() {
             <Card className="border-0 shadow-md">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-5 w-5 text-emerald-600" />
+                  <Users className="h-5 w-5 text-portal-600" />
                   Bulk Score Entry — {selectedPeriod}
                 </CardTitle>
                 <p className="text-xs text-gray-500 mt-1">
@@ -843,7 +846,7 @@ function GrowthContent() {
                           <tr key={student.studentId} className="border-b border-gray-50 hover:bg-gray-50/50">
                             <td className="py-2 px-2 sticky left-0 bg-white">
                               <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center text-[9px] font-semibold text-emerald-700 shrink-0">
+                                <div className="w-6 h-6 rounded-full bg-portal-50 flex items-center justify-center text-[9px] font-semibold text-portal-700 shrink-0">
                                   {getInitials(student.studentName)}
                                 </div>
                                 <span className="font-medium text-gray-900 truncate max-w-[90px]">{student.studentName}</span>
@@ -894,7 +897,7 @@ function GrowthContent() {
                     Cancel
                   </Button>
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+                    className="bg-portal-600 hover:bg-portal-700 rounded-xl"
                     onClick={handleSaveBulk}
                     disabled={savingBulk}
                   >
@@ -916,7 +919,7 @@ function GrowthContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <ClipboardEdit className="h-5 w-5 text-emerald-600" />
+                      <ClipboardEdit className="h-5 w-5 text-portal-600" />
                       Growth Assessment — {entryStudentName}
                     </CardTitle>
                     <p className="text-xs text-gray-500 mt-1">
@@ -1008,7 +1011,7 @@ function GrowthContent() {
                       Cancel
                     </Button>
                     <Button
-                      className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+                      className="bg-portal-600 hover:bg-portal-700 rounded-xl"
                       onClick={handleSaveSingle}
                       disabled={saving}
                     >
@@ -1036,7 +1039,7 @@ function GrowthContent() {
                     Go to Overview
                   </Button>
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-xs"
+                    className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs"
                     onClick={startBulkEntry}
                   >
                     <Users className="h-3.5 w-3.5 mr-1" /> Bulk Entry
@@ -1066,7 +1069,7 @@ function GrowthContent() {
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-base">
-                  <TrendingUp className="h-5 w-5 text-emerald-600" />
+                  <TrendingUp className="h-5 w-5 text-portal-600" />
                   {detailData.student.name} — Growth Detail
                 </DialogTitle>
                 <DialogDescription>
@@ -1095,11 +1098,11 @@ function GrowthContent() {
                             cy="50%"
                             outerRadius="70%"
                           >
-                            <PolarGrid stroke="#e5e7eb" />
-                            <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 10, fill: '#6b7280' }} />
-                            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 8, fill: '#9ca3af' }} />
-                            <Radar name="Student" dataKey="student" stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} />
-                            <Radar name="Class Avg" dataKey="classAverage" stroke="#94a3b8" fill="#94a3b8" fillOpacity={0.1} strokeWidth={1.5} strokeDasharray="5 5" />
+                            <PolarGrid stroke={CHART_PALETTE.grid} />
+                            <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 10, fill: CHART_PALETTE.axis }} />
+                            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 8, fill: CHART_PALETTE.axisLight }} />
+                            <Radar name="Student" dataKey="student" stroke={GROWTH_COLORS.social?.hex || CHART_PALETTE.series[2]} fill={GROWTH_COLORS.social?.hex || CHART_PALETTE.series[2]} fillOpacity={0.3} strokeWidth={2} />
+                            <Radar name="Class Avg" dataKey="classAverage" stroke={CHART_PALETTE.series[1]} fill={CHART_PALETTE.series[1]} fillOpacity={0.1} strokeWidth={1.5} strokeDasharray="5 5" />
                             <Legend wrapperStyle={{ fontSize: 10 }} />
                           </RadarChart>
                         </ResponsiveContainer>
@@ -1120,9 +1123,9 @@ function GrowthContent() {
                       {detailData.trend.length > 1 ? (
                         <ResponsiveContainer width="100%" height={280}>
                           <LineChart data={detailData.trend}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                            <XAxis dataKey="period" tick={{ fontSize: 10, fill: '#6b7280' }} />
-                            <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: '#9ca3af' }} />
+                            <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+                            <XAxis dataKey="period" tick={{ fontSize: 10, fill: CHART_PALETTE.axis }} />
+                            <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: CHART_PALETTE.axisLight }} />
                             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
                             {DIMENSIONS.map((dim) => (
                               <Line
@@ -1182,7 +1185,7 @@ function GrowthContent() {
                                   <td className="text-center py-2 px-3 font-semibold">{score}</td>
                                   <td className="text-center py-2 px-3 text-gray-500">{Math.round(avg)}</td>
                                   <td className="text-center py-2 px-3">
-                                    <span className={`inline-flex items-center gap-0.5 font-medium ${diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                                    <span className={`inline-flex items-center gap-0.5 font-medium ${diff > 0 ? 'text-portal-600' : diff < 0 ? 'text-red-600' : 'text-gray-500'}`}>
                                       {diff > 0 ? <ArrowUpRight className="h-3 w-3" /> : diff < 0 ? <ArrowDownRight className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
                                       {diff > 0 ? '+' : ''}{diff}
                                     </span>
@@ -1221,7 +1224,7 @@ function GrowthContent() {
                 </Button>
                 {detailData.currentPeriod && (
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+                    className="bg-portal-600 hover:bg-portal-700 rounded-xl"
                     onClick={() => {
                       setDetailStudentId(null);
                       const student = data?.students.find(s => s.studentId === detailData.student.id);

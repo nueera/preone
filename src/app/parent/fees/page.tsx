@@ -43,6 +43,8 @@ import {
   useParentFees, useParentReceipt,
   type FeesData, type InvoiceInfo, type ReceiptData,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, FEE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS
@@ -72,7 +74,8 @@ const METHOD_LABELS: Record<string, string> = {
   ONLINE: 'Online',
 };
 
-const PIE_COLORS = ['#10b981', '#f59e0b', '#ef4444'];
+// Chart colors derived from FEE_COLORS tokens
+const PIE_COLORS = [FEE_COLORS.PAID.hex, FEE_COLORS.PENDING.hex, FEE_COLORS.OVERDUE.hex];
 
 // ============================================================
 // HELPERS
@@ -248,7 +251,7 @@ function FeeBreakdownChart({ overview }: { overview: FeesData['overview'] }) {
                 <RechartsTooltip
                   contentStyle={{
                     borderRadius: '12px',
-                    border: '1px solid #e5e7eb',
+                    border: `1px solid ${CHART_PALETTE.grid}`,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     fontSize: '12px',
                   }}
@@ -904,7 +907,7 @@ function ReceiptContent({
   return (
     <div>
       {/* Header */}
-      <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-6 text-white">
+      <div className={`bg-gradient-to-r ${theme.btnGradientClass} p-6 text-white`}>
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold">Payment Receipt</h2>

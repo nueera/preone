@@ -36,14 +36,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import {
+  ResponsiveContainer,
   RadarChart,
-  Radar,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  ResponsiveContainer,
+  Radar,
   Legend,
 } from 'recharts';
+import { PORTAL_THEMES, GROWTH_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface GrowthScore {
@@ -69,12 +71,12 @@ interface ClassInfo {
 
 // ── Constants ──
 const DIMENSIONS = [
-  { key: 'creativity', label: 'Creativity', color: '#ec4899' },
-  { key: 'communication', label: 'Communication', color: '#3b82f6' },
-  { key: 'social', label: 'Social Skills', color: '#22c55e' },
-  { key: 'confidence', label: 'Confidence', color: '#f97316' },
-  { key: 'cognitive', label: 'Cognitive', color: '#8b5cf6' },
-  { key: 'physical', label: 'Physical', color: '#14b8a6' },
+  { key: 'creativity', label: 'Creativity', color: GROWTH_COLORS.creativity.hex },
+  { key: 'communication', label: 'Communication', color: GROWTH_COLORS.communication.hex },
+  { key: 'social', label: 'Social Skills', color: GROWTH_COLORS.social.hex },
+  { key: 'confidence', label: 'Confidence', color: GROWTH_COLORS.physical.hex },
+  { key: 'cognitive', label: 'Cognitive', color: GROWTH_COLORS.cognitive.hex },
+  { key: 'physical', label: 'Physical', color: GROWTH_COLORS.emotional.hex },
 ];
 
 const PERIODS = ['Q1', 'Q2', 'Q3', 'Q4', 'Annual'];
@@ -341,7 +343,7 @@ export default function GrowthPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-purple-600" />
+            <TrendingUp className="h-6 w-6 text-portal-600" />
             Growth & AI
           </h1>
           <p className="text-sm text-gray-500 mt-1">Track student development, analyze growth patterns, and get AI insights</p>
@@ -414,14 +416,14 @@ export default function GrowthPage() {
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={radarData}>
-                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarGrid stroke={CHART_PALETTE.grid} />
                       <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 11 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
                       <Radar
                         name="Class Average"
                         dataKey="classAverage"
-                        stroke="#7C3AED"
-                        fill="#7C3AED"
+                        stroke={CHART_PALETTE.series[0]}
+                        fill={CHART_PALETTE.series[0]}
                         fillOpacity={0.2}
                         strokeWidth={2}
                       />
@@ -429,8 +431,8 @@ export default function GrowthPage() {
                         <Radar
                           name="Student"
                           dataKey="student"
-                          stroke="#0EA5E9"
-                          fill="#0EA5E9"
+                          stroke={CHART_PALETTE.series[1]}
+                          fill={CHART_PALETTE.series[1]}
                           fillOpacity={0.1}
                           strokeWidth={2}
                           strokeDasharray="5 5"
@@ -710,8 +712,8 @@ export default function GrowthPage() {
                 aiObservations.map((obs) => (
                   <Card key={obs.id} className="p-4">
                     <div className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
-                        <Bot className="h-4 w-4 text-purple-600" />
+                      <div className="h-8 w-8 rounded-lg bg-portal-100 flex items-center justify-center shrink-0">
+                        <Bot className="h-4 w-4 text-portal-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -732,7 +734,7 @@ export default function GrowthPage() {
                         </div>
                         <p className="text-xs text-gray-600 leading-relaxed">{obs.insight}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <Button variant="ghost" size="sm" className="h-6 text-[10px] text-purple-600 hover:text-purple-700">
+                          <Button variant="ghost" size="sm" className="h-6 text-[10px] text-portal-600 hover:text-portal-700">
                             Create Action Plan
                           </Button>
                           <Button variant="ghost" size="sm" className="h-6 text-[10px] text-gray-400 hover:text-gray-600">

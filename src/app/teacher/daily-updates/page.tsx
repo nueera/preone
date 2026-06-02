@@ -33,6 +33,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, MOOD_COLORS as THEME_MOOD_COLORS, MEAL_COLORS as THEME_MEAL_COLORS, HEALTH_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 type MealStatus = 'Eaten' | 'Partial' | 'Not Eaten';
@@ -149,11 +151,11 @@ function calculateDuration(start: string, end: string): string | null {
 
 // ── Mood Config ──
 const MOOD_CONFIG: Record<MoodType, { emoji: string; color: string; bg: string; border: string }> = {
-  Happy:   { emoji: '😊', color: 'text-green-700', bg: 'bg-green-100', border: 'border-green-300' },
-  Sad:     { emoji: '😢', color: 'text-blue-700', bg: 'bg-blue-100', border: 'border-blue-300' },
+  Happy:   { emoji: THEME_MOOD_COLORS.HAPPY.emoji, color: THEME_MOOD_COLORS.HAPPY.text, bg: THEME_MOOD_COLORS.HAPPY.bg, border: 'border-green-300' },
+  Sad:     { emoji: THEME_MOOD_COLORS.SAD.emoji, color: THEME_MOOD_COLORS.SAD.text, bg: THEME_MOOD_COLORS.SAD.bg, border: 'border-blue-300' },
   Angry:   { emoji: '😡', color: 'text-red-700', bg: 'bg-red-100', border: 'border-red-300' },
-  Calm:    { emoji: '😌', color: 'text-teal-700', bg: 'bg-teal-100', border: 'border-teal-300' },
-  Excited: { emoji: '🤩', color: 'text-purple-700', bg: 'bg-purple-100', border: 'border-purple-300' },
+  Calm:    { emoji: THEME_MOOD_COLORS.CALM.emoji, color: THEME_MOOD_COLORS.CALM.text, bg: THEME_MOOD_COLORS.CALM.bg, border: 'border-teal-300' },
+  Excited: { emoji: THEME_MOOD_COLORS.EXCITED.emoji, color: THEME_MOOD_COLORS.EXCITED.text, bg: THEME_MOOD_COLORS.EXCITED.bg, border: 'border-purple-300' },
   Tired:   { emoji: '😴', color: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-300' },
   Sick:    { emoji: '🤒', color: 'text-orange-700', bg: 'bg-orange-100', border: 'border-orange-300' },
   Fussy:   { emoji: '😩', color: 'text-pink-700', bg: 'bg-pink-100', border: 'border-pink-300' },
@@ -162,19 +164,19 @@ const MOOD_CONFIG: Record<MoodType, { emoji: string; color: string; bg: string; 
 const MOOD_OPTIONS: MoodType[] = ['Happy', 'Sad', 'Angry', 'Calm', 'Excited', 'Tired', 'Sick', 'Fussy'];
 
 const MEAL_COLORS: Record<MealStatus, { bg: string; text: string; border: string; activeBg: string }> = {
-  'Eaten':     { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300', activeBg: 'bg-emerald-600' },
-  'Partial':   { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-300', activeBg: 'bg-amber-500' },
-  'Not Eaten': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300', activeBg: 'bg-red-500' },
+  'Eaten':     { bg: THEME_MEAL_COLORS.EATEN.bg, text: THEME_MEAL_COLORS.EATEN.text, border: 'border-portal-300', activeBg: 'bg-portal-600' },
+  'Partial':   { bg: THEME_MEAL_COLORS.PARTIAL.bg, text: THEME_MEAL_COLORS.PARTIAL.text, border: 'border-amber-300', activeBg: 'bg-amber-500' },
+  'Not Eaten': { bg: THEME_MEAL_COLORS.NOT_EATEN.bg, text: THEME_MEAL_COLORS.NOT_EATEN.text, border: 'border-red-300', activeBg: 'bg-red-500' },
 };
 
 const SLEEP_COLORS: Record<SleepQuality, { bg: string; text: string; border: string; activeBg: string }> = {
-  Good: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300', activeBg: 'bg-emerald-600' },
-  Fair: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-300', activeBg: 'bg-amber-500' },
-  Poor: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300', activeBg: 'bg-red-500' },
+  Good: { bg: HEALTH_COLORS.GOOD.bg, text: HEALTH_COLORS.GOOD.text, border: 'border-portal-300', activeBg: 'bg-portal-600' },
+  Fair: { bg: HEALTH_COLORS.FAIR.bg, text: HEALTH_COLORS.FAIR.text, border: 'border-amber-300', activeBg: 'bg-amber-500' },
+  Poor: { bg: HEALTH_COLORS.POOR.bg, text: HEALTH_COLORS.POOR.text, border: 'border-red-300', activeBg: 'bg-red-500' },
 };
 
 const POTTY_TYPE_COLORS: Record<PottyType, { bg: string; text: string; border: string; activeBg: string; icon: string }> = {
-  Dry:    { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300', activeBg: 'bg-emerald-600', icon: '✅' },
+  Dry:    { bg: 'bg-portal-50', text: 'text-portal-700', border: 'border-portal-300', activeBg: 'bg-portal-600', icon: '✅' },
   Wet:    { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-300', activeBg: 'bg-amber-500', icon: '⚠️' },
   Soiled: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300', activeBg: 'bg-red-500', icon: '❌' },
 };
@@ -432,7 +434,7 @@ function DailyUpdatesContent() {
         <p className="text-gray-500 mb-4">{error}</p>
         <Button
           onClick={() => fetchData(selectedDate)}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className="bg-portal-600 hover:bg-portal-700 rounded-xl text-white"
         >
           Retry
         </Button>
@@ -485,7 +487,7 @@ function DailyUpdatesContent() {
               {/* Status badge */}
               <Badge
                 variant="outline"
-                className="px-3 py-1 text-xs rounded-xl border-emerald-200 bg-emerald-50 text-emerald-700"
+                className="px-3 py-1 text-xs rounded-xl border-portal-200 bg-portal-50 text-portal-700"
               >
                 {data.summary.published} published / {data.summary.total} total
               </Badge>
@@ -494,13 +496,13 @@ function DailyUpdatesContent() {
               <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setViewMode('detail')}
-                  className={`p-1.5 transition-colors ${viewMode === 'detail' ? 'bg-emerald-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`p-1.5 transition-colors ${viewMode === 'detail' ? 'bg-portal-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => { setViewMode('list'); setSelectedStudentId(null); }}
-                  className={`p-1.5 transition-colors ${viewMode === 'list' ? 'bg-emerald-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`p-1.5 transition-colors ${viewMode === 'list' ? 'bg-portal-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -510,7 +512,7 @@ function DailyUpdatesContent() {
 
           {/* Summary bar */}
           <div className="flex items-center gap-4 mt-3 text-xs">
-            <span className="flex items-center gap-1 text-emerald-600">
+            <span className="flex items-center gap-1 text-portal-600">
               <CheckCircle2 className="h-3.5 w-3.5" /> {data.summary.published} Published
             </span>
             <span className="flex items-center gap-1 text-amber-600">
@@ -523,7 +525,7 @@ function DailyUpdatesContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="ml-auto text-xs rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-7"
+                className="ml-auto text-xs rounded-xl border-portal-200 text-portal-700 hover:bg-portal-50 h-7"
                 onClick={handleBulkPublish}
                 disabled={saving}
               >
@@ -585,7 +587,7 @@ function DailyUpdatesContent() {
                           {currentUpdate?.studentPhoto ? (
                             <AvatarImage src={currentUpdate.studentPhoto} alt={currentUpdate.studentName || ''} />
                           ) : (
-                            <AvatarFallback className="bg-emerald-50 text-emerald-700 text-sm font-semibold">
+                            <AvatarFallback className="bg-portal-50 text-portal-700 text-sm font-semibold">
                               {getInitials(currentUpdate?.studentName || '??')}
                             </AvatarFallback>
                           )}
@@ -599,7 +601,7 @@ function DailyUpdatesContent() {
                       </div>
                       <div>
                         {currentUpdate?.status === 'PUBLISHED' && (
-                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs rounded-xl">
+                          <Badge className="bg-portal-100 text-portal-700 border-portal-200 text-xs rounded-xl">
                             ✅ Published
                           </Badge>
                         )}
@@ -940,7 +942,7 @@ function DailyUpdatesContent() {
                           Unpublish
                         </Button>
                         <Button
-                          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-xs text-white"
+                          className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs text-white"
                           onClick={() => handleSave('PUBLISHED')}
                           disabled={saving}
                         >
@@ -950,7 +952,7 @@ function DailyUpdatesContent() {
                       </>
                     ) : (
                       <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-xs text-white"
+                        className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs text-white"
                         onClick={() => handleSave('PUBLISHED')}
                         disabled={saving}
                       >
@@ -1014,7 +1016,7 @@ function DailyUpdatesContent() {
                               {update.studentPhoto ? (
                                 <AvatarImage src={update.studentPhoto} alt={update.studentName} />
                               ) : (
-                                <AvatarFallback className="bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+                                <AvatarFallback className="bg-portal-50 text-portal-700 text-[10px] font-semibold">
                                   {getInitials(update.studentName)}
                                 </AvatarFallback>
                               )}
@@ -1057,7 +1059,7 @@ function DailyUpdatesContent() {
                         </td>
                         <td className="py-3 px-2 text-center">
                           {update.status === 'PUBLISHED' && (
-                            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-md">
+                            <Badge className="bg-portal-100 text-portal-700 text-[10px] px-1.5 py-0.5 rounded-md">
                               ✅
                             </Badge>
                           )}
@@ -1076,7 +1078,7 @@ function DailyUpdatesContent() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-xs rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-7"
+                            className="text-xs rounded-lg text-portal-600 hover:text-portal-700 hover:bg-portal-50 h-7"
                           >
                             <Eye className="h-3 w-3 mr-1" />
                             {update.status === 'NOT_STARTED' ? 'Fill' : 'View'}
@@ -1140,7 +1142,7 @@ function StudentCard({
       className={`
         w-full flex items-center gap-3 p-2.5 rounded-xl transition-all text-left
         ${isSelected
-          ? 'bg-emerald-50 border border-emerald-200 shadow-sm'
+          ? 'bg-portal-50 border border-portal-200 shadow-sm'
           : 'hover:bg-gray-50 border border-transparent'
         }
       `}
@@ -1149,13 +1151,13 @@ function StudentCard({
         {update.studentPhoto ? (
           <AvatarImage src={update.studentPhoto} alt={update.studentName} />
         ) : (
-          <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+          <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
             {getInitials(update.studentName)}
           </AvatarFallback>
         )}
       </Avatar>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium truncate ${isSelected ? 'text-emerald-900' : 'text-gray-900'}`}>
+        <p className={`text-sm font-medium truncate ${isSelected ? 'text-portal-900' : 'text-gray-900'}`}>
           {update.studentName}
         </p>
         <p className="text-[10px] text-gray-400">Roll: {update.rollNumber || '-'}</p>

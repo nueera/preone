@@ -33,6 +33,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.teacher;
 
 // ── Navigation items for Teacher portal ──
 const NAV_ITEMS = [
@@ -50,7 +53,7 @@ const NAV_ITEMS = [
 
 /**
  * TeacherSidebar — Left sidebar navigation for the PreOne teacher portal.
- * Emerald/teal gradient theme, collapsible with icon-only mode.
+ * Uses global theme tokens from /src/lib/theme-tokens.ts
  */
 export function TeacherSidebar() {
   const pathname = usePathname();
@@ -59,10 +62,7 @@ export function TeacherSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r-0"
-      style={{
-        background: 'linear-gradient(180deg, #059669 0%, #0d9488 100%)',
-      }}
+      className="border-r-0 bg-portal-sidebar"
     >
       {/* ── Logo Area ── */}
       <SidebarHeader className="p-3">
@@ -85,7 +85,7 @@ export function TeacherSidebar() {
               <span className="text-lg font-bold text-white leading-tight">
                 PreOne
               </span>
-              <span className="text-[10px] text-emerald-200 leading-tight">
+              <span className={`text-[10px] leading-tight ${theme.navSubtextClass}`}>
                 Teacher Portal
               </span>
             </div>
@@ -98,7 +98,7 @@ export function TeacherSidebar() {
       {/* ── Navigation Menu ── */}
       <SidebarContent className="px-2 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-emerald-200/70 text-[10px] uppercase tracking-wider">
+          <SidebarGroupLabel className={`${theme.navLabelClass} text-[10px] uppercase tracking-wider`}>
             Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -118,11 +118,7 @@ export function TeacherSidebar() {
                       className={`
                         group relative flex items-center gap-3 rounded-xl px-3 py-2.5
                         transition-all duration-200
-                        ${
-                          isActive
-                            ? 'bg-emerald-600 text-white font-medium shadow-sm border-l-4 border-emerald-800'
-                            : 'text-emerald-100 hover:bg-emerald-50/10 hover:text-white dark:hover:bg-emerald-900/30'
-                        }
+                        ${isActive ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
                       <Link href={item.href}>
@@ -143,7 +139,7 @@ export function TeacherSidebar() {
         <Separator className="bg-white/10 mb-3" />
         <button
           onClick={toggleSidebar}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-emerald-200 hover:bg-white/10 hover:text-white transition-colors"
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 ${theme.navFooterClass} transition-colors`}
         >
           {state === 'collapsed' ? (
             <ChevronsRight className="h-4 w-4 shrink-0" />

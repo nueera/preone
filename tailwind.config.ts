@@ -56,6 +56,21 @@ const config: Config = {
           '4': 'var(--chart-4)',
           '5': 'var(--chart-5)',
         },
+        /** Portal-scoped colors — auto-switch based on [data-portal] */
+        portal: {
+          DEFAULT: 'var(--portal)',
+          foreground: 'var(--portal-foreground)',
+          50: 'var(--portal-50)',
+          100: 'var(--portal-100)',
+          200: 'var(--portal-200)',
+          300: 'var(--portal-300)',
+          400: 'var(--portal-400)',
+          500: 'var(--portal-500)',
+          600: 'var(--portal-600)',
+          700: 'var(--portal-700)',
+          800: 'var(--portal-800)',
+          900: 'var(--portal-900)',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -65,11 +80,17 @@ const config: Config = {
         '2xl': '24px',
         '3xl': '28px',
         '4xl': '32px',
+        /** Semantic border-radius tokens */
+        card: '24px',
+        container: '20px',
+        element: '16px',
+        badge: '12px',
       },
       boxShadow: {
         card: '0px 8px 24px rgba(15,23,42,0.06)',
         'card-hover': '0px 20px 40px rgba(15,23,42,0.08)',
         floating: '0px 30px 60px rgba(15,23,42,0.10)',
+        portal: '0px 8px 24px rgba(15,23,42,0.06)',
       },
       keyframes: {
         twinkle: {

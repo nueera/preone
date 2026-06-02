@@ -25,6 +25,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useParentAuth } from '@/lib/parent-auth';
 import { useParentChildren, type ChildInfo } from '@/hooks/use-parent';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // HELPERS
@@ -128,9 +130,9 @@ function ChildCard({
         {/* Header with photo and basic info */}
         <div className="p-5 pb-4">
           <div className="flex items-start gap-4">
-            <Avatar className="h-20 w-20 border-2 border-sky-200 shrink-0">
+            <Avatar className="h-20 w-20 border-2 border-portal-200 shrink-0">
               <AvatarImage src={child.photo || undefined} />
-              <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-xl font-bold">
+              <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-xl font-bold`}>
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -138,7 +140,7 @@ function ChildCard({
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg font-bold truncate">{fullName}</h3>
                 {isActive && (
-                  <Badge className="bg-sky-100 text-sky-700 text-[9px] border border-sky-200">
+                  <Badge className={`${theme.selectedClass} text-[9px] border border-portal-200`}>
                     Active
                   </Badge>
                 )}
@@ -159,7 +161,7 @@ function ChildCard({
           {/* Personal details grid */}
           <div className="grid grid-cols-2 gap-2.5 text-sm">
             <div className="flex items-center gap-2">
-              <Calendar className="h-3.5 w-3.5 text-sky-500 shrink-0" />
+              <Calendar className="h-3.5 w-3.5 text-portal-500 shrink-0" />
               <div>
                 <p className="text-[10px] text-muted-foreground">DOB</p>
                 <p className="font-medium text-xs">
@@ -208,7 +210,7 @@ function ChildCard({
                     </span>
                     <span className="text-muted-foreground">({p.relation})</span>
                     {p.isPrimary && (
-                      <Badge className="bg-sky-50 text-sky-600 text-[8px] px-1.5 py-0 border border-sky-200">
+                      <Badge className={`${theme.selectedClass} text-[8px] px-1.5 py-0 border border-portal-200`}>
                         Primary
                       </Badge>
                     )}
@@ -268,7 +270,7 @@ function ChildCard({
           {!isActive && (
             <Button
               size="sm"
-              className="flex-1 bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-xl hover:from-sky-600 hover:to-blue-600 text-xs"
+              className={`flex-1 bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass} text-xs`}
               onClick={onSwitch}
             >
               <UserCheck className="h-3 w-3 mr-1" />
@@ -362,7 +364,7 @@ export default function MyChildrenPage() {
         </div>
         <Card className="rounded-3xl">
           <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
-            <Baby className="h-12 w-12 text-sky-400" />
+            <Baby className="h-12 w-12 text-portal-400" />
             <p className="text-muted-foreground">No children found</p>
             <p className="text-xs text-muted-foreground">
               Contact the school administration for enrollment details
@@ -385,9 +387,9 @@ export default function MyChildrenPage() {
 
       {/* Summary Stats */}
       <div className="flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-2 px-4 py-2 bg-sky-50 rounded-xl border border-sky-100">
-          <Baby className="h-4 w-4 text-sky-600" />
-          <span className="text-sm font-medium text-sky-700">
+        <div className="flex items-center gap-2 px-4 py-2 bg-portal-50 rounded-xl border border-portal-100">
+          <Baby className="h-4 w-4 text-portal-600" />
+          <span className="text-sm font-medium text-portal-700">
             {children.length} {children.length === 1 ? 'Child' : 'Children'}
           </span>
         </div>
@@ -421,14 +423,14 @@ export default function MyChildrenPage() {
 
       {/* Quick info for multiple children */}
       {children.length > 1 && (
-        <Card className="rounded-3xl bg-gradient-to-r from-sky-50 to-blue-50 border-sky-100">
+        <Card className={`rounded-3xl bg-gradient-to-r ${theme.cardGradientClass} border-portal-200`}>
           <CardContent className="p-4 flex items-center gap-3">
-            <Users className="h-5 w-5 text-sky-600 shrink-0" />
+            <Users className="h-5 w-5 text-portal-600 shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-sky-800">
+              <p className="text-sm font-medium text-portal-800">
                 You have {children.length} children enrolled
               </p>
-              <p className="text-xs text-sky-600">
+              <p className="text-xs text-portal-600">
                 Click &quot;Switch to This Child&quot; to view dashboard data for a specific child,
                 or &quot;View Full Profile&quot; to see all details.
               </p>

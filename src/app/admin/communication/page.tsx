@@ -57,6 +57,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface Announcement {
@@ -113,7 +115,7 @@ interface ChatMessage {
 
 // ── Constants ──
 const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  General: { label: 'General', color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
+  General: { label: 'General', color: 'text-portal-700', bg: 'bg-portal-50 border-portal-200' },
   Academic: { label: 'Academic', color: 'text-sky-700', bg: 'bg-sky-50 border-sky-200' },
   Event: { label: 'Event', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
   Holiday: { label: 'Holiday', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
@@ -423,7 +425,7 @@ export default function CommunicationPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-violet-600" />
+            <Megaphone className="h-6 w-6 text-portal-600" />
             Communication
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -454,7 +456,7 @@ export default function CommunicationPage() {
               <DialogContent className="sm:max-w-[560px] rounded-3xl">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2 text-lg">
-                    <Bell className="h-5 w-5 text-violet-600" />
+                    <Bell className="h-5 w-5 text-portal-600" />
                     New Announcement
                   </DialogTitle>
                 </DialogHeader>
@@ -691,7 +693,7 @@ export default function CommunicationPage() {
                 <StatCard
                   title="Total Announcements"
                   value={stats?.announcements?.total ?? 0}
-                  icon={<Megaphone className="h-5 w-5 text-violet-600" />}
+                  icon={<Megaphone className="h-5 w-5 text-portal-600" />}
                   gradient="stat-card-violet"
                 />
                 <StatCard
@@ -888,7 +890,7 @@ export default function CommunicationPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg"
+                                className="h-7 text-xs text-portal-600 hover:text-portal-700 hover:bg-portal-50 rounded-lg"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleView(announcement);
@@ -981,7 +983,7 @@ export default function CommunicationPage() {
                       className={cn(
                         'w-full text-left p-3 rounded-2xl transition-all duration-200',
                         selectedThread === thread.id
-                          ? 'bg-violet-50 border border-violet-200'
+                          ? 'bg-portal-50 border border-portal-200'
                           : 'hover:bg-gray-50 border border-transparent'
                       )}
                     >
@@ -991,7 +993,7 @@ export default function CommunicationPage() {
                             className={cn(
                               'text-xs font-semibold rounded-xl',
                               selectedThread === thread.id
-                                ? 'bg-violet-200 text-violet-700'
+                                ? 'bg-portal-200 text-portal-700'
                                 : 'bg-gray-100 text-gray-600'
                             )}
                           >
@@ -1012,7 +1014,7 @@ export default function CommunicationPage() {
                               {thread.lastMessage}
                             </span>
                             {thread.unreadCount > 0 && (
-                              <span className="ml-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-violet-600 text-[9px] font-bold text-white">
+                              <span className="ml-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-portal-600 text-[9px] font-bold text-white">
                                 {thread.unreadCount}
                               </span>
                             )}
@@ -1071,7 +1073,7 @@ export default function CommunicationPage() {
                             {!msg.isMe && (
                               <p className={cn(
                                 'text-[11px] font-semibold mb-0.5',
-                                msg.senderRole === 'Teacher' ? 'text-violet-600' : 'text-sky-600'
+                                msg.senderRole === 'Teacher' ? 'text-portal-600' : 'text-sky-600'
                               )}>
                                 {msg.senderName}
                               </p>
@@ -1122,7 +1124,7 @@ export default function CommunicationPage() {
               {/* Chat Header */}
               <div className="p-4 border-b bg-white flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-violet-100 text-violet-700 text-sm font-semibold rounded-xl">
+                  <AvatarFallback className="bg-portal-100 text-portal-700 text-sm font-semibold rounded-xl">
                     {currentThread?.name.split(' ').map((w) => w[0]).join('').slice(0, 2) || '??'}
                   </AvatarFallback>
                 </Avatar>
@@ -1170,7 +1172,7 @@ export default function CommunicationPage() {
                         {!msg.isMe && (
                           <p className={cn(
                             'text-[11px] font-semibold mb-0.5',
-                            msg.senderRole === 'Teacher' ? 'text-violet-600' : 'text-sky-600'
+                            msg.senderRole === 'Teacher' ? 'text-portal-600' : 'text-sky-600'
                           )}>
                             {msg.senderName}
                           </p>
@@ -1185,7 +1187,7 @@ export default function CommunicationPage() {
                       </div>
                       {msg.isMe && (
                         <Avatar className="h-7 w-7 shrink-0 mt-1">
-                          <AvatarFallback className="text-[9px] font-semibold rounded-lg bg-violet-100 text-violet-700">
+                          <AvatarFallback className="text-[9px] font-semibold rounded-lg bg-portal-100 text-portal-700">
                             You
                           </AvatarFallback>
                         </Avatar>
@@ -1239,7 +1241,7 @@ export default function CommunicationPage() {
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-lg">
-                  <Megaphone className="h-5 w-5 text-violet-600" />
+                  <Megaphone className="h-5 w-5 text-portal-600" />
                   Announcement Details
                 </DialogTitle>
               </DialogHeader>

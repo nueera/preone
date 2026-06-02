@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { ACTIVITY_COLORS } from '@/lib/theme-tokens';
 
 // ── Types ──
 interface ActivityClass {
@@ -71,16 +72,16 @@ interface ActivityDetailDialogProps {
   onActivityChanged: () => void;
 }
 
-// ── Constants ──
+// ── Constants — using centralized theme tokens ──
 const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  ART: { label: 'Art', color: 'text-pink-700', bg: 'bg-pink-50 border-pink-200' },
-  MUSIC: { label: 'Music', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
-  DANCE: { label: 'Dance', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
-  SPORTS: { label: 'Sports', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
+  ART: { label: 'Art', color: ACTIVITY_COLORS.ART?.text ?? 'text-pink-700', bg: ACTIVITY_COLORS.ART ? `${ACTIVITY_COLORS.ART.bg} border-pink-200` : 'bg-pink-50 border-pink-200' },
+  MUSIC: { label: 'Music', color: ACTIVITY_COLORS.MUSIC?.text ?? 'text-purple-700', bg: ACTIVITY_COLORS.MUSIC ? `${ACTIVITY_COLORS.MUSIC.bg} border-purple-200` : 'bg-purple-50 border-purple-200' },
+  DANCE: { label: 'Dance', color: ACTIVITY_COLORS.DANCE?.text ?? 'text-orange-700', bg: ACTIVITY_COLORS.DANCE ? `${ACTIVITY_COLORS.DANCE.bg} border-orange-200` : 'bg-orange-50 border-orange-200' },
+  SPORTS: { label: 'Sports', color: ACTIVITY_COLORS.SPORTS?.text ?? 'text-green-700', bg: ACTIVITY_COLORS.SPORTS ? `${ACTIVITY_COLORS.SPORTS.bg} border-green-200` : 'bg-green-50 border-green-200' },
   ACADEMIC: { label: 'Academic', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
-  OUTDOOR: { label: 'Outdoor', color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
-  INDOOR: { label: 'Indoor', color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },
-  CRAFT: { label: 'Craft', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200' },
+  OUTDOOR: { label: 'Outdoor', color: ACTIVITY_COLORS.OUTDOOR?.text ?? 'text-teal-700', bg: ACTIVITY_COLORS.OUTDOOR ? `${ACTIVITY_COLORS.OUTDOOR.bg} border-teal-200` : 'bg-teal-50 border-teal-200' },
+  INDOOR: { label: 'Indoor', color: ACTIVITY_COLORS.INDOOR?.text ?? 'text-indigo-700', bg: ACTIVITY_COLORS.INDOOR ? `${ACTIVITY_COLORS.INDOOR.bg} border-indigo-200` : 'bg-indigo-50 border-indigo-200' },
+  CRAFT: { label: 'Craft', color: ACTIVITY_COLORS.CRAFT?.text ?? 'text-yellow-700', bg: ACTIVITY_COLORS.CRAFT ? `${ACTIVITY_COLORS.CRAFT.bg} border-yellow-200` : 'bg-yellow-50 border-yellow-200' },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {

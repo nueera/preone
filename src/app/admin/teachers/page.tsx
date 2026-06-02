@@ -47,6 +47,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { AddTeacherDialog } from '@/components/add-teacher-dialog';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface BranchInfo {
@@ -473,7 +475,7 @@ export default function TeachersListPage() {
                   >
                     <TableCell>
                       <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-purple-50 text-purple-700 text-xs font-semibold">
+                        <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
                           {getInitials(teacher.firstName, teacher.lastName)}
                         </AvatarFallback>
                       </Avatar>
@@ -511,7 +513,7 @@ export default function TeachersListPage() {
                       {teacher.phone ? (
                         <a
                           href={`tel:${teacher.phone}`}
-                          className="text-sm text-purple-600 hover:underline inline-flex items-center gap-1"
+                          className="text-sm text-portal-600 hover:underline inline-flex items-center gap-1"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Phone className="h-3 w-3" />

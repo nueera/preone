@@ -55,6 +55,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, ACTIVITY_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 type ActivityType = 'ART' | 'MUSIC' | 'DANCE' | 'SPORTS' | 'ACADEMIC' | 'OUTDOOR' | 'INDOOR' | 'CRAFT';
@@ -85,14 +87,14 @@ interface ActivityRecord {
 
 // ── Type Config ──
 const TYPE_CONFIG: Record<ActivityType, { label: string; icon: string; color: string; bg: string; border: string; LucideIcon: React.ElementType }> = {
-  ART:      { label: 'Art',      icon: '🎨', color: 'text-pink-700',    bg: 'bg-pink-100',    border: 'border-pink-300',    LucideIcon: Palette },
-  MUSIC:    { label: 'Music',    icon: '🎵', color: 'text-purple-700',  bg: 'bg-purple-100',  border: 'border-purple-300',  LucideIcon: Music },
-  DANCE:    { label: 'Dance',    icon: '💃', color: 'text-orange-700',  bg: 'bg-orange-100',  border: 'border-orange-300',  LucideIcon: Sparkles },
-  SPORTS:   { label: 'Sports',   icon: '⚽', color: 'text-green-700',   bg: 'bg-green-100',   border: 'border-green-300',   LucideIcon: Trophy },
-  ACADEMIC: { label: 'Academic', icon: '📚', color: 'text-blue-700',    bg: 'bg-blue-100',    border: 'border-blue-300',    LucideIcon: BookOpen },
-  OUTDOOR:  { label: 'Outdoor',  icon: '🌳', color: 'text-teal-700',    bg: 'bg-teal-100',    border: 'border-teal-300',    LucideIcon: TreePine },
-  INDOOR:   { label: 'Indoor',   icon: '🏠', color: 'text-indigo-700',  bg: 'bg-indigo-100',  border: 'border-indigo-300',  LucideIcon: Home },
-  CRAFT:    { label: 'Craft',    icon: '✂️', color: 'text-yellow-700',  bg: 'bg-yellow-100',  border: 'border-yellow-300',  LucideIcon: Scissors },
+  ART:      { label: 'Art',      icon: ACTIVITY_COLORS.ART?.icon || '🎨', color: ACTIVITY_COLORS.ART?.text || 'text-pink-700',    bg: ACTIVITY_COLORS.ART?.bg || 'bg-pink-100',    border: 'border-pink-300',    LucideIcon: Palette },
+  MUSIC:    { label: 'Music',    icon: ACTIVITY_COLORS.MUSIC?.icon || '🎵', color: ACTIVITY_COLORS.MUSIC?.text || 'text-purple-700',  bg: ACTIVITY_COLORS.MUSIC?.bg || 'bg-purple-100',  border: 'border-purple-300',  LucideIcon: Music },
+  DANCE:    { label: 'Dance',    icon: ACTIVITY_COLORS.DANCE?.icon || '💃', color: ACTIVITY_COLORS.DANCE?.text || 'text-orange-700',  bg: ACTIVITY_COLORS.DANCE?.bg || 'bg-orange-100',  border: 'border-orange-300',  LucideIcon: Sparkles },
+  SPORTS:   { label: 'Sports',   icon: ACTIVITY_COLORS.SPORTS?.icon || '⚽', color: ACTIVITY_COLORS.SPORTS?.text || 'text-green-700',   bg: ACTIVITY_COLORS.SPORTS?.bg || 'bg-green-100',   border: 'border-green-300',   LucideIcon: Trophy },
+  ACADEMIC: { label: 'Academic', icon: ACTIVITY_COLORS.ACADEMIC?.icon || '📚', color: ACTIVITY_COLORS.ACADEMIC?.text || 'text-blue-700', bg: ACTIVITY_COLORS.ACADEMIC?.bg || 'bg-blue-100', border: 'border-blue-300', LucideIcon: BookOpen },
+  OUTDOOR:  { label: 'Outdoor',  icon: ACTIVITY_COLORS.OUTDOOR?.icon || '🌳', color: ACTIVITY_COLORS.OUTDOOR?.text || 'text-teal-700',    bg: ACTIVITY_COLORS.OUTDOOR?.bg || 'bg-teal-100',    border: 'border-teal-300',    LucideIcon: TreePine },
+  INDOOR:   { label: 'Indoor',   icon: ACTIVITY_COLORS.INDOOR?.icon || '🏠', color: ACTIVITY_COLORS.INDOOR?.text || 'text-indigo-700',  bg: ACTIVITY_COLORS.INDOOR?.bg || 'bg-indigo-100',  border: 'border-indigo-300',  LucideIcon: Home },
+  CRAFT:    { label: 'Craft',    icon: ACTIVITY_COLORS.CRAFT?.icon || '✂️', color: ACTIVITY_COLORS.CRAFT?.text || 'text-yellow-700',  bg: ACTIVITY_COLORS.CRAFT?.bg || 'bg-yellow-100',  border: 'border-yellow-300',  LucideIcon: Scissors },
 };
 
 const STATUS_CONFIG: Record<ActivityStatus, { label: string; color: string; bg: string; border: string }> = {
@@ -433,7 +435,7 @@ function ActivitiesContent() {
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Activities</h3>
         <p className="text-gray-500 mb-4">{error}</p>
-        <Button onClick={fetchActivities} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl">
+        <Button onClick={fetchActivities} className="bg-portal-600 hover:bg-portal-700 rounded-xl">
           Retry
         </Button>
       </div>
@@ -450,7 +452,7 @@ function ActivitiesContent() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-emerald-500" />
+                <Calendar className="h-5 w-5 text-portal-500" />
                 Activities
               </h1>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -458,7 +460,7 @@ function ActivitiesContent() {
               </p>
             </div>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm"
               onClick={() => setShowCreateDialog(true)}
             >
               <Plus className="h-4 w-4 mr-1" /> Create Activity
@@ -486,7 +488,7 @@ function ActivitiesContent() {
                 <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">No Activities Scheduled</h3>
                 <p className="text-sm text-gray-500 mb-4">No activities for the next 7 days. Create one to get started!</p>
-                <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm" onClick={() => setShowCreateDialog(true)}>
+                <Button className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm" onClick={() => setShowCreateDialog(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Create Activity
                 </Button>
               </CardContent>
@@ -503,7 +505,7 @@ function ActivitiesContent() {
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-sm font-bold ${
                         isToday(date)
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-portal-600 text-white'
                           : past
                             ? 'bg-gray-100 text-gray-400'
                             : 'bg-gray-100 text-gray-700'
@@ -513,7 +515,7 @@ function ActivitiesContent() {
                       <div>
                         <p className={`text-sm font-semibold ${past ? 'text-gray-400' : 'text-gray-900'}`}>
                           {dayLabel}
-                          {isToday(date) && <span className="ml-2 text-emerald-600 text-xs">— {formatDate(date)}</span>}
+                          {isToday(date) && <span className="ml-2 text-portal-600 text-xs">— {formatDate(date)}</span>}
                           {!isToday(date) && <span className="ml-2 text-gray-400 text-xs">— {formatDate(date)}</span>}
                         </p>
                         <p className="text-xs text-gray-400">{dayActivities.length} activit{dayActivities.length === 1 ? 'y' : 'ies'}</p>
@@ -531,7 +533,7 @@ function ActivitiesContent() {
                             key={activity.id}
                             className={`border-0 shadow-md cursor-pointer hover:shadow-lg transition-all ${
                               past ? 'opacity-60' : ''
-                            } ${isHappening ? 'ring-2 ring-emerald-400' : ''}`}
+                            } ${isHappening ? 'ring-2 ring-portal-400' : ''}`}
                             onClick={() => {
                               setSelectedActivity(activity);
                               setShowDetailDialog(true);
@@ -551,7 +553,7 @@ function ActivitiesContent() {
                                       {typeConfig.label}
                                     </Badge>
                                     {isHappening && (
-                                      <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 border text-[10px] px-1.5 py-0 rounded-md flex items-center gap-1">
+                                      <Badge className="bg-portal-100 text-portal-700 border-portal-300 border text-[10px] px-1.5 py-0 rounded-md flex items-center gap-1">
                                         <Radio className="h-2.5 w-2.5 animate-pulse" /> Happening Now
                                       </Badge>
                                     )}
@@ -721,7 +723,7 @@ function ActivitiesContent() {
         <DialogContent className="sm:max-w-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-emerald-600" />
+              <Plus className="h-5 w-5 text-portal-600" />
               Create Activity
             </DialogTitle>
             <DialogDescription>Schedule a new classroom activity</DialogDescription>
@@ -849,7 +851,7 @@ function ActivitiesContent() {
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.type || !createForm.date}
             >
@@ -924,7 +926,7 @@ function ActivitiesContent() {
                       <Eye className="h-3.5 w-3.5" /> Parent Visibility
                     </h4>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm ${selectedActivity.isPublished ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <span className={`text-sm ${selectedActivity.isPublished ? 'text-portal-600' : 'text-gray-500'}`}>
                         {selectedActivity.isPublished ? (
                           <><CheckCircle2 className="h-4 w-4 inline mr-1" /> Published ✅</>
                         ) : (
@@ -1034,7 +1036,7 @@ function ActivitiesContent() {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl" onClick={() => setShowEditDialog(false)}>Cancel</Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl" onClick={handleEdit} disabled={editing}>
+            <Button className="bg-portal-600 hover:bg-portal-700 rounded-xl" onClick={handleEdit} disabled={editing}>
               {editing ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>

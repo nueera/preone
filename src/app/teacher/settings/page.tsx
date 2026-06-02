@@ -58,6 +58,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { teacherFetch } from '@/lib/teacher-api';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ============================================================
 // TYPES
@@ -355,9 +357,9 @@ function ProfileTab({
             {/* Photo */}
             <div className="flex flex-col items-center mb-6">
               <div className="relative group">
-                <Avatar className="h-28 w-28 border-4 border-emerald-100 shadow-lg">
+                <Avatar className="h-28 w-28 border-4 border-portal-100 shadow-lg">
                   <AvatarImage src={profile.photo || undefined} alt={fullName} />
-                  <AvatarFallback className="bg-gradient-to-br from-emerald-400 to-teal-500 text-white text-3xl font-bold">
+                  <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-3xl font-bold`}>
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -373,7 +375,7 @@ function ProfileTab({
               </p>
               <Badge
                 variant="outline"
-                className="mt-2 border-emerald-200 text-emerald-700 bg-emerald-50 text-xs"
+                className={`mt-2 ${theme.selectedClass} border-emerald-200 text-xs`}
               >
                 {profile.status}
               </Badge>
@@ -415,7 +417,7 @@ function ProfileTab({
 
             <Button
               onClick={openEdit}
-              className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600"
+              className={`w-full mt-6 bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:bg-gradient-to-r hover:${theme.btnGradientHoverClass}`}
             >
               <User className="h-4 w-4 mr-2" />
               Edit Profile
@@ -427,7 +429,7 @@ function ProfileTab({
         <Card className="rounded-3xl lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <User className="h-5 w-5 text-emerald-600" />
+              <User className="h-5 w-5 text-portal-600" />
               Profile Details
             </CardTitle>
             <CardDescription>
@@ -438,7 +440,7 @@ function ProfileTab({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Personal Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm text-emerald-700 uppercase tracking-wider">
+                <h3 className="font-semibold text-sm text-portal-700 uppercase tracking-wider">
                   Personal Information
                 </h3>
                 <DetailField label="Full Name" value={fullName} readonly />
@@ -451,7 +453,7 @@ function ProfileTab({
 
               {/* Professional Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm text-emerald-700 uppercase tracking-wider">
+                <h3 className="font-semibold text-sm text-portal-700 uppercase tracking-wider">
                   Professional Information
                 </h3>
                 <DetailField label="Qualification" value={profile.qualification || 'Not set'} readonly />
@@ -500,9 +502,9 @@ function ProfileTab({
             <div className="space-y-2">
               <Label>Profile Photo</Label>
               <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16 border-2 border-emerald-100">
+                <Avatar className="h-16 w-16 border-2 border-portal-100">
                   <AvatarImage src={editPhoto || undefined} alt="Preview" />
-                  <AvatarFallback className="bg-gradient-to-br from-emerald-400 to-teal-500 text-white text-xl font-bold">
+                  <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-xl font-bold`}>
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -600,7 +602,7 @@ function ProfileTab({
             <Button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600"
+              className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:bg-gradient-to-r hover:${theme.btnGradientHoverClass}`}
             >
               {saving ? (
                 <>
@@ -692,7 +694,7 @@ function ChangePasswordCard() {
     <Card className="rounded-3xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Lock className="h-5 w-5 text-emerald-600" />
+          <Lock className="h-5 w-5 text-portal-600" />
           Change Password
         </CardTitle>
         <CardDescription>
@@ -778,16 +780,16 @@ function ChangePasswordCard() {
 
           {/* Success Message */}
           {success && (
-            <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              <p className="text-sm text-emerald-700">Password changed successfully!</p>
+            <div className={`flex items-center gap-2 p-3 ${theme.selectedClass} border border-emerald-200 rounded-xl`}>
+              <CheckCircle2 className="h-4 w-4 text-portal-600" />
+              <p className="text-sm text-portal-700">Password changed successfully!</p>
             </div>
           )}
 
           <Button
             onClick={handleChangePassword}
             disabled={changing || !currentPassword || !newPassword || !confirmPassword}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600"
+            className={`w-full bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:bg-gradient-to-r hover:${theme.btnGradientHoverClass}`}
           >
             {changing ? (
               <>
@@ -899,7 +901,7 @@ function NotificationsTab() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Bell className="h-5 w-5 text-emerald-600" />
+              <Bell className="h-5 w-5 text-portal-600" />
               Notification Preferences
             </CardTitle>
             <CardDescription className="mt-1">
@@ -934,8 +936,8 @@ function NotificationsTab() {
                 className="grid grid-cols-[1fr_80px_80px] items-center px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-50">
-                    <Icon className="h-4 w-4 text-emerald-600" />
+                  <div className="p-2 rounded-lg bg-portal-50">
+                    <Icon className="h-4 w-4 text-portal-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">{type.label}</p>
@@ -986,7 +988,7 @@ function NotificationsTab() {
               size="sm"
               onClick={handleSave}
               disabled={!hasChanges || saving}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600"
+              className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:bg-gradient-to-r hover:${theme.btnGradientHoverClass}`}
             >
               {saving ? (
                 <>

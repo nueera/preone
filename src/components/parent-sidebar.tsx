@@ -32,8 +32,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 import { useParentAuth } from '@/lib/parent-auth';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.parent;
 
 // ── Navigation items for Parent portal ──
 const NAV_ITEMS = [
@@ -50,7 +52,7 @@ const NAV_ITEMS = [
 
 /**
  * ParentSidebar — Left sidebar navigation for the PreOne parent portal.
- * Sky-blue/blue gradient theme, collapsible with icon-only mode.
+ * Uses global theme tokens from /src/lib/theme-tokens.ts
  * Includes child switcher for multi-child parents.
  */
 export function ParentSidebar() {
@@ -63,10 +65,7 @@ export function ParentSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r-0"
-      style={{
-        background: 'linear-gradient(180deg, #0ea5e9 0%, #3b82f6 100%)',
-      }}
+      className="border-r-0 bg-portal-sidebar"
     >
       {/* ── Logo Area ── */}
       <SidebarHeader className="p-3">
@@ -89,7 +88,7 @@ export function ParentSidebar() {
               <span className="text-lg font-bold text-white leading-tight">
                 PreOne
               </span>
-              <span className="text-[10px] text-sky-200 leading-tight">
+              <span className={`text-[10px] leading-tight ${theme.navSubtextClass}`}>
                 Parent Portal
               </span>
             </div>
@@ -108,7 +107,7 @@ export function ParentSidebar() {
                 <button className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 bg-white/10 hover:bg-white/20 transition-colors text-white">
                   <Avatar className="h-7 w-7 border border-white/30">
                     <AvatarImage src={selectedChild?.photo || undefined} />
-                    <AvatarFallback className="bg-sky-200 text-sky-700 text-[10px] font-semibold">
+                    <AvatarFallback className={`${theme.avatarFallbackClass} text-[10px] font-semibold`}>
                       {selectedChild
                         ? `${selectedChild.firstName[0]}${selectedChild.lastName[0]}`
                         : '??'}
@@ -120,11 +119,11 @@ export function ParentSidebar() {
                         ? `${selectedChild.firstName} ${selectedChild.lastName}`
                         : 'Select Child'}
                     </p>
-                    <p className="text-[10px] text-sky-200 truncate">
+                    <p className={`text-[10px] truncate ${theme.navSubtextClass}`}>
                       {selectedChild?.className || 'No class'}
                     </p>
                   </div>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-sky-200" />
+                  <ChevronDown className={`h-4 w-4 shrink-0 ${theme.navSubtextClass}`} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
@@ -136,14 +135,14 @@ export function ParentSidebar() {
                     key={child.id}
                     className={`cursor-pointer ${
                       child.id === selectedChild?.id
-                        ? 'bg-sky-50 text-sky-700'
+                        ? theme.selectedClass
                         : ''
                     }`}
                     onClick={() => selectChild(child.id)}
                   >
                     <Avatar className="h-5 w-5 mr-2">
                       <AvatarImage src={child.photo || undefined} />
-                      <AvatarFallback className="text-[8px] bg-sky-100 text-sky-700">
+                      <AvatarFallback className={`text-[8px] ${theme.avatarFallbackClass}`}>
                         {child.firstName[0]}
                         {child.lastName[0]}
                       </AvatarFallback>
@@ -157,7 +156,7 @@ export function ParentSidebar() {
                       </span>
                     </div>
                     {child.id === selectedChild?.id && (
-                      <Badge className="bg-sky-100 text-sky-700 text-[9px] ml-1">
+                      <Badge className={`${theme.selectedClass} text-[9px] ml-1`}>
                         Active
                       </Badge>
                     )}
@@ -173,7 +172,7 @@ export function ParentSidebar() {
       {/* ── Navigation Menu ── */}
       <SidebarContent className="px-2 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sky-200/70 text-[10px] uppercase tracking-wider">
+          <SidebarGroupLabel className={`${theme.navLabelClass} text-[10px] uppercase tracking-wider`}>
             Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -193,11 +192,7 @@ export function ParentSidebar() {
                       className={`
                         group relative flex items-center gap-3 rounded-xl px-3 py-2.5
                         transition-all duration-200
-                        ${
-                          isActive
-                            ? 'bg-sky-600 text-white font-medium shadow-sm border-l-4 border-blue-800'
-                            : 'text-sky-100 hover:bg-sky-50/10 hover:text-white dark:hover:bg-sky-900/30'
-                        }
+                        ${isActive ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
                       <Link href={item.href}>
@@ -218,7 +213,7 @@ export function ParentSidebar() {
         <Separator className="bg-white/10 mb-3" />
         <button
           onClick={toggleSidebar}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sky-200 hover:bg-white/10 hover:text-white transition-colors"
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 ${theme.navFooterClass} transition-colors`}
         >
           {state === 'collapsed' ? (
             <ChevronsRight className="h-4 w-4 shrink-0" />

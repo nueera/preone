@@ -42,14 +42,17 @@ import {
   type DailyUpdateData,
   type DailyUpdatesHistoryResponse,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, MEAL_COLORS, MOOD_COLORS, HEALTH_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS
 // ============================================================
 
 const MOOD_EMOJI: Record<string, string> = {
-  HAPPY: '😊', SAD: '😢', TIRED: '😴', EXCITED: '🤩',
-  CALM: '😌', FUSSY: '😤', NEUTRAL: '😐',
+  HAPPY: MOOD_COLORS.HAPPY?.emoji ?? '😊', SAD: MOOD_COLORS.SAD?.emoji ?? '😢',
+  TIRED: '😴', EXCITED: MOOD_COLORS.EXCITED?.emoji ?? '🤩',
+  CALM: MOOD_COLORS.CALM?.emoji ?? '😌', FUSSY: '😤', NEUTRAL: '😐',
 };
 
 const MOOD_LABEL: Record<string, string> = {
@@ -58,8 +61,9 @@ const MOOD_LABEL: Record<string, string> = {
 };
 
 const MOOD_COLOR: Record<string, string> = {
-  HAPPY: 'text-emerald-600', SAD: 'text-red-600', TIRED: 'text-amber-600',
-  EXCITED: 'text-purple-600', CALM: 'text-blue-600', FUSSY: 'text-orange-600',
+  HAPPY: MOOD_COLORS.HAPPY?.text ?? 'text-emerald-600', SAD: MOOD_COLORS.SAD?.text ?? 'text-red-600',
+  TIRED: 'text-amber-600', EXCITED: MOOD_COLORS.EXCITED?.text ?? 'text-purple-600',
+  CALM: MOOD_COLORS.CALM?.text ?? 'text-blue-600', FUSSY: 'text-orange-600',
   NEUTRAL: 'text-gray-600',
 };
 
@@ -72,15 +76,19 @@ const MEAL_STATUS_LABEL: Record<string, string> = {
 };
 
 const MEAL_STATUS_COLOR: Record<string, string> = {
-  EATEN: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  PARTIAL: 'bg-amber-100 text-amber-700 border-amber-200',
+  EATEN: MEAL_COLORS.EATEN ? `${MEAL_COLORS.EATEN.bg} ${MEAL_COLORS.EATEN.text} border-emerald-200` : 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  PARTIAL: MEAL_COLORS.PARTIAL ? `${MEAL_COLORS.PARTIAL.bg} ${MEAL_COLORS.PARTIAL.text} border-amber-200` : 'bg-amber-100 text-amber-700 border-amber-200',
   SKIPPED: 'bg-red-100 text-red-700 border-red-200',
   NOT_PROVIDED: 'bg-gray-100 text-gray-500 border-gray-200',
 };
 
 const SLEEP_QUALITY_ICON: Record<string, string> = { GOOD: '🟢', FAIR: '🟡', POOR: '🔴' };
 const SLEEP_QUALITY_LABEL: Record<string, string> = { GOOD: 'Good', FAIR: 'Fair', POOR: 'Poor' };
-const SLEEP_QUALITY_BAR: Record<string, string> = { GOOD: 'bg-emerald-500', FAIR: 'bg-amber-500', POOR: 'bg-red-500' };
+const SLEEP_QUALITY_BAR: Record<string, string> = {
+  GOOD: HEALTH_COLORS.GOOD ? `bg-emerald-500` : 'bg-emerald-500',
+  FAIR: HEALTH_COLORS.FAIR ? `bg-amber-500` : 'bg-amber-500',
+  POOR: HEALTH_COLORS.POOR ? `bg-red-500` : 'bg-red-500',
+};
 const SLEEP_QUALITY_PCT: Record<string, number> = { GOOD: 100, FAIR: 60, POOR: 25 };
 
 const MAX_WATER = 8;
@@ -218,7 +226,7 @@ function MealBadge({ status }: { status: string | null }) {
 
 function TodayUpdateCard({ update, childName }: { update: DailyUpdateData; childName: string }) {
   return (
-    <Card className="rounded-3xl bg-gradient-to-br from-sky-500 to-blue-500 text-white border-0 overflow-hidden relative">
+    <Card className={`rounded-3xl bg-gradient-to-br ${theme.btnGradientClass} text-white border-0 overflow-hidden relative`}>
       {/* Decorative circles */}
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10" />
       <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-white/5" />

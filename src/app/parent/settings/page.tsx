@@ -37,6 +37,8 @@ import {
   useChangePassword,
   type NotificationPreferencesData,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // HELPERS
@@ -199,7 +201,7 @@ function ProfileTab() {
         <div className="relative group">
           <Avatar className="h-24 w-24 border-4 border-sky-200 shadow-lg">
             <AvatarImage src={parent.photo || undefined} />
-            <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-2xl font-bold">
+            <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-2xl font-bold`}>
               {parentInitials}
             </AvatarFallback>
           </Avatar>
@@ -336,7 +338,7 @@ function ProfileTab() {
               >
                 <Avatar className="h-8 w-8 border border-sky-100">
                   <AvatarImage src={child.photo || undefined} />
-                  <AvatarFallback className="bg-gradient-to-br from-sky-400 to-blue-500 text-white text-[10px] font-bold">
+                  <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-[10px] font-bold`}>
                     {getInitials(child.firstName, child.lastName)}
                   </AvatarFallback>
                 </Avatar>
@@ -371,7 +373,7 @@ function ProfileTab() {
               Cancel
             </Button>
             <Button
-              className="rounded-xl flex-1 min-h-[44px] bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600"
+              className={`rounded-xl flex-1 min-h-[44px] bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass}`}
               onClick={handleSave}
               disabled={updateProfile.isPending}
             >
@@ -380,7 +382,7 @@ function ProfileTab() {
           </>
         ) : (
           <Button
-            className="rounded-xl w-full min-h-[44px] bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600"
+            className={`rounded-xl w-full min-h-[44px] bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass}`}
             onClick={() => setIsEditing(true)}
           >
             Edit Profile
@@ -506,7 +508,7 @@ function KycTab() {
   return (
     <div className="space-y-6">
       {/* KYC Status Header */}
-      <Card className="rounded-2xl border-sky-100 bg-gradient-to-r from-sky-50 to-blue-50">
+      <Card className={`rounded-2xl border-sky-100 bg-gradient-to-r ${theme.cardGradientClass}`}>
         <CardContent className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white shadow-sm">
@@ -603,7 +605,7 @@ function KycTab() {
                     {hasFile && (
                       <Button
                         size="sm"
-                        className="rounded-xl w-full min-h-[44px] bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600"
+                        className={`rounded-xl w-full min-h-[44px] bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass}`}
                         onClick={() => handleUpload(docType)}
                         disabled={uploadKyc.isPending}
                       >
@@ -626,7 +628,7 @@ function KycTab() {
       {/* Upload All Button */}
       {!isLocked && Object.values(selectedFiles).some((f) => f !== null) && (
         <Button
-          className="rounded-xl w-full min-h-[44px] bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600"
+          className={`rounded-xl w-full min-h-[44px] bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass}`}
           onClick={handleUploadAll}
           disabled={uploadKyc.isPending}
         >
@@ -887,7 +889,7 @@ function ChangePasswordTab() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-100">
+      <div className={`flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r ${theme.cardGradientClass} border border-sky-100`}>
         <div className="p-2.5 rounded-xl bg-white shadow-sm">
           <Shield className="h-5 w-5 text-sky-600" />
         </div>
@@ -991,7 +993,7 @@ function ChangePasswordTab() {
 
       {/* Submit Button */}
       <Button
-        className="rounded-xl w-full min-h-[44px] bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600"
+        className={`rounded-xl w-full min-h-[44px] bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass}`}
         onClick={handleSubmit}
         disabled={changePassword.isPending}
       >
@@ -1028,7 +1030,7 @@ function SettingsContent() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-500">
+          <div className={`p-2 rounded-xl bg-gradient-to-r ${theme.btnGradientClass}`}>
             <Settings className="h-5 w-5 text-white" />
           </div>
           Settings

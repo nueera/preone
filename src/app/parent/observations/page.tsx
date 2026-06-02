@@ -35,6 +35,8 @@ import {
   useAcknowledgeObservation,
   type ObservationData,
 } from '@/hooks/use-parent';
+import { PORTAL_THEMES, OBSERVATION_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // CONSTANTS & CONFIG
@@ -44,12 +46,12 @@ const CATEGORIES = ['BEHAVIORAL', 'ACADEMIC', 'SOCIAL', 'EMOTIONAL', 'PHYSICAL',
 const PRIORITIES = ['LOW', 'NORMAL', 'HIGH', 'CONCERN'] as const;
 
 const CATEGORY_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  BEHAVIORAL: { label: 'Behavioral', bg: 'bg-purple-100', text: 'text-purple-700', dot: 'bg-purple-500' },
-  ACADEMIC:   { label: 'Academic',   bg: 'bg-blue-100',   text: 'text-blue-700',   dot: 'bg-blue-500' },
-  SOCIAL:     { label: 'Social',     bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-  EMOTIONAL:  { label: 'Emotional',  bg: 'bg-rose-100',   text: 'text-rose-700',   dot: 'bg-rose-500' },
-  PHYSICAL:   { label: 'Physical',   bg: 'bg-amber-100',  text: 'text-amber-700',  dot: 'bg-amber-500' },
-  COGNITIVE:  { label: 'Cognitive',  bg: 'bg-sky-100',    text: 'text-sky-700',    dot: 'bg-sky-500' },
+  BEHAVIORAL: { label: 'Behavioral', bg: OBSERVATION_COLORS.COGNITIVE?.bg ?? 'bg-purple-100', text: OBSERVATION_COLORS.COGNITIVE?.text ?? 'text-purple-700', dot: 'bg-purple-500' },
+  ACADEMIC:   { label: 'Academic',   bg: OBSERVATION_COLORS.SOCIAL?.bg ?? 'bg-blue-100',   text: OBSERVATION_COLORS.SOCIAL?.text ?? 'text-blue-700',   dot: 'bg-blue-500' },
+  SOCIAL:     { label: 'Social',     bg: OBSERVATION_COLORS.SOCIAL?.bg ?? 'bg-emerald-100', text: OBSERVATION_COLORS.SOCIAL?.text ?? 'text-emerald-700', dot: 'bg-emerald-500' },
+  EMOTIONAL:  { label: 'Emotional',  bg: OBSERVATION_COLORS.EMOTIONAL?.bg ?? 'bg-rose-100',   text: OBSERVATION_COLORS.EMOTIONAL?.text ?? 'text-rose-700',   dot: 'bg-rose-500' },
+  PHYSICAL:   { label: 'Physical',   bg: OBSERVATION_COLORS.PHYSICAL?.bg ?? 'bg-amber-100',  text: OBSERVATION_COLORS.PHYSICAL?.text ?? 'text-amber-700',  dot: 'bg-amber-500' },
+  COGNITIVE:  { label: 'Cognitive',  bg: OBSERVATION_COLORS.COGNITIVE?.bg ?? 'bg-sky-100',    text: OBSERVATION_COLORS.COGNITIVE?.text ?? 'text-sky-700',    dot: 'bg-sky-500' },
 };
 
 const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -60,12 +62,12 @@ const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string 
 };
 
 const PIE_COLORS: Record<string, string> = {
-  BEHAVIORAL: '#a855f7',
-  ACADEMIC:   '#3b82f6',
-  SOCIAL:     '#10b981',
-  EMOTIONAL:  '#f43f5e',
-  PHYSICAL:   '#f59e0b',
-  COGNITIVE:  '#0ea5e9',
+  BEHAVIORAL: OBSERVATION_COLORS.COGNITIVE.hex,
+  ACADEMIC:   OBSERVATION_COLORS.SOCIAL.hex,
+  SOCIAL:     OBSERVATION_COLORS.PHYSICAL.hex,
+  EMOTIONAL:  OBSERVATION_COLORS.EMOTIONAL.hex,
+  PHYSICAL:   OBSERVATION_COLORS.LANGUAGE.hex,
+  COGNITIVE:  OBSERVATION_COLORS.CREATIVE.hex,
 };
 
 // ============================================================
@@ -141,7 +143,7 @@ function CategoryPieChart({ categories }: { categories: Record<string, number> }
               stroke="none"
             >
               {data.map((entry) => (
-                <Cell key={entry.key} fill={PIE_COLORS[entry.key] || '#94a3b8'} />
+                <Cell key={entry.key} fill={PIE_COLORS[entry.key] || CHART_PALETTE.axisLight} />
               ))}
             </Pie>
           </PieChart>
@@ -152,7 +154,7 @@ function CategoryPieChart({ categories }: { categories: Record<string, number> }
           <div key={entry.key} className="flex items-center gap-2 text-xs">
             <div
               className="h-2.5 w-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: PIE_COLORS[entry.key] || '#94a3b8' }}
+              style={{ backgroundColor: PIE_COLORS[entry.key] || CHART_PALETTE.axisLight }}
             />
             <span className="text-muted-foreground truncate">{entry.name}</span>
             <span className="font-semibold ml-auto">{entry.value}</span>
@@ -288,7 +290,7 @@ function ObservationCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-7 text-[11px] rounded-lg bg-gradient-to-r from-sky-500 to-blue-500 text-white border-0 hover:from-sky-600 hover:to-blue-600"
+                  className={`h-7 text-[11px] rounded-lg bg-gradient-to-r ${theme.btnGradientClass} text-white border-0 hover:${theme.btnGradientHoverClass}`}
                   onClick={() => onAcknowledge(observation.id)}
                 >
                   Acknowledge

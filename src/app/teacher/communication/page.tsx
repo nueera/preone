@@ -44,6 +44,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, COMMUNICATION_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 interface Announcement {
@@ -98,10 +100,10 @@ interface ParentOption {
 
 // ── Config ──
 const ANNOUNCEMENT_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; emoji: string }> = {
-  General:  { label: 'General',  color: 'text-gray-700',    bg: 'bg-gray-100',    emoji: '📋' },
-  Urgent:   { label: 'Urgent',   color: 'text-red-700',     bg: 'bg-red-100',     emoji: '🚨' },
-  Academic: { label: 'Academic', color: 'text-blue-700',    bg: 'bg-blue-100',    emoji: '📚' },
-  Event:    { label: 'Event',    color: 'text-purple-700',  bg: 'bg-purple-100',  emoji: '🎉' },
+  General:  { label: 'General',  color: 'text-gray-700',    bg: COMMUNICATION_COLORS.ANNOUNCEMENT?.bg || 'bg-gray-100',    emoji: '📋' },
+  Urgent:   { label: 'Urgent',   color: COMMUNICATION_COLORS.ALERT?.text || 'text-red-700',     bg: COMMUNICATION_COLORS.ALERT?.bg || 'bg-red-100',     emoji: '🚨' },
+  Academic: { label: 'Academic', color: COMMUNICATION_COLORS.MESSAGE?.text || 'text-blue-700',    bg: COMMUNICATION_COLORS.MESSAGE?.bg || 'bg-blue-100',    emoji: '📚' },
+  Event:    { label: 'Event',    color: COMMUNICATION_COLORS.EVENT?.text || 'text-purple-700',  bg: COMMUNICATION_COLORS.EVENT?.bg || 'bg-purple-100',  emoji: '🎉' },
   Holiday:  { label: 'Holiday',  color: 'text-green-700',   bg: 'bg-green-100',   emoji: '🏖️' },
   Fee:      { label: 'Fee',      color: 'text-yellow-700',  bg: 'bg-yellow-100',  emoji: '💰' },
 };
@@ -441,7 +443,7 @@ function CommunicationContent() {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-emerald-500" />
+              <MessageSquare className="h-5 w-5 text-portal-500" />
               Communication
             </h1>
           </div>
@@ -499,7 +501,7 @@ function CommunicationContent() {
               <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load</h3>
               <p className="text-gray-500 mb-4">{annError}</p>
-              <Button onClick={fetchAnnouncements} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl">Retry</Button>
+              <Button onClick={fetchAnnouncements} className="bg-portal-600 hover:bg-portal-700 rounded-xl">Retry</Button>
             </div>
           ) : announcements.length === 0 ? (
             <Card className="border-0 shadow-md">
@@ -579,7 +581,7 @@ function CommunicationContent() {
                     />
                   </div>
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-8 w-8 p-0 shrink-0"
+                    className="bg-portal-600 hover:bg-portal-700 rounded-xl h-8 w-8 p-0 shrink-0"
                     onClick={() => {
                       fetchParentOptions();
                       setShowNewChatDialog(true);
@@ -593,7 +595,7 @@ function CommunicationContent() {
                   <button
                     className={`text-[10px] px-2.5 py-1 rounded-lg font-medium transition-all ${
                       chatFilter === 'all'
-                        ? 'bg-emerald-100 text-emerald-700'
+                        ? `${theme.selectedClass}`
                         : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                     }`}
                     onClick={() => setChatFilter('all')}
@@ -636,7 +638,7 @@ function CommunicationContent() {
                     </p>
                     <Button
                       size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-[10px]"
+                      className="bg-portal-600 hover:bg-portal-700 rounded-xl text-[10px]"
                       onClick={() => {
                         fetchParentOptions();
                         setShowNewChatDialog(true);
@@ -650,7 +652,7 @@ function CommunicationContent() {
                     <button
                       key={thread.id}
                       className={`w-full text-left p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                        selectedThreadId === thread.id ? 'bg-emerald-50' : ''
+                        selectedThreadId === thread.id ? theme.selectedClass : ''
                       } ${thread.unreadCount > 0 ? 'bg-blue-50/50' : ''}`}
                       onClick={() => {
                         setSelectedThreadId(thread.id);
@@ -660,7 +662,7 @@ function CommunicationContent() {
                     >
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 shrink-0">
-                          <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                          <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                             {thread.participant ? getInitials(thread.participant.name) : '?'}
                           </AvatarFallback>
                         </Avatar>
@@ -718,7 +720,7 @@ function CommunicationContent() {
                       <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                      <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                         {selectedThread.participant ? getInitials(selectedThread.participant.name) : '?'}
                       </AvatarFallback>
                     </Avatar>
@@ -736,7 +738,7 @@ function CommunicationContent() {
                       <div className="flex items-center gap-1">
                         <a
                           href={`tel:${(selectedThread.participant as any).phone || ''}`}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-emerald-600 transition-colors"
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-portal-600 transition-colors"
                           title="Call"
                         >
                           <Phone className="h-4 w-4" />
@@ -768,7 +770,7 @@ function CommunicationContent() {
                           >
                             <div className={`max-w-[75%] ${
                               isOwn
-                                ? 'bg-emerald-600 text-white rounded-2xl rounded-br-md'
+                                ? 'bg-portal-600 text-white rounded-2xl rounded-br-md'
                                 : 'bg-gray-100 text-gray-800 rounded-2xl rounded-bl-md'
                             } px-3.5 py-2`}>
                               <p className="text-sm leading-relaxed break-words">{msg.content}</p>
@@ -796,7 +798,7 @@ function CommunicationContent() {
                       {QUICK_REPLIES.map((reply, i) => (
                         <button
                           key={i}
-                          className="text-[10px] px-2.5 py-1 bg-gray-50 text-gray-600 rounded-full hover:bg-emerald-50 hover:text-emerald-700 whitespace-nowrap transition-colors shrink-0"
+                          className="text-[10px] px-2.5 py-1 bg-gray-50 text-gray-600 rounded-full hover:bg-portal-50 hover:text-portal-700 whitespace-nowrap transition-colors shrink-0"
                           onClick={() => setNewMessage(reply)}
                         >
                           {reply.length > 35 ? reply.substring(0, 35) + '...' : reply}
@@ -824,7 +826,7 @@ function CommunicationContent() {
                         />
                       </div>
                       <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-10 w-10 p-0 shrink-0"
+                        className="bg-portal-600 hover:bg-portal-700 rounded-xl h-10 w-10 p-0 shrink-0"
                         onClick={handleSendMessage}
                         disabled={sending || !newMessage.trim()}
                       >
@@ -852,7 +854,7 @@ function CommunicationContent() {
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-emerald-600" />
+              <Plus className="h-5 w-5 text-portal-600" />
               New Chat with Parent
             </DialogTitle>
             <DialogDescription>
@@ -874,7 +876,7 @@ function CommunicationContent() {
                       key={parent.userId}
                       className={`w-full text-left p-3 rounded-xl border transition-all ${
                         isSelected
-                          ? 'border-emerald-300 bg-emerald-50'
+                          ? `border-portal-300 ${theme.selectedClass}`
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                       onClick={() => setSelectedParentId(parent.userId)}
@@ -882,7 +884,7 @@ function CommunicationContent() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
                           <AvatarFallback className={`text-xs font-semibold ${
-                            isSelected ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'
+                            isSelected ? `${theme.avatarFallbackClass}` : 'bg-gray-100 text-gray-700'
                           }`}>
                             {getInitials(parent.name)}
                           </AvatarFallback>
@@ -894,7 +896,7 @@ function CommunicationContent() {
                           </div>
                         </div>
                         {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full bg-portal-500 flex items-center justify-center">
                             <Check className="h-3 w-3 text-white" />
                           </div>
                         )}
@@ -918,7 +920,7 @@ function CommunicationContent() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
               onClick={handleCreateThread}
               disabled={creatingThread || !selectedParentId}
             >

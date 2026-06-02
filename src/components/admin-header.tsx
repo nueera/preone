@@ -29,6 +29,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.admin;
 
 // ── Auth user shape (from localStorage) ──
 interface AuthUser {
@@ -137,7 +140,7 @@ export function AdminHeader() {
               className="flex items-center gap-2 px-2 h-9"
             >
               <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-purple-100 text-purple-700 text-xs font-semibold">
+                <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                   {userInitial}
                 </AvatarFallback>
               </Avatar>

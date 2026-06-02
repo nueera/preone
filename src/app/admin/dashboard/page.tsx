@@ -38,6 +38,8 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { PORTAL_THEMES, CHART_PALETTE, FEE_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ============================================================
 // TYPES
@@ -132,7 +134,7 @@ const ACTIVITY_ICONS: Record<string, React.ElementType> = {
 const ACTIVITY_COLORS: Record<string, string> = {
   ADMISSION: 'text-emerald-500',
   PAYMENT: 'text-emerald-600',
-  LEAD: 'text-purple-500',
+  LEAD: `text-portal-600`,
   ATTENDANCE: 'text-red-500',
   LEAVE: 'text-orange-500',
   ANNOUNCEMENT: 'text-blue-500',
@@ -141,7 +143,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
 const ACTIVITY_BG: Record<string, string> = {
   ADMISSION: 'bg-emerald-50',
   PAYMENT: 'bg-emerald-50',
-  LEAD: 'bg-purple-50',
+  LEAD: 'bg-portal-50',
   ATTENDANCE: 'bg-red-50',
   LEAVE: 'bg-orange-50',
   ANNOUNCEMENT: 'bg-blue-50',
@@ -161,7 +163,7 @@ const STAT_CARDS: {
     key: 'totalStudents',
     label: 'Total Students',
     icon: GraduationCap,
-    iconColorClass: 'bg-purple-100 text-purple-600',
+    iconColorClass: 'bg-portal-100 text-portal-600',
     trendKey: 'students',
   },
   {
@@ -183,7 +185,7 @@ const STAT_CARDS: {
     key: 'newAdmissions',
     label: 'New Admissions',
     icon: UserPlus,
-    iconColorClass: 'bg-pink-100 text-pink-600',
+    iconColorClass: 'bg-pink-100 text-pink-600', // Admission pink — no portal token
     trendKey: 'admissions',
   },
   {
@@ -322,7 +324,7 @@ function RevenueChart({
               size="sm"
               className={`h-7 text-xs rounded-lg ${
                 period === p
-                  ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                  ? 'bg-portal-600 hover:bg-portal-700 text-white'
                   : ''
               }`}
               onClick={() => onPeriodChange(p)}
@@ -340,8 +342,8 @@ function RevenueChart({
             <AreaChart data={filteredData}>
               <defs>
                 <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
+                  <stop offset="5%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient
                   id="gradCollections"
@@ -350,11 +352,11 @@ function RevenueChart({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
               <XAxis
                 dataKey="month"
                 tick={{ fontSize: 12 }}
@@ -376,7 +378,7 @@ function RevenueChart({
               <Area
                 type="monotone"
                 dataKey="revenue"
-                stroke="#7C3AED"
+                stroke={CHART_PALETTE.series[0]}
                 strokeWidth={2}
                 fill="url(#gradRevenue)"
                 name="revenue"
@@ -384,7 +386,7 @@ function RevenueChart({
               <Area
                 type="monotone"
                 dataKey="collections"
-                stroke="#10b981"
+                stroke={CHART_PALETTE.series[2]}
                 strokeWidth={2}
                 fill="url(#gradCollections)"
                 name="collections"
@@ -412,9 +414,9 @@ function FeeBreakdownPie({
 
   const pieData = useMemo(
     () => [
-      { name: 'Collected', value: data.collected, color: '#10b981' },
-      { name: 'Pending', value: data.pending, color: '#f59e0b' },
-      { name: 'Overdue', value: data.overdue, color: '#ef4444' },
+      { name: 'Collected', value: data.collected, color: FEE_COLORS.PAID.hex },
+      { name: 'Pending', value: data.pending, color: FEE_COLORS.PENDING.hex },
+      { name: 'Overdue', value: data.overdue, color: FEE_COLORS.OVERDUE.hex },
     ],
     [data],
   );

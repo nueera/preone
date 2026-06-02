@@ -33,6 +33,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, ATTENDANCE_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 type AttendanceStatus = 'PRESENT' | 'LATE' | 'ABSENT';
@@ -350,7 +352,7 @@ export default function AttendancePage() {
         <p className="text-gray-500 mb-4">{error}</p>
         <Button
           onClick={() => fetchAttendance(selectedDate)}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className="bg-portal-600 hover:bg-portal-700 rounded-xl"
         >
           Retry
         </Button>
@@ -418,15 +420,15 @@ export default function AttendancePage() {
 
                   {/* Already marked banner */}
                   {data.marked && !editMode && (
-                    <div className="mt-3 flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-emerald-700">
+                    <div className="mt-3 flex items-center justify-between p-3 bg-portal-50 border border-portal-200 rounded-xl">
+                      <div className="flex items-center gap-2 text-portal-700">
                         <CheckCircle2 className="h-4 w-4" />
                         <span className="text-sm font-medium">Attendance already marked for {formatDateDisplay(selectedDate)}</span>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-xs rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        className="text-xs rounded-xl border-portal-200 text-portal-700 hover:bg-portal-50"
                         onClick={() => setEditMode(true)}
                       >
                         <Edit3 className="h-3 w-3 mr-1" /> Edit
@@ -449,7 +451,7 @@ export default function AttendancePage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                    className="text-xs rounded-xl border-portal-200 text-portal-700 hover:bg-portal-50"
                     onClick={handleMarkAllPresent}
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark All Present
@@ -466,7 +468,7 @@ export default function AttendancePage() {
                   <span className="text-sm text-gray-500">{formatDateDisplay(selectedDate)}</span>
                   <Button
                     size="sm"
-                    className="text-xs rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl text-white"
                     onClick={handleSave}
                     disabled={saving}
                   >
@@ -534,11 +536,11 @@ export default function AttendancePage() {
                   <div className="border-t border-gray-100 pt-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Attendance Rate</span>
-                      <span className="font-bold text-lg text-emerald-600">{liveStats.rate}%</span>
+                      <span className="font-bold text-lg text-portal-600">{liveStats.rate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2 mt-1 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                        className="h-full rounded-full bg-portal-500 transition-all duration-500"
                         style={{ width: `${liveStats.rate}%` }}
                       />
                     </div>
@@ -598,7 +600,7 @@ export default function AttendancePage() {
                           onClick={() => handleDateChange(dateStr)}
                           className={`px-2 py-1.5 rounded-lg text-xs text-center transition-colors ${
                             isCurrent
-                              ? 'bg-emerald-600 text-white font-medium'
+                              ? 'bg-portal-600 text-white font-medium'
                               : 'text-gray-600 hover:bg-gray-100'
                           }`}
                         >
@@ -639,7 +641,7 @@ export default function AttendancePage() {
             {absentStudents.map((s) => (
               <div key={s.studentId} className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-red-100 text-red-700 text-xs">
+                <AvatarFallback className={`${ATTENDANCE_COLORS.ABSENT.bg} ${ATTENDANCE_COLORS.ABSENT.text} text-xs`}>
                     {getInitials(s.firstName, s.lastName)}
                   </AvatarFallback>
                 </Avatar>
@@ -659,11 +661,7 @@ export default function AttendancePage() {
               Close
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
-              onClick={() => {
-                toast.success('Notifications sent to parents of absent students');
-                setShowAbsentDialog(false);
-              }}
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
             >
               <Send className="h-4 w-4 mr-1" /> Send Notification
             </Button>
@@ -702,7 +700,7 @@ function StudentRow({
           {student.photo ? (
             <AvatarImage src={student.photo} alt={student.name} />
           ) : (
-            <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+            <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
               {initials}
             </AvatarFallback>
           )}
@@ -720,9 +718,9 @@ function StudentRow({
         {statusButtons.map(({ status, label, icon: Icon }) => {
           const isSelected = selectedStatus === status;
           const colorMap: Record<AttendanceStatus, { bg: string; border: string; text: string; activeBg: string }> = {
-            PRESENT: { bg: 'bg-emerald-50', border: 'border-emerald-300', text: 'text-emerald-700', activeBg: 'bg-emerald-600' },
-            LATE: { bg: 'bg-amber-50', border: 'border-amber-300', text: 'text-amber-700', activeBg: 'bg-amber-500' },
-            ABSENT: { bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-700', activeBg: 'bg-red-500' },
+            PRESENT: { bg: `${ATTENDANCE_COLORS.PRESENT.bg}`, border: 'border-emerald-300', text: `${ATTENDANCE_COLORS.PRESENT.text}`, activeBg: 'bg-emerald-600' },
+            LATE: { bg: `${ATTENDANCE_COLORS.LATE.bg}`, border: 'border-amber-300', text: `${ATTENDANCE_COLORS.LATE.text}`, activeBg: 'bg-amber-500' },
+            ABSENT: { bg: `${ATTENDANCE_COLORS.ABSENT.bg}`, border: 'border-red-300', text: `${ATTENDANCE_COLORS.ABSENT.text}`, activeBg: 'bg-red-500' },
           };
           const colors = colorMap[status];
 
@@ -753,8 +751,8 @@ function StudentRow({
 
 // ── Stat Row Component ──
 function StatRow({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
-  const bgColor = color === 'emerald' ? 'bg-emerald-50' : color === 'amber' ? 'bg-amber-50' : 'bg-red-50';
-  const textColor = color === 'emerald' ? 'text-emerald-700' : color === 'amber' ? 'text-amber-700' : 'text-red-700';
+  const bgColor = color === 'emerald' ? ATTENDANCE_COLORS.PRESENT.bg : color === 'amber' ? ATTENDANCE_COLORS.LATE.bg : ATTENDANCE_COLORS.ABSENT.bg;
+  const textColor = color === 'emerald' ? ATTENDANCE_COLORS.PRESENT.text : color === 'amber' ? ATTENDANCE_COLORS.LATE.text : ATTENDANCE_COLORS.ABSENT.text;
 
   return (
     <div className={`flex items-center justify-between p-2.5 ${bgColor} rounded-xl`}>
@@ -819,7 +817,7 @@ function MonthlyView({
             </div>
             <div className="flex items-center gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-emerald-600">{data.monthlyRate}%</p>
+                <p className="text-2xl font-bold text-portal-600">{data.monthlyRate}%</p>
                 <p className="text-xs text-gray-500">Monthly Rate</p>
               </div>
               <div className="text-center">
@@ -865,8 +863,8 @@ function MonthlyView({
               let dotColor = '';
               if (ds) {
                 const absentRate = totalStudents > 0 ? ds.absent / totalStudents : 0;
-                if (absentRate === 0) { cellBg = 'bg-emerald-50 hover:bg-emerald-100'; dotColor = 'bg-emerald-500'; }
-                else if (absentRate <= 0.1) { cellBg = 'bg-emerald-50 hover:bg-emerald-100'; dotColor = 'bg-emerald-500'; }
+                if (absentRate === 0) { cellBg = 'bg-portal-50 hover:bg-emerald-100'; dotColor = 'bg-emerald-500'; }
+                else if (absentRate <= 0.1) { cellBg = 'bg-portal-50 hover:bg-emerald-100'; dotColor = 'bg-emerald-500'; }
                 else if (absentRate <= 0.3) { cellBg = 'bg-amber-50 hover:bg-amber-100'; dotColor = 'bg-amber-500'; }
                 else { cellBg = 'bg-red-50 hover:bg-red-100'; dotColor = 'bg-red-500'; }
               }
@@ -879,13 +877,13 @@ function MonthlyView({
                   className={`
                     h-14 flex flex-col items-center justify-center rounded-xl text-sm relative
                     transition-all duration-200 border
-                    ${isSelected ? 'ring-2 ring-emerald-500 ring-offset-1 border-emerald-200' : 'border-transparent'}
+                    ${isSelected ? 'ring-2 ring-portal-500 ring-offset-1 border-portal-200' : 'border-transparent'}
                     ${isToday ? 'font-bold' : ''}
                     ${isFuture ? 'text-gray-300 cursor-default' : isWeekend ? 'text-gray-400 cursor-default' : 'cursor-pointer'}
                     ${cellBg}
                   `}
                 >
-                  <span className={`${isToday ? 'text-emerald-600' : ''}`}>{day}</span>
+                  <span className={`${isToday ? 'text-portal-600' : ''}`}>{day}</span>
                   {ds && !isFuture && (
                     <div className="flex items-center gap-0.5 mt-0.5">
                       <div className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />

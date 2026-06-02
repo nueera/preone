@@ -17,7 +17,7 @@ export default function AdminLayout({
       <AdminSidebar />
       <div className="flex flex-1 flex-col min-h-screen">
         <AdminHeader />
-        <main className="flex-1 bg-gray-50 p-6 overflow-auto dark:bg-gray-950">
+        <main className="flex-1 bg-background p-6 overflow-auto" data-portal="admin">
           {children}
         </main>
       </div>

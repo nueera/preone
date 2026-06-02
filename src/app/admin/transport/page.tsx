@@ -29,6 +29,8 @@ import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ============================================================
 // TYPES
@@ -127,7 +129,7 @@ function formatDistance(distance: number | null): string {
 // ============================================================
 const VEHICLE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   Bus: { label: 'Bus', color: 'text-sky-700', bg: 'bg-sky-50 border-sky-200' },
-  Van: { label: 'Van', color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
+  Van: { label: 'Van', color: 'text-portal-700', bg: 'bg-portal-50 border-portal-200' },
   'Mini Bus': { label: 'Mini Bus', color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
   Auto: { label: 'Auto', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
 };
@@ -543,12 +545,12 @@ export default function TransportPage() {
       <Card className="rounded-3xl stat-card-violet">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-violet-100">
-              <Route className="h-5 w-5 sm:h-6 sm:w-6 text-violet-600" />
+            <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-portal-100">
+              <Route className="h-5 w-5 sm:h-6 sm:w-6 text-portal-600" />
             </div>
             <div>
               <p className="text-xs sm:text-sm text-muted-foreground">Total Routes</p>
-              <p className="text-xl sm:text-2xl font-bold text-violet-700">{stats.totalRoutes}</p>
+              <p className="text-xl sm:text-2xl font-bold text-portal-700">{stats.totalRoutes}</p>
             </div>
           </div>
         </CardContent>
@@ -592,7 +594,7 @@ export default function TransportPage() {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Route className="h-5 w-5 text-violet-600" />
+            <Route className="h-5 w-5 text-portal-600" />
             Routes
           </CardTitle>
           <div className="flex items-center gap-3">
@@ -607,7 +609,7 @@ export default function TransportPage() {
             </div>
             <Button
               onClick={openAddRoute}
-              className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 shrink-0"
+              className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover shrink-0"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Route
             </Button>
@@ -645,7 +647,7 @@ export default function TransportPage() {
                       <TableCell className="text-sm text-muted-foreground">{route.startPoint}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{route.endPoint}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200">
+                        <Badge variant="outline" className="bg-portal-50 text-portal-700 border-portal-200">
                           {stops.length} stop{stops.length !== 1 ? 's' : ''}
                         </Badge>
                       </TableCell>
@@ -665,7 +667,7 @@ export default function TransportPage() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-violet-600 hover:text-violet-700 hover:bg-violet-50"
+                                    className="h-8 w-8 text-portal-600 hover:text-portal-700 hover:bg-portal-50"
                                     onClick={() => setViewStopsRoute(route)}
                                   >
                                     <Eye className="h-4 w-4" />
@@ -741,7 +743,7 @@ export default function TransportPage() {
             </div>
             <Button
               onClick={openAddVehicle}
-              className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 shrink-0"
+              className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover shrink-0"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Vehicle
             </Button>
@@ -879,7 +881,7 @@ export default function TransportPage() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-violet-600" />
+              <MapPin className="h-5 w-5 text-portal-600" />
               Stops — {viewStopsRoute.name}
             </DialogTitle>
             <DialogDescription>
@@ -905,8 +907,8 @@ export default function TransportPage() {
             {stops.map((stop, index) => (
               <div key={index} className="flex items-start gap-3 mb-2">
                 <div className="flex flex-col items-center">
-                  <div className="h-8 w-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                    <MapPin className="h-4 w-4 text-violet-600" />
+                  <div className="h-8 w-8 rounded-full bg-portal-100 flex items-center justify-center shrink-0">
+                    <MapPin className="h-4 w-4 text-portal-600" />
                   </div>
                   {index < stops.length - 1 && (
                     <div className="w-0.5 h-6 bg-gray-200" />
@@ -966,7 +968,7 @@ export default function TransportPage() {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Route className="h-5 w-5 text-violet-600" />
+            <Route className="h-5 w-5 text-portal-600" />
             {editingRoute ? 'Edit Route' : 'Add Route'}
           </DialogTitle>
           <DialogDescription>
@@ -1033,7 +1035,7 @@ export default function TransportPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-violet-600" />
+                <MapPin className="h-4 w-4 text-portal-600" />
                 Stops
               </Label>
               <Button
@@ -1056,7 +1058,7 @@ export default function TransportPage() {
                 <div className="space-y-3">
                   {routeStops.map((stop, index) => (
                     <div key={index} className="flex items-start gap-3 bg-gray-50 p-3 rounded-xl">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 text-xs font-bold">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-portal-100 text-portal-700 text-xs font-bold">
                         {index + 1}
                       </div>
                       <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1107,7 +1109,7 @@ export default function TransportPage() {
           <Button
             onClick={handleSaveRoute}
             disabled={routeSaving}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 min-w-[120px]"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover min-w-[120px]"
           >
             {routeSaving ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -1201,7 +1203,7 @@ export default function TransportPage() {
           {/* Driver details */}
           <div className="space-y-3">
             <Label className="text-base font-semibold flex items-center gap-2">
-              <User className="h-4 w-4 text-violet-600" />
+              <User className="h-4 w-4 text-portal-600" />
               Driver Details
             </Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1240,7 +1242,7 @@ export default function TransportPage() {
           {/* Compliance details */}
           <div className="space-y-3">
             <Label className="text-base font-semibold flex items-center gap-2">
-              <Shield className="h-4 w-4 text-violet-600" />
+              <Shield className="h-4 w-4 text-portal-600" />
               Compliance
             </Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1277,7 +1279,7 @@ export default function TransportPage() {
           <Button
             onClick={handleSaveVehicle}
             disabled={vehicleSaving}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 min-w-[120px]"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover min-w-[120px]"
           >
             {vehicleSaving ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -1365,7 +1367,7 @@ export default function TransportPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <Bus className="h-7 w-7 text-violet-600" />
+            <Bus className="h-7 w-7 text-portal-600" />
             Transport
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Manage routes, vehicles, and driver assignments</p>
@@ -1384,14 +1386,14 @@ export default function TransportPage() {
         <TabsList className="bg-white dark:bg-gray-800 border rounded-xl p-1 h-auto">
           <TabsTrigger
             value="routes"
-            className="rounded-lg px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-sky-500 data-[state=active]:text-white data-[state=active]:shadow-sm"
+            className={`rounded-lg px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:${theme.btnGradientClass} data-[state=active]:text-white data-[state=active]:shadow-sm`}
           >
             <Route className="h-4 w-4 mr-2" />
             Routes
           </TabsTrigger>
           <TabsTrigger
             value="vehicles"
-            className="rounded-lg px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-sky-500 data-[state=active]:text-white data-[state=active]:shadow-sm"
+            className={`rounded-lg px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:${theme.btnGradientClass} data-[state=active]:text-white data-[state=active]:shadow-sm`}
           >
             <Bus className="h-4 w-4 mr-2" />
             Vehicles

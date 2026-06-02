@@ -51,6 +51,8 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES, ATTENDANCE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ClassWiseStat {
@@ -371,7 +373,7 @@ export default function AttendancePage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-purple-500" />
+            <CheckSquare className="h-5 w-5 text-portal-500" />
             Student Attendance — {format(selectedDate, 'dd MMM yyyy')}
           </CardTitle>
         </CardHeader>
@@ -399,7 +401,7 @@ export default function AttendancePage() {
                 </TableHeader>
                 <TableBody>
                   {classStats.map((cls) => (
-                    <TableRow key={cls.classId} className="cursor-pointer hover:bg-purple-50/50">
+                    <TableRow key={cls.classId} className="cursor-pointer hover:bg-portal-50/50">
                       <TableCell className="font-medium">{cls.className}</TableCell>
                       <TableCell className="text-center">{cls.total}</TableCell>
                       <TableCell className="text-center text-emerald-600 font-medium">{cls.present}</TableCell>
@@ -409,16 +411,16 @@ export default function AttendancePage() {
                       <TableCell>
                         <div className="flex h-4 w-full rounded-full overflow-hidden bg-gray-100">
                           <div
-                            className="bg-emerald-400 transition-all"
-                            style={{ width: `${(cls.present / Math.max(cls.total, 1)) * 100}%` }}
+                            className="transition-all"
+                            style={{ width: `${(cls.present / Math.max(cls.total, 1)) * 100}%`, backgroundColor: ATTENDANCE_COLORS.PRESENT.hex }}
                           />
                           <div
-                            className="bg-amber-400 transition-all"
-                            style={{ width: `${(cls.late / Math.max(cls.total, 1)) * 100}%` }}
+                            className="transition-all"
+                            style={{ width: `${(cls.late / Math.max(cls.total, 1)) * 100}%`, backgroundColor: ATTENDANCE_COLORS.LATE.hex }}
                           />
                           <div
-                            className="bg-red-400 transition-all"
-                            style={{ width: `${(cls.absent / Math.max(cls.total, 1)) * 100}%` }}
+                            className="transition-all"
+                            style={{ width: `${(cls.absent / Math.max(cls.total, 1)) * 100}%`, backgroundColor: ATTENDANCE_COLORS.ABSENT.hex }}
                           />
                         </div>
                       </TableCell>
@@ -466,7 +468,7 @@ export default function AttendancePage() {
       {/* ═══════════ Section 2: Staff Attendance ═══════════ */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Users className="h-5 w-5 text-sky-500" />
+          <Users className="h-5 w-5 text-portal-500" />
           Staff Attendance
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -552,9 +554,9 @@ export default function AttendancePage() {
                       const status = staff.attendance?.status ||
                         (staff.teacherStatus === 'ON_LEAVE' ? 'ON_LEAVE' : 'UNMARKED');
                       const statusColor: Record<string, string> = {
-                        PRESENT: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                        LATE: 'bg-amber-50 text-amber-700 border-amber-200',
-                        ABSENT: 'bg-red-50 text-red-700 border-red-200',
+                        PRESENT: `${ATTENDANCE_COLORS.PRESENT.bg} ${ATTENDANCE_COLORS.PRESENT.text} border-emerald-200`,
+                        LATE: `${ATTENDANCE_COLORS.LATE.bg} ${ATTENDANCE_COLORS.LATE.text} border-amber-200`,
+                        ABSENT: `${ATTENDANCE_COLORS.ABSENT.bg} ${ATTENDANCE_COLORS.ABSENT.text} border-red-200`,
                         ON_LEAVE: 'bg-yellow-50 text-yellow-700 border-yellow-200',
                         UNMARKED: 'bg-gray-50 text-gray-500 border-gray-200',
                       };
@@ -563,7 +565,7 @@ export default function AttendancePage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-sky-50 text-sky-700 text-xs font-semibold">
+                                <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
                                   {getInitials(staff.firstName, staff.lastName)}
                                 </AvatarFallback>
                               </Avatar>
@@ -618,7 +620,7 @@ export default function AttendancePage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="h-5 w-5 text-purple-500" />
+            <Clock className="h-5 w-5 text-portal-500" />
             Check-in / Check-out — {format(selectedDate, 'dd MMM yyyy')}
           </CardTitle>
         </CardHeader>
@@ -667,7 +669,7 @@ export default function AttendancePage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-7 w-7">
-                                <AvatarFallback className="bg-purple-50 text-purple-700 text-xs">
+                                <AvatarFallback className="bg-portal-50 text-portal-700 text-xs">
                                   {getInitials(record.student.firstName, record.student.lastName)}
                                 </AvatarFallback>
                               </Avatar>
@@ -746,7 +748,7 @@ export default function AttendancePage() {
                   <div key={student.id} className="flex items-center justify-between rounded-lg border p-3">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-purple-50 text-purple-700 text-xs font-semibold">
+                        <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
                           {getInitials(student.firstName, student.lastName)}
                         </AvatarFallback>
                       </Avatar>

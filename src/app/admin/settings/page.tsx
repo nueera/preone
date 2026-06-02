@@ -32,6 +32,8 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ============================================================
 // TYPES
@@ -146,7 +148,7 @@ function generatePassword(): string {
 }
 
 const ROLE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  ADMIN: { label: 'Admin', color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
+  ADMIN: { label: 'Admin', color: 'text-portal-700', bg: 'bg-portal-50 border-portal-200' },
   TEACHER: { label: 'Teacher', color: 'text-sky-700', bg: 'bg-sky-50 border-sky-200' },
   PARENT: { label: 'Parent', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
   TASK_MASTER: { label: 'Task Master', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
@@ -881,7 +883,7 @@ export default function SettingsPage() {
     <Card className="rounded-3xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Building2 className="h-5 w-5 text-violet-600" />
+          <Building2 className="h-5 w-5 text-portal-600" />
           School Profile
         </CardTitle>
       </CardHeader>
@@ -904,7 +906,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 rounded-xl border-2 border-dashed border-gray-300">
                 {schoolForm.logo ? (
-                  <AvatarFallback className="rounded-xl bg-violet-100 text-violet-600 text-xl font-bold">
+                  <AvatarFallback className="rounded-xl bg-portal-100 text-portal-600 text-xl font-bold">
                     {(schoolForm.name || 'S').charAt(0)}
                   </AvatarFallback>
                 ) : (
@@ -1049,7 +1051,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleSaveSchool}
             disabled={savingSchool}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 min-w-[160px]"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover min-w-[160px]"
           >
             {savingSchool ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -1070,12 +1072,12 @@ export default function SettingsPage() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Building2 className="h-5 w-5 text-violet-600" />
+            <Building2 className="h-5 w-5 text-portal-600" />
             Branches
           </CardTitle>
           <Button
             onClick={openAddBranch}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover"
           >
             <Plus className="h-4 w-4 mr-1" /> Add Branch
           </Button>
@@ -1219,7 +1221,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setBranchDialogOpen(false)} className="rounded-xl">Cancel</Button>
-            <Button onClick={handleSaveBranch} disabled={branchSaving} className="rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white hover:from-violet-700 hover:to-sky-600">
+            <Button onClick={handleSaveBranch} disabled={branchSaving} className="rounded-xl bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover">
               {branchSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               {editingBranch ? 'Update Branch' : 'Create Branch'}
             </Button>
@@ -1253,12 +1255,12 @@ export default function SettingsPage() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Users className="h-5 w-5 text-violet-600" />
+            <Users className="h-5 w-5 text-portal-600" />
             Users
           </CardTitle>
           <Button
             onClick={openAddUser}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover"
           >
             <Plus className="h-4 w-4 mr-1" /> Add User
           </Button>
@@ -1334,7 +1336,7 @@ export default function SettingsPage() {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setResetPwdUserId(user.id)}>
-                                  <KeyRound className="h-3.5 w-3.5 text-violet-500" />
+                                  <KeyRound className="h-3.5 w-3.5 text-portal-500" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>Reset Password</TooltipContent>
@@ -1410,7 +1412,7 @@ export default function SettingsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-xs text-violet-600 hover:text-violet-700"
+                    className="h-7 text-xs text-portal-600 hover:text-portal-700"
                     onClick={() => setUserForm({ ...userForm, password: generatePassword() })}
                   >
                     <RefreshCw className="h-3 w-3 mr-1" /> Auto-Generate
@@ -1440,7 +1442,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setUserDialogOpen(false)} className="rounded-xl">Cancel</Button>
-            <Button onClick={handleSaveUser} disabled={userSaving} className="rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white hover:from-violet-700 hover:to-sky-600">
+            <Button onClick={handleSaveUser} disabled={userSaving} className="rounded-xl bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover">
               {userSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               {editingUser ? 'Update User' : 'Create User'}
             </Button>
@@ -1475,7 +1477,7 @@ export default function SettingsPage() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setResetPwdUserId(null)} className="rounded-xl">Cancel</Button>
-            <Button onClick={handleResetPassword} className="rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white hover:from-violet-700 hover:to-sky-600">
+            <Button onClick={handleResetPassword} className="rounded-xl bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover">
               Reset Password
             </Button>
           </DialogFooter>
@@ -1493,7 +1495,7 @@ export default function SettingsPage() {
           </DialogHeader>
           <div className="p-4 bg-gray-50 rounded-xl border">
             <p className="text-xs text-muted-foreground mb-1">New Password</p>
-            <p className="text-lg font-mono font-bold tracking-wider text-violet-700">{resetPwdResult}</p>
+            <p className="text-lg font-mono font-bold tracking-wider text-portal-700">{resetPwdResult}</p>
           </div>
           <DialogFooter>
             <Button onClick={() => { navigator.clipboard.writeText(resetPwdResult || ''); }} className="rounded-xl">
@@ -1514,12 +1516,12 @@ export default function SettingsPage() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Route className="h-5 w-5 text-violet-600" />
+            <Route className="h-5 w-5 text-portal-600" />
             Routes
           </CardTitle>
           <Button
             onClick={openAddRoute}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover"
           >
             <Plus className="h-4 w-4 mr-1" /> Add Route
           </Button>
@@ -1709,7 +1711,7 @@ export default function SettingsPage() {
 
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setRouteDialogOpen(false)} className="rounded-xl">Cancel</Button>
-            <Button onClick={handleSaveRoute} disabled={routeSaving} className="rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white hover:from-violet-700 hover:to-sky-600">
+            <Button onClick={handleSaveRoute} disabled={routeSaving} className="rounded-xl bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover">
               {routeSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               {editingRoute ? 'Update Route' : 'Create Route'}
             </Button>
@@ -1746,12 +1748,12 @@ export default function SettingsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Bus className="h-5 w-5 text-violet-600" />
+              <Bus className="h-5 w-5 text-portal-600" />
               Vehicles
             </CardTitle>
             <Button
               onClick={openAddVehicle}
-              className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600"
+              className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Vehicle
             </Button>
@@ -1941,7 +1943,7 @@ export default function SettingsPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setVehicleDialogOpen(false)} className="rounded-xl">Cancel</Button>
-              <Button onClick={handleSaveVehicle} disabled={vehicleSaving} className="rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white hover:from-violet-700 hover:to-sky-600">
+              <Button onClick={handleSaveVehicle} disabled={vehicleSaving} className="rounded-xl bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover">
                 {vehicleSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                 {editingVehicle ? 'Update Vehicle' : 'Create Vehicle'}
               </Button>
@@ -2026,7 +2028,7 @@ export default function SettingsPage() {
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Channel Configuration</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* SMS Card */}
-            <ChannelCard icon={Smartphone} title="SMS" color="bg-violet-500">
+            <ChannelCard icon={Smartphone} title="SMS" color="bg-portal-500">
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Provider</Label>
@@ -2252,7 +2254,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleSaveNotifications}
             disabled={notifSaving}
-            className="bg-gradient-to-r from-violet-600 to-sky-500 text-white rounded-xl hover:from-violet-700 hover:to-sky-600 min-w-[160px]"
+            className="bg-brand-gradient text-white border-0 rounded-xl hover:bg-brand-gradient-hover min-w-[160px]"
           >
             {notifSaving ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -2274,7 +2276,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-sky-500 shadow-lg shadow-violet-500/25">
+        <div className={`p-2.5 rounded-xl bg-gradient-to-br ${theme.avatarGradientClass} shadow-lg shadow-violet-500/25`}>
           <Building2 className="h-5 w-5 text-white" />
         </div>
         <div>

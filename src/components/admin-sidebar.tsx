@@ -34,6 +34,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.admin;
 
 // ── Navigation items definition ──
 const NAV_ITEMS = [
@@ -54,6 +57,7 @@ const NAV_ITEMS = [
  * AdminSidebar — Left sidebar navigation for the PreOne admin portal.
  * Uses shadcn/ui Sidebar with collapsible="icon" support.
  * Shows tooltips when collapsed, full labels when expanded.
+ * Uses global theme tokens from /src/lib/theme-tokens.ts
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -85,7 +89,7 @@ export function AdminSidebar() {
               <span className="text-lg font-bold text-white leading-tight">
                 PreOne
               </span>
-              <span className="text-[10px] text-purple-200 leading-tight">
+              <span className={`text-[10px] leading-tight ${theme.navSubtextClass}`}>
                 Preschool ERP
               </span>
             </div>
@@ -98,7 +102,7 @@ export function AdminSidebar() {
       {/* ── Navigation Menu ── */}
       <SidebarContent className="px-2 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-purple-200/70 text-[10px] uppercase tracking-wider">
+          <SidebarGroupLabel className={`${theme.navLabelClass} text-[10px] uppercase tracking-wider`}>
             Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -118,11 +122,7 @@ export function AdminSidebar() {
                       className={`
                         group relative flex items-center gap-3 rounded-xl px-3 py-2.5
                         transition-all duration-200
-                        ${
-                          isActive
-                            ? 'bg-purple-600 text-white font-medium shadow-sm border-l-4 border-purple-800'
-                            : 'text-purple-100 hover:bg-purple-50/10 hover:text-white dark:hover:bg-purple-900/30'
-                        }
+                        ${isActive ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
                       <Link href={item.href}>
@@ -143,7 +143,7 @@ export function AdminSidebar() {
         <Separator className="bg-white/10 mb-3" />
         <button
           onClick={toggleSidebar}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-purple-200 hover:bg-white/10 hover:text-white transition-colors"
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 ${theme.navFooterClass} transition-colors`}
         >
           {state === 'collapsed' ? (
             <ChevronsRight className="h-4 w-4 shrink-0" />

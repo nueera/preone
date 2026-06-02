@@ -48,6 +48,8 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
+import { PORTAL_THEMES, ATTENDANCE_COLORS, GROWTH_COLORS, MOOD_COLORS, MEAL_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 interface GrowthScoreDetail {
@@ -190,25 +192,26 @@ function getGrowthLabel(score: number): string {
 
 // Attendance calendar color
 function getAttendanceColor(status: string): string {
-  switch (status) {
-    case 'PRESENT': return 'bg-emerald-500';
-    case 'ABSENT': return 'bg-red-500';
-    case 'LATE': return 'bg-amber-500';
-    default: return 'bg-gray-200';
-  }
+  const upper = status.toUpperCase();
+  if (upper === 'PRESENT') return ATTENDANCE_COLORS.PRESENT?.dot || 'bg-emerald-500';
+  if (upper === 'ABSENT') return ATTENDANCE_COLORS.ABSENT?.dot || 'bg-red-500';
+  if (upper === 'LATE') return ATTENDANCE_COLORS.LATE?.dot || 'bg-amber-500';
+  return 'bg-gray-200';
 }
 
 // Mood icon
 function getMoodEmoji(mood: string | null): string {
   if (!mood) return '';
-  const m = mood.toLowerCase();
-  if (m.includes('happy') || m.includes('great')) return '😊';
-  if (m.includes('sad') || m.includes('upset')) return '😢';
-  if (m.includes('tired') || m.includes('sleepy')) return '😴';
-  if (m.includes('excited') || m.includes('energetic')) return '🤩';
-  if (m.includes('calm') || m.includes('quiet')) return '😌';
-  if (m.includes('angry') || m.includes('cranky')) return '😤';
-  return '😊';
+  const m = mood.toUpperCase();
+  if (MOOD_COLORS[m]) return MOOD_COLORS[m].emoji;
+  const lower = mood.toLowerCase();
+  if (lower.includes('happy') || lower.includes('great')) return MOOD_COLORS.HAPPY.emoji;
+  if (lower.includes('sad') || lower.includes('upset')) return MOOD_COLORS.SAD.emoji;
+  if (lower.includes('tired') || lower.includes('sleepy')) return '😴';
+  if (lower.includes('excited') || lower.includes('energetic')) return MOOD_COLORS.EXCITED.emoji;
+  if (lower.includes('calm') || lower.includes('quiet')) return MOOD_COLORS.CALM.emoji;
+  if (lower.includes('angry') || lower.includes('cranky')) return '😤';
+  return MOOD_COLORS.HAPPY.emoji;
 }
 
 /**
@@ -270,7 +273,7 @@ export default function StudentProfilePage() {
         <p className="text-gray-500 mb-4">{error || 'Could not load student details.'}</p>
         <Button
           onClick={() => router.push('/teacher/my-class')}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl`}
         >
           Back to My Class
         </Button>
@@ -343,10 +346,7 @@ export default function StudentProfilePage() {
       {/* ── Profile Header ── */}
       <Card className="border-0 shadow-md overflow-hidden">
         <div
-          className="h-24"
-          style={{
-            background: 'linear-gradient(135deg, #059669 0%, #0d9488 50%, #0ea5e9 100%)',
-          }}
+          className="h-24 bg-portal-gradient"
         />
         <CardContent className="relative -mt-12 px-6 pb-5">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
@@ -354,7 +354,7 @@ export default function StudentProfilePage() {
               {student.photo ? (
                 <AvatarImage src={student.photo} alt={student.firstName} />
               ) : (
-                <AvatarFallback className="bg-emerald-50 text-emerald-700 text-2xl font-bold">
+                <AvatarFallback className={`${theme.avatarFallbackClass} text-2xl font-bold`}>
                   {initials}
                 </AvatarFallback>
               )}
@@ -367,7 +367,7 @@ export default function StudentProfilePage() {
                 <Badge
                   className={`w-fit rounded-md text-xs ${
                     student.status === 'ACTIVE'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      ? `${theme.selectedClass} border-emerald-200`
                       : 'bg-gray-100 text-gray-600 border-gray-200'
                   }`}
                 >
@@ -382,7 +382,7 @@ export default function StudentProfilePage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-xl"
+                className={`border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-xl`}
                 onClick={() => router.push(`/teacher/communication?parent=${primaryParent.id}`)}
               >
                 <MessageCircle className="h-4 w-4 mr-1.5" />
@@ -453,7 +453,7 @@ export default function StudentProfilePage() {
                   <CardContent className="p-5">
                     <div className="flex items-start gap-3 mb-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-emerald-50 text-emerald-700 font-semibold">
+                        <AvatarFallback className={`${theme.avatarFallbackClass} font-semibold`}>
                           {pInitials}
                         </AvatarFallback>
                       </Avatar>
@@ -472,7 +472,7 @@ export default function StudentProfilePage() {
                             {p.relation}
                           </Badge>
                           {sp.isPrimary && (
-                            <Badge className="text-[10px] rounded-md bg-emerald-50 text-emerald-700 border-emerald-200">
+                            <Badge className={`text-[10px] rounded-md ${theme.selectedClass} border-emerald-200`}>
                               Primary
                             </Badge>
                           )}
@@ -582,21 +582,21 @@ export default function StudentProfilePage() {
                   <div className="flex items-center justify-center">
                     <ResponsiveContainer width="100%" height={280}>
                       <RadarChart data={radarData}>
-                        <PolarGrid stroke="#e5e7eb" />
+                        <PolarGrid stroke={CHART_PALETTE.grid} />
                         <PolarAngleAxis
                           dataKey="dimension"
-                          tick={{ fontSize: 11, fill: '#6b7280' }}
+                          tick={{ fontSize: 11, fill: CHART_PALETTE.axis }}
                         />
                         <PolarRadiusAxis
                           angle={30}
                           domain={[0, 100]}
-                          tick={{ fontSize: 9, fill: '#9ca3af' }}
+                          tick={{ fontSize: 9, fill: CHART_PALETTE.axisLight }}
                         />
                         <Radar
                           name="Score"
                           dataKey="value"
-                          stroke="#059669"
-                          fill="#059669"
+                          stroke={theme.primary}
+                          fill={theme.primary}
                           fillOpacity={0.2}
                           strokeWidth={2}
                         />
@@ -627,7 +627,7 @@ export default function StudentProfilePage() {
                         <Badge
                           className={`rounded-md text-xs ${
                             overallScore >= 70
-                              ? 'bg-emerald-50 text-emerald-700'
+                              ? `${theme.selectedClass}`
                               : overallScore >= 40
                               ? 'bg-amber-50 text-amber-700'
                               : 'bg-red-50 text-red-700'
@@ -653,7 +653,7 @@ export default function StudentProfilePage() {
                     Start tracking this student&apos;s growth across 6 dimensions.
                   </p>
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+                    className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl`}
                     onClick={() => router.push(`/teacher/growth?student=${student.id}`)}
                   >
                     Add Growth Assessment
@@ -802,7 +802,7 @@ export default function StudentProfilePage() {
                         key={day}
                         className={`
                           h-9 flex flex-col items-center justify-center rounded-lg text-xs relative
-                          ${isToday ? 'ring-2 ring-emerald-500 ring-offset-1' : ''}
+                          ${isToday ? 'ring-2 ring-portal-500 ring-offset-1' : ''}
                           ${isFuture ? 'text-gray-300' : 'text-gray-700'}
                         `}
                       >
@@ -818,13 +818,13 @@ export default function StudentProfilePage() {
                 {/* Legend */}
                 <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
                   <div className="flex items-center gap-1">
-                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Present
+                    <div className={`h-2.5 w-2.5 rounded-full ${ATTENDANCE_COLORS.PRESENT?.dot || 'bg-emerald-500'}`} /> Present
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="h-2.5 w-2.5 rounded-full bg-red-500" /> Absent
+                    <div className={`h-2.5 w-2.5 rounded-full ${ATTENDANCE_COLORS.ABSENT?.dot || 'bg-red-500'}`} /> Absent
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Late
+                    <div className={`h-2.5 w-2.5 rounded-full ${ATTENDANCE_COLORS.LATE?.dot || 'bg-amber-500'}`} /> Late
                   </div>
                 </div>
               </div>

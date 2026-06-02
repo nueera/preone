@@ -50,6 +50,9 @@ import {
   Tooltip as RTooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { PORTAL_THEMES, OBSERVATION_COLORS, GROWTH_COLORS, ATTENDANCE_COLORS as THEME_ATTENDANCE_COLORS, FEE_COLORS as THEME_FEE_COLORS, CHART_PALETTE, getChartColor } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.parent;
 
 // ============================================================
 // TYPES
@@ -336,27 +339,27 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Behavioral: 'bg-violet-100 text-violet-700',
-  Academic: 'bg-emerald-100 text-emerald-700',
-  Social: 'bg-blue-100 text-blue-700',
-  Emotional: 'bg-rose-100 text-rose-700',
-  Physical: 'bg-orange-100 text-orange-700',
-  Cognitive: 'bg-purple-100 text-purple-700',
+  Behavioral: OBSERVATION_COLORS.COGNITIVE ? `${OBSERVATION_COLORS.COGNITIVE.bg} ${OBSERVATION_COLORS.COGNITIVE.text}` : 'bg-violet-100 text-violet-700',
+  Academic: OBSERVATION_COLORS.SOCIAL ? `${OBSERVATION_COLORS.SOCIAL.bg} ${OBSERVATION_COLORS.SOCIAL.text}` : 'bg-emerald-100 text-emerald-700',
+  Social: OBSERVATION_COLORS.SOCIAL ? `${OBSERVATION_COLORS.SOCIAL.bg} ${OBSERVATION_COLORS.SOCIAL.text}` : 'bg-blue-100 text-blue-700',
+  Emotional: OBSERVATION_COLORS.EMOTIONAL ? `${OBSERVATION_COLORS.EMOTIONAL.bg} ${OBSERVATION_COLORS.EMOTIONAL.text}` : 'bg-rose-100 text-rose-700',
+  Physical: OBSERVATION_COLORS.PHYSICAL ? `${OBSERVATION_COLORS.PHYSICAL.bg} ${OBSERVATION_COLORS.PHYSICAL.text}` : 'bg-orange-100 text-orange-700',
+  Cognitive: OBSERVATION_COLORS.COGNITIVE ? `${OBSERVATION_COLORS.COGNITIVE.bg} ${OBSERVATION_COLORS.COGNITIVE.text}` : 'bg-purple-100 text-purple-700',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
   High: 'text-rose-600',
-  Medium: 'text-violet-600',
+  Medium: 'text-sky-600',
   Low: 'text-emerald-600',
 };
 
 const GROWTH_DIMENSIONS = [
-  { key: 'creativity', label: 'Creativity', color: '#7C3AED' },
-  { key: 'communication', label: 'Communication', color: '#10b981' },
-  { key: 'socialSkills', label: 'Social Skills', color: '#3b82f6' },
-  { key: 'confidence', label: 'Confidence', color: '#8b5cf6' },
-  { key: 'cognitive', label: 'Cognitive', color: '#ef4444' },
-  { key: 'physical', label: 'Physical', color: '#0EA5E9' },
+  { key: 'creativity', label: 'Creativity', color: GROWTH_COLORS.creativity?.hex ?? '#7C3AED' },
+  { key: 'communication', label: 'Communication', color: GROWTH_COLORS.communication?.hex ?? '#10b981' },
+  { key: 'socialSkills', label: 'Social Skills', color: GROWTH_COLORS.social?.hex ?? '#3b82f6' },
+  { key: 'confidence', label: 'Confidence', color: GROWTH_COLORS.cognitive?.hex ?? '#8b5cf6' },
+  { key: 'cognitive', label: 'Cognitive', color: GROWTH_COLORS.cognitive?.hex ?? '#ef4444' },
+  { key: 'physical', label: 'Physical', color: GROWTH_COLORS.physical?.hex ?? '#0EA5E9' },
 ];
 
 // ============================================================
@@ -435,22 +438,28 @@ function getSleepEmoji(sleep?: string) {
 }
 
 function getAttendanceColor(status: string) {
+  const upper = status.toUpperCase();
+  const token = THEME_ATTENDANCE_COLORS[upper];
+  if (token) return token.dot;
   switch (status) {
-    case 'Present': return 'bg-emerald-500';
-    case 'Absent': return 'bg-rose-500';
-    case 'Late': return 'bg-amber-500';
-    case 'HalfDay': return 'bg-yellow-500';
-    case 'Excused': return 'bg-blue-500';
+    case 'Present': return THEME_ATTENDANCE_COLORS.PRESENT?.dot ?? 'bg-emerald-500';
+    case 'Absent': return THEME_ATTENDANCE_COLORS.ABSENT?.dot ?? 'bg-rose-500';
+    case 'Late': return THEME_ATTENDANCE_COLORS.LATE?.dot ?? 'bg-amber-500';
+    case 'HalfDay': return THEME_ATTENDANCE_COLORS.HALF_DAY?.dot ?? 'bg-yellow-500';
+    case 'Excused': return THEME_ATTENDANCE_COLORS.EXCUSED?.dot ?? 'bg-blue-500';
     default: return 'bg-gray-300';
   }
 }
 
 function getInvoiceStatusBadge(status: string) {
+  const upper = status.toUpperCase();
+  const feeToken = THEME_FEE_COLORS[upper];
+  if (feeToken) return <Badge className={`${feeToken.bg} ${feeToken.text} hover:${feeToken.bg}`}>{status}</Badge>;
   switch (status) {
-    case 'Paid': return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Paid</Badge>;
-    case 'Pending': return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">Pending</Badge>;
-    case 'Overdue': return <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100">Overdue</Badge>;
-    case 'Partial': return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Partial</Badge>;
+    case 'Paid': return <Badge className="badge-paid">{status}</Badge>;
+    case 'Pending': return <Badge className="badge-pending">{status}</Badge>;
+    case 'Overdue': return <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100">{status}</Badge>;
+    case 'Partial': return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">{status}</Badge>;
     default: return <Badge variant="secondary">{status}</Badge>;
   }
 }
@@ -491,7 +500,7 @@ function ListSkeleton({ rows = 4 }: { rows?: number }) {
 function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <AlertTriangle className="h-10 w-10 text-violet-500 mb-3" />
+      <AlertTriangle className="h-10 w-10 text-sky-500 mb-3" />
       <p className="text-muted-foreground mb-3">{message}</p>
       {onRetry && <Button variant="outline" onClick={onRetry} size="sm">Try Again</Button>}
     </div>
@@ -777,7 +786,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
               key={child.id}
               variant={isActive ? 'default' : 'outline'}
               size="sm"
-              className={`shrink-0 ${isActive ? 'bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all' : ''}`}
+              className={`shrink-0 ${isActive ? `bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all` : ''}`}
               onClick={() => setSelectedChildId(child.id)}
             >
               <Avatar className="h-5 w-5 mr-2">
@@ -817,7 +826,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Present Days', value: presentDays, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', iconBg: 'bg-emerald-100' },
-            { label: 'Pending Fees', value: formatCurrency(pendingFees), icon: IndianRupee, color: 'text-violet-600', bg: 'bg-violet-50', iconBg: 'bg-violet-100' },
+            { label: 'Pending Fees', value: formatCurrency(pendingFees), icon: IndianRupee, color: 'text-sky-600', bg: 'bg-sky-50', iconBg: 'bg-sky-100' },
             { label: 'New Observations', value: newObs, icon: Eye, color: 'text-blue-600', bg: 'bg-blue-50', iconBg: 'bg-blue-100' },
             { label: 'Children', value: data.children.length, icon: Baby, color: 'text-orange-600', bg: 'bg-orange-50', iconBg: 'bg-orange-100' },
           ].map((stat) => (
@@ -844,9 +853,9 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                 <Card key={child.id} className="hover:shadow-md transition-all duration-300 cursor-pointer rounded-3xl" onClick={() => { setSelectedChildId(child.id); setActiveSection('children'); }}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-violet-200">
+                      <Avatar className="h-12 w-12 border-2 border-sky-200">
                         {child.photo && <AvatarImage src={child.photo} />}
-                        <AvatarFallback className="bg-violet-100 text-violet-700 font-semibold">
+                        <AvatarFallback className={theme.avatarFallbackClass + ' font-semibold'}>
                           {child.firstName[0]}{child.lastName[0]}
                         </AvatarFallback>
                       </Avatar>
@@ -873,7 +882,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           <Card className="rounded-3xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Sun className="h-4 w-4 text-violet-500" /> Recent Daily Updates
+                <Sun className="h-4 w-4 text-sky-500" /> Recent Daily Updates
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -936,7 +945,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           <Card className="rounded-3xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Receipt className="h-4 w-4 text-violet-500" /> Upcoming Fee Reminders
+                <Receipt className="h-4 w-4 text-sky-500" /> Upcoming Fee Reminders
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -981,9 +990,9 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <Card className="rounded-3xl">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <Avatar className="h-20 w-20 border-4 border-violet-200">
+              <Avatar className="h-20 w-20 border-4 border-sky-200">
                 {child.photo && <AvatarImage src={child.photo} />}
-                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-2xl font-bold">
+                <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-2xl font-bold`}>
                   {child.firstName[0]}{child.lastName[0]}
                 </AvatarFallback>
               </Avatar>
@@ -1009,7 +1018,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           {child.class?.teacher && (
             <Card className="rounded-3xl">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2"><GraduationCap className="h-4 w-4 text-violet-500" /> Class Teacher</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><GraduationCap className="h-4 w-4 text-sky-500" /> Class Teacher</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3">
@@ -1082,7 +1091,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           {/* Growth Score Card */}
           <Card className="rounded-3xl">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2"><TrendingUp className="h-4 w-4 text-violet-500" /> Latest Growth Score</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><TrendingUp className="h-4 w-4 text-sky-500" /> Latest Growth Score</CardTitle>
             </CardHeader>
             <CardContent>
               {child.growthScores && child.growthScores.length > 0 ? (
@@ -1411,7 +1420,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                 <Card className="rounded-3xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Utensils className="h-4 w-4 text-violet-500" /> Food
+                      <Utensils className="h-4 w-4 text-sky-500" /> Food
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1488,7 +1497,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                   <Card className="md:col-span-2 rounded-3xl">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-violet-500" /> Highlights
+                        <Sparkles className="h-4 w-4 text-sky-500" /> Highlights
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1502,7 +1511,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                   <Card className="md:col-span-2 rounded-3xl">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-purple-500" /> Notes
+                        <BookOpen className="h-4 w-4 text-sky-500" /> Notes
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1616,7 +1625,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
             />
             <DialogFooter>
               <Button variant="outline" onClick={() => setCommentDialogOpen(false)}>Cancel</Button>
-              <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all" onClick={() => { setCommentDialogOpen(false); setObservationComment(''); }}>
+              <Button className={`bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`} onClick={() => { setCommentDialogOpen(false); setObservationComment(''); }}>
                 <Send className="h-4 w-4 mr-2" /> Submit
               </Button>
             </DialogFooter>
@@ -1651,10 +1660,10 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
               {growthRadarData.some(d => d.value > 0) ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={growthRadarData}>
-                    <PolarGrid stroke="#e5e7eb" />
+                    <PolarGrid stroke={CHART_PALETTE.grid} />
                     <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
-                    <Radar name="Score" dataKey="value" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
+                    <Radar name="Score" dataKey="value" stroke={theme.primary} fill={theme.primary} fillOpacity={0.3} strokeWidth={2} />
                   </RadarChart>
                 </ResponsiveContainer>
               ) : (
@@ -1675,14 +1684,14 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
               {growthTrendData.length > 1 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={growthTrendData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
                     <RTooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="overall" stroke="#7C3AED" strokeWidth={2} name="Overall" />
-                    <Line type="monotone" dataKey="creativity" stroke="#10b981" strokeWidth={1} strokeDasharray="4 2" name="Creativity" />
-                    <Line type="monotone" dataKey="communication" stroke="#3b82f6" strokeWidth={1} strokeDasharray="4 2" name="Communication" />
+                    <Line type="monotone" dataKey="overall" stroke={theme.primary} strokeWidth={2} name="Overall" />
+                    <Line type="monotone" dataKey="creativity" stroke={getChartColor(2)} strokeWidth={1} strokeDasharray="4 2" name="Creativity" />
+                    <Line type="monotone" dataKey="communication" stroke={getChartColor(1)} strokeWidth={1} strokeDasharray="4 2" name="Communication" />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
@@ -1699,7 +1708,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Star className="h-4 w-4 text-violet-500" /> Milestone Timeline
+                <Star className="h-4 w-4 text-sky-500" /> Milestone Timeline
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1707,8 +1716,8 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                 {gData.milestoneTimelines.map(mt => (
                   <div key={mt.id} className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <div className="w-3 h-3 rounded-full bg-violet-500" />
-                      <div className="w-0.5 flex-1 bg-violet-200" />
+                      <div className="w-3 h-3 rounded-full bg-sky-500" />
+                      <div className="w-0.5 flex-1 bg-sky-200" />
                     </div>
                     <div className="pb-4">
                       <p className="font-medium text-sm">{mt.milestone.name}</p>
@@ -1730,13 +1739,13 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Brain className="h-4 w-4 text-purple-500" /> AI Observations
+                <Brain className="h-4 w-4 text-sky-500" /> AI Observations
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {gData.aiObservations.map(aio => (
-                  <div key={aio.id} className="p-3 rounded-lg bg-purple-50 border border-purple-100">
+                  <div key={aio.id} className="p-3 rounded-lg bg-sky-50 border border-sky-100">
                     <p className="text-sm">{aio.content}</p>
                     <p className="text-xs text-muted-foreground mt-2">{formatDate(aio.createdAt)}</p>
                   </div>
@@ -1759,8 +1768,8 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
               {gData && gData.memories.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
                   {gData.memories.slice(0, 6).map(mem => (
-                    <div key={mem.id} className="aspect-square rounded-lg bg-gradient-to-br from-violet-100 to-sky-100 flex flex-col items-center justify-center p-2">
-                      {mem.type === 'video' ? <Video className="h-8 w-8 text-violet-400" /> : <ImageIcon className="h-8 w-8 text-violet-400" />}
+                    <div key={mem.id} className="aspect-square rounded-lg bg-gradient-to-br from-sky-100 to-blue-100 flex flex-col items-center justify-center p-2">
+                      {mem.type === 'video' ? <Video className="h-8 w-8 text-sky-400" /> : <ImageIcon className="h-8 w-8 text-sky-400" />}
                       <p className="text-[10px] text-center mt-1 line-clamp-1">{mem.title || formatDate(mem.date)}</p>
                     </div>
                   ))}
@@ -1775,23 +1784,23 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
           <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-violet-500" /> Achievements
+                <Trophy className="h-4 w-4 text-sky-500" /> Achievements
               </CardTitle>
             </CardHeader>
             <CardContent>
               {gData && gData.achievements.length > 0 ? (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {gData.achievements.map(ach => (
-                    <div key={ach.id} className="flex items-center gap-3 p-2 rounded-lg bg-violet-50 border border-violet-100">
-                      <div className="p-2 rounded-lg bg-violet-100">
-                        <Trophy className="h-4 w-4 text-violet-600" />
+                    <div key={ach.id} className="flex items-center gap-3 p-2 rounded-lg bg-sky-50 border border-sky-100">
+                      <div className="p-2 rounded-lg bg-sky-100">
+                        <Trophy className="h-4 w-4 text-sky-600" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium">{ach.title}</p>
                         {ach.description && <p className="text-xs text-muted-foreground">{ach.description}</p>}
                         <p className="text-[10px] text-muted-foreground">{formatDate(ach.date)}</p>
                       </div>
-                      <Badge className="bg-violet-100 text-violet-700 text-[10px]">{ach.type || 'Award'}</Badge>
+                      <Badge className="bg-sky-100 text-sky-700 text-[10px]">{ach.type || 'Award'}</Badge>
                     </div>
                   ))}
                 </div>
@@ -1882,19 +1891,19 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Settings className="h-4 w-4 text-violet-500" /> Profile
+              <Settings className="h-4 w-4 text-sky-500" /> Profile
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-violet-200">
-                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-sky-400 text-white text-xl font-bold">
+              <Avatar className="h-16 w-16 border-2 border-sky-200">
+                <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-xl font-bold`}>
                   {user.email[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-semibold text-lg">{user.email}</p>
-                <Badge className="bg-violet-100 text-violet-700">Parent</Badge>
+                <Badge className={theme.avatarFallbackClass}>Parent</Badge>
               </div>
             </div>
             <Separator />
@@ -1935,7 +1944,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
               <Label htmlFor="confirm-password">Confirm Password</Label>
               <Input id="confirm-password" type="password" placeholder="Confirm new password" />
             </div>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white shadow-sm hover:shadow-md transition-all">Update Password</Button>
+            <Button className={`bg-gradient-to-r ${theme.btnGradientClass} hover:${theme.btnGradientHoverClass} text-white shadow-sm hover:shadow-md transition-all`}>Update Password</Button>
           </CardContent>
         </Card>
 
@@ -1943,7 +1952,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Bell className="h-4 w-4 text-violet-500" /> Notification Preferences
+              <Bell className="h-4 w-4 text-sky-500" /> Notification Preferences
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1968,7 +1977,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         <Card className="rounded-3xl">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-violet-500" /> Language
+              <BookOpen className="h-4 w-4 text-sky-500" /> Language
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -2015,7 +2024,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-violet-400/30 shrink-0">
+        <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-sky-400/30 shrink-0">
           <Image src="/preonelogo.png" alt="PreOne" width={36} height={36} className="w-full h-full object-cover" />
         </div>
         {!sidebarCollapsed && (

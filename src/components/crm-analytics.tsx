@@ -25,6 +25,9 @@ import {
   Line,
   Legend,
 } from 'recharts';
+import { PORTAL_THEMES, CRM_COLORS, CHART_PALETTE, getChartColor } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface InsightsData {
@@ -116,8 +119,8 @@ export function CrmAnalytics() {
     );
   }
 
-  // Pie chart colors
-  const PIE_COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#6366f1', '#ec4899', '#14b8a6'];
+  // Pie chart colors — use CHART_PALETTE instead of hardcoded hex
+  const PIE_COLORS = CHART_PALETTE.series;
 
   return (
     <div className="space-y-6">
@@ -190,25 +193,25 @@ export function CrmAnalytics() {
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.monthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
+                <YAxis tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
                 <Tooltip />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey="leads"
-                  stroke="#7C3AED"
+                  stroke={getChartColor(0)}
                   strokeWidth={2}
-                  dot={{ fill: '#7C3AED', r: 3 }}
+                  dot={{ fill: getChartColor(0), r: 3 }}
                   name="Leads"
                 />
                 <Line
                   type="monotone"
                   dataKey="conversions"
-                  stroke="#10b981"
+                  stroke={getChartColor(2)}
                   strokeWidth={2}
-                  dot={{ fill: '#10b981', r: 3 }}
+                  dot={{ fill: getChartColor(2), r: 3 }}
                   name="Conversions"
                 />
               </LineChart>
@@ -230,11 +233,11 @@ export function CrmAnalytics() {
                 layout="vertical"
                 margin={{ left: 20 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                <YAxis type="category" dataKey="source" tick={{ fontSize: 11 }} width={80} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} domain={[0, 100]} />
+                <YAxis type="category" dataKey="source" tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} width={80} />
                 <Tooltip formatter={(value: number) => [`${value}%`, 'Conversion Rate']} />
-                <Bar dataKey="conversionRate" fill="#7C3AED" radius={[0, 4, 4, 0]} name="Conversion %" />
+                <Bar dataKey="conversionRate" fill={theme.primary} radius={[0, 4, 4, 0]} name="Conversion %" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -285,9 +288,9 @@ export function CrmAnalytics() {
                   value: r.value,
                 }))}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="stage" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
+                <YAxis tick={{ fontSize: 11, fill: CHART_PALETTE.axis }} />
                 <Tooltip formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Est. Value']} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                   {data.revenueForecast.map((entry, index) => (

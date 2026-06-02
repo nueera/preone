@@ -49,6 +49,8 @@ import {
 } from '@/components/ui/select';
 import { AddStudentDialog } from '@/components/add-student-dialog';
 import { TransferStudentDialog } from '@/components/transfer-student-dialog';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ClassInfo {
@@ -384,14 +386,14 @@ export default function StudentsListPage() {
           </div>
 
           {/* Gender Filter */}
-          <div className="flex gap-1.5">
+          <div className='flex gap-1.5'>
             {['All', 'Male', 'Female'].map((g) => (
               <button
                 key={g}
                 onClick={() => { setGender(g); setPage(1); }}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                   gender === g
-                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                    ? 'bg-portal-50 text-portal-700 border-portal-200'
                     : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -519,7 +521,7 @@ export default function StudentsListPage() {
                   >
                     <TableCell>
                       <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-purple-50 text-purple-700 text-xs font-semibold">
+                        <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
                           {getInitials(student.firstName, student.lastName)}
                         </AvatarFallback>
                       </Avatar>

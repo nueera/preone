@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { toast } from 'sonner';
+import { CHART_PALETTE } from '@/lib/theme-tokens';
 
 // ============================================================
 // Types
@@ -209,7 +210,7 @@ export default function LoginPage() {
   // ============================================================
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-sky-50 dark:from-slate-950 dark:via-purple-950/30 dark:to-slate-950">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-login-gradient">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating circles */}
@@ -225,7 +226,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md mx-4">
         {/* Logo & Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-xl shadow-purple-500/25 mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-brand-gradient shadow-xl shadow-purple-500/25 mb-4">
             <GraduationCap className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
@@ -237,7 +238,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Card */}
-        <Card className="border-0 shadow-2xl shadow-purple-500/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+        <Card className="border-0 shadow-2xl shadow-purple-500/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl card-preone">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
             <CardDescription className="text-center">
@@ -287,7 +288,7 @@ export default function LoginPage() {
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                          <KeyRound className="h-5 w-5 text-purple-500" />
+                          <KeyRound className="h-5 w-5" style={{ color: CHART_PALETTE.series[0] }} />
                           Reset Password
                         </DialogTitle>
                         <DialogDescription>
@@ -317,7 +318,7 @@ export default function LoginPage() {
                           </div>
                           <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                            className="w-full btn-brand"
                             disabled={isForgotLoading}
                           >
                             {isForgotLoading ? (
@@ -370,7 +371,7 @@ export default function LoginPage() {
 
                           <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                            className="w-full btn-brand"
                             disabled={isForgotLoading || otpValue.length !== 6}
                           >
                             {isForgotLoading ? (
@@ -421,7 +422,7 @@ export default function LoginPage() {
               {/* Sign In Button */}
               <Button
                 type="submit"
-                className="w-full h-11 text-base font-semibold rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
+                className="w-full h-11 text-base font-semibold rounded-xl btn-brand shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
                 disabled={isLoading}
               >
                 {isLoading ? (

@@ -48,6 +48,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { PORTAL_THEMES, OBSERVATION_COLORS as THEME_OBSERVATION_COLORS, PRIORITY_COLORS } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.teacher;
 
 // ── Types ──
 type ObservationCategory = 'BEHAVIORAL' | 'ACADEMIC' | 'SOCIAL' | 'EMOTIONAL' | 'PHYSICAL' | 'COGNITIVE';
@@ -95,48 +97,48 @@ interface ObservationsData {
 const CATEGORY_CONFIG: Record<ObservationCategory, { label: string; color: string; bg: string; border: string; icon: string; guidance: string }> = {
   BEHAVIORAL: {
     label: 'Behavioral',
-    color: 'text-orange-700',
-    bg: 'bg-orange-100',
+    color: THEME_OBSERVATION_COLORS.COGNITIVE?.text || 'text-orange-700',
+    bg: THEME_OBSERVATION_COLORS.COGNITIVE?.bg || 'bg-orange-100',
     border: 'border-orange-300',
     icon: '🧠',
     guidance: 'Describe the behavior, when it occurred, and context',
   },
   ACADEMIC: {
     label: 'Academic',
-    color: 'text-blue-700',
-    bg: 'bg-blue-100',
+    color: THEME_OBSERVATION_COLORS.SOCIAL?.text || 'text-blue-700',
+    bg: THEME_OBSERVATION_COLORS.SOCIAL?.bg || 'bg-blue-100',
     border: 'border-blue-300',
     icon: '📚',
     guidance: 'Note learning progress, areas of strength/weakness',
   },
   SOCIAL: {
     label: 'Social',
-    color: 'text-green-700',
-    bg: 'bg-green-100',
+    color: THEME_OBSERVATION_COLORS.SOCIAL?.text || 'text-green-700',
+    bg: THEME_OBSERVATION_COLORS.SOCIAL?.bg || 'bg-green-100',
     border: 'border-green-300',
     icon: '🤝',
     guidance: 'Describe interaction with peers, sharing, cooperation',
   },
   EMOTIONAL: {
     label: 'Emotional',
-    color: 'text-purple-700',
-    bg: 'bg-purple-100',
+    color: THEME_OBSERVATION_COLORS.EMOTIONAL?.text || 'text-purple-700',
+    bg: THEME_OBSERVATION_COLORS.EMOTIONAL?.bg || 'bg-purple-100',
     border: 'border-purple-300',
     icon: '💜',
     guidance: 'Note emotional responses, triggers, coping',
   },
   PHYSICAL: {
     label: 'Physical',
-    color: 'text-teal-700',
-    bg: 'bg-teal-100',
+    color: THEME_OBSERVATION_COLORS.PHYSICAL?.text || 'text-teal-700',
+    bg: THEME_OBSERVATION_COLORS.PHYSICAL?.bg || 'bg-teal-100',
     border: 'border-teal-300',
     icon: '🏃',
     guidance: 'Describe motor skills, coordination, health observations',
   },
   COGNITIVE: {
     label: 'Cognitive',
-    color: 'text-pink-700',
-    bg: 'bg-pink-100',
+    color: THEME_OBSERVATION_COLORS.COGNITIVE?.text || 'text-pink-700',
+    bg: THEME_OBSERVATION_COLORS.COGNITIVE?.bg || 'bg-pink-100',
     border: 'border-pink-300',
     icon: '💡',
     guidance: 'Note problem-solving, reasoning, attention span',
@@ -144,10 +146,10 @@ const CATEGORY_CONFIG: Record<ObservationCategory, { label: string; color: strin
 };
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  LOW:    { label: 'Low',    color: 'text-gray-600',   bg: 'bg-gray-100',   border: 'border-gray-300',   dot: 'bg-gray-400' },
-  NORMAL: { label: 'Normal', color: 'text-blue-700',   bg: 'bg-blue-100',   border: 'border-blue-300',   dot: 'bg-blue-500' },
-  HIGH:   { label: 'High',   color: 'text-orange-700', bg: 'bg-orange-100', border: 'border-orange-300', dot: 'bg-orange-500' },
-  CONCERN:{ label: 'Concern',color: 'text-red-700',    bg: 'bg-red-100',    border: 'border-red-300',    dot: 'bg-red-500' },
+  LOW:    { label: 'Low',    color: PRIORITY_COLORS.LOW.text,   bg: PRIORITY_COLORS.LOW.bg,   border: 'border-gray-300',   dot: PRIORITY_COLORS.LOW.hex },
+  NORMAL: { label: 'Normal', color: PRIORITY_COLORS.MEDIUM.text, bg: PRIORITY_COLORS.MEDIUM.bg, border: 'border-blue-300',   dot: PRIORITY_COLORS.MEDIUM.hex },
+  HIGH:   { label: 'High',   color: PRIORITY_COLORS.HIGH.text,  bg: PRIORITY_COLORS.HIGH.bg,  border: 'border-orange-300', dot: PRIORITY_COLORS.HIGH.hex },
+  CONCERN:{ label: 'Concern',color: 'text-red-700',    bg: 'bg-red-100',    border: 'border-red-300',    dot: PRIORITY_COLORS.HIGH.hex },
 };
 
 // ── Helpers ──
@@ -481,7 +483,7 @@ function ObservationsContent() {
         <p className="text-gray-500 mb-4">{error}</p>
         <Button
           onClick={fetchObservations}
-          className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+          className="bg-portal-600 hover:bg-portal-700 rounded-xl"
         >
           Retry
         </Button>
@@ -499,7 +501,7 @@ function ObservationsContent() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Eye className="h-5 w-5 text-emerald-500" />
+                <Eye className="h-5 w-5 text-portal-500" />
                 Observations
                 {activeStudentId && data?.observations[0] && (
                   <span className="text-sm font-normal text-gray-500">
@@ -512,7 +514,7 @@ function ObservationsContent() {
               </p>
             </div>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm"
+              className={`bg-portal-600 hover:bg-portal-700 rounded-xl text-sm`}
               onClick={() => setShowCreateDialog(true)}
             >
               <Plus className="h-4 w-4 mr-1" /> Create Observation
@@ -596,10 +598,9 @@ function ObservationsContent() {
                 : 'Create your first observation to get started'}
             </p>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm"
-              onClick={() => setShowCreateDialog(true)}
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm"
             >
-              <Plus className="h-4 w-4 mr-1" /> Create Observation
+              Create Observation
             </Button>
           </CardContent>
         </Card>
@@ -618,7 +619,7 @@ function ObservationsContent() {
                       {obs.studentPhoto ? (
                         <AvatarImage src={obs.studentPhoto} alt={obs.studentName} />
                       ) : (
-                        <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                        <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
                           {getInitials(obs.studentName)}
                         </AvatarFallback>
                       )}
@@ -657,11 +658,11 @@ function ObservationsContent() {
                       {/* Shared status */}
                       <div className="flex items-center gap-3 mt-2">
                         {obs.isShared ? (
-                          <span className="flex items-center gap-1 text-xs text-emerald-600">
+                          <span className="flex items-center gap-1 text-xs text-portal-600">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             Shared
                             {obs.parentAck && (
-                              <span className="text-emerald-700 font-medium" title="Parent acknowledged">
+                              <span className="text-portal-700 font-medium" title="Parent acknowledged">
                                 <CheckCircle2 className="h-3.5 w-3.5 ml-0.5" />
                               </span>
                             )}
@@ -684,7 +685,7 @@ function ObservationsContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
+                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-portal-600 hover:bg-portal-50"
                         onClick={() => {
                           setSelectedObservation(obs);
                           setShowDetailDialog(true);
@@ -740,7 +741,7 @@ function ObservationsContent() {
         <DialogContent className="sm:max-w-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-emerald-600" />
+              <Plus className="h-5 w-5 text-portal-600" />
               Create Observation
             </DialogTitle>
             <DialogDescription>
@@ -861,7 +862,7 @@ function ObservationsContent() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
               onClick={handleCreate}
               disabled={creating || !createForm.studentId || !createForm.category || createForm.content.trim().length < 10}
             >
@@ -914,17 +915,17 @@ function ObservationsContent() {
                     </h4>
                     {selectedObservation.isShared ? (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-emerald-600">
+                        <div className="flex items-center gap-2 text-sm text-portal-600">
                           <CheckCircle2 className="h-4 w-4" />
                           <span className="font-medium">Shared with Parent</span>
                         </div>
                         {selectedObservation.parentAck ? (
-                          <div className="bg-emerald-50 p-2.5 rounded-lg">
-                            <p className="text-xs text-emerald-700 font-medium flex items-center gap-1">
+                          <div className="bg-portal-50 p-2.5 rounded-lg">
+                            <p className="text-xs text-portal-700 font-medium flex items-center gap-1">
                               <CheckCircle2 className="h-3.5 w-3.5" /> Parent has acknowledged this observation
                             </p>
                             {selectedObservation.parentComment && (
-                              <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                              <p className="text-xs text-portal-600 mt-1 flex items-center gap-1">
                                 <MessageSquare className="h-3 w-3" /> Parent comment: &quot;{selectedObservation.parentComment}&quot;
                               </p>
                             )}
@@ -939,7 +940,7 @@ function ObservationsContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-xs rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                          className="text-xs rounded-xl border-portal-200 text-portal-700 hover:bg-portal-50"
                           onClick={() => {
                             setShareTarget(selectedObservation);
                             setShowShareDialog(true);
@@ -983,7 +984,7 @@ function ObservationsContent() {
                     </Button>
                   ) : (
                     <Button
-                      className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+                      className="bg-portal-600 hover:bg-portal-700 rounded-xl"
                       onClick={() => {
                         setShareTarget(selectedObservation);
                         setShowShareDialog(true);
@@ -1064,7 +1065,7 @@ function ObservationsContent() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              className="bg-portal-600 hover:bg-portal-700 rounded-xl"
               onClick={handleEdit}
               disabled={editing || editForm.content.trim().length < 10}
             >
@@ -1086,7 +1087,7 @@ function ObservationsContent() {
                 </>
               ) : (
                 <>
-                  <Share2 className="h-5 w-5 text-emerald-500" />
+                  <Share2 className="h-5 w-5 text-portal-500" />
                   Share with Parent
                 </>
               )}
@@ -1105,7 +1106,7 @@ function ObservationsContent() {
             <Button
               className={shareTarget?.isShared
                 ? 'bg-amber-600 hover:bg-amber-700 rounded-xl'
-                : 'bg-emerald-600 hover:bg-emerald-700 rounded-xl'
+                : 'bg-portal-600 hover:bg-portal-700 rounded-xl'
               }
               onClick={handleShare}
               disabled={sharing}

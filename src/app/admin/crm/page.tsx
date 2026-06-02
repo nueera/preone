@@ -47,6 +47,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES, CRM_COLORS, CHART_PALETTE, getChartColor } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── @dnd-kit imports ──
 import {
@@ -118,12 +120,12 @@ interface PipelineStage {
 
 // ── Constants ──
 const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string; textColor: string }> = {
-  NEW: { label: 'New', color: '#9ca3af', cardBg: 'bg-white', textColor: 'text-gray-600' },
-  CONTACTED: { label: 'Contacted', color: '#3b82f6', cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
-  VISITED: { label: 'Visited', color: '#8b5cf6', cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
-  APPLIED: { label: 'Applied', color: '#f59e0b', cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
-  ENROLLED: { label: 'Enrolled', color: '#10b981', cardBg: 'bg-green-50', textColor: 'text-green-600' },
-  LOST: { label: 'Lost', color: '#ef4444', cardBg: 'bg-red-50', textColor: 'text-red-600' },
+  NEW: { label: 'New', color: CRM_COLORS.NEW.hex, cardBg: 'bg-white', textColor: 'text-gray-600' },
+  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED.hex, cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
+  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED.hex, cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
+  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION.hex, cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
+  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED.hex, cardBg: 'bg-green-50', textColor: 'text-green-600' },
+  LOST: { label: 'Lost', color: CRM_COLORS.LOST.hex, cardBg: 'bg-red-50', textColor: 'text-red-600' },
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -228,7 +230,7 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 text-[11px] px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              className="h-6 text-[11px] px-2 text-portal-600 hover:text-portal-700 hover:bg-portal-50"
               onClick={(e) => { e.stopPropagation(); onClick(lead); }}
             >
               View
@@ -479,7 +481,7 @@ export default function CrmPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-purple-600" />
+            <Megaphone className="h-6 w-6 text-portal-600" />
             Admission CRM
           </h1>
           <p className="text-sm text-gray-500 mt-1">Manage leads, track conversions, and grow enrollments</p>
@@ -711,7 +713,7 @@ export default function CrmPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                              className="h-7 text-xs text-portal-600 hover:text-portal-700"
                               onClick={(e) => { e.stopPropagation(); handleLeadClick(lead); }}
                             >
                               View

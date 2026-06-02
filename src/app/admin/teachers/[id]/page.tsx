@@ -63,6 +63,8 @@ import {
 } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface BranchInfo { id: string; name: string }
@@ -503,7 +505,7 @@ export default function TeacherDetailPage() {
       <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-gray-900">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-purple-50 text-purple-700 text-2xl font-bold">
+            <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
               {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -562,7 +564,7 @@ export default function TeacherDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5 text-purple-500" />
+                  <User className="h-5 w-5 text-portal-500" />
                   Personal Information
                 </CardTitle>
               </CardHeader>
@@ -650,7 +652,7 @@ export default function TeacherDetailPage() {
                     <Separator />
                     <div>
                       <p className="text-xs text-muted-foreground">Monthly Salary</p>
-                      <p className="text-lg font-bold text-purple-700">₹{teacher.salary.toLocaleString('en-IN')}</p>
+                      <p className="text-lg font-bold text-portal-700">₹{teacher.salary.toLocaleString('en-IN')}</p>
                     </div>
                   </>
                 )}
@@ -664,7 +666,7 @@ export default function TeacherDetailPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-purple-500" />
+                <Clock className="h-5 w-5 text-portal-500" />
                 Weekly Timetable
               </CardTitle>
             </CardHeader>
@@ -780,7 +782,7 @@ export default function TeacherDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Attendance Rate</p>
-                  <p className="text-2xl font-bold text-purple-600">{attendanceRate}%</p>
+                  <p className="text-2xl font-bold text-portal-600">{attendanceRate}%</p>
                 </CardContent>
               </Card>
             </div>
@@ -795,7 +797,7 @@ export default function TeacherDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Current Monthly Salary</p>
-                  <p className="text-2xl font-bold text-purple-700">
+                  <p className="text-2xl font-bold text-portal-700">
                     ₹{(teacher.salary || 0).toLocaleString('en-IN')}
                   </p>
                 </CardContent>
@@ -901,7 +903,7 @@ export default function TeacherDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Earned Leave</p>
-                  <p className="text-2xl font-bold text-purple-600">15</p>
+                  <p className="text-2xl font-bold text-portal-600">15</p>
                   <p className="text-xs text-muted-foreground">Available this year</p>
                 </CardContent>
               </Card>
@@ -1003,7 +1005,7 @@ export default function TeacherDetailPage() {
                   <div>
                     <p className="text-xs text-muted-foreground">Overall Rating</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-3xl font-bold text-purple-700">
+                      <span className="text-3xl font-bold text-portal-700">
                         {teacher.reviews.length > 0
                           ? (teacher.reviews.reduce((sum, r) => sum + r.overallRating, 0) / teacher.reviews.length).toFixed(1)
                           : '—'}
@@ -1202,9 +1204,9 @@ export default function TeacherDetailPage() {
             <Separator />
 
             {/* Net Pay Display */}
-            <div className="rounded-lg bg-purple-50 border border-purple-200 p-4 text-center">
+            <div className="rounded-lg bg-portal-50 border border-portal-200 p-4 text-center">
               <p className="text-xs text-muted-foreground">Net Pay</p>
-              <p className="text-2xl font-bold text-purple-700">₹{calculatedNetPay.toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-bold text-portal-700">₹{calculatedNetPay.toLocaleString('en-IN')}</p>
               <p className="text-xs text-muted-foreground">
                 Basic + HRA + DA - PF - Tax - Other + Bonus
               </p>
@@ -1360,7 +1362,7 @@ export default function TeacherDetailPage() {
               <div key={key}>
                 <div className="flex items-center justify-between mb-1">
                   <Label>{label}</Label>
-                  <span className="text-sm font-bold text-purple-700">
+                  <span className="text-sm font-bold text-portal-700">
                     {reviewForm[key as keyof typeof reviewForm] as number}/5
                   </span>
                 </div>

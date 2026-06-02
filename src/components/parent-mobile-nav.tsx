@@ -7,6 +7,9 @@ import {
   LayoutDashboard, Baby, Sun, IndianRupee, MessageSquare, TrendingUp,
 } from 'lucide-react';
 import { useParentAuth } from '@/lib/parent-auth';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
+const theme = PORTAL_THEMES.parent;
 
 // ── Mobile bottom navigation items (5 most important) ──
 const MOBILE_NAV_ITEMS = [
@@ -41,7 +44,7 @@ export function ParentMobileNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px] min-h-[44px] transition-colors ${
                 isActive
-                  ? 'text-sky-600'
+                  ? theme.selectedClass
                   : 'text-gray-400 hover:text-gray-600'
               }`}
             >

@@ -34,6 +34,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TransferStudentDialog } from '@/components/transfer-student-dialog';
+import { PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
+const theme = PORTAL_THEMES.admin;
 import {
   RadarChart,
   PolarGrid,
@@ -366,7 +368,7 @@ export default function StudentDetailPage() {
       <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-gray-900">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-purple-50 text-purple-700 text-2xl font-bold">
+            <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
               {student.firstName.charAt(0)}{student.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -424,7 +426,7 @@ export default function StudentDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5 text-purple-500" />
+                  <User className="h-5 w-5 text-portal-500" />
                   Personal Information
                 </CardTitle>
               </CardHeader>
@@ -485,7 +487,7 @@ export default function StudentDetailPage() {
               <CardContent className="space-y-4">
                 {father && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold text-purple-700">Father</p>
+                    <p className="text-sm font-semibold text-portal-700">Father</p>
                     <p className="text-sm">{father.firstName} {father.lastName}</p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3" /> {father.phone}
@@ -502,7 +504,7 @@ export default function StudentDetailPage() {
                 )}
                 {mother && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold text-purple-700">Mother</p>
+                    <p className="text-sm font-semibold text-portal-700">Mother</p>
                     <p className="text-sm">{mother.firstName} {mother.lastName}</p>
                     {mother.phone && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -616,7 +618,7 @@ export default function StudentDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Attendance Rate</p>
-                  <p className="text-2xl font-bold text-purple-600">{attendanceRate}%</p>
+                  <p className="text-2xl font-bold text-portal-600">{attendanceRate}%</p>
                 </CardContent>
               </Card>
             </div>
@@ -758,15 +760,15 @@ export default function StudentDetailPage() {
                           <Radar
                             name="Student"
                             dataKey="student"
-                            stroke="#7C3AED"
-                            fill="#7C3AED"
+                            stroke={CHART_PALETTE.series[0]}
+                            fill={CHART_PALETTE.series[0]}
                             fillOpacity={0.25}
                           />
                           <Radar
                             name="Class Average"
                             dataKey="average"
-                            stroke="#0EA5E9"
-                            fill="#0EA5E9"
+                            stroke={CHART_PALETTE.series[1]}
+                            fill={CHART_PALETTE.series[1]}
                             fillOpacity={0.1}
                           />
                           <Legend />
@@ -835,7 +837,7 @@ export default function StudentDetailPage() {
                 <Card key={med.id}>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-purple-500" />
+                      <Shield className="h-5 w-5 text-portal-500" />
                       Medical Record
                     </CardTitle>
                   </CardHeader>
