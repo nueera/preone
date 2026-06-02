@@ -300,6 +300,186 @@ export function useParentReceipt(receiptId: string | null) {
 }
 
 // ============================================================
+// Daily Updates Types
+// ============================================================
+
+export interface DailyUpdateData {
+  id: string;
+  date: string;
+  breakfast: string | null;
+  breakfastMenu: string | null;
+  lunch: string | null;
+  lunchMenu: string | null;
+  snacks: string | null;
+  snacksMenu: string | null;
+  sleepStart: string | null;
+  sleepEnd: string | null;
+  sleepQuality: string | null;
+  moodMorning: string | null;
+  moodAfternoon: string | null;
+  pottyCount: number;
+  pottyType: string | null;
+  waterGlasses: number;
+  highlights: string | null;
+  publishedAt: string | null;
+}
+
+export interface DailyUpdatesResponse {
+  updates: DailyUpdateData[];
+  date: string;
+}
+
+// ============================================================
+// useParentDailyUpdates — Get daily updates for a child
+// ============================================================
+
+export function useParentDailyUpdates(childId: string | null, date?: string) {
+  return useQuery({
+    queryKey: [...parentKeys.dailyUpdates(childId || ''), date] as const,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      if (date) params.set('date', date);
+      return parentGet<DailyUpdatesResponse>(`/api/parent/daily-updates?${params.toString()}`);
+    },
+    enabled: !!childId,
+    staleTime: 60 * 1000, // 1 minute
+  });
+}
+
+// ============================================================
+// Observations Types
+// ============================================================
+
+export interface ObservationData {
+  id: string;
+  category: string;
+  content: string;
+  priority: string;
+  isShared: boolean;
+  parentAck: boolean;
+  parentComment: string | null;
+  media: string | null;
+  createdAt: string;
+}
+
+export interface ObservationsResponse {
+  observations: ObservationData[];
+  total: number;
+  categories: Record<string, number>;
+}
+
+// ============================================================
+// useParentObservations — Get observations for a child
+// ============================================================
+
+export function useParentObservations(childId: string | null) {
+  return useQuery({
+    queryKey: parentKeys.observations(childId || ''),
+    queryFn: () =>
+      parentGet<ObservationsResponse>(`/api/parent/observations?childId=${childId}`),
+    enabled: !!childId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
+// Growth Types
+// ============================================================
+
+export interface GrowthScoreData {
+  id: string;
+  period: string;
+  creativity: number;
+  communication: number;
+  social: number;
+  confidence: number;
+  cognitive: number;
+  physical: number;
+  overall: number | null;
+  comments: string | null;
+  createdAt: string;
+}
+
+export interface AchievementData {
+  id: string;
+  title: string;
+  description: string | null;
+  icon: string | null;
+  date: string | null;
+}
+
+export interface MilestoneData {
+  id: string;
+  milestoneId: string;
+  milestoneName: string | null;
+  milestoneCategory: string | null;
+  milestoneAgeGroup: string | null;
+  achievedDate: string | null;
+  status: string;
+  notes: string | null;
+}
+
+export interface GrowthResponse {
+  growthScores: GrowthScoreData[];
+  achievements: AchievementData[];
+  milestones: MilestoneData[];
+}
+
+// ============================================================
+// useParentGrowth — Get growth data for a child
+// ============================================================
+
+export function useParentGrowth(childId: string | null) {
+  return useQuery({
+    queryKey: parentKeys.growth(childId || ''),
+    queryFn: () =>
+      parentGet<GrowthResponse>(`/api/parent/growth?childId=${childId}`),
+    enabled: !!childId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
+// Announcement Types
+// ============================================================
+
+export interface AnnouncementData {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  priority: string;
+  attachments: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+}
+
+export interface AnnouncementsResponse {
+  announcements: AnnouncementData[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+// ============================================================
+// useParentAnnouncements — Get announcements for parent
+// ============================================================
+
+export function useParentAnnouncements(page?: number) {
+  return useQuery({
+    queryKey: [...parentKeys.announcements, page] as const,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (page) params.set('page', String(page));
+      params.set('limit', '10');
+      return parentGet<AnnouncementsResponse>(`/api/parent/announcements?${params.toString()}`);
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
 // useParentDashboard — Get dashboard data
 // ============================================================
 
