@@ -84,3 +84,24 @@ Stage Summary:
 - Teacher layout now has React Query + Auth Context
 - Notification preferences stored as JSON in SchoolSetting (no schema migration needed)
 - Build succeeds with no new TypeScript errors
+
+---
+Task ID: parent-children-module
+Agent: Main Agent
+Task: Build My Children module for PreOne Parent Portal
+
+Work Log:
+- Added requireParent() and verifyChildAccess() to /src/lib/api-auth.ts — Parent auth helper that finds parent by matching User.email to Parent.email/phone, loads all linked children via StudentParent, returns structured ParentAuthResult
+- Enhanced /src/app/api/parent/children/route.ts — Returns rich child data including parents (with isPrimary, occupation, address), siblings (from both relation directions), medical records, class/teacher info, emergency contact
+- Created /src/app/api/parent/children/[childId]/route.ts — Single child detail endpoint with all relations, medical records, growth scores, siblings, teacher details
+- Created /src/hooks/use-parent.ts — React Query hooks: useParentChildren(), useParentChild(), useParentDashboard() with proper query key factory and types
+- Built /src/app/parent/children/page.tsx — Children list page with card grid (responsive 2-col/1-col), each card showing photo, name, class, roll, DOB/age, blood group, program, admission date, parents list, siblings, emergency contact badge, switch/view actions
+- Built /src/app/parent/children/[childId]/page.tsx — Child detail page with 5 tabs: Personal Info, Parents & Guardians, Medical Records (with allergy/condition alert banners), Siblings, Class Teacher (with chat button)
+- Fixed isAuthError() to be overloaded for both Teacher and Parent auth result types
+- Verified build passes with zero new TypeScript errors
+
+Stage Summary:
+- 7 files created/modified for the My Children module
+- API auth foundation (requireParent + verifyChildAccess) now enables all remaining parent API routes to work
+- React Query hooks established for parent portal data fetching
+- Build passes: /parent/children (static), /parent/children/[childId] (dynamic)
