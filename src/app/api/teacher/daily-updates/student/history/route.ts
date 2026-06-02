@@ -15,6 +15,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'studentId is required' }, { status: 400 });
     }
 
+    // Verify student belongs to teacher's class
+    if (auth.classId) {
+      const student = await db.student.findFirst({
+        where: { id: studentId, classId: auth.classId },
+        select: { id: true },
+      });
+      if (!student) {
+        return NextResponse.json({ error: 'Student not found in your class' }, { status: 403 });
+      }
+    }
+
     const month = parseInt(searchParams.get('month') || String(new Date().getMonth() + 1));
     const year = parseInt(searchParams.get('year') || String(new Date().getFullYear()));
 

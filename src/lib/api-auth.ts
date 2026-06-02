@@ -295,6 +295,33 @@ export function verifyChildAccess(
 }
 
 // ============================================================
+// getParentUserId — Find the User record ID for a Parent
+// Since Parent model has no userId FK, we find the User by
+// matching email/phone. Returns null if no User found.
+// ============================================================
+
+export async function getParentUserId(parentId: string): Promise<string | null> {
+  const parent = await db.parent.findUnique({
+    where: { id: parentId },
+    select: { email: true, phone: true },
+  });
+  if (!parent) return null;
+
+  const user = await db.user.findFirst({
+    where: {
+      role: 'PARENT',
+      OR: [
+        { email: parent.email },
+        { email: parent.phone },
+      ],
+    },
+    select: { id: true },
+  });
+
+  return user?.id ?? null;
+}
+
+// ============================================================
 // Helper: Check if auth result is an error (teacher)
 // ============================================================
 

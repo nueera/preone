@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // ── GET /api/teacher/daily-updates — Get all daily updates for teacher's class on a date ──
 export async function GET(request: NextRequest) {
@@ -283,19 +284,22 @@ export async function POST(request: NextRequest) {
       try {
         const parentLink = await db.studentParent.findFirst({
           where: { studentId, isPrimary: true },
-          select: { parent: { select: { userId: true, fatherName: true } } },
+          select: { parentId: true },
         });
 
-        if (parentLink?.parent?.userId) {
-          await db.notification.create({
-            data: {
-              userId: parentLink.parent.userId,
-              title: `Daily Update - ${student.firstName} ${student.lastName}`,
-              message: `Today's update is now available`,
-              type: 'DAILY_UPDATE',
-              actionUrl: `/parent/daily-updates?student=${studentId}&date=${date}`,
-            },
-          });
+        if (parentLink?.parentId) {
+          const notifyUserId = await getParentUserId(parentLink.parentId);
+          if (notifyUserId) {
+            await db.notification.create({
+              data: {
+                userId: notifyUserId,
+                title: `Daily Update - ${student.firstName} ${student.lastName}`,
+                message: `Today's update is now available`,
+                type: 'DAILY_UPDATE',
+                actionUrl: `/parent/daily-updates?student=${studentId}&date=${date}`,
+              },
+            });
+          }
         }
       } catch (notifError) {
         console.error('Failed to send notification:', notifError);

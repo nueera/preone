@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause: PUBLISHED announcements targeting teachers or all
     const where: Record<string, unknown>[] = [
-      { status: 'Published' },
+      { status: 'PUBLISHED' },
       { publishedAt: { not: null } },
       {
         OR: [

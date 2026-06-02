@@ -28,7 +28,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -583,10 +583,7 @@ function DailyUpdatesContent() {
                         </Button>
                         <Avatar className="h-10 w-10">
                           {currentUpdate?.studentPhoto ? (
-                            <AvatarFallback
-                              className="bg-emerald-50 text-emerald-700 text-sm font-semibold"
-                              style={{ backgroundImage: `url(${currentUpdate.studentPhoto})`, backgroundSize: 'cover' }}
-                            />
+                            <AvatarImage src={currentUpdate.studentPhoto} alt={currentUpdate.studentName || ''} />
                           ) : (
                             <AvatarFallback className="bg-emerald-50 text-emerald-700 text-sm font-semibold">
                               {getInitials(currentUpdate?.studentName || '??')}
@@ -1015,10 +1012,7 @@ function DailyUpdatesContent() {
                           <div className="flex items-center gap-2">
                             <Avatar className="h-7 w-7">
                               {update.studentPhoto ? (
-                                <AvatarFallback
-                                  className="bg-emerald-50 text-emerald-700 text-[10px] font-semibold"
-                                  style={{ backgroundImage: `url(${update.studentPhoto})`, backgroundSize: 'cover' }}
-                                />
+                                <AvatarImage src={update.studentPhoto} alt={update.studentName} />
                               ) : (
                                 <AvatarFallback className="bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
                                   {getInitials(update.studentName)}
@@ -1153,10 +1147,7 @@ function StudentCard({
     >
       <Avatar className="h-9 w-9 shrink-0">
         {update.studentPhoto ? (
-          <AvatarFallback
-            className="bg-emerald-50 text-emerald-700 text-xs font-semibold"
-            style={{ backgroundImage: `url(${update.studentPhoto})`, backgroundSize: 'cover' }}
-          />
+          <AvatarImage src={update.studentPhoto} alt={update.studentName} />
         ) : (
           <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
             {getInitials(update.studentName)}

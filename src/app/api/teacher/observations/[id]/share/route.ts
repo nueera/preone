@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // PATCH /api/teacher/observations/[id]/share — Toggle share with parent
 export async function PATCH(
@@ -57,19 +58,22 @@ export async function PATCH(
       try {
         const parentLink = await db.studentParent.findFirst({
           where: { studentId: existing.studentId, isPrimary: true },
-          select: { parent: { select: { userId: true } } },
+          select: { parentId: true },
         });
 
-        if (parentLink?.parent?.userId) {
-          await db.notification.create({
-            data: {
-              userId: parentLink.parent.userId,
-              title: `New Observation - ${existing.student.firstName} ${existing.student.lastName}`,
-              message: `Your child's teacher has shared a ${existing.category.toLowerCase()} observation`,
-              type: 'OBSERVATION',
-              actionUrl: '/parent/observations',
-            },
-          });
+        if (parentLink?.parentId) {
+          const notifyUserId = await getParentUserId(parentLink.parentId);
+          if (notifyUserId) {
+            await db.notification.create({
+              data: {
+                userId: notifyUserId,
+                title: `New Observation - ${existing.student.firstName} ${existing.student.lastName}`,
+                message: `Your child's teacher has shared a ${existing.category.toLowerCase()} observation`,
+                type: 'OBSERVATION',
+                actionUrl: '/parent/observations',
+              },
+            });
+          }
         }
       } catch (notifError) {
         console.error('Failed to send notification:', notifError);

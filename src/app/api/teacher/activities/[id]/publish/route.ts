@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // PATCH /api/teacher/activities/[id]/publish — Toggle publish status
 export async function PATCH(
@@ -57,19 +58,22 @@ export async function PATCH(
         for (const student of students) {
           const parentLink = await db.studentParent.findFirst({
             where: { studentId: student.id, isPrimary: true },
-            select: { parent: { select: { userId: true } } },
+            select: { parentId: true },
           });
 
-          if (parentLink?.parent?.userId) {
-            await db.notification.create({
-              data: {
-                userId: parentLink.parent.userId,
-                title: `New Activity: ${existing.title}`,
-                message: `Your child has a ${existing.type.toLowerCase()} activity scheduled`,
-                type: 'ACTIVITY',
-                actionUrl: '/parent/activities',
-              },
-            });
+          if (parentLink?.parentId) {
+            const notifyUserId = await getParentUserId(parentLink.parentId);
+            if (notifyUserId) {
+              await db.notification.create({
+                data: {
+                  userId: notifyUserId,
+                  title: `New Activity: ${existing.title}`,
+                  message: `Your child has a ${existing.type.toLowerCase()} activity scheduled`,
+                  type: 'ACTIVITY',
+                  actionUrl: '/parent/activities',
+                },
+              });
+            }
           }
         }
       } catch (notifError) {

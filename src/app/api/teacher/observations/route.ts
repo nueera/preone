@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // ── GET /api/teacher/observations — Get observations with filters ──
 export async function GET(request: NextRequest) {
@@ -207,19 +208,22 @@ export async function POST(request: NextRequest) {
       try {
         const parentLink = await db.studentParent.findFirst({
           where: { studentId, isPrimary: true },
-          select: { parent: { select: { userId: true } } },
+          select: { parentId: true },
         });
 
-        if (parentLink?.parent?.userId) {
-          await db.notification.create({
-            data: {
-              userId: parentLink.parent.userId,
-              title: `New Observation - ${student.firstName} ${student.lastName}`,
-              message: `Your child's teacher has shared a ${category.toLowerCase()} observation`,
-              type: 'OBSERVATION',
-              actionUrl: '/parent/observations',
-            },
-          });
+        if (parentLink?.parentId) {
+          const notifyUserId = await getParentUserId(parentLink.parentId);
+          if (notifyUserId) {
+            await db.notification.create({
+              data: {
+                userId: notifyUserId,
+                title: `New Observation - ${student.firstName} ${student.lastName}`,
+                message: `Your child's teacher has shared a ${category.toLowerCase()} observation`,
+                type: 'OBSERVATION',
+                actionUrl: '/parent/observations',
+              },
+            });
+          }
         }
       } catch (notifError) {
         console.error('Failed to send notification:', notifError);

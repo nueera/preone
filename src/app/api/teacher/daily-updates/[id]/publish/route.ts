@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // PATCH /api/teacher/daily-updates/[id]/publish — Publish a draft update
 export async function PATCH(
@@ -51,19 +52,22 @@ export async function PATCH(
     try {
       const parentLink = await db.studentParent.findFirst({
         where: { studentId: dailyUpdate.studentId, isPrimary: true },
-        select: { parent: { select: { userId: true } } },
+        select: { parentId: true },
       });
 
-      if (parentLink?.parent?.userId) {
-        await db.notification.create({
-          data: {
-            userId: parentLink.parent.userId,
-            title: `Daily Update - ${dailyUpdate.student.firstName} ${dailyUpdate.student.lastName}`,
-            message: `Today's update is now available`,
-            type: 'DAILY_UPDATE',
-            actionUrl: `/parent/daily-updates?student=${dailyUpdate.studentId}&date=${dailyUpdate.date.toISOString().split('T')[0]}`,
-          },
-        });
+      if (parentLink?.parentId) {
+        const notifyUserId = await getParentUserId(parentLink.parentId);
+        if (notifyUserId) {
+          await db.notification.create({
+            data: {
+              userId: notifyUserId,
+              title: `Daily Update - ${dailyUpdate.student.firstName} ${dailyUpdate.student.lastName}`,
+              message: `Today's update is now available`,
+              type: 'DAILY_UPDATE',
+              actionUrl: `/parent/daily-updates?student=${dailyUpdate.studentId}&date=${dailyUpdate.date.toISOString().split('T')[0]}`,
+            },
+          });
+        }
       }
     } catch (notifError) {
       console.error('Failed to send notification:', notifError);

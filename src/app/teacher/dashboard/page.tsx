@@ -290,7 +290,7 @@ export default function TeacherDashboard() {
           },
           {
             label: 'Leaves Remaining',
-            value: Object.values(stats.leavesRemaining).reduce((a, b) => a + b, 0),
+            value: Object.values(stats.leavesRemaining || {}).reduce((a: number, b: number) => a + b, 0),
             total: null,
             icon: Calendar,
             iconBg: 'bg-purple-100',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // ── GET /api/teacher/activities — Get activities with filters ──
 export async function GET(request: NextRequest) {
@@ -212,19 +213,22 @@ export async function POST(request: NextRequest) {
         for (const student of students) {
           const parentLink = await db.studentParent.findFirst({
             where: { studentId: student.id, isPrimary: true },
-            select: { parent: { select: { userId: true } } },
+            select: { parentId: true },
           });
 
-          if (parentLink?.parent?.userId) {
-            await db.notification.create({
-              data: {
-                userId: parentLink.parent.userId,
-                title: `New Activity: ${title}`,
-                message: `Your child has a ${type.toLowerCase()} activity ${date === today ? 'today' : 'on ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}`,
-                type: 'ACTIVITY',
-                actionUrl: '/parent/activities',
-              },
-            });
+          if (parentLink?.parentId) {
+            const notifyUserId = await getParentUserId(parentLink.parentId);
+            if (notifyUserId) {
+              await db.notification.create({
+                data: {
+                  userId: notifyUserId,
+                  title: `New Activity: ${title}`,
+                  message: `Your child has a ${type.toLowerCase()} activity ${date === today ? 'today' : 'on ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}`,
+                  type: 'ACTIVITY',
+                  actionUrl: '/parent/activities',
+                },
+              });
+            }
           }
         }
       } catch (notifError) {

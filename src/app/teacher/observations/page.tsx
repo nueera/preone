@@ -26,7 +26,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -616,10 +616,7 @@ function ObservationsContent() {
                     {/* Student avatar */}
                     <Avatar className="h-10 w-10 shrink-0 mt-0.5">
                       {obs.studentPhoto ? (
-                        <AvatarFallback
-                          className="bg-emerald-50 text-emerald-700 text-xs font-semibold"
-                          style={{ backgroundImage: `url(${obs.studentPhoto})`, backgroundSize: 'cover' }}
-                        />
+                        <AvatarImage src={obs.studentPhoto} alt={obs.studentName} />
                       ) : (
                         <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
                           {getInitials(obs.studentName)}

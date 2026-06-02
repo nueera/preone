@@ -22,7 +22,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -706,10 +706,7 @@ function GrowthContent() {
                   <div className="flex items-center gap-3 mb-3">
                     <Avatar className="h-9 w-9">
                       {student.studentPhoto ? (
-                        <AvatarFallback
-                          className="bg-emerald-50 text-emerald-700 text-xs font-semibold"
-                          style={{ backgroundImage: `url(${student.studentPhoto})`, backgroundSize: 'cover' }}
-                        />
+                        <AvatarImage src={student.studentPhoto} alt={student.studentName} />
                       ) : (
                         <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
                           {getInitials(student.studentName)}

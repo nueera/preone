@@ -33,12 +33,12 @@ export function useTeacherClass() {
     queryKey: teacherKeys.class,
     queryFn: () =>
       teacherGet<{
-        classInfo: {
+        assignedClass: {
           id: string;
           name: string;
           program: { id: string; name: string };
         } | null;
-      }>('/api/teacher/profile').then((data) => data.classInfo),
+      }>('/api/teacher/profile').then((data) => data.assignedClass),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -62,7 +62,7 @@ export function useMyStudents() {
           dob: string;
           status: string;
         }>;
-      }>('/api/teacher/my-class'),
+      }>('/api/teacher/class'),
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
@@ -86,7 +86,7 @@ export function useTodayAttendance() {
           studentId: string;
           status: string;
         }>;
-      }>('/api/teacher/attendance?today=true'),
+      }>('/api/teacher/attendance/mark?today=true'),
     staleTime: 30 * 1000, // 30 seconds
   });
 }

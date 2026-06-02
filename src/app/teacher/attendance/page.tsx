@@ -20,7 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -700,10 +700,7 @@ function StudentRow({
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <Avatar className="h-9 w-9 shrink-0">
           {student.photo ? (
-            <AvatarFallback
-              className="bg-emerald-50 text-emerald-700 text-xs font-semibold"
-              style={{ backgroundImage: `url(${student.photo})`, backgroundSize: 'cover' }}
-            />
+            <AvatarImage src={student.photo} alt={student.name} />
           ) : (
             <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-semibold">
               {initials}

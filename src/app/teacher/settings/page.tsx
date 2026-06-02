@@ -56,7 +56,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { teacherFetch } from '@/lib/teacher-api';
 
 // ============================================================
@@ -287,11 +287,7 @@ function ProfileTab({
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Photo must be less than 2MB',
-        variant: 'destructive',
-      });
+      toast.error('File too large — Photo must be less than 2MB');
       return;
     }
 
@@ -331,16 +327,9 @@ function ProfileTab({
       const data = await res.json();
       onProfileUpdate(data.profile);
       setEditOpen(false);
-      toast({
-        title: 'Profile updated',
-        description: 'Your profile has been updated successfully',
-      });
+      toast.success('Profile updated successfully');
     } catch (err: unknown) {
-      toast({
-        title: 'Update failed',
-        description: err instanceof Error ? err.message : 'Failed to update profile',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setSaving(false);
     }
@@ -649,38 +638,22 @@ function ChangePasswordCard() {
   async function handleChangePassword() {
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast({
-        title: 'Missing fields',
-        description: 'Please fill in all password fields',
-        variant: 'destructive',
-      });
+      toast.error('Please fill in all password fields');
       return;
     }
 
     if (newPassword.length < 6) {
-      toast({
-        title: 'Password too short',
-        description: 'New password must be at least 6 characters',
-        variant: 'destructive',
-      });
+      toast.error('Password too short — must be at least 6 characters');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast({
-        title: 'Passwords don\'t match',
-        description: 'New password and confirm password must be the same',
-        variant: 'destructive',
-      });
+      toast.error('Passwords don\'t match');
       return;
     }
 
     if (currentPassword === newPassword) {
-      toast({
-        title: 'Same password',
-        description: 'New password must be different from current password',
-        variant: 'destructive',
-      });
+      toast.error('New password must be different from current password');
       return;
     }
 
@@ -704,19 +677,12 @@ function ChangePasswordCard() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      toast({
-        title: 'Password changed',
-        description: 'Your password has been updated successfully',
-      });
+      toast.success('Password changed successfully');
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: unknown) {
-      toast({
-        title: 'Change failed',
-        description: err instanceof Error ? err.message : 'Failed to change password',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to change password');
     } finally {
       setChanging(false);
     }
@@ -905,16 +871,9 @@ function NotificationsTab() {
 
       setOriginalPrefs(prefs);
       setHasChanges(false);
-      toast({
-        title: 'Preferences saved',
-        description: 'Your notification preferences have been updated',
-      });
+      toast.success('Notification preferences saved');
     } catch (err: unknown) {
-      toast({
-        title: 'Save failed',
-        description: err instanceof Error ? err.message : 'Failed to save preferences',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to save preferences');
     } finally {
       setSaving(false);
     }

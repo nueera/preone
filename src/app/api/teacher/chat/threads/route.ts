@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { getParentUserId } from '@/lib/api-auth';
 
 // GET /api/teacher/chat/threads — Get all chat threads for the teacher
 export async function GET(request: NextRequest) {
@@ -65,8 +66,14 @@ export async function GET(request: NextRequest) {
           if (otherUser) {
             // If parent, find their child
             if (otherUser.role === 'PARENT') {
+              // Find Parent record by matching User email/phone
               const parentRecord = await db.parent.findFirst({
-                where: { userId: otherUser.id },
+                where: {
+                  OR: [
+                    { email: otherUser.email },
+                    { phone: otherUser.email },
+                  ],
+                },
                 select: { id: true, firstName: true, lastName: true },
               });
 
@@ -162,13 +169,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify parent exists and has a child in teacher's class
+    // parentId in request body is a User ID — find the Parent record by matching email
+    const parentUser = await db.user.findUnique({
+      where: { id: parentId },
+      select: { email: true },
+    });
+
+    if (!parentUser) {
+      return NextResponse.json({ error: 'Parent user not found' }, { status: 404 });
+    }
+
     const parentRecord = await db.parent.findFirst({
-      where: { userId: parentId },
+      where: {
+        OR: [
+          { email: parentUser.email },
+          { phone: parentUser.email },
+        ],
+      },
       select: { id: true },
     });
 
     if (!parentRecord) {
-      return NextResponse.json({ error: 'Parent not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
     }
 
     const studentParent = await db.studentParent.findFirst({
