@@ -1,20 +1,21 @@
 'use client';
 
 // ============================================================
-// PreOne — Parent Growth & Development Page
-// Shows growth scores, achievements, and milestones for the
-// selected child:
-// - Latest score card with circular progress + dimension bars
-// - Radar chart for 6 growth dimensions
-// - Progress over time bar chart (multiple periods)
-// - Achievements section with trophy/star theming
-// - Milestones list grouped by category with status badges
+// PreOne — Parent Growth & Development Page (Enhanced)
+// Shows comprehensive growth tracking for the selected child:
+// - Page Header with child switcher & period selector
+// - Growth Radar Chart (6-dim, child vs class average)
+// - Score Breakdown Table (difference + status badges)
+// - Growth Trend Chart (line chart, all dimensions + overall)
+// - Milestones Section (grouped by category, progress bar)
+// - AI Insights Section
 // ============================================================
 
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo, useState, Suspense } from 'react';
 import {
   TrendingUp, RefreshCw, AlertCircle, ChevronDown,
-  Trophy, Star, Target, Award, Milestone, Sparkles,
+  Target, Sparkles, Brain, CheckCircle2, Circle,
+  ArrowUp, ArrowDown, ArrowRight, Lightbulb, Info,
 } from 'lucide-react';
 import {
   Card, CardContent, CardHeader, CardTitle,
@@ -24,19 +25,23 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  Radar, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Radar, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer,
 } from 'recharts';
 import { useParentAuth } from '@/lib/parent-auth';
 import {
   useParentGrowth,
-  type GrowthScoreData, type AchievementData, type MilestoneData,
+  type EnhancedGrowthResponse,
 } from '@/hooks/use-parent';
 
 // ============================================================
@@ -44,20 +49,31 @@ import {
 // ============================================================
 
 const DIMENSIONS = [
-  { key: 'creativity', label: 'Creativity', color: 'bg-purple-500', textColor: 'text-purple-600', bgLight: 'bg-purple-100', chartColor: '#a855f7' },
-  { key: 'communication', label: 'Communication', color: 'bg-blue-500', textColor: 'text-blue-600', bgLight: 'bg-blue-100', chartColor: '#3b82f6' },
-  { key: 'social', label: 'Social', color: 'bg-emerald-500', textColor: 'text-emerald-600', bgLight: 'bg-emerald-100', chartColor: '#10b981' },
-  { key: 'confidence', label: 'Confidence', color: 'bg-amber-500', textColor: 'text-amber-600', bgLight: 'bg-amber-100', chartColor: '#f59e0b' },
-  { key: 'cognitive', label: 'Cognitive', color: 'bg-sky-500', textColor: 'text-sky-600', bgLight: 'bg-sky-100', chartColor: '#0ea5e9' },
-  { key: 'physical', label: 'Physical', color: 'bg-rose-500', textColor: 'text-rose-600', bgLight: 'bg-rose-100', chartColor: '#f43f5e' },
+  { key: 'creativity', label: 'Creativity', color: '#a855f7', bgLight: 'bg-purple-100', textColor: 'text-purple-600' },
+  { key: 'communication', label: 'Communication', color: '#3b82f6', bgLight: 'bg-blue-100', textColor: 'text-blue-600' },
+  { key: 'social', label: 'Social', color: '#10b981', bgLight: 'bg-emerald-100', textColor: 'text-emerald-600' },
+  { key: 'confidence', label: 'Confidence', color: '#f59e0b', bgLight: 'bg-amber-100', textColor: 'text-amber-600' },
+  { key: 'cognitive', label: 'Cognitive', color: '#0ea5e9', bgLight: 'bg-sky-100', textColor: 'text-sky-600' },
+  { key: 'physical', label: 'Physical', color: '#f43f5e', bgLight: 'bg-rose-100', textColor: 'text-rose-600' },
 ] as const;
 
-const MILESTONE_STATUS_STYLES: Record<string, { bg: string; icon: string }> = {
-  ACHIEVED: { bg: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: '✅' },
-  PENDING: { bg: 'bg-amber-100 text-amber-700 border-amber-200', icon: '⏳' },
-};
+const PERIODS = [
+  { key: 'Q1', label: 'Q1' },
+  { key: 'Q2', label: 'Q2' },
+  { key: 'Q3', label: 'Q3' },
+  { key: 'Q4', label: 'Q4' },
+  { key: 'ANNUAL', label: 'Annual' },
+] as const;
 
-const DEFAULT_ACHIEVEMENT_ICON = '🏆';
+const CHILD_RADAR_COLOR = '#0ea5e9';
+const CLASS_AVG_COLOR = '#9ca3af';
+
+const CATEGORY_ICONS: Record<string, string> = {
+  Physical: '🏃',
+  Cognitive: '🧠',
+  Social: '🤝',
+  Language: '💬',
+};
 
 // ============================================================
 // HELPERS
@@ -73,186 +89,102 @@ function formatDate(dateStr: string): string {
   }
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 90) return 'Excellent';
-  if (score >= 75) return 'Good';
-  if (score >= 50) return 'Average';
-  return 'Needs Improvement';
+function getStatusBadge(score: number): { label: string; className: string } {
+  if (score > 90) return { label: 'Outstanding', className: 'bg-amber-100 text-amber-800 border-amber-200' };
+  if (score > 80) return { label: 'Excellent', className: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+  if (score > 70) return { label: 'Above Average', className: 'bg-sky-100 text-sky-800 border-sky-200' };
+  if (score >= 50) return { label: 'Average', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+  if (score >= 40) return { label: 'Below Average', className: 'bg-orange-100 text-orange-800 border-orange-200' };
+  return { label: 'Needs Attention', className: 'bg-red-100 text-red-800 border-red-200' };
 }
 
-function getScoreColor(score: number): string {
-  if (score >= 90) return 'text-emerald-600';
-  if (score >= 75) return 'text-sky-600';
-  if (score >= 50) return 'text-amber-600';
-  return 'text-red-600';
+function getDifferenceIcon(diff: number) {
+  if (diff > 0) return <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />;
+  if (diff < 0) return <ArrowDown className="h-3.5 w-3.5 text-red-500" />;
+  return <ArrowRight className="h-3.5 w-3.5 text-gray-400" />;
 }
 
-function getScoreRingColor(score: number): string {
-  if (score >= 90) return '#10b981';
-  if (score >= 75) return '#0ea5e9';
-  if (score >= 50) return '#f59e0b';
-  return '#ef4444';
+function getDifferenceColor(diff: number): string {
+  if (diff > 0) return 'text-emerald-600';
+  if (diff < 0) return 'text-red-500';
+  return 'text-gray-400';
 }
 
-function getMilestoneStatusStyle(status: string) {
-  return MILESTONE_STATUS_STYLES[status] || { bg: 'bg-gray-100 text-gray-500 border-gray-200', icon: '•' };
+function getSeverityStyle(severity: string | null): { bg: string; border: string; icon: string } {
+  switch (severity) {
+    case 'high':
+      return { bg: 'bg-red-50', border: 'border-red-200', icon: '🔴' };
+    case 'medium':
+      return { bg: 'bg-amber-50', border: 'border-amber-200', icon: '🟡' };
+    case 'low':
+      return { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: '🟢' };
+    default:
+      return { bg: 'bg-sky-50', border: 'border-sky-200', icon: '💡' };
+  }
 }
 
 // ============================================================
-// CIRCULAR PROGRESS INDICATOR
+// PERIOD SELECTOR
 // ============================================================
 
-function CircularProgress({
-  value,
-  size = 120,
-  strokeWidth = 8,
+function PeriodSelector({
+  selected,
+  onSelect,
 }: {
-  value: number;
-  size?: number;
-  strokeWidth?: number;
+  selected: string;
+  onSelect: (period: string) => void;
 }) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
-  const color = getScoreRingColor(value);
-
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="-rotate-90"
-      >
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#e5e7eb"
-          strokeWidth={strokeWidth}
-        />
-        {/* Progress circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className="transition-all duration-700 ease-out"
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-3xl font-bold ${getScoreColor(value)}`}>{value}</span>
-        <span className="text-[10px] text-muted-foreground">out of 100</span>
-      </div>
+    <div className="flex items-center gap-1.5 p-1 bg-gray-100 rounded-xl">
+      {PERIODS.map((p) => (
+        <button
+          key={p.key}
+          onClick={() => onSelect(p.key)}
+          className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            selected === p.key
+              ? 'bg-white text-sky-700 shadow-sm'
+              : 'text-muted-foreground hover:text-foreground hover:bg-white/50'
+          }`}
+        >
+          {p.label}
+        </button>
+      ))}
     </div>
   );
 }
 
 // ============================================================
-// LATEST SCORE CARD
+// GROWTH RADAR CHART
 // ============================================================
 
-function LatestScoreCard({ score }: { score: GrowthScoreData }) {
-  return (
-    <Card className="rounded-3xl overflow-hidden">
-      {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-5 text-white">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 opacity-90" />
-              <h2 className="text-lg font-bold">Latest Assessment</h2>
-            </div>
-            <p className="text-sm opacity-90">
-              {score.period}
-              {score.createdAt && (
-                <span className="opacity-75"> — Evaluated on {formatDate(score.createdAt)}</span>
-              )}
-            </p>
-          </div>
-          {score.overall !== null && (
-            <CircularProgress value={score.overall} size={100} strokeWidth={7} />
-          )}
-        </div>
-      </div>
-
-      <CardContent className="p-5 space-y-5">
-        {/* Dimension Scores Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {DIMENSIONS.map((dim) => {
-            const rawValue = score[dim.key as keyof GrowthScoreData];
-            const value = typeof rawValue === 'number' ? rawValue : 0;
-            const percentage = (value / 10) * 100;
-
-            return (
-              <div key={dim.key} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">{dim.label}</span>
-                  <span className={`text-sm font-bold ${dim.textColor}`}>{value}/10</span>
-                </div>
-                <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${dim.color} transition-all duration-700 ease-out`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Comments */}
-        {score.comments && (
-          <>
-            <Separator />
-            <div className="space-y-1.5">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Teacher&apos;s Comments
-              </p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {score.comments}
-              </p>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ============================================================
-// RADAR CHART
-// ============================================================
-
-function GrowthRadarChart({ score }: { score: GrowthScoreData }) {
+function GrowthRadarChart({
+  scores,
+  classAverage,
+}: {
+  scores: Record<string, number>;
+  classAverage: Record<string, number>;
+}) {
   const radarData = useMemo(() => {
     return DIMENSIONS.map((dim) => ({
       dimension: dim.label,
-      value: typeof score[dim.key as keyof GrowthScoreData] === 'number'
-        ? score[dim.key as keyof GrowthScoreData] as number
-        : 0,
-      fullMark: 10,
+      child: scores[dim.key] ?? 0,
+      classAvg: classAverage[dim.key] ?? 0,
+      fullMark: 100,
     }));
-  }, [score]);
+  }, [scores, classAverage]);
 
   return (
     <Card className="rounded-3xl">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <Target className="h-4 w-4 text-sky-600" />
           Growth Dimensions
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-72">
+        <div className="h-[340px] sm:h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
+            <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="65%">
               <PolarGrid stroke="#e5e7eb" />
               <PolarAngleAxis
                 dataKey="dimension"
@@ -260,17 +192,34 @@ function GrowthRadarChart({ score }: { score: GrowthScoreData }) {
               />
               <PolarRadiusAxis
                 angle={30}
-                domain={[0, 10]}
+                domain={[0, 100]}
                 tick={{ fontSize: 9, fill: '#9ca3af' }}
                 tickCount={6}
               />
               <Radar
-                name="Score"
-                dataKey="value"
-                stroke="#0ea5e9"
-                fill="#0ea5e9"
-                fillOpacity={0.2}
-                strokeWidth={2}
+                name="Your Child"
+                dataKey="child"
+                stroke={CHILD_RADAR_COLOR}
+                fill={CHILD_RADAR_COLOR}
+                fillOpacity={0.15}
+                strokeWidth={2.5}
+              />
+              <Radar
+                name="Class Average"
+                dataKey="classAvg"
+                stroke={CLASS_AVG_COLOR}
+                fill={CLASS_AVG_COLOR}
+                fillOpacity={0.05}
+                strokeWidth={1.5}
+                strokeDasharray="5 5"
+              />
+              <Legend
+                wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
+                formatter={(value: string) => (
+                  <span className={value === 'Your Child' ? 'text-sky-700 font-medium' : 'text-gray-500'}>
+                    {value}
+                  </span>
+                )}
               />
               <RechartsTooltip
                 contentStyle={{
@@ -279,7 +228,11 @@ function GrowthRadarChart({ score }: { score: GrowthScoreData }) {
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   fontSize: '12px',
                 }}
-                formatter={(value: number) => [`${value}/10`, 'Score']}
+                formatter={(value: number, name: string) => {
+                  const label = name === 'child' ? 'Your Child' : 'Class Average';
+                  return [`${value}`, label];
+                }}
+                labelFormatter={(label: string) => `${label}`}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -290,35 +243,161 @@ function GrowthRadarChart({ score }: { score: GrowthScoreData }) {
 }
 
 // ============================================================
-// PROGRESS OVER TIME BAR CHART
+// SCORE BREAKDOWN TABLE
 // ============================================================
 
-function ProgressOverTimeChart({ scores }: { scores: GrowthScoreData[] }) {
-  const chartData = useMemo(() => {
-    return scores
-      .filter((s) => s.overall !== null)
-      .map((s) => ({
-        period: s.period,
-        overall: s.overall as number,
-      }));
-  }, [scores]);
+function ScoreBreakdownTable({
+  scores,
+  classAverage,
+}: {
+  scores: Record<string, number>;
+  classAverage: Record<string, number>;
+}) {
+  const rows = useMemo(() => {
+    return DIMENSIONS.map((dim) => {
+      const childScore = scores[dim.key] ?? 0;
+      const avgScore = classAverage[dim.key] ?? 0;
+      const diff = childScore - avgScore;
+      const status = getStatusBadge(childScore);
+      return { dim, childScore, avgScore, diff, status };
+    });
+  }, [scores, classAverage]);
 
-  if (chartData.length < 2) {
-    return null;
+  // Overall row
+  const overallScore = scores['overall'] ?? 0;
+  const overallAvg = classAverage['overall'] ?? 0;
+  const overallDiff = overallScore - overallAvg;
+  const overallStatus = getStatusBadge(overallScore);
+
+  return (
+    <Card className="rounded-3xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Info className="h-4 w-4 text-sky-600" />
+          Score Breakdown
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="text-xs font-semibold">Dimension</TableHead>
+                <TableHead className="text-xs font-semibold text-center">Your Child</TableHead>
+                <TableHead className="text-xs font-semibold text-center">Class Avg</TableHead>
+                <TableHead className="text-xs font-semibold text-center">Difference</TableHead>
+                <TableHead className="text-xs font-semibold text-center">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map(({ dim, childScore, avgScore, diff, status }) => (
+                <TableRow key={dim.key} className="hover:bg-gray-50/50">
+                  <TableCell className="py-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-2.5 w-2.5 rounded-full`} style={{ backgroundColor: dim.color }} />
+                      <span className="text-sm font-medium">{dim.label}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2.5 text-center">
+                    <span className="text-sm font-bold">{childScore}</span>
+                  </TableCell>
+                  <TableCell className="py-2.5 text-center">
+                    <span className="text-sm text-muted-foreground">{avgScore}</span>
+                  </TableCell>
+                  <TableCell className="py-2.5 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      {getDifferenceIcon(diff)}
+                      <span className={`text-sm font-medium ${getDifferenceColor(diff)}`}>
+                        {diff > 0 ? '+' : ''}{diff}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2.5 text-center">
+                    <Badge variant="outline" className={`text-[10px] px-2 py-0.5 ${status.className}`}>
+                      {status.label}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {/* Overall row */}
+              <TableRow className="hover:bg-sky-50/50 border-t-2 border-sky-100">
+                <TableCell className="py-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2.5 w-2.5 rounded-full bg-sky-500" />
+                    <span className="text-sm font-bold">Overall</span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-2.5 text-center">
+                  <span className="text-sm font-bold text-sky-700">{overallScore}</span>
+                </TableCell>
+                <TableCell className="py-2.5 text-center">
+                  <span className="text-sm text-muted-foreground">{overallAvg}</span>
+                </TableCell>
+                <TableCell className="py-2.5 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    {getDifferenceIcon(overallDiff)}
+                    <span className={`text-sm font-medium ${getDifferenceColor(overallDiff)}`}>
+                      {overallDiff > 0 ? '+' : ''}{overallDiff}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-2.5 text-center">
+                  <Badge variant="outline" className={`text-[10px] px-2 py-0.5 ${overallStatus.className}`}>
+                    {overallStatus.label}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================
+// GROWTH TREND CHART
+// ============================================================
+
+function GrowthTrendChart({
+  trend,
+}: {
+  trend: EnhancedGrowthResponse['trend'];
+}) {
+  if (!trend || trend.length === 0) {
+    return (
+      <Card className="rounded-3xl">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-sky-600" />
+            Growth Trend
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12 space-y-2">
+            <TrendingUp className="h-10 w-10 text-muted-foreground mx-auto" />
+            <p className="text-sm text-muted-foreground">No trend data available</p>
+            <p className="text-xs text-muted-foreground">
+              Trends will appear after multiple assessments are completed
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card className="rounded-3xl">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-sky-600" />
-          Progress Over Time
+          Growth Trend
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64">
+        <div className="h-[300px] sm:h-[340px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <LineChart data={trend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="period"
@@ -329,7 +408,6 @@ function ProgressOverTimeChart({ scores }: { scores: GrowthScoreData[] }) {
                 domain={[0, 100]}
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 axisLine={{ stroke: '#d1d5db' }}
-                tickFormatter={(v: number) => `${v}`}
               />
               <RechartsTooltip
                 contentStyle={{
@@ -338,15 +416,34 @@ function ProgressOverTimeChart({ scores }: { scores: GrowthScoreData[] }) {
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                   fontSize: '12px',
                 }}
-                formatter={(value: number) => [`${value}/100`, 'Overall Score']}
               />
-              <Bar
-                dataKey="overall"
-                fill="#0ea5e9"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={48}
+              <Legend
+                wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
               />
-            </BarChart>
+              {DIMENSIONS.map((dim) => (
+                <Line
+                  key={dim.key}
+                  type="monotone"
+                  dataKey={dim.key}
+                  name={dim.label}
+                  stroke={dim.color}
+                  strokeWidth={1.5}
+                  dot={{ r: 3, fill: dim.color }}
+                  activeDot={{ r: 5 }}
+                />
+              ))}
+              {trend.some((t) => t.overall !== null) && (
+                <Line
+                  type="monotone"
+                  dataKey="overall"
+                  name="Overall"
+                  stroke="#0ea5e9"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: '#0ea5e9', stroke: '#fff', strokeWidth: 2 }}
+                  activeDot={{ r: 6 }}
+                />
+              )}
+            </LineChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
@@ -355,117 +452,44 @@ function ProgressOverTimeChart({ scores }: { scores: GrowthScoreData[] }) {
 }
 
 // ============================================================
-// ACHIEVEMENTS SECTION
-// ============================================================
-
-function AchievementsSection({ achievements }: { achievements: AchievementData[] }) {
-  if (achievements.length === 0) {
-    return (
-      <Card className="rounded-3xl">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-sky-600" />
-            Achievements
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 space-y-2">
-            <Trophy className="h-10 w-10 text-muted-foreground mx-auto" />
-            <p className="text-sm text-muted-foreground">No achievements yet</p>
-            <p className="text-xs text-muted-foreground">
-              Achievements will appear as your child reaches new milestones
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="rounded-3xl">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-sky-600" />
-          Achievements
-          <Badge variant="outline" className="text-[10px] ml-1">
-            {achievements.length}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {achievements.map((achievement) => (
-            <AchievementCard key={achievement.id} achievement={achievement} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ============================================================
-// ACHIEVEMENT CARD
-// ============================================================
-
-function AchievementCard({ achievement }: { achievement: AchievementData }) {
-  const iconDisplay = achievement.icon || DEFAULT_ACHIEVEMENT_ICON;
-
-  return (
-    <div className="relative p-4 rounded-2xl bg-gradient-to-br from-amber-50/80 to-yellow-50/50 border border-amber-100 hover:shadow-md transition-shadow">
-      {/* Decorative star */}
-      <Star className="absolute top-2 right-2 h-4 w-4 text-amber-300 fill-amber-300 opacity-40" />
-
-      <div className="flex items-start gap-3">
-        {/* Icon */}
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-lg">
-          {iconDisplay}
-        </div>
-
-        <div className="flex-1 min-w-0 space-y-1">
-          <p className="text-sm font-semibold truncate">{achievement.title}</p>
-          {achievement.description && (
-            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-              {achievement.description}
-            </p>
-          )}
-          {achievement.date && (
-            <p className="text-[10px] text-muted-foreground">
-              {formatDate(achievement.date)}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
 // MILESTONES SECTION
 // ============================================================
 
-function MilestonesSection({ milestones }: { milestones: MilestoneData[] }) {
-  // Group milestones by category
+function MilestonesSection({
+  milestones,
+}: {
+  milestones: EnhancedGrowthResponse['milestones'];
+}) {
+  // Group by category — must be called before any early return
   const groupedMilestones = useMemo(() => {
-    const groups: Record<string, MilestoneData[]> = {};
-    for (const m of milestones) {
-      const category = m.milestoneCategory || 'Uncategorized';
+    if (!milestones || !milestones.items || milestones.items.length === 0) return [];
+    const groups: Record<string, typeof milestones.items> = {};
+    for (const m of milestones.items) {
+      const category = m.category || 'Uncategorized';
       if (!groups[category]) groups[category] = [];
       groups[category].push(m);
     }
-    return groups;
+    // Sort categories in a preferred order
+    const preferredOrder = ['Physical', 'Cognitive', 'Social', 'Language', 'Uncategorized'];
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+      const ai = preferredOrder.indexOf(a);
+      const bi = preferredOrder.indexOf(b);
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    });
+    return sortedKeys.map((key) => ({ category: key, items: groups[key] }));
   }, [milestones]);
 
-  if (milestones.length === 0) {
+  if (!milestones || milestones.items.length === 0) {
     return (
       <Card className="rounded-3xl">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Milestone className="h-4 w-4 text-sky-600" />
+            <Sparkles className="h-4 w-4 text-sky-600" />
             Milestones
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 space-y-2">
+          <div className="text-center py-12 space-y-2">
             <Sparkles className="h-10 w-10 text-muted-foreground mx-auto" />
             <p className="text-sm text-muted-foreground">No milestones recorded yet</p>
             <p className="text-xs text-muted-foreground">
@@ -477,94 +501,163 @@ function MilestonesSection({ milestones }: { milestones: MilestoneData[] }) {
     );
   }
 
-  const categoryOrder = Object.keys(groupedMilestones).sort();
+  const progressPercent = milestones.total > 0
+    ? Math.round((milestones.achieved / milestones.total) * 100)
+    : 0;
 
   return (
     <Card className="rounded-3xl">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+      <CardHeader className="pb-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Milestone className="h-4 w-4 text-sky-600" />
+            <Sparkles className="h-4 w-4 text-sky-600" />
             Milestones
             <Badge variant="outline" className="text-[10px] ml-1">
-              {milestones.length}
+              {milestones.ageGroup}
             </Badge>
           </CardTitle>
-          <div className="flex items-center gap-2">
-            {Object.entries(MILESTONE_STATUS_STYLES).map(([status, style]) => (
-              <span key={status} className="text-[10px] text-muted-foreground flex items-center gap-1">
-                <span>{style.icon}</span> {status}
-              </span>
-            ))}
-          </div>
+          <span className="text-xs text-muted-foreground">
+            {milestones.achieved}/{milestones.total} achieved ({progressPercent}%)
+          </span>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        {categoryOrder.map((category) => (
+        {/* Grouped milestones by category */}
+        {groupedMilestones.map(({ category, items }) => (
           <div key={category}>
             {/* Category header */}
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-6 w-6 rounded-lg bg-sky-100 flex items-center justify-center">
-                <Award className="h-3.5 w-3.5 text-sky-600" />
+              <div className="h-7 w-7 rounded-lg bg-sky-100 flex items-center justify-center text-sm">
+                {CATEGORY_ICONS[category] || '📋'}
               </div>
               <h3 className="text-sm font-semibold">{category}</h3>
               <Badge variant="outline" className="text-[10px]">
-                {groupedMilestones[category].length}
+                {items.filter((i) => i.status === 'ACHIEVED').length}/{items.length}
               </Badge>
             </div>
 
             {/* Milestone items */}
-            <div className="space-y-2 ml-8">
-              {groupedMilestones[category].map((milestone) => (
-                <MilestoneItem key={milestone.id} milestone={milestone} />
+            <div className="space-y-1.5 ml-9">
+              {items.map((milestone) => (
+                <div
+                  key={milestone.id}
+                  className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  {/* Status icon */}
+                  {milestone.status === 'ACHIEVED' ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                  )}
+
+                  <div className="flex-1 min-w-0 space-y-0.5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={`text-sm font-medium ${milestone.status === 'ACHIEVED' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {milestone.name}
+                      </p>
+                      {milestone.status === 'ACHIEVED' && milestone.achievedDate && (
+                        <span className="text-[10px] text-emerald-600 font-medium">
+                          {formatDate(milestone.achievedDate)}
+                        </span>
+                      )}
+                    </div>
+                    {milestone.description && (
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {milestone.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         ))}
+
+        {/* Progress bar at bottom */}
+        <Separator />
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground">
+              Overall Progress
+            </span>
+            <span className="text-xs font-bold text-sky-700">
+              {milestones.achieved}/{milestones.total} milestones achieved ({progressPercent}%)
+            </span>
+          </div>
+          <Progress value={progressPercent} className="h-2.5" />
+        </div>
       </CardContent>
     </Card>
   );
 }
 
 // ============================================================
-// MILESTONE ITEM
+// AI INSIGHTS SECTION
 // ============================================================
 
-function MilestoneItem({ milestone }: { milestone: MilestoneData }) {
-  const statusStyle = getMilestoneStatusStyle(milestone.status);
-
+function AIInsightsSection({
+  insights,
+}: {
+  insights: EnhancedGrowthResponse['aiInsights'];
+}) {
   return (
-    <div className="flex items-start justify-between gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100/70 transition-colors">
-      <div className="flex-1 min-w-0 space-y-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-medium">
-            {milestone.milestoneName || 'Unnamed Milestone'}
-          </p>
-          <Badge className={`${statusStyle.bg} text-[10px] border`}>
-            {statusStyle.icon} {milestone.status}
-          </Badge>
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          {milestone.milestoneAgeGroup && (
-            <span className="text-[10px] text-muted-foreground">
-              Age Group: {milestone.milestoneAgeGroup}
-            </span>
-          )}
-          {milestone.achievedDate && (
-            <span className="text-[10px] text-muted-foreground">
-              Achieved: {formatDate(milestone.achievedDate)}
-            </span>
-          )}
-        </div>
-
-        {milestone.notes && (
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {milestone.notes}
-          </p>
+    <Card className="rounded-3xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Brain className="h-4 w-4 text-sky-600" />
+          AI Insights
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {insights && insights.length > 0 ? (
+          <>
+            {insights.map((item, index) => {
+              const style = getSeverityStyle(item.severity);
+              const dimLabel = DIMENSIONS.find((d) => d.key === item.dimension)?.label || item.dimension;
+              return (
+                <div
+                  key={index}
+                  className={`p-3.5 rounded-xl border ${style.bg} ${style.border}`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-base flex-shrink-0 mt-0.5">{style.icon}</span>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <p className="text-sm leading-relaxed">{item.insight}</p>
+                      {item.dimension && (
+                        <p className="text-[10px] text-muted-foreground font-medium">
+                          Dimension: {dimLabel}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <Separator />
+            <div className="flex items-center gap-2 py-1">
+              <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+              <span className="text-xs text-muted-foreground italic">
+                More personalized insights coming soon as we gather more assessment data.
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-8 space-y-2">
+            <Brain className="h-10 w-10 text-muted-foreground mx-auto" />
+            <p className="text-sm text-muted-foreground">No AI insights available yet</p>
+            <p className="text-xs text-muted-foreground">
+              AI-powered observations will appear once more assessment data is collected
+            </p>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+              <span className="text-xs text-muted-foreground italic">
+                Personalized insights coming soon
+              </span>
+            </div>
+          </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -579,17 +672,57 @@ function GrowthLoadingSkeleton() {
         <Skeleton className="h-8 w-56 rounded-xl" />
         <Skeleton className="h-4 w-64 rounded-lg" />
       </div>
-      {/* Latest score card skeleton */}
-      <Skeleton className="h-80 rounded-3xl" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton className="h-80 rounded-3xl" />
-        <Skeleton className="h-80 rounded-3xl" />
-      </div>
-      {/* Achievements skeleton */}
-      <Skeleton className="h-64 rounded-3xl" />
-      {/* Milestones skeleton */}
+      {/* Period selector skeleton */}
+      <Skeleton className="h-9 w-72 rounded-xl" />
+      {/* Radar chart skeleton */}
+      <Skeleton className="h-[420px] rounded-3xl" />
+      {/* Score breakdown skeleton */}
       <Skeleton className="h-72 rounded-3xl" />
+      {/* Trend chart skeleton */}
+      <Skeleton className="h-80 rounded-3xl" />
+      {/* Milestones skeleton */}
+      <Skeleton className="h-96 rounded-3xl" />
+      {/* AI Insights skeleton */}
+      <Skeleton className="h-64 rounded-3xl" />
     </div>
+  );
+}
+
+// ============================================================
+// ERROR STATE
+// ============================================================
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <AlertCircle className="h-12 w-12 text-red-400" />
+      <p className="text-red-500 text-sm">{message}</p>
+      <Button onClick={onRetry} variant="outline" className="rounded-xl">
+        <RefreshCw className="h-4 w-4 mr-2" /> Retry
+      </Button>
+    </div>
+  );
+}
+
+// ============================================================
+// EMPTY STATE
+// ============================================================
+
+function EmptyState() {
+  return (
+    <Card className="rounded-3xl">
+      <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
+        <div className="h-16 w-16 rounded-2xl bg-sky-100 flex items-center justify-center">
+          <TrendingUp className="h-8 w-8 text-sky-600" />
+        </div>
+        <div className="text-center space-y-1">
+          <p className="text-lg font-semibold">No Growth Data Yet</p>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            Growth assessments, achievements, and milestones will appear here once your child&apos;s development tracking begins.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -599,9 +732,10 @@ function GrowthLoadingSkeleton() {
 
 function GrowthPageContent() {
   const { selectedChildId, selectedChild, children, selectChild } = useParentAuth();
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('Q4');
 
-  // Fetch growth data
-  const { data, isLoading, isError, error, refetch } = useParentGrowth(selectedChildId);
+  // Fetch enhanced growth data
+  const { data, isLoading, isError, error, refetch } = useParentGrowth(selectedChildId, selectedPeriod);
 
   const childName = `${selectedChild?.firstName || ''} ${selectedChild?.lastName || ''}`.trim() || 'Child';
 
@@ -613,28 +747,26 @@ function GrowthPageContent() {
   // Error state
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <AlertCircle className="h-12 w-12 text-red-400" />
-        <p className="text-red-500 text-sm">
-          {error?.message || 'Failed to load growth data'}
-        </p>
-        <Button onClick={() => refetch()} variant="outline" className="rounded-xl">
-          <RefreshCw className="h-4 w-4 mr-2" /> Retry
-        </Button>
-      </div>
+      <ErrorState
+        message={error?.message || 'Failed to load growth data'}
+        onRetry={() => refetch()}
+      />
     );
   }
 
-  const growthScores = data?.growthScores || [];
+  const scores = data?.scores || {};
+  const classAverage = data?.classAverage || {};
+  const trend = data?.trend || [];
   const achievements = data?.achievements || [];
-  const milestones = data?.milestones || [];
+  const milestonesData = data?.milestones || { ageGroup: '', total: 0, achieved: 0, items: [] };
+  const aiInsights = data?.aiInsights || [];
 
-  // Get the latest score (first in the array, assuming sorted desc)
-  const latestScore = growthScores.length > 0 ? growthScores[0] : null;
+  // Check if we have any meaningful data at all
+  const hasAnyData = Object.keys(scores).length > 0 || trend.length > 0 || achievements.length > 0 || (milestonesData.items && milestonesData.items.length > 0);
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* ===== Page Header ===== */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">Growth & Development</h1>
@@ -675,74 +807,31 @@ function GrowthPageContent() {
         )}
       </div>
 
-      {/* No Growth Data Empty State */}
-      {!latestScore && achievements.length === 0 && milestones.length === 0 ? (
-        <Card className="rounded-3xl">
-          <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-sky-100 flex items-center justify-center">
-              <TrendingUp className="h-8 w-8 text-sky-600" />
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-lg font-semibold">No Growth Data Yet</p>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Growth assessments, achievements, and milestones will appear here once your child&apos;s development tracking begins.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      {/* ===== Period Selector ===== */}
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-medium text-muted-foreground">Period:</span>
+        <PeriodSelector selected={selectedPeriod} onSelect={setSelectedPeriod} />
+      </div>
+
+      {/* ===== Empty State ===== */}
+      {!hasAnyData ? (
+        <EmptyState />
       ) : (
         <>
-          {/* Latest Score Card */}
-          {latestScore ? (
-            <LatestScoreCard score={latestScore} />
-          ) : (
-            <Card className="rounded-3xl">
-              <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
-                <Target className="h-10 w-10 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">No growth assessments recorded yet</p>
-                <p className="text-xs text-muted-foreground">
-                  Assessment scores will appear once evaluations are completed
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          {/* ===== Growth Radar Chart (Full Width — Main Visual) ===== */}
+          <GrowthRadarChart scores={scores} classAverage={classAverage} />
 
-          {/* Charts Row */}
-          {latestScore && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Radar Chart */}
-              <GrowthRadarChart score={latestScore} />
+          {/* ===== Score Breakdown Table ===== */}
+          <ScoreBreakdownTable scores={scores} classAverage={classAverage} />
 
-              {/* Progress Over Time or placeholder */}
-              {growthScores.length >= 2 ? (
-                <ProgressOverTimeChart scores={growthScores} />
-              ) : (
-                <Card className="rounded-3xl">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-sky-600" />
-                      Progress Over Time
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 space-y-2">
-                      <TrendingUp className="h-10 w-10 text-muted-foreground mx-auto" />
-                      <p className="text-sm text-muted-foreground">Not enough data yet</p>
-                      <p className="text-xs text-muted-foreground">
-                        Progress trends will appear after multiple assessments are completed
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          )}
+          {/* ===== Growth Trend Chart ===== */}
+          <GrowthTrendChart trend={trend} />
 
-          {/* Achievements Section */}
-          <AchievementsSection achievements={achievements} />
+          {/* ===== Milestones Section ===== */}
+          <MilestonesSection milestones={milestonesData} />
 
-          {/* Milestones Section */}
-          <MilestonesSection milestones={milestones} />
+          {/* ===== AI Insights Section ===== */}
+          <AIInsightsSection insights={aiInsights} />
         </>
       )}
     </div>

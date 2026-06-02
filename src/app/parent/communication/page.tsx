@@ -5,14 +5,24 @@
 // Communication Hub with two tabs:
 // 1. Announcements — paginated list with type/priority badges,
 //    expand/collapse content, stats row, pagination
-// 2. Messages — placeholder coming-soon card
+// 2. Chat with Teacher — real-time messaging with teachers,
+//    two-panel desktop layout, mobile full-screen chat
 // ============================================================
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+  Suspense,
+} from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import {
   Megaphone, Bell, AlertCircle, RefreshCw, ChevronDown,
   ChevronLeft, ChevronRight, Paperclip, MessageSquare,
   Calendar, AlertTriangle, Inbox, Clock,
+  Send, Phone, ArrowLeft, MessageCircle,
 } from 'lucide-react';
 import {
   Card, CardContent,
@@ -20,15 +30,24 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useParentAuth } from '@/lib/parent-auth';
+import { parentPost } from '@/lib/parent-api';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   useParentAnnouncements,
+  useParentChatThreads,
+  useParentChatMessages,
   type AnnouncementData,
+  type ChatThreadData,
+  type ChatMessageData,
 } from '@/hooks/use-parent';
 
 // ============================================================
@@ -51,6 +70,12 @@ const PRIORITY_BADGES: Record<string, { label: string; class: string }> = {
   CONCERN: { label: 'Concern', class: 'bg-red-100 text-red-600' },
 };
 
+const QUICK_REPLIES = [
+  'Thank you for the update!',
+  'Can we schedule a meeting?',
+  'Noted, will follow up.',
+];
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -64,6 +89,41 @@ function formatDate(dateStr: string): string {
     });
   } catch {
     return dateStr;
+  }
+}
+
+function formatTime(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function formatMessageTime(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return '';
   }
 }
 
@@ -87,11 +147,34 @@ function countThisMonth(announcements: AnnouncementData[]): number {
   }).length;
 }
 
+/** Get the parent's user ID from localStorage */
+function getParentUserId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('preone_user');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.id || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Get initials from a name */
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 // ============================================================
 // TAB TYPE
 // ============================================================
 
-type TabKey = 'announcements' | 'messages';
+type TabKey = 'announcements' | 'chat';
 
 // ============================================================
 // MAIN COMPONENT
@@ -216,21 +299,21 @@ function CommunicationContent() {
           Announcements
         </Button>
         <Button
-          variant={activeTab === 'messages' ? 'default' : 'outline'}
+          variant={activeTab === 'chat' ? 'default' : 'outline'}
           size="sm"
           className={`rounded-xl text-xs ${
-            activeTab === 'messages'
+            activeTab === 'chat'
               ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:from-sky-600 hover:to-blue-600 shadow-sm'
               : 'hover:bg-sky-50 hover:text-sky-700'
           }`}
-          onClick={() => handleTabSwitch('messages')}
+          onClick={() => handleTabSwitch('chat')}
         >
           <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
-          Messages
+          Chat with Teacher
         </Button>
       </div>
 
-      {/* ── Tab Content ── */}
+      {/* ── Tab content ── */}
       {activeTab === 'announcements' ? (
         <AnnouncementsTab
           announcements={announcements}
@@ -245,7 +328,7 @@ function CommunicationContent() {
           onRetry={() => refetch()}
         />
       ) : (
-        <MessagesTab />
+        <ChatTab />
       )}
     </div>
   );
@@ -488,28 +571,483 @@ function AnnouncementCard({ announcement }: { announcement: AnnouncementData }) 
 }
 
 // ============================================================
-// MESSAGES TAB (Coming Soon)
+// CHAT TAB — Full Implementation
 // ============================================================
 
-function MessagesTab() {
+function ChatTab() {
+  const { selectedChildId } = useParentAuth();
+  const isMobile = useIsMobile();
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+
+  // Fetch threads
+  const { data: threadsData, isLoading: threadsLoading } = useParentChatThreads(selectedChildId);
+  const threads = threadsData?.threads ?? [];
+
+  // On mobile, show either list or chat — not both
+  const showChatOnMobile = isMobile && selectedThreadId !== null;
+
   return (
-    <Card className="rounded-3xl">
-      <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-sky-500 to-blue-500 flex items-center justify-center shadow-lg">
-          <MessageSquare className="h-10 w-10 text-white" />
-        </div>
-        <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold">Messaging Feature Coming Soon</h3>
-          <p className="text-sm text-muted-foreground max-w-sm">
-            Direct messaging between parents and teachers will be available here.
-            Stay tuned for real-time conversations, group chats, and message notifications.
-          </p>
-        </div>
-        <Badge variant="outline" className="text-xs border-sky-200 text-sky-600 bg-sky-50">
-          Under Development
-        </Badge>
-      </CardContent>
+    <Card className="rounded-3xl overflow-hidden h-[calc(100vh-280px)] min-h-[480px]">
+      <div className="flex h-full">
+        {/* ── Left Panel: Thread List ── */}
+        {(!isMobile || !showChatOnMobile) && (
+          <div className="flex-shrink-0 w-full md:w-80 lg:w-[340px] border-r-0 md:border-r h-full">
+            <ChatThreadList
+              threads={threads}
+              isLoading={threadsLoading}
+              selectedThreadId={selectedThreadId}
+              onSelectThread={(id) => setSelectedThreadId(id)}
+            />
+          </div>
+        )}
+
+        {/* ── Right Panel: Chat Window ── */}
+        {(!isMobile || showChatOnMobile) && (
+          <div className="flex-1 min-w-0 h-full">
+            {selectedThreadId ? (
+              <ChatWindow
+                threadId={selectedThreadId}
+                onBack={() => setSelectedThreadId(null)}
+                isMobile={isMobile}
+              />
+            ) : (
+              <ChatEmptyState />
+            )}
+          </div>
+        )}
+      </div>
     </Card>
+  );
+}
+
+// ============================================================
+// CHAT THREAD LIST
+// ============================================================
+
+function ChatThreadList({
+  threads,
+  isLoading,
+  selectedThreadId,
+  onSelectThread,
+}: {
+  threads: ChatThreadData[];
+  isLoading: boolean;
+  selectedThreadId: string | null;
+  onSelectThread: (id: string) => void;
+}) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 pb-3">
+        <h2 className="text-sm font-semibold flex items-center gap-2">
+          <MessageCircle className="h-4 w-4 text-sky-500" />
+          Conversations
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {threads.length} {threads.length === 1 ? 'teacher' : 'teachers'}
+        </p>
+      </div>
+
+      <Separator />
+
+      {/* Thread List */}
+      {isLoading ? (
+        <div className="flex-1 p-3 space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 p-3">
+              <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="h-3 w-36" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : threads.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-3">
+          <div className="w-14 h-14 rounded-full bg-sky-50 flex items-center justify-center">
+            <MessageSquare className="h-7 w-7 text-sky-300" />
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">No conversations yet</p>
+            <p className="text-xs text-muted-foreground">
+              Start chatting with your child&apos;s teacher!
+            </p>
+          </div>
+        </div>
+      ) : (
+        <ScrollArea className="flex-1">
+          <div className="p-2 space-y-0.5">
+            {threads.map((thread) => (
+              <ChatThreadItem
+                key={thread.id}
+                thread={thread}
+                isSelected={thread.id === selectedThreadId}
+                onClick={() => onSelectThread(thread.id)}
+              />
+            ))}
+          </div>
+        </ScrollArea>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// CHAT THREAD ITEM
+// ============================================================
+
+function ChatThreadItem({
+  thread,
+  isSelected,
+  onClick,
+}: {
+  thread: ChatThreadData;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const initials = getInitials(thread.teacher.name);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors ${
+        isSelected
+          ? 'bg-sky-50 border border-sky-200'
+          : 'hover:bg-gray-50 border border-transparent'
+      }`}
+    >
+      {/* Avatar */}
+      <div className="relative flex-shrink-0">
+        <Avatar className="h-10 w-10">
+          {thread.teacher.photo ? (
+            <AvatarImage src={thread.teacher.photo} alt={thread.teacher.name} />
+          ) : null}
+          <AvatarFallback className="bg-sky-100 text-sky-700 text-xs font-medium">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+        {thread.unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white px-1">
+            {thread.unreadCount > 9 ? '9+' : thread.unreadCount}
+          </span>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <p className={`text-sm truncate ${thread.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
+            {thread.teacher.name}
+          </p>
+          {thread.lastMessage && (
+            <span className="text-[10px] text-muted-foreground flex-shrink-0">
+              {formatTime(thread.lastMessage.createdAt)}
+            </span>
+          )}
+        </div>
+        {thread.teacher.className && (
+          <p className="text-[11px] text-sky-600 truncate">{thread.teacher.className}</p>
+        )}
+        {thread.lastMessage && (
+          <p className={`text-xs truncate mt-0.5 ${thread.unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+            {thread.lastMessage.content}
+          </p>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// ============================================================
+// CHAT WINDOW
+// ============================================================
+
+function ChatWindow({
+  threadId,
+  onBack,
+  isMobile,
+}: {
+  threadId: string;
+  onBack: () => void;
+  isMobile: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const [messageInput, setMessageInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch messages for the selected thread
+  const { data: messagesData, isLoading: messagesLoading } = useParentChatMessages(threadId);
+
+  const teacher = messagesData?.teacher ?? null;
+  const messages = messagesData?.messages ?? [];
+
+  // Get parent user ID to determine message alignment
+  const parentUserId = getParentUserId();
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // ── Send Message Mutation ──
+  const sendMessageMutation = useMutation({
+    mutationFn: async (content: string) => {
+      return parentPost(`/api/parent/chat/${threadId}/messages`, {
+        content,
+        type: 'TEXT',
+      });
+    },
+    onSuccess: () => {
+      // Invalidate messages query to refresh
+      queryClient.invalidateQueries({
+        queryKey: ['parent', 'chat', 'messages', threadId],
+      });
+      // Invalidate threads to update last message
+      queryClient.invalidateQueries({
+        queryKey: ['parent', 'chat', 'threads'],
+      });
+      setMessageInput('');
+    },
+  });
+
+  const handleSend = useCallback(() => {
+    const trimmed = messageInput.trim();
+    if (!trimmed) return;
+    sendMessageMutation.mutate(trimmed);
+  }, [messageInput, sendMessageMutation]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend],
+  );
+
+  const handleQuickReply = useCallback(
+    (text: string) => {
+      sendMessageMutation.mutate(text);
+    },
+    [sendMessageMutation],
+  );
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* ── Chat Header ── */}
+      <div className="flex items-center gap-3 p-4 border-b flex-shrink-0">
+        {isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-xl -ml-1 mr-0.5"
+            onClick={onBack}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
+
+        {teacher ? (
+          <>
+            <Avatar className="h-9 w-9">
+              {teacher.photo ? (
+                <AvatarImage src={teacher.photo} alt={teacher.name} />
+              ) : null}
+              <AvatarFallback className="bg-sky-100 text-sky-700 text-xs font-medium">
+                {getInitials(teacher.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate">{teacher.name}</p>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {teacher.className || 'Teacher'}
+              </p>
+            </div>
+            {teacher.phone && (
+              <a
+                href={`tel:${teacher.phone}`}
+                className="flex items-center justify-center h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                title={`Call ${teacher.phone}`}
+              >
+                <Phone className="h-4 w-4" />
+              </a>
+            )}
+          </>
+        ) : (
+          <div className="flex-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20 mt-1.5" />
+          </div>
+        )}
+      </div>
+
+      {/* ── Messages Area ── */}
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-1">
+          {messagesLoading ? (
+            <div className="space-y-4 py-8">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}
+                >
+                  <Skeleton
+                    className={`h-12 ${i % 2 === 0 ? 'w-48' : 'w-40'} rounded-2xl`}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <div className="w-14 h-14 rounded-full bg-sky-50 flex items-center justify-center">
+                <MessageCircle className="h-7 w-7 text-sky-300" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Start the conversation!
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Say hello to the teacher.
+                </p>
+              </div>
+              {/* Quick replies as starters */}
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {QUICK_REPLIES.map((text) => (
+                  <Button
+                    key={text}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full text-xs h-7 border-sky-200 text-sky-600 hover:bg-sky-50"
+                    onClick={() => handleQuickReply(text)}
+                    disabled={sendMessageMutation.isPending}
+                  >
+                    {text}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {messages.map((msg) => {
+                const isParent = msg.senderId === parentUserId;
+                return (
+                  <ChatMessageBubble
+                    key={msg.id}
+                    message={msg}
+                    isParent={isParent}
+                  />
+                );
+              })}
+            </>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
+
+      {/* ── Quick Replies (when there are messages) ── */}
+      {messages.length > 0 && (
+        <div className="px-4 pt-2 pb-1 flex gap-1.5 overflow-x-auto flex-shrink-0">
+          {QUICK_REPLIES.map((text) => (
+            <Button
+              key={text}
+              variant="outline"
+              size="sm"
+              className="rounded-full text-[11px] h-6 px-2.5 border-sky-200 text-sky-600 hover:bg-sky-50 whitespace-nowrap flex-shrink-0"
+              onClick={() => handleQuickReply(text)}
+              disabled={sendMessageMutation.isPending}
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Input Area ── */}
+      <div className="p-3 border-t flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <Input
+            ref={inputRef}
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type a message..."
+            className="flex-1 rounded-xl h-10 text-sm border-gray-200 focus-visible:ring-sky-400"
+            disabled={sendMessageMutation.isPending}
+          />
+          <Button
+            size="icon"
+            className="h-10 w-10 rounded-xl bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white flex-shrink-0"
+            onClick={handleSend}
+            disabled={!messageInput.trim() || sendMessageMutation.isPending}
+          >
+            {sendMessageMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CHAT MESSAGE BUBBLE
+// ============================================================
+
+function ChatMessageBubble({
+  message,
+  isParent,
+}: {
+  message: ChatMessageData;
+  isParent: boolean;
+}) {
+  return (
+    <div className={`flex ${isParent ? 'justify-end' : 'justify-start'} mb-1`}>
+      <div
+        className={`max-w-[75%] sm:max-w-[65%] rounded-2xl px-3.5 py-2.5 ${
+          isParent
+            ? 'bg-sky-500 text-white rounded-br-md'
+            : 'bg-gray-100 text-foreground rounded-bl-md'
+        }`}
+      >
+        <p className="text-sm leading-relaxed whitespace-pre-line break-words">
+          {message.content}
+        </p>
+        <p
+          className={`text-[10px] mt-1 ${
+            isParent ? 'text-sky-100' : 'text-muted-foreground'
+          }`}
+        >
+          {formatMessageTime(message.createdAt)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CHAT EMPTY STATE (no thread selected)
+// ============================================================
+
+function ChatEmptyState() {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
+      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center">
+        <MessageCircle className="h-10 w-10 text-sky-400" />
+      </div>
+      <div className="text-center space-y-2">
+        <h3 className="text-base font-semibold text-foreground">Select a conversation</h3>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Choose a teacher from the list to start or continue a conversation.
+        </p>
+      </div>
+    </div>
   );
 }
 

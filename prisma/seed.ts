@@ -621,7 +621,267 @@ async function main() {
       },
     });
   }
-  console.log('  ✓ Growth scores created');
+  console.log('  ✓ Growth scores created (current quarter)');
+
+  // Growth scores for previous quarters (Q1, Q2, Q3) for trend data
+  console.log('  Creating Growth Scores for previous quarters...');
+  const year = new Date().getFullYear();
+  const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
+  const previousQuarters: string[] = [];
+  for (let q = 1; q < currentQ; q++) {
+    previousQuarters.push(`${year}-Q${q}`);
+  }
+
+  for (const student of studentRecords) {
+    const cls = classRecords.find(c => c.id === student.classId)!;
+    let baseScore: number;
+    if (cls.name.includes('Nursery')) baseScore = 45;
+    else if (cls.name.includes('LKG')) baseScore = 55;
+    else baseScore = 65;
+
+    for (let qi = 0; qi < previousQuarters.length; qi++) {
+      const period = previousQuarters[qi];
+      // Progressive improvement: earlier quarters have lower base
+      const qBase = baseScore + qi * 5;
+      const creativity = Math.min(100, Math.max(10, qBase + randomInt(-10, 10)));
+      const communication = Math.min(100, Math.max(10, qBase + randomInt(-10, 10)));
+      const social = Math.min(100, Math.max(10, qBase + randomInt(-10, 10)));
+      const confidence = Math.min(100, Math.max(10, qBase + randomInt(-10, 10)));
+      const cognitive = Math.min(100, Math.max(10, qBase + randomInt(-10, 10)));
+      const physical = Math.min(100, Math.max(10, qBase + randomInt(-5, 10)));
+      const overall = parseFloat(((creativity + communication + social + confidence + cognitive + physical) / 6).toFixed(1));
+
+      await prisma.growthScore.create({
+        data: {
+          studentId: student.id,
+          period,
+          creativity,
+          communication,
+          social,
+          confidence,
+          cognitive,
+          physical,
+          overall,
+          assessedBy: teacherRecords[qi % teacherRecords.length]?.id,
+          comments: `${student.firstName} is showing ${qi === 0 ? 'developing' : 'improving'} progress in ${randomItem(['creativity', 'communication', 'social skills', 'physical activities'])}.`,
+        },
+      });
+    }
+  }
+  console.log(`  ✓ Growth scores created for ${previousQuarters.length} previous quarters`);
+
+  // ============================================================
+  // 11b. MILESTONES (developmental milestones by age group)
+  // ============================================================
+  console.log('  Creating Milestones...');
+  const milestoneDefs = [
+    // Age 2-3 (Nursery)
+    { name: 'Walks steadily', ageGroup: '2-3', category: 'Physical', description: 'Can walk without support on different surfaces' },
+    { name: 'Stacks 4+ blocks', ageGroup: '2-3', category: 'Cognitive', description: 'Can stack four or more blocks in a tower' },
+    { name: 'Uses 2-word phrases', ageGroup: '2-3', category: 'Language', description: 'Combines two words like "more milk" or "big truck"' },
+    { name: 'Plays alongside others', ageGroup: '2-3', category: 'Social', description: 'Engages in parallel play near other children' },
+    { name: 'Identifies 3 colors', ageGroup: '2-3', category: 'Cognitive', description: 'Can point to and name at least 3 colors' },
+    // Age 3-4 (LKG)
+    { name: 'Hops on one foot', ageGroup: '3-4', category: 'Physical', description: 'Can hop on one foot for a few steps' },
+    { name: 'Catches a bounced ball', ageGroup: '3-4', category: 'Physical', description: 'Can catch a large ball bounced to them' },
+    { name: 'Counts to 10', ageGroup: '3-4', category: 'Cognitive', description: 'Can count objects up to 10' },
+    { name: 'Tells a simple story', ageGroup: '3-4', category: 'Language', description: 'Can narrate a simple sequence of events' },
+    { name: 'Plays cooperatively in group', ageGroup: '3-4', category: 'Social', description: 'Takes turns and shares with other children' },
+    { name: 'Draws a person with 3+ body parts', ageGroup: '3-4', category: 'Cognitive', description: 'Can draw a figure with at least 3 body parts' },
+    { name: 'Uses scissors', ageGroup: '3-4', category: 'Physical', description: 'Can cut along a straight line with safety scissors' },
+    // Age 4-5 (UKG)
+    { name: 'Balances on one foot for 10 sec', ageGroup: '4-5', category: 'Physical', description: 'Can maintain balance on one foot for 10 seconds' },
+    { name: 'Identifies colors and shapes', ageGroup: '4-5', category: 'Cognitive', description: 'Can name all primary colors and basic shapes' },
+    { name: 'Counts to 20', ageGroup: '4-5', category: 'Cognitive', description: 'Can count reliably up to 20 objects' },
+    { name: 'Draws a person with 6+ body parts', ageGroup: '4-5', category: 'Cognitive', description: 'Can draw a detailed figure with 6 or more body parts' },
+    { name: 'Takes turns in games', ageGroup: '4-5', category: 'Social', description: 'Understands and follows turn-taking rules' },
+    { name: 'Uses future tense', ageGroup: '4-5', category: 'Language', description: 'Can talk about future events using correct tense' },
+    { name: 'Writes some letters', ageGroup: '4-5', category: 'Cognitive', description: 'Can write some letters of the alphabet' },
+    { name: 'Skips on both feet', ageGroup: '4-5', category: 'Physical', description: 'Can skip alternating feet' },
+  ];
+
+  const milestoneRecords: { id: string; ageGroup: string; category: string; name: string }[] = [];
+  for (const md of milestoneDefs) {
+    const milestone = await prisma.milestone.create({
+      data: {
+        name: md.name,
+        ageGroup: md.ageGroup,
+        category: md.category,
+        description: md.description,
+      },
+    });
+    milestoneRecords.push({ id: milestone.id, ageGroup: md.ageGroup, category: md.category, name: md.name });
+  }
+  console.log(`  ✓ ${milestoneRecords.length} Milestones created`);
+
+  // Create MilestoneTimelines for first 5 students (mix of achieved and pending)
+  console.log('  Creating Milestone Timelines...');
+  for (let i = 0; i < Math.min(5, studentRecords.length); i++) {
+    const student = studentRecords[i];
+    const studentDef = studentDefs[i];
+    // Calculate age group from DOB
+    const age = (Date.now() - studentDef.dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+    let ageGroup: string;
+    if (age < 3) ageGroup = '2-3';
+    else if (age < 4) ageGroup = '3-4';
+    else ageGroup = '4-5';
+
+    const relevantMilestones = milestoneRecords.filter(m => m.ageGroup === ageGroup);
+    for (let j = 0; j < relevantMilestones.length; j++) {
+      const isAchieved = j < Math.ceil(relevantMilestones.length * 0.55); // ~55% achieved
+      await prisma.milestoneTimeline.create({
+        data: {
+          studentId: student.id,
+          milestoneId: relevantMilestones[j].id,
+          achievedDate: isAchieved ? daysAgo(randomInt(1, 30)) : null,
+          status: isAchieved ? 'ACHIEVED' : 'PENDING',
+          notes: isAchieved ? `Achieved during ${randomItem(['class activity', 'play time', 'guided session', 'home practice'])}` : null,
+        },
+      });
+    }
+  }
+  console.log('  ✓ Milestone timelines created for first 5 students');
+
+  // ============================================================
+  // 11c. AI OBSERVATIONS (for first 5 students)
+  // ============================================================
+  console.log('  Creating AI Observations...');
+  const aiInsightDefs = [
+    { dimension: 'communication', insight: 'Communication score has improved 15% from Q1 to Q2', severity: 'INFO' },
+    { dimension: 'social', insight: 'Social skills are a strong area — encourage group activities', severity: 'POSITIVE' },
+    { dimension: 'communication', insight: 'Consider activities that boost communication: storytelling, show-and-tell', severity: 'SUGGESTION' },
+    { dimension: 'physical', insight: 'Physical development is outstanding compared to class average', severity: 'POSITIVE' },
+    { dimension: 'cognitive', insight: 'Cognitive growth trend shows consistent improvement over 3 quarters', severity: 'INFO' },
+  ];
+
+  for (let i = 0; i < Math.min(5, studentRecords.length); i++) {
+    const insight = aiInsightDefs[i];
+    await prisma.aIObservation.create({
+      data: {
+        studentId: studentRecords[i].id,
+        insight: insight.insight,
+        dimension: insight.dimension,
+        severity: insight.severity,
+        isActioned: false,
+      },
+    });
+  }
+  console.log('  ✓ AI Observations created');
+
+  // ============================================================
+  // 11d. PARENT USER & CHAT DATA
+  // ============================================================
+  console.log('  Creating Parent User & Chat Data...');
+
+  // Create a User for the first parent (Rajesh Sharma) for login
+  const parentPasswordHash = await hashPassword('password123');
+  const parentUser = await prisma.user.create({
+    data: {
+      email: 'rajesh.sharma@email.com',
+      password: parentPasswordHash,
+      name: 'Rajesh Sharma',
+      phone: parentRecords[0].phone,
+      role: 'PARENT',
+      isActive: true,
+      schoolId: school.id,
+      branchId: branch.id,
+    },
+  });
+
+  // Create chat threads between parent and teacher of Nursery-A
+  const nurseryACls = classRecords.find(c => c.name === 'Nursery-A')!;
+  const nurseryATeacher = teacherRecords.find(t => t.className === 'Nursery-A');
+
+  if (nurseryATeacher) {
+    const teacherUser = await prisma.user.findFirst({
+      where: { email: 'kavitha.raman@littlestars.com' },
+    });
+
+    if (teacherUser) {
+      // Thread 1: Parent of Aarav (student 0) with Nursery-A teacher
+      const thread1 = await prisma.chatThread.create({
+        data: {
+          type: 'DIRECT',
+          title: 'Rajesh Sharma - Kavitha Raman',
+        },
+      });
+
+      await prisma.chatParticipant.create({
+        data: { threadId: thread1.id, userId: parentUser.id, role: 'PARENT' },
+      });
+      await prisma.chatParticipant.create({
+        data: { threadId: thread1.id, userId: teacherUser.id, role: 'TEACHER' },
+      });
+
+      // Messages in thread 1
+      const messages1 = [
+        { senderId: teacherUser.id, content: 'Good morning! Raj had a great day today. He participated well in the art activity.', type: 'TEXT' },
+        { senderId: parentUser.id, content: 'That\'s wonderful to hear! He was excited about painting this morning.', type: 'TEXT' },
+        { senderId: teacherUser.id, content: 'Yes, he was very creative. I\'ll share some photos of his artwork soon.', type: 'TEXT' },
+        { senderId: parentUser.id, content: 'Thank you for the update! Looking forward to seeing them.', type: 'TEXT' },
+        { senderId: teacherUser.id, content: 'Raj is doing well today. He made a new friend during outdoor play.', type: 'TEXT' },
+      ];
+
+      for (let mi = 0; mi < messages1.length; mi++) {
+        const msg = messages1[mi];
+        await prisma.message.create({
+          data: {
+            threadId: thread1.id,
+            senderId: msg.senderId,
+            content: msg.content,
+            type: msg.type,
+            isRead: mi < messages1.length - 1, // last message unread for parent
+            createdAt: daysAgo(messages1.length - 1 - mi),
+          },
+        });
+      }
+    }
+  }
+
+  // Thread 2: Create second thread for Nursery-B teacher (Priya Nair)
+  const nurseryBTeacher = teacherRecords.find(t => t.className === 'Nursery-B');
+  if (nurseryBTeacher) {
+    const teacher2User = await prisma.user.findFirst({
+      where: { email: 'priya.nair@littlestars.com' },
+    });
+
+    if (teacher2User) {
+      const thread2 = await prisma.chatThread.create({
+        data: {
+          type: 'DIRECT',
+          title: 'Rajesh Sharma - Priya Nair',
+        },
+      });
+
+      await prisma.chatParticipant.create({
+        data: { threadId: thread2.id, userId: parentUser.id, role: 'PARENT' },
+      });
+      await prisma.chatParticipant.create({
+        data: { threadId: thread2.id, userId: teacher2User.id, role: 'TEACHER' },
+      });
+
+      const messages2 = [
+        { senderId: teacher2User.id, content: 'Hello! Welcome to the new academic year. Looking forward to working with your child.', type: 'TEXT' },
+        { senderId: parentUser.id, content: 'Thank you! We\'re excited about the year ahead.', type: 'TEXT' },
+      ];
+
+      for (let mi = 0; mi < messages2.length; mi++) {
+        const msg = messages2[mi];
+        await prisma.message.create({
+          data: {
+            threadId: thread2.id,
+            senderId: msg.senderId,
+            content: msg.content,
+            type: msg.type,
+            isRead: true,
+            createdAt: daysAgo(3 - mi),
+          },
+        });
+      }
+    }
+  }
+
+  console.log('  ✓ Parent user, chat threads, and messages created');
 
   // ============================================================
   // 12. DAILY UPDATES (today for first 5 students)

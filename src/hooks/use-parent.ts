@@ -506,16 +506,174 @@ export interface GrowthResponse {
 }
 
 // ============================================================
-// useParentGrowth — Get growth data for a child
+// Enhanced Growth Types
 // ============================================================
 
-export function useParentGrowth(childId: string | null) {
+export interface EnhancedGrowthResponse {
+  childId: string;
+  childName: string;
+  period: string;
+  scores: Record<string, number>;
+  classAverage: Record<string, number>;
+  trend: Array<{
+    period: string;
+    creativity: number;
+    communication: number;
+    social: number;
+    confidence: number;
+    cognitive: number;
+    physical: number;
+    overall: number | null;
+  }>;
+  growthScores: GrowthScoreData[];
+  achievements: AchievementData[];
+  milestones: {
+    ageGroup: string;
+    total: number;
+    achieved: number;
+    items: Array<{
+      id: string;
+      milestoneId: string;
+      name: string;
+      category: string;
+      ageGroup: string;
+      description: string | null;
+      achievedDate: string | null;
+      status: string;
+      notes: string | null;
+    }>;
+  };
+  aiInsights: Array<{
+    insight: string;
+    dimension: string | null;
+    severity: string | null;
+  }>;
+}
+
+// ============================================================
+// Growth Comparison Types
+// ============================================================
+
+export interface GrowthComparisonChild {
+  childId: string;
+  name: string;
+  className: string | null;
+  overall: number;
+  scores: Record<string, number>;
+}
+
+export interface GrowthComparisonResponse {
+  children: GrowthComparisonChild[];
+}
+
+// ============================================================
+// Chat Thread Types
+// ============================================================
+
+export interface ChatThreadData {
+  id: string;
+  teacher: {
+    id: string;
+    name: string;
+    photo: string | null;
+    className: string | null;
+    phone: string;
+  };
+  lastMessage: {
+    content: string;
+    createdAt: string;
+    senderId: string;
+  } | null;
+  unreadCount: number;
+}
+
+export interface ChatThreadsResponse {
+  threads: ChatThreadData[];
+}
+
+// ============================================================
+// Chat Message Types
+// ============================================================
+
+export interface ChatMessageData {
+  id: string;
+  content: string;
+  type: string;
+  senderId: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface ChatMessagesResponse {
+  threadId: string;
+  teacher: {
+    id: string;
+    name: string;
+    photo: string | null;
+    className: string | null;
+    phone: string;
+  } | null;
+  messages: ChatMessageData[];
+}
+
+// ============================================================
+// useParentGrowth — Get growth data for a child (enhanced)
+// ============================================================
+
+export function useParentGrowth(childId: string | null, period?: string) {
   return useQuery({
-    queryKey: parentKeys.growth(childId || ''),
-    queryFn: () =>
-      parentGet<GrowthResponse>(`/api/parent/growth?childId=${childId}`),
+    queryKey: [...parentKeys.growth(childId || ''), period] as const,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      if (period) params.set('period', period);
+      return parentGet<EnhancedGrowthResponse>(`/api/parent/growth?${params.toString()}`);
+    },
     enabled: !!childId,
     staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
+// useParentGrowthComparison — Compare growth across children
+// ============================================================
+
+export function useParentGrowthComparison() {
+  return useQuery({
+    queryKey: ['parent', 'growth', 'comparison'] as const,
+    queryFn: () =>
+      parentGet<GrowthComparisonResponse>('/api/parent/growth/comparison'),
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+// ============================================================
+// useParentChatThreads — Get chat threads for parent
+// ============================================================
+
+export function useParentChatThreads(childId?: string | null) {
+  return useQuery({
+    queryKey: ['parent', 'chat', 'threads', childId] as const,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      return parentGet<ChatThreadsResponse>(`/api/parent/chat/threads?${params.toString()}`);
+    },
+    staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+// ============================================================
+// useParentChatMessages — Get messages for a thread
+// ============================================================
+
+export function useParentChatMessages(threadId: string | null) {
+  return useQuery({
+    queryKey: ['parent', 'chat', 'messages', threadId] as const,
+    queryFn: () =>
+      parentGet<ChatMessagesResponse>(`/api/parent/chat/${threadId}/messages?limit=50`),
+    enabled: !!threadId,
+    staleTime: 10 * 1000, // 10 seconds
   });
 }
 
