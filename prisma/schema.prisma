@@ -149,11 +149,15 @@ model Parent {
   address            String?
   relation           String
   isEmergencyContact Boolean       @default(false)
+  photo              String?
   kycDoc             String?
   kycStatus          String?
+  kycRejectionReason String?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   students           StudentParent[]
+  kycDocuments       KycDocument[]
+  notificationPreferences NotificationPreference?
 }
 
 model StudentParent {
@@ -911,6 +915,52 @@ model Notification {
   isRead    Boolean  @default(false)
   actionUrl String?
   createdAt DateTime @default(now())
+}
+
+model KycDocument {
+  id           String   @id @default(cuid())
+  parentId     String
+  documentType String
+  documentUrl  String
+  status       String   @default("PENDING")
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  rejectionReason String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  parent       Parent   @relation(fields: [parentId], references: [id])
+}
+
+model NotificationPreference {
+  id                    String   @id @default(cuid())
+  parentId              String   @unique
+  dailyUpdateApp        Boolean  @default(true)
+  dailyUpdateSms        Boolean  @default(false)
+  dailyUpdateEmail      Boolean  @default(false)
+  observationApp        Boolean  @default(true)
+  observationSms        Boolean  @default(true)
+  observationEmail      Boolean  @default(false)
+  feeReminderApp        Boolean  @default(true)
+  feeReminderSms        Boolean  @default(true)
+  feeReminderEmail      Boolean  @default(true)
+  feeOverdueApp         Boolean  @default(true)
+  feeOverdueSms         Boolean  @default(true)
+  feeOverdueEmail       Boolean  @default(true)
+  attendanceApp         Boolean  @default(false)
+  attendanceSms         Boolean  @default(false)
+  attendanceEmail       Boolean  @default(false)
+  announcementApp       Boolean  @default(true)
+  announcementSms       Boolean  @default(false)
+  announcementEmail     Boolean  @default(true)
+  teacherMessageApp     Boolean  @default(true)
+  teacherMessageSms     Boolean  @default(false)
+  teacherMessageEmail   Boolean  @default(false)
+  leaveStatusApp        Boolean  @default(true)
+  leaveStatusSms        Boolean  @default(false)
+  leaveStatusEmail      Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  parent                Parent   @relation(fields: [parentId], references: [id])
 }
 
 model Report {

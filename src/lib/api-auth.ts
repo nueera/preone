@@ -41,7 +41,12 @@ interface ParentAuthResult {
     address: string | null;
     relation: string;
     isEmergencyContact: boolean;
+    photo: string | null;
+    kycDoc: string | null;
+    kycStatus: string | null;
+    kycRejectionReason: string | null;
   };
+  userId: string;
   children: Array<{
     id: string;
     firstName: string;
@@ -67,6 +72,7 @@ interface ParentAuthResult {
         experience: number;
       } | null;
     } | null;
+    isPrimary: boolean;
   }>;
   childIds: string[];
 }
@@ -188,6 +194,10 @@ export async function requireParent(
       address: true,
       relation: true,
       isEmergencyContact: true,
+      photo: true,
+      kycDoc: true,
+      kycStatus: true,
+      kycRejectionReason: true,
     },
   });
 
@@ -251,6 +261,7 @@ export async function requireParent(
     status: sp.student.status,
     admissionDate: sp.student.admissionDate,
     class: sp.student.class,
+    isPrimary: sp.isPrimary,
   }));
 
   const childIds = children.map((c) => c.id);
@@ -258,6 +269,7 @@ export async function requireParent(
   // Step 4: Return structured result
   return {
     parent,
+    userId: user.userId,
     children,
     childIds,
   };

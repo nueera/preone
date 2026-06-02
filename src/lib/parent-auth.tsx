@@ -45,6 +45,8 @@ interface ParentInfo {
   address: string | null;
   relation: string;
   isEmergencyContact: boolean;
+  photo: string | null;
+  kycStatus: string | null;
 }
 
 interface ParentAuthContextType {
@@ -122,6 +124,24 @@ export function ParentAuthProvider({ children: childNodes }: { children: ReactNo
         classId: (c.class as Record<string, unknown>)?.id as string || null,
       }));
       setChildren(childList);
+
+      // Update parent info with all fields from /api/parent/me response
+      if (data.parent) {
+        setParent((prev) => ({
+          ...prev,
+          id: data.parent.id as string,
+          firstName: data.parent.firstName as string,
+          lastName: data.parent.lastName as string,
+          phone: data.parent.phone as string,
+          email: data.parent.email as string | null,
+          occupation: data.parent.occupation as string | null,
+          address: data.parent.address as string | null,
+          relation: data.parent.relation as string,
+          isEmergencyContact: data.parent.isEmergencyContact as boolean,
+          photo: data.parent.photo as string | null,
+          kycStatus: data.parent.kycStatus as string | null,
+        } as ParentInfo));
+      }
 
       // Auto-select child: from localStorage > URL > primary > first
       const storedChildId = getSelectedChildId();

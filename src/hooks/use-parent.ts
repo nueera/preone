@@ -3,8 +3,8 @@
 // React Query hooks for parent portal data fetching
 // ============================================================
 
-import { useQuery } from '@tanstack/react-query';
-import { parentGet } from '@/lib/parent-api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { parentGet, parentPost, parentPatch } from '@/lib/parent-api';
 
 // ============================================================
 // Query Key Factory
@@ -20,6 +20,8 @@ export const parentKeys = {
   growth: (childId: string) => ['parent', 'growth', childId] as const,
   observations: (childId: string) => ['parent', 'observations', childId] as const,
   announcements: ['parent', 'announcements'] as const,
+  profile: ['parent', 'profile'] as const,
+  notificationPrefs: ['parent', 'notification-preferences'] as const,
 };
 
 // ============================================================
@@ -851,5 +853,167 @@ export function useParentDashboard(childId?: string | null) {
     },
     enabled: childId !== undefined,
     staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+// ============================================================
+// Settings — Profile Types
+// ============================================================
+
+export interface ProfileData {
+  parent: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string | null;
+    occupation: string | null;
+    address: string | null;
+    relation: string;
+    isEmergencyContact: boolean;
+    photo: string | null;
+    kycDoc: string | null;
+    kycStatus: string | null;
+    kycRejectionReason: string | null;
+  };
+  children: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    photo: string | null;
+    rollNumber: string | null;
+    className: string | null;
+    programName: string | null;
+    isPrimary: boolean;
+  }>;
+  kycDocuments: Array<{
+    id: string;
+    documentType: string;
+    documentUrl: string;
+    status: string;
+    reviewedBy: string | null;
+    reviewedAt: string | null;
+    rejectionReason: string | null;
+    createdAt: string;
+  }>;
+  notificationPreferences: NotificationPreferencesData | null;
+}
+
+export interface NotificationPreferencesData {
+  id: string;
+  dailyUpdateApp: boolean;
+  dailyUpdateSms: boolean;
+  dailyUpdateEmail: boolean;
+  observationApp: boolean;
+  observationSms: boolean;
+  observationEmail: boolean;
+  feeReminderApp: boolean;
+  feeReminderSms: boolean;
+  feeReminderEmail: boolean;
+  feeOverdueApp: boolean;
+  feeOverdueSms: boolean;
+  feeOverdueEmail: boolean;
+  attendanceApp: boolean;
+  attendanceSms: boolean;
+  attendanceEmail: boolean;
+  announcementApp: boolean;
+  announcementSms: boolean;
+  announcementEmail: boolean;
+  teacherMessageApp: boolean;
+  teacherMessageSms: boolean;
+  teacherMessageEmail: boolean;
+  leaveStatusApp: boolean;
+  leaveStatusSms: boolean;
+  leaveStatusEmail: boolean;
+}
+
+// ============================================================
+// useParentProfile — Get full profile data
+// ============================================================
+
+export function useParentProfile() {
+  return useQuery({
+    queryKey: parentKeys.profile,
+    queryFn: () =>
+      parentGet<ProfileData>('/api/parent/profile'),
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+// ============================================================
+// useUpdateProfile — Update editable profile fields
+// ============================================================
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      phone?: string;
+      email?: string;
+      occupation?: string;
+      address?: string;
+      photo?: string;
+    }) => parentPatch<{ message: string; parent: ProfileData['parent'] }>('/api/parent/profile', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: parentKeys.profile });
+    },
+  });
+}
+
+// ============================================================
+// useUploadKyc — Upload KYC document
+// ============================================================
+
+export function useUploadKyc() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      documentType: string;
+      document: string;
+    }) => parentPost<{ message: string; document: { id: string; documentType: string; status: string } }>('/api/parent/kyc', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: parentKeys.profile });
+    },
+  });
+}
+
+// ============================================================
+// useNotificationPreferences — Get notification preferences
+// ============================================================
+
+export function useNotificationPreferences() {
+  return useQuery({
+    queryKey: parentKeys.notificationPrefs,
+    queryFn: () =>
+      parentGet<{ preferences: NotificationPreferencesData }>('/api/parent/notification-preferences'),
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+// ============================================================
+// useUpdateNotificationPreferences — Update notification prefs
+// ============================================================
+
+export function useUpdateNotificationPreferences() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<NotificationPreferencesData>) =>
+      parentPatch<{ message: string; preferences: NotificationPreferencesData }>('/api/parent/notification-preferences', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: parentKeys.notificationPrefs });
+    },
+  });
+}
+
+// ============================================================
+// useChangePassword — Change password mutation
+// ============================================================
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (data: {
+      currentPassword: string;
+      newPassword: string;
+    }) => parentPost<{ message: string }>('/api/parent/change-password', data),
   });
 }

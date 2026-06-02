@@ -131,6 +131,42 @@ export async function parentPatch<T = unknown>(
 }
 
 /**
+ * parentUpload — Convenience helper for file uploads (FormData)
+ */
+export async function parentUpload<T = unknown>(
+  path: string,
+  formData: FormData
+): Promise<T> {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    window.location.href = '/login';
+    throw new Error('Not authenticated');
+  }
+
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    window.location.href = '/login';
+    throw new Error('Session expired');
+  }
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(err.error || err.message || 'Upload failed');
+  }
+
+  return res.json();
+}
+
+/**
  * getToken — Get the current auth token from localStorage
  */
 export function getToken(): string | null {

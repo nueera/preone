@@ -53,7 +53,7 @@ async function main() {
   // Clean existing data (order matters for foreign keys)
   console.log('  Cleaning existing data...');
   const models = [
-    'auditLog', 'report', 'notification', 'milestoneTimeline', 'milestone',
+    'auditLog', 'report', 'notification', 'notificationPreference', 'kycDocument', 'milestoneTimeline', 'milestone',
     'certificate', 'achievement', 'memory', 'aIObservation', 'growthScore',
     'observation', 'dailyUpdate', 'feeReminder', 'refund', 'receipt',
     'payment', 'invoice', 'feeStructure', 'staffAttendance', 'studentAttendance',
@@ -882,6 +882,101 @@ async function main() {
   }
 
   console.log('  ✓ Parent user, chat threads, and messages created');
+
+  // ============================================================
+  // 11e. KYC DOCUMENTS & NOTIFICATION PREFERENCES for first parent
+  // ============================================================
+  console.log('  Creating KYC & Notification Preferences for demo parent...');
+  const firstParentId = parentRecords[0].id;
+
+  // Create KYC document for first parent (Aadhaar - verified)
+  await prisma.kycDocument.create({
+    data: {
+      parentId: firstParentId,
+      documentType: 'AADHAAR',
+      documentUrl: 'uploads/kyc/aadhaar_rajesh_sharma.pdf',
+      status: 'VERIFIED',
+      reviewedBy: adminUser.id,
+      reviewedAt: daysAgo(10),
+    },
+  });
+
+  // Create Address Proof (pending)
+  await prisma.kycDocument.create({
+    data: {
+      parentId: firstParentId,
+      documentType: 'ADDRESS_PROOF',
+      documentUrl: 'uploads/kyc/address_rajesh_sharma.pdf',
+      status: 'PENDING',
+    },
+  });
+
+  // Update parent KYC status
+  await prisma.parent.update({
+    where: { id: firstParentId },
+    data: {
+      kycDoc: 'AADHAAR',
+      kycStatus: 'PENDING', // Has one verified + one pending
+      photo: null,
+    },
+  });
+
+  // Create notification preferences for first parent
+  await prisma.notificationPreference.create({
+    data: {
+      parentId: firstParentId,
+      dailyUpdateApp: true,
+      dailyUpdateSms: false,
+      dailyUpdateEmail: false,
+      observationApp: true,
+      observationSms: true,
+      observationEmail: false,
+      feeReminderApp: true,
+      feeReminderSms: true,
+      feeReminderEmail: true,
+      feeOverdueApp: true,
+      feeOverdueSms: true,
+      feeOverdueEmail: true,
+      attendanceApp: false,
+      attendanceSms: false,
+      attendanceEmail: false,
+      announcementApp: true,
+      announcementSms: false,
+      announcementEmail: true,
+      teacherMessageApp: true,
+      teacherMessageSms: false,
+      teacherMessageEmail: false,
+      leaveStatusApp: true,
+      leaveStatusSms: false,
+      leaveStatusEmail: false,
+    },
+  });
+
+  // Also add KYC for second parent (rejected status demo)
+  if (parentRecords.length > 1) {
+    const secondParentId = parentRecords[1].id;
+    await prisma.kycDocument.create({
+      data: {
+        parentId: secondParentId,
+        documentType: 'AADHAAR',
+        documentUrl: 'uploads/kyc/aadhaar_anitha_kumar.pdf',
+        status: 'REJECTED',
+        reviewedBy: adminUser.id,
+        reviewedAt: daysAgo(5),
+        rejectionReason: 'Document is blurry. Please upload a clear scan or photo.',
+      },
+    });
+    await prisma.parent.update({
+      where: { id: secondParentId },
+      data: {
+        kycDoc: 'AADHAAR',
+        kycStatus: 'REJECTED',
+        kycRejectionReason: 'Document is blurry. Please upload a clear scan or photo.',
+      },
+    });
+  }
+
+  console.log('  ✓ KYC documents and notification preferences created');
 
   // ============================================================
   // 12. DAILY UPDATES (today for first 5 students)

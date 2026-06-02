@@ -4,23 +4,23 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Baby, Sun, IndianRupee, MessageSquare,
+  LayoutDashboard, Baby, Sun, IndianRupee, MessageSquare, TrendingUp,
 } from 'lucide-react';
 import { useParentAuth } from '@/lib/parent-auth';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 // ── Mobile bottom navigation items (5 most important) ──
 const MOBILE_NAV_ITEMS = [
   { label: 'Home', icon: LayoutDashboard, href: '/parent/dashboard' },
   { label: 'Kids', icon: Baby, href: '/parent/children' },
   { label: 'Updates', icon: Sun, href: '/parent/daily-updates' },
-  { label: 'Fees', icon: IndianRupee, href: '/parent/fees' },
+  { label: 'Growth', icon: TrendingUp, href: '/parent/growth' },
   { label: 'Chat', icon: MessageSquare, href: '/parent/communication' },
 ];
 
 /**
  * ParentMobileNav — Fixed bottom navigation for mobile devices.
  * Shows 5 most important items. Safe area padding for iOS.
+ * Minimum 44px touch targets for accessibility.
  */
 export function ParentMobileNav() {
   const pathname = usePathname();
@@ -39,7 +39,7 @@ export function ParentMobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px] min-h-[44px] transition-colors ${
                 isActive
                   ? 'text-sky-600'
                   : 'text-gray-400 hover:text-gray-600'
