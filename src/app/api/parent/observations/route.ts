@@ -1,78 +1,62 @@
+// ============================================================
+// PreOne — GET /api/parent/observations
+// Teacher observations shared with parent
+// Query params: childId
+// Uses requireParent for consistent auth
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireParent, isAuthError, verifyChildAccess } from '@/lib/api-auth';
 
-// GET /api/parent/observations — Teacher observations shared with parent
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Parent);
-    if (user instanceof NextResponse) return user;
-
-    // Find the Parent record linked to this user
-    const parent = await db.parent.findUnique({
-      where: { userId: user.userId },
-    });
-
-    if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
-    }
+    const auth = await requireParent(request);
+    if (isAuthError(auth)) return auth.error;
 
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
 
-    // Get all children of this parent
-    const studentParents = await db.studentParent.findMany({
-      where: { parentId: parent.id },
-      select: { studentId: true },
-    });
-    const childIds = studentParents.map((sp) => sp.studentId);
+    // Determine target child
+    let targetChildId = auth.childIds[0];
+    if (childId) {
+      const accessError = verifyChildAccess(auth, childId);
+      if (accessError) return accessError;
+      targetChildId = childId;
+    }
 
-    if (childIds.length === 0) {
+    if (!targetChildId) {
       return NextResponse.json({ observations: [], total: 0 });
     }
 
-    // Validate childId if provided
-    if (childId && !childIds.includes(childId)) {
-      return NextResponse.json(
-        { error: 'Child not found or not associated with this parent' },
-        { status: 403 }
-      );
-    }
-
-    // Determine which children to query
-    const targetChildIds = childId ? [childId] : childIds;
-
-    // Fetch observations that are shared with parents
+    // Only show observations that are shared with parent
     const observations = await db.observation.findMany({
       where: {
-        studentId: { in: targetChildIds },
+        studentId: targetChildId,
         isShared: true,
       },
-      orderBy: { date: 'desc' },
-      include: {
-        student: {
-          select: { id: true, firstName: true, lastName: true, photo: true },
-        },
-        teacher: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            photo: true,
-            specialization: true,
-          },
-        },
-      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
     });
 
-    // Group by category for easier frontend consumption
-    const categories = observations.reduce<Record<string, number>>((acc, obs) => {
-      acc[obs.category] = (acc[obs.category] || 0) + 1;
-      return acc;
-    }, {});
+    // Count by category
+    const categories: Record<string, number> = {};
+    observations.forEach((o) => {
+      categories[o.category] = (categories[o.category] || 0) + 1;
+    });
 
     return NextResponse.json({
-      observations,
+      observations: observations.map((o) => ({
+        id: o.id,
+        category: o.category,
+        content: o.content,
+        priority: o.priority,
+        isShared: o.isShared,
+        parentAck: o.parentAck,
+        parentComment: o.parentComment,
+        media: o.media,
+        createdAt: o.createdAt.toISOString(),
+      })),
       total: observations.length,
       categories,
     });

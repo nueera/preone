@@ -1,141 +1,96 @@
+// ============================================================
+// PreOne — GET /api/parent/fees
+// Fee information for parent's children
+// Query params: childId
+// Uses requireParent for consistent auth
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireParent, isAuthError, verifyChildAccess } from '@/lib/api-auth';
 
-// GET /api/parent/fees — Fee information for parent's children
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Parent);
-    if (user instanceof NextResponse) return user;
-
-    // Find the Parent record linked to this user
-    const parent = await db.parent.findUnique({
-      where: { userId: user.userId },
-    });
-
-    if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
-    }
+    const auth = await requireParent(request);
+    if (isAuthError(auth)) return auth.error;
 
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
-    const statusFilter = searchParams.get('status');
 
-    // Get all children of this parent
-    const studentParents = await db.studentParent.findMany({
-      where: { parentId: parent.id },
-      select: { studentId: true },
-    });
-    const childIds = studentParents.map((sp) => sp.studentId);
-
-    if (childIds.length === 0) {
-      return NextResponse.json({
-        invoices: [],
-        paymentHistory: [],
-        totalPending: 0,
-        totalOverdue: 0,
-        totalPaid: 0,
-      });
+    // Determine target child
+    let targetChildIds = auth.childIds;
+    if (childId) {
+      const accessError = verifyChildAccess(auth, childId);
+      if (accessError) return accessError;
+      targetChildIds = [childId];
     }
 
-    // Validate childId if provided
-    if (childId && !childIds.includes(childId)) {
-      return NextResponse.json(
-        { error: 'Child not found or not associated with this parent' },
-        { status: 403 }
-      );
+    if (targetChildIds.length === 0) {
+      return NextResponse.json({ invoices: [], totalPending: 0, totalOverdue: 0, totalPaid: 0 });
     }
 
-    // Determine which children to query
-    const targetChildIds = childId ? [childId] : childIds;
-
-    // Build where clause for invoices
-    const invoiceWhere: Record<string, unknown> = {
-      studentId: { in: targetChildIds },
-    };
-
-    if (statusFilter) {
-      invoiceWhere.status = statusFilter;
-    }
-
-    // Fetch invoices with fee structure and payment details
+    // Get all invoices for the children
     const invoices = await db.invoice.findMany({
-      where: invoiceWhere,
-      orderBy: { createdAt: 'desc' },
+      where: { studentId: { in: targetChildIds } },
       include: {
-        student: {
-          select: { id: true, firstName: true, lastName: true, admissionNo: true },
-        },
-        feeStructure: {
-          select: {
-            id: true,
-            name: true,
-            feeType: true,
-            frequency: true,
-            amount: true,
-            academicYear: true,
-            description: true,
-          },
-        },
         payments: {
-          where: { status: 'Success' },
-          orderBy: { paidAt: 'desc' },
-          select: {
-            id: true,
-            amount: true,
-            paymentMethod: true,
-            transactionRef: true,
-            paidByName: true,
-            paidAt: true,
-            status: true,
-            receipt: {
-              select: { id: true, receiptNo: true },
-            },
-          },
-        },
-      },
-    });
-
-    // Get all successful payments for payment history
-    const paidInvoiceIds = invoices
-      .filter((inv) => inv.status === 'Paid' || inv.status === 'Partial')
-      .map((inv) => inv.id);
-
-    const paymentHistory = await db.payment.findMany({
-      where: {
-        invoiceId: { in: paidInvoiceIds },
-        status: 'Success',
-      },
-      orderBy: { paidAt: 'desc' },
-      include: {
-        invoice: {
-          select: {
-            id: true,
-            invoiceNo: true,
-            studentId: true,
-            student: {
-              select: { id: true, firstName: true, lastName: true },
-            },
-          },
+          orderBy: { paymentDate: 'desc' },
         },
         receipt: {
           select: { id: true, receiptNo: true },
         },
       },
+      orderBy: { dueDate: 'asc' },
     });
 
-    // Calculate totals
-    const pendingInvoices = invoices.filter((inv) => inv.status === 'Pending' || inv.status === 'Partial');
-    const overdueInvoices = invoices.filter((inv) => inv.status === 'Overdue');
-    const paidInvoices = invoices.filter((inv) => inv.status === 'Paid');
+    // Get fee structure details separately (no direct relation on Invoice)
+    const feeStructureIds = invoices
+      .map((i) => i.feeStructureId)
+      .filter((id): id is string => !!id);
 
-    const totalPending = pendingInvoices.reduce((sum, inv) => sum + (inv.totalAmount - inv.paidAmount), 0);
-    const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + (inv.totalAmount - inv.paidAmount), 0);
-    const totalPaid = paidInvoices.reduce((sum, inv) => sum + inv.paidAmount, 0);
+    const feeStructures = feeStructureIds.length > 0
+      ? await db.feeStructure.findMany({
+          where: { id: { in: feeStructureIds } },
+          select: { id: true, name: true, type: true, frequency: true, amount: true },
+        })
+      : [];
+
+    const feeStructureMap = new Map(feeStructures.map((fs) => [fs.id, fs]));
+
+    const totalPending = invoices
+      .filter((i) => i.status === 'PENDING' || i.status === 'PARTIAL')
+      .reduce((sum, i) => sum + i.netAmount, 0);
+
+    const totalOverdue = invoices
+      .filter((i) => i.status === 'OVERDUE')
+      .reduce((sum, i) => sum + i.netAmount, 0);
+
+    const totalPaid = invoices
+      .filter((i) => i.status === 'PAID')
+      .reduce((sum, i) => sum + i.netAmount, 0);
 
     return NextResponse.json({
-      invoices,
-      paymentHistory,
+      invoices: invoices.map((inv) => ({
+        id: inv.id,
+        invoiceNo: inv.invoiceNo,
+        amount: inv.amount,
+        discount: inv.discount,
+        netAmount: inv.netAmount,
+        status: inv.status,
+        dueDate: inv.dueDate.toISOString().split('T')[0],
+        paidDate: inv.paidDate?.toISOString().split('T')[0] || null,
+        description: inv.description,
+        feeStructureId: inv.feeStructureId,
+        feeStructure: inv.feeStructureId ? feeStructureMap.get(inv.feeStructureId) || null : null,
+        payments: inv.payments.map((p) => ({
+          id: p.id,
+          amount: p.amount,
+          method: p.method,
+          transactionRef: p.transactionRef,
+          paymentDate: p.paymentDate.toISOString().split('T')[0],
+        })),
+        receipt: inv.receipt,
+      })),
       totalPending,
       totalOverdue,
       totalPaid,

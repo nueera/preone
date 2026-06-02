@@ -1,102 +1,74 @@
+// ============================================================
+// PreOne — GET /api/parent/attendance
+// Attendance records for parent's children
+// Query params: childId, month (YYYY-MM)
+// Uses requireParent for consistent auth
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireParent, isAuthError, verifyChildAccess } from '@/lib/api-auth';
 
-// GET /api/parent/attendance — Attendance records for parent's children
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Parent);
-    if (user instanceof NextResponse) return user;
-
-    // Find the Parent record linked to this user
-    const parent = await db.parent.findUnique({
-      where: { userId: user.userId },
-    });
-
-    if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
-    }
+    const auth = await requireParent(request);
+    if (isAuthError(auth)) return auth.error;
 
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
-    const monthParam = searchParams.get('month'); // format: "2024-01"
+    const month = searchParams.get('month'); // YYYY-MM format
 
-    // Get all children of this parent
-    const studentParents = await db.studentParent.findMany({
-      where: { parentId: parent.id },
-      select: { studentId: true },
-    });
-    const childIds = studentParents.map((sp) => sp.studentId);
-
-    if (childIds.length === 0) {
-      return NextResponse.json({
-        records: [],
-        summary: { present: 0, absent: 0, late: 0, halfDay: 0, excused: 0, total: 0 },
-      });
+    // Determine target child
+    let targetChildId = auth.childIds[0];
+    if (childId) {
+      const accessError = verifyChildAccess(auth, childId);
+      if (accessError) return accessError;
+      targetChildId = childId;
     }
 
-    // Validate childId if provided
-    if (childId && !childIds.includes(childId)) {
-      return NextResponse.json(
-        { error: 'Child not found or not associated with this parent' },
-        { status: 403 }
-      );
+    if (!targetChildId) {
+      return NextResponse.json({ records: [], summary: { present: 0, absent: 0, late: 0, total: 0 } });
     }
 
-    // Determine date range
+    // Parse month or default to current month
     let monthStart: Date;
     let monthEnd: Date;
 
-    if (monthParam) {
-      const [year, month] = monthParam.split('-').map(Number);
-      if (!year || !month || month < 1 || month > 12) {
-        return NextResponse.json(
-          { error: 'Invalid month format. Use YYYY-MM (e.g., 2024-01)' },
-          { status: 400 }
-        );
-      }
-      monthStart = new Date(year, month - 1, 1);
-      monthEnd = new Date(year, month, 0, 23, 59, 59, 999);
+    if (month) {
+      const [year, mon] = month.split('-').map(Number);
+      monthStart = new Date(year, mon - 1, 1);
+      monthEnd = new Date(year, mon, 0, 23, 59, 59, 999);
     } else {
       const now = new Date();
       monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
       monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     }
 
-    // Determine which children to query
-    const targetChildIds = childId ? [childId] : childIds;
-
-    // Fetch attendance records
     const records = await db.studentAttendance.findMany({
       where: {
-        studentId: { in: targetChildIds },
-        date: {
-          gte: monthStart,
-          lte: monthEnd,
-        },
+        studentId: targetChildId,
+        date: { gte: monthStart, lte: monthEnd },
       },
-      include: {
-        student: {
-          select: { id: true, firstName: true, lastName: true, photo: true },
-        },
-      },
-      orderBy: { date: 'desc' },
+      orderBy: { date: 'asc' },
     });
 
-    // Compute monthly summary
     const summary = {
-      present: records.filter((r) => r.status === 'Present').length,
-      absent: records.filter((r) => r.status === 'Absent').length,
-      late: records.filter((r) => r.status === 'Late').length,
-      halfDay: records.filter((r) => r.status === 'HalfDay').length,
-      excused: records.filter((r) => r.status === 'Excused').length,
+      present: records.filter((r) => r.status === 'PRESENT').length,
+      absent: records.filter((r) => r.status === 'ABSENT').length,
+      late: records.filter((r) => r.status === 'LATE').length,
       total: records.length,
     };
 
     return NextResponse.json({
-      records,
+      records: records.map((r) => ({
+        id: r.id,
+        date: r.date.toISOString().split('T')[0],
+        status: r.status,
+        checkInTime: r.checkInTime,
+        checkOutTime: r.checkOutTime,
+      })),
       summary,
-      month: monthParam || `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, '0')}`,
+      month: month || `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, '0')}`,
     });
   } catch (error) {
     console.error('Parent attendance error:', error);

@@ -1,98 +1,42 @@
+// ============================================================
+// PreOne — GET /api/parent/children
+// List all children or single child details for parent
+// Uses requireParent for consistent auth
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireParent, isAuthError, verifyChildAccess } from '@/lib/api-auth';
 
-// GET /api/parent/children — List all children or single child details
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Parent);
-    if (user instanceof NextResponse) return user;
-
-    // Find the Parent record linked to this user
-    const parent = await db.parent.findUnique({
-      where: { userId: user.userId },
-    });
-
-    if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
-    }
+    const auth = await requireParent(request);
+    if (isAuthError(auth)) return auth.error;
 
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
 
-    // Get all StudentParent links for this parent
-    const studentParents = await db.studentParent.findMany({
-      where: { parentId: parent.id },
-      select: { studentId: true, isPrimary: true },
-    });
-
-    const childIds = studentParents.map((sp) => sp.studentId);
-
-    if (childIds.length === 0) {
-      // No children found — return empty gracefully
-      if (childId) {
-        return NextResponse.json({ error: 'Child not found or not associated with this parent' }, { status: 404 });
-      }
-      return NextResponse.json({ children: [], total: 0 });
-    }
-
     // If a specific child is requested
     if (childId) {
-      // Verify the child belongs to this parent
-      if (!childIds.includes(childId)) {
-        return NextResponse.json({ error: 'Child not found or not associated with this parent' }, { status: 403 });
-      }
+      const accessError = verifyChildAccess(auth, childId);
+      if (accessError) return accessError;
 
       const student = await db.student.findUnique({
         where: { id: childId },
         include: {
           class: {
             include: {
-              program: {
-                select: { id: true, name: true, code: true, color: true, icon: true },
-              },
-              teacher: {
-                select: { id: true, firstName: true, lastName: true, photo: true },
-              },
+              program: { select: { id: true, name: true } },
+              teacher: { select: { id: true, firstName: true, lastName: true, photo: true, specialization: true } },
             },
           },
-          section: {
-            select: { id: true, name: true },
-          },
-          medicalRecords: {
-            where: { isActive: true },
-            orderBy: { createdAt: 'desc' },
-          },
-          siblings: {
+          parents: {
             include: {
-              sibling: {
-                select: {
-                  id: true,
-                  firstName: true,
-                  lastName: true,
-                  photo: true,
-                  status: true,
-                },
-              },
+              parent: { select: { id: true, firstName: true, lastName: true, phone: true, email: true, relation: true, isEmergencyContact: true } },
             },
           },
-          siblingOf: {
-            include: {
-              student: {
-                select: {
-                  id: true,
-                  firstName: true,
-                  lastName: true,
-                  photo: true,
-                  status: true,
-                },
-              },
-            },
-          },
-          growthScores: {
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-          },
+          medicalRecords: { orderBy: { createdAt: 'desc' } },
+          growthScores: { orderBy: { createdAt: 'desc' }, take: 5 },
         },
       });
 
@@ -100,135 +44,34 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Child not found' }, { status: 404 });
       }
 
-      // Combine siblings from both directions
-      const siblings = [
-        ...student.siblings.map((s) => ({
-          id: s.sibling.id,
-          firstName: s.sibling.firstName,
-          lastName: s.sibling.lastName,
-          photo: s.sibling.photo,
-          status: s.sibling.status,
-          relation: s.relation,
-        })),
-        ...student.siblingOf.map((s) => ({
-          id: s.student.id,
-          firstName: s.student.firstName,
-          lastName: s.student.lastName,
-          photo: s.student.photo,
-          status: s.student.status,
-          relation: s.relation,
-        })),
-      ];
-
       return NextResponse.json({
         child: {
           id: student.id,
-          admissionNo: student.admissionNo,
           firstName: student.firstName,
           lastName: student.lastName,
-          dob: student.dob,
+          dob: student.dob.toISOString().split('T')[0],
           gender: student.gender,
           bloodGroup: student.bloodGroup,
           photo: student.photo,
-          address: student.address,
-          emergencyContact: student.emergencyContact,
-          enrollmentDate: student.enrollmentDate,
+          rollNumber: student.rollNumber,
           status: student.status,
+          admissionDate: student.admissionDate.toISOString().split('T')[0],
           class: student.class,
-          section: student.section,
+          parents: student.parents.map((sp) => ({
+            isPrimary: sp.isPrimary,
+            ...sp.parent,
+          })),
           medicalRecords: student.medicalRecords,
-          siblings,
           growthScores: student.growthScores,
         },
       });
     }
 
     // Return all children with basic details
-    const students = await db.student.findMany({
-      where: { id: { in: childIds } },
-      include: {
-        class: {
-          include: {
-            program: {
-              select: { id: true, name: true, code: true, color: true, icon: true },
-            },
-            teacher: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-          },
-        },
-        section: {
-          select: { id: true, name: true },
-        },
-        medicalRecords: {
-          where: { isActive: true },
-          orderBy: { createdAt: 'desc' },
-        },
-        growthScores: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
-        siblings: {
-          include: {
-            sibling: {
-              select: { id: true, firstName: true, lastName: true, photo: true, status: true },
-            },
-          },
-        },
-        siblingOf: {
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true, status: true },
-            },
-          },
-        },
-      },
+    return NextResponse.json({
+      children: auth.children,
+      total: auth.children.length,
     });
-
-    const children = students.map((student) => {
-      const sp = studentParents.find((s) => s.studentId === student.id);
-      const siblings = [
-        ...student.siblings.map((s) => ({
-          id: s.sibling.id,
-          firstName: s.sibling.firstName,
-          lastName: s.sibling.lastName,
-          photo: s.sibling.photo,
-          status: s.sibling.status,
-          relation: s.relation,
-        })),
-        ...student.siblingOf.map((s) => ({
-          id: s.student.id,
-          firstName: s.student.firstName,
-          lastName: s.student.lastName,
-          photo: s.student.photo,
-          status: s.student.status,
-          relation: s.relation,
-        })),
-      ];
-
-      return {
-        id: student.id,
-        admissionNo: student.admissionNo,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        dob: student.dob,
-        gender: student.gender,
-        bloodGroup: student.bloodGroup,
-        photo: student.photo,
-        address: student.address,
-        emergencyContact: student.emergencyContact,
-        enrollmentDate: student.enrollmentDate,
-        status: student.status,
-        class: student.class,
-        section: student.section,
-        medicalRecords: student.medicalRecords,
-        siblings,
-        growthScores: student.growthScores,
-        isPrimary: sp?.isPrimary || false,
-      };
-    });
-
-    return NextResponse.json({ children, total: children.length });
   } catch (error) {
     console.error('Parent children error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

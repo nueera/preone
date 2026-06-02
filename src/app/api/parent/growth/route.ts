@@ -1,133 +1,99 @@
+// ============================================================
+// PreOne — GET /api/parent/growth
+// Growth scores and milestones for parent's children
+// Query params: childId
+// Uses requireParent for consistent auth
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireParent, isAuthError, verifyChildAccess } from '@/lib/api-auth';
 
-// GET /api/parent/growth — Growth scores and milestones for parent's children
 export async function GET(request: NextRequest) {
   try {
-    const user = requireRole(request, Role.Parent);
-    if (user instanceof NextResponse) return user;
-
-    // Find the Parent record linked to this user
-    const parent = await db.parent.findUnique({
-      where: { userId: user.userId },
-    });
-
-    if (!parent) {
-      return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 });
-    }
+    const auth = await requireParent(request);
+    if (isAuthError(auth)) return auth.error;
 
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
 
-    // Get all children of this parent
-    const studentParents = await db.studentParent.findMany({
-      where: { parentId: parent.id },
-      select: { studentId: true },
+    // Determine target child
+    let targetChildId = auth.childIds[0];
+    if (childId) {
+      const accessError = verifyChildAccess(auth, childId);
+      if (accessError) return accessError;
+      targetChildId = childId;
+    }
+
+    if (!targetChildId) {
+      return NextResponse.json({ growthScores: [], achievements: [], milestones: [] });
+    }
+
+    // Get growth scores
+    const growthScores = await db.growthScore.findMany({
+      where: { studentId: targetChildId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
     });
-    const childIds = studentParents.map((sp) => sp.studentId);
 
-    if (childIds.length === 0) {
-      return NextResponse.json({
-        growthScores: [],
-        milestoneTimelines: [],
-        aiObservations: [],
-        achievements: [],
-        memories: [],
-      });
-    }
+    // Get achievements
+    const achievements = await db.achievement.findMany({
+      where: { studentId: targetChildId },
+      orderBy: { date: 'desc' },
+      take: 10,
+    });
 
-    // Validate childId if provided
-    if (childId && !childIds.includes(childId)) {
-      return NextResponse.json(
-        { error: 'Child not found or not associated with this parent' },
-        { status: 403 }
-      );
-    }
+    // Get milestone timelines (no milestone relation, just milestoneId)
+    const milestones = await db.milestoneTimeline.findMany({
+      where: { studentId: targetChildId },
+      orderBy: { achievedDate: 'desc' },
+      take: 20,
+    });
 
-    // Determine which children to query
-    const targetChildIds = childId ? [childId] : childIds;
+    // If there are milestones, fetch the related milestone details
+    const milestoneIds = milestones.map((m) => m.milestoneId).filter(Boolean);
+    const milestoneDetails = milestoneIds.length > 0
+      ? await db.milestone.findMany({
+          where: { id: { in: milestoneIds } },
+        })
+      : [];
 
-    // Fetch all growth-related data in parallel
-    const [growthScores, milestoneTimelines, aiObservations, achievements, memories] =
-      await Promise.all([
-        // Growth scores history
-        db.growthScore.findMany({
-          where: { studentId: { in: targetChildIds } },
-          orderBy: { assessmentDate: 'desc' },
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-          },
-        }),
-
-        // Milestone timelines
-        db.milestoneTimeline.findMany({
-          where: { studentId: { in: targetChildIds } },
-          orderBy: { achievedDate: 'desc' },
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-            milestone: {
-              select: {
-                id: true,
-                name: true,
-                category: true,
-                ageRange: true,
-                indicators: true,
-              },
-            },
-          },
-        }),
-
-        // AI observations (only reviewed ones for parents)
-        db.aIObservation.findMany({
-          where: {
-            studentId: { in: targetChildIds },
-            isReviewed: true,
-          },
-          orderBy: { createdAt: 'desc' },
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-          },
-        }),
-
-        // Achievements
-        db.achievement.findMany({
-          where: { studentId: { in: targetChildIds } },
-          orderBy: { date: 'desc' },
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-          },
-        }),
-
-        // Memories (childhood passport) — only public ones
-        db.memory.findMany({
-          where: {
-            studentId: { in: targetChildIds },
-            isPublic: true,
-          },
-          orderBy: { date: 'desc' },
-          include: {
-            student: {
-              select: { id: true, firstName: true, lastName: true, photo: true },
-            },
-          },
-        }),
-      ]);
+    const milestoneMap = new Map(milestoneDetails.map((m) => [m.id, m]));
 
     return NextResponse.json({
-      growthScores,
-      milestoneTimelines,
-      aiObservations,
-      achievements,
-      memories,
+      growthScores: growthScores.map((gs) => ({
+        id: gs.id,
+        period: gs.period,
+        creativity: gs.creativity,
+        communication: gs.communication,
+        social: gs.social,
+        confidence: gs.confidence,
+        cognitive: gs.cognitive,
+        physical: gs.physical,
+        overall: gs.overall ? Math.round(gs.overall) : null,
+        comments: gs.comments,
+        createdAt: gs.createdAt.toISOString(),
+      })),
+      achievements: achievements.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        icon: a.icon,
+        date: a.date?.toISOString().split('T')[0] || null,
+      })),
+      milestones: milestones.map((m) => {
+        const detail = milestoneMap.get(m.milestoneId);
+        return {
+          id: m.id,
+          milestoneId: m.milestoneId,
+          milestoneName: detail?.name || null,
+          milestoneCategory: detail?.category || null,
+          milestoneAgeGroup: detail?.ageGroup || null,
+          achievedDate: m.achievedDate?.toISOString().split('T')[0] || null,
+          status: m.status,
+          notes: m.notes,
+        };
+      }),
     });
   } catch (error) {
     console.error('Parent growth error:', error);
