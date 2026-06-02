@@ -203,3 +203,33 @@ Stage Summary:
 - Parent Portal is now COMPLETE with all 10 modules: Layout+Dashboard, My Children, Attendance, Fees, Daily Updates, Observations, Growth, Communication, Settings
 - All pages follow consistent patterns: useParentAuth, child switcher, Suspense boundary, rounded-3xl cards, sky-500 theme
 - All API routes use requireParent() + verifyChildAccess() auth pattern
+
+---
+Task ID: 5
+Agent: main
+Task: Rebuild Daily Updates module with full design specs
+
+Work Log:
+- Rebuilt /api/parent/daily-updates/route.ts — Enhanced to return single update for a date with teacherName, sleepDuration, and latestUpdateDate (for "no update yet" state)
+- Created /api/parent/daily-updates/history/route.ts — Monthly history endpoint with aggregated summary (food stats, mood counts/trend, sleep/water averages, highlights collection)
+- Created /api/parent/daily-updates/latest/route.ts — Latest published update endpoint (for dashboard quick view)
+- Updated use-parent.ts — Added DailyUpdateResponse, DailyUpdatesHistoryResponse, LatestUpdateResponse types; Added useParentDailyUpdate, useParentDailyUpdatesHistory, useParentLatestUpdate hooks
+- Rebuilt /parent/daily-updates/page.tsx — Complete redesign with:
+  - Date navigation (prev/next day + Today button)
+  - Today's Update Card (large, beautiful gradient card with all sections: breakfast/lunch/snacks with status+menu, sleep with times+duration+quality, mood AM/PM with emojis, potty/diaper, water glasses visual, highlights)
+  - No Update Yet state with last update date and "View Last Update" button
+  - Detailed cards (Meals, Sleep, Activity) shown below the main card
+  - Previous Updates list (collapsible with quick preview, expandable to show meals/mood/sleep/water/highlights)
+  - Weekly Summary tab (food intake stats, mood trend per day, sleep/water averages, highlights collection)
+  - Multi-child comparison section (when parent has 2+ children)
+  - Tab switcher (Daily / Weekly Summary)
+  - Child switcher dropdown
+  - All sections use consistent color coding (Eaten=green, Partial=amber, Skipped=red, Good=green, etc.)
+- Build passed successfully with zero errors
+
+Stage Summary:
+- Daily Updates module rebuilt to full spec with 3 API routes and comprehensive page
+- All PUBLISHED-only filtering enforced in API routes
+- Teacher name included in update responses
+- Sleep duration calculated automatically from start/end times
+- Monthly history includes aggregated summary stats for weekly view

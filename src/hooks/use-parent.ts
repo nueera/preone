@@ -314,6 +314,7 @@ export interface DailyUpdateData {
   snacksMenu: string | null;
   sleepStart: string | null;
   sleepEnd: string | null;
+  sleepDuration: string | null;
   sleepQuality: string | null;
   moodMorning: string | null;
   moodAfternoon: string | null;
@@ -321,29 +322,107 @@ export interface DailyUpdateData {
   pottyType: string | null;
   waterGlasses: number;
   highlights: string | null;
+  status: string;
   publishedAt: string | null;
+  teacherName: string | null;
 }
 
-export interface DailyUpdatesResponse {
-  updates: DailyUpdateData[];
+export interface DailyUpdateResponse {
+  childId: string;
+  childName: string;
   date: string;
+  update: DailyUpdateData | null;
+  latestUpdateDate: string | null;
+}
+
+export interface DailyUpdatesHistoryResponse {
+  updates: DailyUpdateData[];
+  summary: {
+    totalDays: number;
+    food: {
+      breakfast: { eaten: number; partial: number; total: number };
+      lunch: { eaten: number; partial: number; total: number };
+      snacks: { eaten: number; partial: number; total: number };
+    };
+    moodCounts: Record<string, number>;
+    moodTrend: Array<{ date: string; moodMorning: string | null; moodAfternoon: string | null }>;
+    sleepAvgHours: number;
+    waterAvgGlasses: number;
+    highlights: Array<{ date: string; text: string }>;
+  };
+  month: number;
+  year: number;
+}
+
+export interface LatestUpdateResponse {
+  update: {
+    id: string;
+    date: string;
+    breakfast: string | null;
+    lunch: string | null;
+    snacks: string | null;
+    moodMorning: string | null;
+    moodAfternoon: string | null;
+    highlights: string | null;
+    waterGlasses: number;
+    sleepQuality: string | null;
+    publishedAt: string | null;
+    teacherName: string | null;
+  } | null;
 }
 
 // ============================================================
-// useParentDailyUpdates — Get daily updates for a child
+// useParentDailyUpdate — Get daily update for a specific date
 // ============================================================
 
-export function useParentDailyUpdates(childId: string | null, date?: string) {
+export function useParentDailyUpdate(childId: string | null, date?: string) {
   return useQuery({
     queryKey: [...parentKeys.dailyUpdates(childId || ''), date] as const,
     queryFn: () => {
       const params = new URLSearchParams();
       if (childId) params.set('childId', childId);
       if (date) params.set('date', date);
-      return parentGet<DailyUpdatesResponse>(`/api/parent/daily-updates?${params.toString()}`);
+      return parentGet<DailyUpdateResponse>(`/api/parent/daily-updates?${params.toString()}`);
     },
     enabled: !!childId,
     staleTime: 60 * 1000, // 1 minute
+  });
+}
+
+// ============================================================
+// useParentDailyUpdatesHistory — Get monthly history
+// ============================================================
+
+export function useParentDailyUpdatesHistory(
+  childId: string | null,
+  month?: number,
+  year?: number
+) {
+  return useQuery({
+    queryKey: ['parent', 'daily-updates', 'history', childId, month, year] as const,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (childId) params.set('childId', childId);
+      if (month) params.set('month', String(month));
+      if (year) params.set('year', String(year));
+      return parentGet<DailyUpdatesHistoryResponse>(`/api/parent/daily-updates/history?${params.toString()}`);
+    },
+    enabled: !!childId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+// ============================================================
+// useParentLatestUpdate — Get latest published update
+// ============================================================
+
+export function useParentLatestUpdate(childId: string | null) {
+  return useQuery({
+    queryKey: ['parent', 'daily-updates', 'latest', childId] as const,
+    queryFn: () =>
+      parentGet<LatestUpdateResponse>(`/api/parent/daily-updates/latest?childId=${childId}`),
+    enabled: !!childId,
+    staleTime: 60 * 1000,
   });
 }
 
