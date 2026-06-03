@@ -454,7 +454,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                 )}
                 style={isActive ? {
                   backgroundColor: cfg.color,
-                  ringColor: cfg.color,
+                  outlineColor: cfg.color,
                 } : undefined}
               >
                 {isActive && idx < (isLost ? 0 : currentIndex) ? (
@@ -1224,7 +1224,7 @@ export default function LeadDetailPage() {
                               <CalendarComponent
                                 mode="single"
                                 selected={editForm.nextFollowUp || undefined}
-                                onSelect={(d) => setEditForm((p) => ({ ...p, nextFollowUp: d }))}
+                                onSelect={(d) => setEditForm((p) => ({ ...p, nextFollowUp: d ?? null }))}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -1325,7 +1325,7 @@ export default function LeadDetailPage() {
                           <CalendarComponent
                             mode="single"
                             selected={followUpForm.nextFollowUp || undefined}
-                            onSelect={(d) => setFollowUpForm((p) => ({ ...p, nextFollowUp: d }))}
+                            onSelect={(d) => setFollowUpForm((p) => ({ ...p, nextFollowUp: d ?? null }))}
                             initialFocus
                           />
                         </PopoverContent>

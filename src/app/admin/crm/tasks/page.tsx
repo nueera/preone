@@ -334,7 +334,7 @@ function AddTaskDialog({
                   <CalendarComponent
                     mode="single"
                     selected={form.dueDate || undefined}
-                    onSelect={(d) => setForm((p) => ({ ...p, dueDate: d }))}
+                    onSelect={(d) => setForm((p) => ({ ...p, dueDate: d ?? null }))}
                     initialFocus
                   />
                 </PopoverContent>

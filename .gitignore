@@ -17,11 +17,17 @@ node_modules
 /.next/
 /out/
 
+# database
+*.db
+*.db-journal
+prisma/migrations/
+
 # production
 /build
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -30,8 +36,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env
+.env.local
+.env.production
+# Keep .env.example
+!.env.example
 
 # vercel
 .vercel
@@ -50,5 +60,10 @@ test
 prompt
 
 server.log
+
+# IDE
+.vscode/
+.idea/
+
 # Skills directory
 /skills/

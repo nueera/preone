@@ -846,7 +846,7 @@ export default function FeesPage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={generateForm.dueDate || undefined} onSelect={(d) => setGenerateForm((p) => ({ ...p, dueDate: d }))} initialFocus />
+                    <Calendar mode="single" selected={generateForm.dueDate || undefined} onSelect={(d) => setGenerateForm((p) => ({ ...p, dueDate: d ?? null }))} initialFocus />
                   </PopoverContent>
                 </Popover>
               </div>
