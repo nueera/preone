@@ -1,140 +1,79 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { format, isTomorrow, isToday } from 'date-fns';
+import Link from 'next/link';
 import {
-  Megaphone,
+  Users,
+  UserPlus,
+  PhoneCall,
+  TrendingUp,
+  AlertTriangle,
+  IndianRupee,
   Plus,
   LayoutGrid,
-  List,
-  Search,
-  Filter,
-  Phone,
-  Mail,
-  Calendar,
-  Star,
-  Tag,
-  UserCircle,
-  ChevronDown,
-  X,
-  RefreshCw,
-  BarChart3,
-  TrendingUp,
-  Users,
-  Clock,
-  AlertCircle,
-  CheckCircle2,
   CheckSquare,
-  IndianRupee,
+  ChevronRight,
+  RefreshCw,
+  Clock,
+  Baby,
+  ArrowRight,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageTransition } from '@/components/ui/page-transition';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { CRM_COLORS, PORTAL_THEMES } from '@/lib/theme-tokens';
 import { cn } from '@/lib/utils';
-import { PORTAL_THEMES, CRM_COLORS, CHART_PALETTE, getChartColor } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
-
-// ── @dnd-kit imports ──
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragEndEvent,
-  DragOverEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
 import { AddLeadDialog } from '@/components/add-lead-dialog';
 import { LeadDetailDrawer } from '@/components/lead-detail-drawer';
-import { CrmAnalytics } from '@/components/crm-analytics';
 
 // ── Types ──
-interface FollowUp {
-  id: string;
-  type: string;
-  dateTime: string;
-  outcome: string;
-  nextFollowUp: string | null;
-  notes: string;
-  createdBy: string | null;
-  createdAt: string;
+interface StatsData {
+  totalLeads: number;
+  leadsByStage: { stage: string; count: number }[];
+  newThisWeek: number;
+  followUpsToday: number;
+  overdueFollowUps: number;
+  conversionRate: number;
+  estimatedRevenue: number;
+  leadsBySource: { source: string; count: number }[];
+  leadsByPriority: { priority: string; count: number }[];
+  recentLeads: {
+    id: string;
+    parentName: string;
+    childName: string;
+    stage: string;
+    source: string;
+    priority: string;
+    nextFollowUp: string | null;
+    estimatedValue: number | null;
+    createdAt: string;
+  }[];
+  tasks: {
+    total: number;
+    todo: number;
+    inProgress: number;
+    done: number;
+    overdue: number;
+  };
 }
 
-interface Lead {
-  id: string;
-  parentName: string;
-  parentPhone: string;
-  parentEmail: string | null;
-  childName: string;
-  childAge: string | null;
-  source: string;
-  stage: string;
-  priority: string;
-  programInterest: string | null;
-  estimatedValue: number | null;
-  assignedTo: string | null;
-  notes: string | null;
-  nextFollowUp: string | null;
-  convertedStudentId: string | null;
-  lostReason: string | null;
-  createdAt: string;
-  updatedAt: string;
-  followUps: FollowUp[];
-}
-
-interface PipelineStage {
-  key: string;
-  label: string;
-  color: string;
-  cardBg: string;
-  count: number;
-  totalValue: number;
-  leads: Lead[];
-}
-
-// ── Constants ──
-const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string; textColor: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW.hex, cardBg: 'bg-white', textColor: 'text-gray-600' },
-  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED.hex, cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
-  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED.hex, cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
-  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION.hex, cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
-  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED.hex, cardBg: 'bg-green-50', textColor: 'text-green-600' },
-  LOST: { label: 'Lost', color: CRM_COLORS.LOST.hex, cardBg: 'bg-red-50', textColor: 'text-red-600' },
+// ── Stage Config using CRM_COLORS ──
+const STAGE_CONFIG: Record<string, { label: string; color: string }> = {
+  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#3b82f6' },
+  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6' },
+  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b' },
+  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f97316' },
+  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED?.hex ?? '#10b981' },
+  LOST: { label: 'Lost', color: CRM_COLORS.LOST?.hex ?? '#9ca3af' },
 };
 
+// ── Ordered stages for the pipeline bar ──
+const PIPELINE_STAGES = ['NEW', 'CONTACTED', 'VISITED', 'APPLIED', 'ENROLLED', 'LOST'] as const;
+
+// ── Source labels ──
 const SOURCE_LABELS: Record<string, string> = {
   INSTAGRAM: 'Instagram',
   FACEBOOK: 'Facebook',
@@ -150,684 +89,633 @@ const SOURCE_LABELS: Record<string, string> = {
   OTHER: 'Other',
 };
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50' },
-  NORMAL: { label: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50' },
-};
-
+// ── Helper: Get auth token ──
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('preone_token');
 }
 
-// ── Lead Card (Sortable) ──
-function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lead.id,
-    data: { lead },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  const stageConfig = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
-  const priorityConfig = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.NORMAL;
-  const followUpDate = lead.nextFollowUp ? new Date(lead.nextFollowUp) : null;
-  const isFollowUpSoon = followUpDate && (isTomorrow(followUpDate) || isToday(followUpDate));
-
+// ── Skeleton loader component ──
+function StatCardSkeleton() {
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card
-        className={cn(
-          'p-3 cursor-pointer hover:shadow-md transition-all duration-200 border-l-4',
-          stageConfig.cardBg
-        )}
-        style={{ borderLeftColor: stageConfig.color }}
-        onClick={() => onClick(lead)}
-      >
-        <div className="space-y-2">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm">🧒</span>
-              <span className="font-semibold text-gray-900 text-sm leading-tight">{lead.childName}</span>
-            </div>
-            <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full font-medium', priorityConfig.bg, priorityConfig.color)}>
-              {priorityConfig.label}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-gray-600">
-            <UserCircle className="h-3 w-3" />
-            <span>{lead.parentName}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Phone className="h-3 w-3" />
-            <span>{lead.parentPhone}</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1 text-gray-500">
-              <Tag className="h-3 w-3" />
-              {SOURCE_LABELS[lead.source] || lead.source}
-            </span>
-          </div>
-
-          {lead.estimatedValue && (
-            <div className="text-xs font-medium text-gray-700">
-              💰 Est: ₹{lead.estimatedValue.toLocaleString('en-IN')}
-            </div>
-          )}
-
-          {followUpDate && (
-            <div className={cn(
-              'text-[11px] flex items-center gap-1',
-              isFollowUpSoon ? 'text-orange-600 font-medium' : 'text-gray-500'
-            )}>
-              <Calendar className="h-3 w-3" />
-              Follow-up: {isToday(followUpDate) ? 'Today' : isTomorrow(followUpDate) ? 'Tomorrow' : format(followUpDate, 'dd MMM')}
-            </div>
-          )}
-
-          <div className="flex items-center gap-1.5 pt-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 text-[11px] px-2 text-portal-600 hover:text-portal-700 hover:bg-portal-50"
-              onClick={(e) => { e.stopPropagation(); onClick(lead); }}
-            >
-              View
-            </Button>
-            {lead.stage === 'ENROLLED' && !lead.convertedStudentId && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-[11px] px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
-                onClick={(e) => { e.stopPropagation(); onClick(lead); }}
-              >
-                Convert
-              </Button>
-            )}
-          </div>
+    <Card className="p-4">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl bg-gray-100 animate-pulse" />
+        <div className="space-y-2 flex-1">
+          <div className="h-6 w-16 bg-gray-100 rounded animate-pulse" />
+          <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
         </div>
-      </Card>
-    </div>
+      </div>
+    </Card>
   );
 }
 
-// ── Kanban Column ──
-function KanbanColumn({ stage, leads, onLeadClick }: { stage: PipelineStage; leads: Lead[]; onLeadClick: (lead: Lead) => void }) {
+function PipelineBarSkeleton() {
   return (
-    <div className="flex flex-col min-w-[280px] w-[280px]">
-      {/* Column Header */}
-      <div className="flex items-center justify-between p-3 rounded-t-xl" style={{ backgroundColor: stage.color + '15' }}>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: stage.color }} />
-          <span className="font-semibold text-sm text-gray-800">{stage.label}</span>
-          <span className="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">
-            {stage.count}
-          </span>
-        </div>
-        <span className="text-xs text-gray-500 font-medium">
-          ₹{stage.totalValue.toLocaleString('en-IN')}
-        </span>
-      </div>
+    <Card className="p-4">
+      <div className="h-8 w-full bg-gray-100 rounded-full animate-pulse" />
+    </Card>
+  );
+}
 
-      {/* Cards Container */}
-      <SortableContext items={leads.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-        <div className="flex flex-col gap-2 p-2 bg-gray-50/50 rounded-b-xl min-h-[200px] border border-t-0 border-gray-100"
-          style={{ borderTopColor: stage.color }}
-        >
-          {leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
-          ))}
-          {leads.length === 0 && (
-            <div className="flex items-center justify-center h-24 text-xs text-gray-400">
-              No leads in this stage
-            </div>
-          )}
-        </div>
-      </SortableContext>
-    </div>
+function RecentLeadsSkeleton() {
+  return (
+    <Card className="p-4">
+      <div className="space-y-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-12 bg-gray-50 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    </Card>
   );
 }
 
 // ── Main Page Component ──
-export default function CrmPage() {
-  const [viewMode, setViewMode] = useState<'pipeline' | 'list'>('pipeline');
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [pipeline, setPipeline] = useState<PipelineStage[]>([]);
+export default function CrmDashboardPage() {
+  const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [addLeadOpen, setAddLeadOpen] = useState(false);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+
+  // Lead detail drawer
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [selectedLead, setSelectedLead] = useState<StatsData['recentLeads'][number] | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('pipeline');
 
-  // Filters for list view
-  const [searchQuery, setSearchQuery] = useState('');
-  const [stageFilter, setStageFilter] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('');
-  const [assignedFilter, setAssignedFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Drag state
-  const [activeLead, setActiveLead] = useState<Lead | null>(null);
-
-  // CRM Stats
-  const [stats, setStats] = useState<{
-    totalLeads: number;
-    newThisWeek: number;
-    followUpsToday: number;
-    overdueFollowUps: number;
-    conversionRate: number;
-    estimatedRevenue: number;
-    tasks: { total: number; todo: number; inProgress: number; done: number; overdue: number };
-  } | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor)
-  );
-
-  // ── Fetch data ──
-  const fetchPipeline = useCallback(async () => {
+  // ── Fetch stats data ──
+  const fetchStats = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
       const token = getToken();
-      const [pipelineRes, statsRes] = await Promise.all([
-        fetch('/api/crm/pipeline', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/crm/stats', { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
-      ]);
-      if (pipelineRes.ok) {
-        const data = await pipelineRes.json();
-        setPipeline(data.pipeline);
-        const allLeads = data.pipeline.flatMap((s: PipelineStage) => s.leads);
-        setLeads(allLeads);
+      const res = await fetch('/api/crm/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch CRM statistics');
       }
-      if (statsRes?.ok) {
-        const data = await statsRes.json();
-        setStats(data);
-      }
+      const data = await res.json();
+      setStats(data);
     } catch (err) {
-      console.error('Failed to fetch pipeline:', err);
+      console.error('Failed to fetch CRM stats:', err);
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+      toast.error('Failed to load CRM dashboard data');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const fetchLeads = useCallback(async () => {
-    try {
-      const token = getToken();
-      const params = new URLSearchParams();
-      if (searchQuery) params.set('search', searchQuery);
-      if (stageFilter) params.set('stage', stageFilter);
-      if (sourceFilter) params.set('source', sourceFilter);
-      if (priorityFilter) params.set('priority', priorityFilter);
-      if (assignedFilter) params.set('assignedTo', assignedFilter);
-
-      const res = await fetch(`/api/crm/leads?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setLeads(data.leads);
-      }
-    } catch (err) {
-      console.error('Failed to fetch leads:', err);
-    }
-  }, [searchQuery, stageFilter, sourceFilter, priorityFilter, assignedFilter]);
-
   useEffect(() => {
-    fetchPipeline();
-  }, [fetchPipeline]);
+    fetchStats();
+  }, [fetchStats]);
 
-  useEffect(() => {
-    if (viewMode === 'list') {
-      fetchLeads();
-    }
-  }, [viewMode, fetchLeads]);
-
-  // ── Drag handlers ──
-  const handleDragStart = (event: DragStartEvent) => {
-    const lead = event.active.data.current?.lead as Lead;
-    setActiveLead(lead || null);
-  };
-
-  const handleDragOver = (event: DragOverEvent) => {
-    // Visual feedback during drag
-  };
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    setActiveLead(null);
-
-    const { active, over } = event;
-    if (!over) return;
-
-    const leadId = active.id as string;
-    const leadData = active.data.current?.lead as Lead;
-    if (!leadData) return;
-
-    // Find the target column by checking which column the over container belongs to
-    // The over.id could be a lead card or a column container
-    let targetStage: string | null = null;
-
-    // Check if dropped on a column (stage key is the column id)
-    const stageKeys = ['NEW', 'CONTACTED', 'VISITED', 'APPLIED', 'ENROLLED', 'LOST'];
-
-    // If over.id is a stage key, that's the target
-    if (stageKeys.includes(over.id as string)) {
-      targetStage = over.id as string;
-    } else {
-      // over.id is a lead card — find which column it's in
-      for (const stage of pipeline) {
-        if (stage.leads.some((l) => l.id === over.id)) {
-          targetStage = stage.key;
-          break;
-        }
-      }
-    }
-
-    if (!targetStage || targetStage === leadData.stage) return;
-
-    // Optimistic update
-    setPipeline((prev) =>
-      prev.map((stage) => {
-        if (stage.key === leadData.stage) {
-          return {
-            ...stage,
-            leads: stage.leads.filter((l) => l.id !== leadId),
-            count: stage.count - 1,
-            totalValue: stage.totalValue - (leadData.estimatedValue || 0),
-          };
-        }
-        if (stage.key === targetStage) {
-          return {
-            ...stage,
-            leads: [{ ...leadData, stage: targetStage }, ...stage.leads],
-            count: stage.count + 1,
-            totalValue: stage.totalValue + (leadData.estimatedValue || 0),
-          };
-        }
-        return stage;
-      })
-    );
-
-    // API call to update stage
-    try {
-      const token = getToken();
-      await fetch(`/api/crm/leads/${leadId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ stage: targetStage }),
-      });
-    } catch (err) {
-      console.error('Failed to update lead stage:', err);
-      fetchPipeline(); // Revert on error
-    }
-  };
-
-  // ── Lead click handler ──
-  const handleLeadClick = (lead: Lead) => {
+  // ── Handle lead click ──
+  const handleLeadClick = (lead: StatsData['recentLeads'][number]) => {
     setSelectedLead(lead);
+    setSelectedLeadId(lead.id);
     setDrawerOpen(true);
   };
 
-  // ── Refresh handler ──
-  const handleRefresh = () => {
-    setLoading(true);
-    fetchPipeline();
-  };
-
-  // ── Lead created callback ──
+  // ── Handle lead created ──
   const handleLeadCreated = () => {
     setAddLeadOpen(false);
-    handleRefresh();
+    fetchStats();
+    toast.success('Lead created successfully');
   };
 
-  // ── Lead updated callback (from drawer) ──
+  // ── Handle lead updated from drawer ──
   const handleLeadUpdated = () => {
-    handleRefresh();
+    fetchStats();
     setDrawerOpen(false);
+    toast.success('Lead updated successfully');
+  };
+
+  // ── Pipeline bar data ──
+  const pipelineData = React.useMemo(() => {
+    if (!stats) return [];
+    const stageMap = new Map(stats.leadsByStage.map((s) => [s.stage, s.count]));
+    return PIPELINE_STAGES.map((stage) => ({
+      stage,
+      count: stageMap.get(stage) || 0,
+      config: STAGE_CONFIG[stage],
+    }));
+  }, [stats]);
+
+  const totalPipelineLeads = React.useMemo(
+    () => pipelineData.reduce((sum, s) => sum + s.count, 0),
+    [pipelineData]
+  );
+
+  // ── Format currency ──
+  const formatCurrency = (value: number) => {
+    if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
+    if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-portal-600" />
-            Admission CRM
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">Manage leads, track conversions, and grow enrollments</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            className="gap-1"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
-          </Button>
-          <Button
-            onClick={() => setAddLeadOpen(true)}
-            className="gap-1 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-          >
-            <Plus className="h-4 w-4" />
-            Add Lead
-          </Button>
-        </div>
-      </div>
-
-      {/* ── CRM Stats Dashboard ── */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-purple-50 flex items-center justify-center">
-                <Users className="h-4 w-4 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-gray-900">{stats.totalLeads}</p>
-                <p className="text-[11px] text-gray-500">Total Leads</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
-                <TrendingUp className="h-4 w-4 text-green-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-green-600">{stats.conversionRate}%</p>
-                <p className="text-[11px] text-gray-500">Conversion</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                <Star className="h-4 w-4 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-blue-600">{stats.newThisWeek}</p>
-                <p className="text-[11px] text-gray-500">New This Week</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-amber-600">{stats.followUpsToday}</p>
-                <p className="text-[11px] text-gray-500">Follow-ups Today</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-red-50 flex items-center justify-center">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-red-600">{stats.overdueFollowUps}</p>
-                <p className="text-[11px] text-gray-500">Overdue</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <IndianRupee className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-emerald-600">₹{(stats.estimatedRevenue / 1000).toFixed(0)}k</p>
-                <p className="text-[11px] text-gray-500">Est. Revenue</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {/* ── Main Tabs: Pipeline/List + Analytics ── */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="flex items-center justify-between">
-          <TabsList className="bg-gray-100">
-            <TabsTrigger value="pipeline" className="gap-1.5">
-              {activeTab === 'pipeline' && <LayoutGrid className="h-3.5 w-3.5" />}
-              Pipeline
-            </TabsTrigger>
-            <TabsTrigger value="list" className="gap-1.5">
-              {activeTab === 'list' && <List className="h-3.5 w-3.5" />}
-              List
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-1.5">
-              {activeTab === 'analytics' && <BarChart3 className="h-3.5 w-3.5" />}
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          {activeTab !== 'analytics' && (
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search leads..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
-                />
-              </div>
-              <Button
-                variant={showFilters ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="gap-1"
-              >
-                <Filter className="h-3.5 w-3.5" />
-                Filters
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* ── Filters Row ── */}
-        {showFilters && activeTab !== 'analytics' && (
-          <div className="flex items-center gap-3 flex-wrap mt-3 p-3 bg-white rounded-xl border">
-            <Select value={stageFilter} onValueChange={(v) => setStageFilter(v === 'ALL' ? '' : v)}>
-              <SelectTrigger className="w-[140px] h-8 text-xs">
-                <SelectValue placeholder="Stage" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Stages</SelectItem>
-                {Object.entries(STAGE_CONFIG).map(([key, cfg]) => (
-                  <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={sourceFilter} onValueChange={(v) => setSourceFilter(v === 'ALL' ? '' : v)}>
-              <SelectTrigger className="w-[140px] h-8 text-xs">
-                <SelectValue placeholder="Source" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Sources</SelectItem>
-                {Object.entries(SOURCE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={priorityFilter} onValueChange={(v) => setPriorityFilter(v === 'ALL' ? '' : v)}>
-              <SelectTrigger className="w-[120px] h-8 text-xs">
-                <SelectValue placeholder="Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All</SelectItem>
-                <SelectItem value="HIGH">High</SelectItem>
-                <SelectItem value="NORMAL">Medium</SelectItem>
-                <SelectItem value="LOW">Low</SelectItem>
-              </SelectContent>
-            </Select>
-
+    <PageTransition>
+      <div className="space-y-6">
+        {/* ── Page Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <span className="text-portal-600">Admission CRM</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Track leads, manage follow-ups, and grow enrollments
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => {
-                setStageFilter('');
-                setSourceFilter('');
-                setPriorityFilter('');
-                setAssignedFilter('');
-                setSearchQuery('');
-              }}
-              className="text-xs"
+              onClick={() => { fetchStats(); toast.success('Dashboard refreshed'); }}
+              className="gap-1.5"
             >
-              <X className="h-3 w-3 mr-1" />
-              Clear
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh
+            </Button>
+            <Button
+              onClick={() => setAddLeadOpen(true)}
+              className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            >
+              <Plus className="h-4 w-4" />
+              Add Lead
             </Button>
           </div>
+        </div>
+
+        {/* ── Overdue Follow-ups Alert ── */}
+        {!loading && stats && stats.overdueFollowUps > 0 && (
+          <AnimatedCard delay={0} hover={false}>
+            <div className="p-4 flex items-center gap-3 rounded-xl border-l-4 border-red-500 bg-red-50">
+              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-red-800">
+                  {stats.overdueFollowUps} Overdue Follow-up{stats.overdueFollowUps > 1 ? 's' : ''}
+                </p>
+                <p className="text-xs text-red-600 mt-0.5">
+                  These leads need immediate attention. Follow up now to keep your pipeline healthy.
+                </p>
+              </div>
+              <Link href="/admin/crm/followups">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 border-red-200 text-red-700 hover:bg-red-100 hover:text-red-800 flex-shrink-0"
+                >
+                  View All
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
+          </AnimatedCard>
         )}
 
-        {/* ── Pipeline View ── */}
-        <TabsContent value="pipeline" className="mt-4">
+        {/* ── Stat Cards (2x2 on mobile, 4-col on desktop) ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {loading ? (
-            <div className="flex items-center justify-center h-64 text-gray-400">
-              <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-              Loading pipeline...
-            </div>
+            <>
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+            </>
           ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCorners}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="flex gap-4 overflow-x-auto pb-4">
-                {pipeline.map((stage) => (
-                  <KanbanColumn
-                    key={stage.key}
-                    stage={stage}
-                    leads={stage.leads}
-                    onLeadClick={handleLeadClick}
-                  />
-                ))}
-              </div>
-              <DragOverlay>
-                {activeLead && (
-                  <LeadCard lead={activeLead} onClick={() => {}} />
-                )}
-              </DragOverlay>
-            </DndContext>
-          )}
-        </TabsContent>
+            <>
+              {/* Total Leads */}
+              <AnimatedCard delay={0.05}>
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center flex-shrink-0">
+                      <Users className="h-5 w-5 text-violet-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-2xl font-bold text-gray-900 leading-tight">
+                        {stats?.totalLeads ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Total Leads</p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedCard>
 
-        {/* ── List View ── */}
-        <TabsContent value="list" className="mt-4">
-          {loading ? (
-            <div className="flex items-center justify-center h-64 text-gray-400">
-              <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-              Loading leads...
-            </div>
-          ) : (
-            <Card className="overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Parent Name</TableHead>
-                    <TableHead>Child Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Stage</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Program</TableHead>
-                    <TableHead>Est. Value</TableHead>
-                    <TableHead>Next Follow-up</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leads.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
-                        No leads found. Click &quot;Add Lead&quot; to create one.
-                      </TableCell>
-                    </TableRow>
+              {/* New This Week */}
+              <AnimatedCard delay={0.1}>
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <UserPlus className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-2xl font-bold text-blue-600 leading-tight">
+                        {stats?.newThisWeek ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">New This Week</p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedCard>
+
+              {/* Follow-ups Today */}
+              <AnimatedCard delay={0.15}>
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+                      <PhoneCall className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-2xl font-bold text-amber-600 leading-tight">
+                        {stats?.followUpsToday ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Follow-ups Today</p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedCard>
+
+              {/* Conversion Rate */}
+              <AnimatedCard delay={0.2}>
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                      <TrendingUp className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-2xl font-bold text-emerald-600 leading-tight">
+                        {stats?.conversionRate ?? 0}%
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">Conversion Rate</p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedCard>
+            </>
+          )}
+        </div>
+
+        {/* ── Pipeline Overview + Revenue (side by side on desktop) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Pipeline Overview Bar */}
+          <div className="lg:col-span-2">
+            {loading ? (
+              <PipelineBarSkeleton />
+            ) : (
+              <AnimatedCard delay={0.25}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-semibold text-gray-900">
+                      Pipeline Overview
+                    </CardTitle>
+                    <Link href="/admin/crm/pipeline">
+                      <Button variant="ghost" size="sm" className="gap-1 text-portal-600 hover:text-portal-700 text-xs">
+                        View Pipeline
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {totalPipelineLeads === 0 ? (
+                    <div className="py-8 text-center text-sm text-gray-400">
+                      No leads in the pipeline yet
+                    </div>
                   ) : (
-                    leads.map((lead) => {
-                      const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
-                      const priorityCfg = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.NORMAL;
-                      return (
-                        <TableRow
-                          key={lead.id}
-                          className="cursor-pointer hover:bg-gray-50/80"
-                          onClick={() => handleLeadClick(lead)}
-                        >
-                          <TableCell className="font-medium text-sm">{lead.parentName}</TableCell>
-                          <TableCell className="text-sm">{lead.childName}</TableCell>
-                          <TableCell className="text-sm text-gray-600">{lead.parentPhone}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[11px]">
-                              {SOURCE_LABELS[lead.source] || lead.source}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <span
-                              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
-                              style={{ backgroundColor: stageCfg.color + '15', color: stageCfg.color }}
+                    <>
+                      {/* Horizontal stacked bar */}
+                      <div className="flex h-10 rounded-full overflow-hidden shadow-inner bg-gray-100">
+                        {pipelineData.map((segment) => {
+                          if (segment.count === 0) return null;
+                          const width = (segment.count / totalPipelineLeads) * 100;
+                          return (
+                            <div
+                              key={segment.stage}
+                              className="relative group transition-all duration-300 hover:brightness-110"
+                              style={{
+                                width: `${width}%`,
+                                backgroundColor: segment.config.color,
+                                minWidth: width > 0 ? '20px' : '0',
+                              }}
+                              title={`${segment.config.label}: ${segment.count} (${width.toFixed(1)}%)`}
                             >
-                              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: stageCfg.color }} />
-                              {stageCfg.label}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className={cn('text-xs font-medium', priorityCfg.color)}>
-                              {priorityCfg.label}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-600">{lead.programInterest || '—'}</TableCell>
-                          <TableCell className="text-sm font-medium">
-                            {lead.estimatedValue ? `₹${lead.estimatedValue.toLocaleString('en-IN')}` : '—'}
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-500">
-                            {lead.nextFollowUp ? format(new Date(lead.nextFollowUp), 'dd MMM yyyy') : '—'}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 text-xs text-portal-600 hover:text-portal-700"
-                              onClick={(e) => { e.stopPropagation(); handleLeadClick(lead); }}
-                            >
-                              View
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-          )}
-        </TabsContent>
+                              {/* Tooltip on hover */}
+                              {width >= 8 && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-[11px] font-bold text-white drop-shadow-sm">
+                                    {segment.count}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
 
-        {/* ── Analytics Tab ── */}
-        <TabsContent value="analytics" className="mt-4">
-          <CrmAnalytics />
-        </TabsContent>
-      </Tabs>
+                      {/* Legend */}
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+                        {pipelineData.map((segment) => (
+                          <div key={segment.stage} className="flex items-center gap-1.5">
+                            <div
+                              className="h-2.5 w-2.5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: segment.config.color }}
+                            />
+                            <span className="text-xs text-gray-600">
+                              {segment.config.label}
+                            </span>
+                            <span className="text-xs font-medium text-gray-900">
+                              {segment.count}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </AnimatedCard>
+            )}
+          </div>
+
+          {/* Revenue Estimate Card */}
+          <div>
+            {loading ? (
+              <AnimatedCard delay={0.3}>
+                <Card className="p-4">
+                  <div className="h-28 bg-gray-50 rounded-lg animate-pulse" />
+                </Card>
+              </AnimatedCard>
+            ) : (
+              <AnimatedCard delay={0.3}>
+                <Card className="overflow-hidden">
+                  <div className="p-5 bg-gradient-to-br from-emerald-50 to-green-50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                        <IndianRupee className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-emerald-700 font-medium">Estimated Revenue</p>
+                        <p className="text-2xl font-bold text-emerald-800 leading-tight">
+                          {formatCurrency(stats?.estimatedRevenue ?? 0)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+                      <TrendingUp className="h-3 w-3" />
+                      <span>From {stats?.leadsByStage.find(s => s.stage === 'ENROLLED')?.count ?? 0} enrolled leads</span>
+                    </div>
+                  </div>
+                  <div className="px-5 py-3 border-t border-emerald-100">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500">Active pipeline value</span>
+                      <span className="font-semibold text-gray-700">
+                        {formatCurrency(
+                          (stats?.leadsByStage ?? [])
+                            .filter(s => !['ENROLLED', 'LOST'].includes(s.stage))
+                            .reduce((sum, s) => sum + s.count, 0) > 0
+                            ? stats?.estimatedRevenue ?? 0
+                            : 0
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              </AnimatedCard>
+            )}
+          </div>
+        </div>
+
+        {/* ── Recent Leads + Quick Actions ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Recent Leads List */}
+          <div className="lg:col-span-2">
+            {loading ? (
+              <RecentLeadsSkeleton />
+            ) : (
+              <AnimatedCard delay={0.35}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-semibold text-gray-900">
+                      Recent Leads
+                    </CardTitle>
+                    <Link href="/admin/crm/leads">
+                      <Button variant="ghost" size="sm" className="gap-1 text-portal-600 hover:text-portal-700 text-xs">
+                        View All
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {!stats?.recentLeads || stats.recentLeads.length === 0 ? (
+                    <div className="py-8 text-center text-sm text-gray-400">
+                      No leads yet. Click &quot;Add Lead&quot; to create your first lead.
+                    </div>
+                  ) : (
+                    <div className="space-y-1 max-h-96 overflow-y-auto custom-scrollbar">
+                      {stats.recentLeads.map((lead) => {
+                        const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
+                        return (
+                          <Link
+                            key={lead.id}
+                            href={`/admin/crm/leads/${lead.id}`}
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                          >
+                            {/* Avatar */}
+                            <div
+                              className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
+                              style={{
+                                backgroundColor: stageCfg.color + '18',
+                                color: stageCfg.color,
+                              }}
+                            >
+                              {lead.parentName?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+
+                            {/* Lead info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-900 truncate">
+                                  {lead.parentName}
+                                </span>
+                                <span className="text-xs text-gray-400 flex items-center gap-1 flex-shrink-0">
+                                  <Baby className="h-3 w-3" />
+                                  {lead.childName}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs text-gray-500">
+                                  {SOURCE_LABELS[lead.source] || lead.source}
+                                </span>
+                                {lead.nextFollowUp && (
+                                  <span className="text-xs text-gray-400 flex items-center gap-0.5">
+                                    <Clock className="h-2.5 w-2.5" />
+                                    {new Date(lead.nextFollowUp).toLocaleDateString('en-IN', {
+                                      day: 'numeric',
+                                      month: 'short',
+                                    })}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Stage badge */}
+                            <Badge
+                              variant="outline"
+                              className="text-[11px] font-medium flex-shrink-0 border-0"
+                              style={{
+                                backgroundColor: stageCfg.color + '15',
+                                color: stageCfg.color,
+                              }}
+                            >
+                              {stageCfg.label}
+                            </Badge>
+
+                            {/* Arrow */}
+                            <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </AnimatedCard>
+            )}
+          </div>
+
+          {/* Quick Actions + Task Summary */}
+          <div className="space-y-4">
+            {/* Quick Action Buttons */}
+            <AnimatedCard delay={0.4}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold text-gray-900">
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => setAddLeadOpen(true)}
+                    className="w-full justify-start gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Lead
+                  </Button>
+                  <Link href="/admin/crm/pipeline" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2 hover:border-portal-300 hover:text-portal-700"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                      Go to Pipeline
+                    </Button>
+                  </Link>
+                  <Link href="/admin/crm/tasks" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2 hover:border-portal-300 hover:text-portal-700"
+                    >
+                      <CheckSquare className="h-4 w-4" />
+                      View Tasks
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </AnimatedCard>
+
+            {/* Task Summary */}
+            {!loading && stats?.tasks && (
+              <AnimatedCard delay={0.45}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-semibold text-gray-900">
+                      Tasks
+                    </CardTitle>
+                    <Link href="/admin/crm/tasks">
+                      <Button variant="ghost" size="sm" className="gap-1 text-portal-600 hover:text-portal-700 text-xs">
+                        View All
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2.5">
+                    {/* Task progress bar */}
+                    <div className="flex h-2.5 rounded-full overflow-hidden bg-gray-100">
+                      {stats.tasks.done > 0 && (
+                        <div
+                          className="bg-emerald-500 transition-all duration-500"
+                          style={{ width: `${(stats.tasks.done / stats.tasks.total) * 100}%` }}
+                        />
+                      )}
+                      {stats.tasks.inProgress > 0 && (
+                        <div
+                          className="bg-blue-500 transition-all duration-500"
+                          style={{ width: `${(stats.tasks.inProgress / stats.tasks.total) * 100}%` }}
+                        />
+                      )}
+                      {stats.tasks.todo > 0 && (
+                        <div
+                          className="bg-amber-400 transition-all duration-500"
+                          style={{ width: `${(stats.tasks.todo / stats.tasks.total) * 100}%` }}
+                        />
+                      )}
+                    </div>
+
+                    {/* Task counts */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-amber-400" />
+                        <span className="text-gray-500">To Do</span>
+                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.todo}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-blue-500" />
+                        <span className="text-gray-500">In Progress</span>
+                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.inProgress}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span className="text-gray-500">Done</span>
+                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.done}</span>
+                      </div>
+                      {stats.tasks.overdue > 0 && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <div className="h-2 w-2 rounded-full bg-red-500" />
+                          <span className="text-red-600 font-medium">Overdue</span>
+                          <span className="font-bold text-red-600 ml-auto">{stats.tasks.overdue}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            )}
+          </div>
+        </div>
+
+        {/* ── Error State ── */}
+        {!loading && error && (
+          <AnimatedCard delay={0.5}>
+            <div className="p-6 text-center">
+              <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
+              <p className="text-sm text-red-600 font-medium">Failed to load dashboard data</p>
+              <p className="text-xs text-gray-500 mt-1">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={fetchStats}
+              >
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                Retry
+              </Button>
+            </div>
+          </AnimatedCard>
+        )}
+      </div>
 
       {/* ── Add Lead Dialog ── */}
       <AddLeadDialog
@@ -840,9 +728,29 @@ export default function CrmPage() {
       <LeadDetailDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
-        lead={selectedLead}
+        lead={selectedLead ? {
+          id: selectedLead.id,
+          parentName: selectedLead.parentName,
+          parentPhone: '',
+          parentEmail: null,
+          childName: selectedLead.childName,
+          childAge: null,
+          source: selectedLead.source,
+          stage: selectedLead.stage,
+          priority: selectedLead.priority,
+          programInterest: null,
+          estimatedValue: selectedLead.estimatedValue,
+          assignedTo: null,
+          notes: null,
+          nextFollowUp: selectedLead.nextFollowUp,
+          convertedStudentId: null,
+          lostReason: null,
+          createdAt: selectedLead.createdAt,
+          updatedAt: selectedLead.createdAt,
+          followUps: [],
+        } : null}
         onLeadUpdated={handleLeadUpdated}
       />
-    </div>
+    </PageTransition>
   );
 }

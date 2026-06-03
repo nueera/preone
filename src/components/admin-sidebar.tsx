@@ -22,6 +22,7 @@ import {
   Phone,
   List,
   ChevronDown,
+  GitBranch,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -75,7 +76,8 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/crm',
     roles: ['ADMIN', 'TASK_MASTER'],
     children: [
-      { label: 'Pipeline', icon: LayoutDashboard, href: '/admin/crm', roles: ['ADMIN', 'TASK_MASTER'] },
+      { label: 'Dashboard', icon: LayoutDashboard, href: '/admin/crm', roles: ['ADMIN', 'TASK_MASTER'] },
+      { label: 'Pipeline', icon: GitBranch, href: '/admin/crm/pipeline', roles: ['ADMIN', 'TASK_MASTER'] },
       { label: 'Leads', icon: Users, href: '/admin/crm/leads', roles: ['ADMIN', 'TASK_MASTER'] },
       { label: 'Follow-ups', icon: Phone, href: '/admin/crm/followups', roles: ['ADMIN', 'TASK_MASTER'] },
       { label: 'Tasks', icon: CheckSquare, href: '/admin/crm/tasks', roles: ['ADMIN', 'TASK_MASTER'] },
@@ -204,7 +206,7 @@ export function AdminSidebar() {
                             {item.children
                               .filter(child => child.roles.includes(userRole))
                               .map((child) => {
-                                const childActive = pathname === child.href || (child.href === '/admin/crm' && pathname === '/admin/crm');
+                                const childActive = pathname === child.href || (child.href === '/admin/crm' && pathname === '/admin/crm' && !pathname.startsWith('/admin/crm/'));
                                 return (
                                   <SidebarMenuSubItem key={child.href}>
                                     <SidebarMenuSubButton
