@@ -19,6 +19,13 @@ import {
   X,
   RefreshCw,
   BarChart3,
+  TrendingUp,
+  Users,
+  Clock,
+  AlertCircle,
+  CheckCircle2,
+  CheckSquare,
+  IndianRupee,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -311,6 +318,17 @@ export default function CrmPage() {
   // Drag state
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
 
+  // CRM Stats
+  const [stats, setStats] = useState<{
+    totalLeads: number;
+    newThisWeek: number;
+    followUpsToday: number;
+    overdueFollowUps: number;
+    conversionRate: number;
+    estimatedRevenue: number;
+    tasks: { total: number; todo: number; inProgress: number; done: number; overdue: number };
+  } | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor)
@@ -320,15 +338,19 @@ export default function CrmPage() {
   const fetchPipeline = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch('/api/crm/pipeline', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const [pipelineRes, statsRes] = await Promise.all([
+        fetch('/api/crm/pipeline', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/crm/stats', { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+      ]);
+      if (pipelineRes.ok) {
+        const data = await pipelineRes.json();
         setPipeline(data.pipeline);
-        // Also flatten all leads for list view
         const allLeads = data.pipeline.flatMap((s: PipelineStage) => s.leads);
         setLeads(allLeads);
+      }
+      if (statsRes?.ok) {
+        const data = await statsRes.json();
+        setStats(data);
       }
     } catch (err) {
       console.error('Failed to fetch pipeline:', err);
@@ -505,6 +527,78 @@ export default function CrmPage() {
           </Button>
         </div>
       </div>
+
+      {/* ── CRM Stats Dashboard ── */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                <Users className="h-4 w-4 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{stats.totalLeads}</p>
+                <p className="text-[11px] text-gray-500">Total Leads</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
+                <TrendingUp className="h-4 w-4 text-green-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-green-600">{stats.conversionRate}%</p>
+                <p className="text-[11px] text-gray-500">Conversion</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Star className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-blue-600">{stats.newThisWeek}</p>
+                <p className="text-[11px] text-gray-500">New This Week</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-amber-600">{stats.followUpsToday}</p>
+                <p className="text-[11px] text-gray-500">Follow-ups Today</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-red-50 flex items-center justify-center">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-red-600">{stats.overdueFollowUps}</p>
+                <p className="text-[11px] text-gray-500">Overdue</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <IndianRupee className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-emerald-600">₹{(stats.estimatedRevenue / 1000).toFixed(0)}k</p>
+                <p className="text-[11px] text-gray-500">Est. Revenue</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* ── Main Tabs: Pipeline/List + Analytics ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
