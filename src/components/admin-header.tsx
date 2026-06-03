@@ -8,6 +8,7 @@ import {
   User,
   Settings,
   LogOut,
+  Zap,
 } from 'lucide-react';
 import {
   SidebarTrigger,
@@ -29,7 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import { PORTAL_THEMES, ROLE_THEMES, PREONE_COLORS } from '@/lib/theme-tokens';
 
 const theme = PORTAL_THEMES.admin;
 
@@ -51,7 +52,10 @@ const PATH_LABELS: Record<string, string> = {
   teachers: 'Teachers',
   attendance: 'Attendance',
   fees: 'Fees',
-  crm: 'Admission CRM',
+  crm: 'CRM',
+  leads: 'Leads',
+  followups: 'Follow-ups',
+  tasks: 'Tasks',
   activities: 'Activities',
   growth: 'Growth',
   communication: 'Communication',
@@ -86,9 +90,25 @@ export function AdminHeader() {
   };
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'A';
+  const isTaskMaster = user?.role === 'TASK_MASTER';
+  const roleTheme = isTaskMaster ? ROLE_THEMES.taskmaster : ROLE_THEMES.admin;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+      {/* ── TASK_MASTER badge ── */}
+      {isTaskMaster && (
+        <span
+          className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+          style={{
+            backgroundColor: PREONE_COLORS.star[50],
+            color: PREONE_COLORS.star[700],
+            borderColor: PREONE_COLORS.star[200],
+          }}
+        >
+          <Zap className="h-3 w-3" />
+          Task Master
+        </span>
+      )}
       {/* ── Left: Sidebar trigger + Breadcrumb ── */}
       <SidebarTrigger className="shrink-0" />
 

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // GET /api/dashboard/stats — Aggregate dashboard statistics
 // Requires ADMIN role. Returns counts, rates, and trend percentages.
 export async function GET(request: NextRequest) {
   try {
     // ── Verify ADMIN role ──
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     // ── Current date boundaries ──

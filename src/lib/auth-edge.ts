@@ -13,11 +13,11 @@ export enum Role {
 }
 
 // Route prefixes mapped to required roles
+// TASK_MASTER uses /admin routes (same portal, CRM-only access)
 export const ROLE_ROUTE_MAP: Record<string, Role> = {
   '/admin': Role.ADMIN,
   '/teacher': Role.TEACHER,
   '/parent': Role.PARENT,
-  '/taskmaster': Role.TASK_MASTER,
 };
 
 // Role-based redirect helper
@@ -25,12 +25,12 @@ export function getDashboardPath(role: Role): string {
   switch (role) {
     case Role.ADMIN:
       return '/admin/dashboard';
+    case Role.TASK_MASTER:
+      return '/admin/crm';  // TASK_MASTER lands on CRM page within Admin portal
     case Role.TEACHER:
       return '/teacher/dashboard';
     case Role.PARENT:
       return '/parent/dashboard';
-    case Role.TASK_MASTER:
-      return '/taskmaster/dashboard';
     default:
       return '/login';
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 import { formatDistanceToNow } from 'date-fns';
 
 // ── Activity type mapping ──
@@ -18,7 +18,7 @@ interface ActivityEntry {
 export async function GET(request: NextRequest) {
   try {
     // ── Verify ADMIN role ──
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const limit = Math.min(

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
-// GET /api/crm/leads/[id] — Get lead by ID with follow-ups
+// GET /api/crm/leads/[id] — Get lead by ID with follow-ups (Admin + TaskMaster)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
@@ -32,13 +32,13 @@ export async function GET(
   }
 }
 
-// PATCH /api/crm/leads/[id] — Update lead (including stage change for drag-drop)
+// PATCH /api/crm/leads/[id] — Update lead (including stage change for drag-drop) (Admin + TaskMaster)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
@@ -87,13 +87,13 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/crm/leads/[id] — Delete a lead
+// DELETE /api/crm/leads/[id] — Delete a lead (Admin only)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;

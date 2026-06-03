@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
-// GET /api/crm/pipeline — Pipeline aggregation for kanban board
+// GET /api/crm/pipeline — Pipeline aggregation for kanban board (Admin + TaskMaster)
 export async function GET(request: NextRequest) {
   try {
-    const authResult = getAuthUser(request);
-    if (!authResult) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
+    if (authResult instanceof NextResponse) return authResult;
 
     // Get all leads grouped by stage
     const leads = await db.lead.findMany({

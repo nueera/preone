@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 // GET /api/attendance — Get attendance records (filter by date, class)
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const searchParams = request.nextUrl.searchParams;
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
@@ -73,8 +73,8 @@ export async function GET(request: NextRequest) {
 // POST /api/attendance — Mark attendance (bulk or single)
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getAuthUser(request);
-    if (!authUser) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const body = await request.json();
     const { type = 'student', records } = body;
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
               method: method || 'MANUAL',
               checkInTime,
               checkOutTime,
-              markedBy: authUser.userId,
+              markedBy: authResult.userId,
             },
             update: {
               status,
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
               method: method || 'MANUAL',
               checkInTime,
               checkOutTime,
-              markedBy: authUser.userId,
+              markedBy: authResult.userId,
             },
             update: {
               status,

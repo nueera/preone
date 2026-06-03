@@ -1,12 +1,13 @@
 // ============================================================
 // PreOne — Next.js Middleware
 // Route protection with JWT-based role verification
-// Protects /admin, /teacher, /parent, /taskmaster routes
+// Protects /admin, /teacher, /parent routes
+// TASK_MASTER uses /admin routes (CRM + Dashboard only)
 // Uses edge-compatible token parser (no Node.js crypto)
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseToken, ROLE_ROUTE_MAP, getDashboardPath } from '@/lib/auth-edge';
+import { parseToken, Role } from '@/lib/auth-edge';
 
 // ============================================================
 // Public routes that don't require authentication
@@ -27,6 +28,16 @@ const PUBLIC_PATTERNS = [
   /^\/preonelogo\.png/,
   /^\/logo\.svg/,
   /^\/robots\.txt/,
+];
+
+// ============================================================
+// TASK_MASTER route restrictions
+// Can only access: /admin/dashboard, /admin/crm
+// ============================================================
+
+const TASK_MASTER_ALLOWED_PREFIXES = [
+  '/admin/dashboard',
+  '/admin/crm',
 ];
 
 // ============================================================
@@ -56,19 +67,30 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if this is a protected route
-  const protectedPrefix = Object.keys(ROLE_ROUTE_MAP).find(prefix =>
-    pathname === prefix || pathname.startsWith(prefix + '/')
-  );
+  // ── Check if this is a protected route ──
+  const isProtectedRoute =
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/teacher') ||
+    pathname.startsWith('/parent');
 
-  if (!protectedPrefix) {
+  // Legacy /taskmaster routes → redirect to /admin/crm
+  if (pathname.startsWith('/taskmaster')) {
+    const token = request.cookies.get('preone_token')?.value;
+    if (!token) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', '/admin/crm');
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.redirect(new URL('/admin/crm', request.url));
+  }
+
+  if (!isProtectedRoute) {
     // Not a protected route, allow through
     return NextResponse.next();
   }
 
-  // Get token from cookie first
+  // Get token from cookie
   let token: string | null = null;
-
   const tokenCookie = request.cookies.get('preone_token');
   if (tokenCookie) {
     token = tokenCookie.value;
@@ -93,12 +115,43 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Check role matches route
-  const requiredRole = ROLE_ROUTE_MAP[protectedPrefix];
-  if (payload.role !== requiredRole) {
-    // Role doesn't match → redirect to their own dashboard
-    const dashboardPath = getDashboardPath(payload.role);
-    return NextResponse.redirect(new URL(dashboardPath, request.url));
+  // ── Role-based route access ──
+
+  // /admin routes: both ADMIN and TASK_MASTER can access
+  if (pathname.startsWith('/admin')) {
+    if (payload.role !== Role.ADMIN && payload.role !== Role.TASK_MASTER) {
+      // Not admin or taskmaster → redirect to their own dashboard
+      const dashboardPath = payload.role === Role.TEACHER ? '/teacher/dashboard' :
+                           payload.role === Role.PARENT ? '/parent/dashboard' : '/login';
+      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    }
+
+    // TASK_MASTER can only access CRM + Dashboard within /admin
+    if (payload.role === Role.TASK_MASTER) {
+      const isAllowed = TASK_MASTER_ALLOWED_PREFIXES.some(prefix =>
+        pathname === prefix || pathname.startsWith(prefix + '/')
+      );
+      if (!isAllowed) {
+        // Block non-CRM admin routes for TASK_MASTER → redirect to CRM
+        return NextResponse.redirect(new URL('/admin/crm', request.url));
+      }
+    }
+  }
+
+  // /teacher routes: only TEACHER
+  if (pathname.startsWith('/teacher') && payload.role !== Role.TEACHER) {
+    const defaultRoute = payload.role === Role.ADMIN ? '/admin/dashboard' :
+                         payload.role === Role.TASK_MASTER ? '/admin/crm' :
+                         payload.role === Role.PARENT ? '/parent/dashboard' : '/login';
+    return NextResponse.redirect(new URL(defaultRoute, request.url));
+  }
+
+  // /parent routes: only PARENT
+  if (pathname.startsWith('/parent') && payload.role !== Role.PARENT) {
+    const defaultRoute = payload.role === Role.ADMIN ? '/admin/dashboard' :
+                         payload.role === Role.TASK_MASTER ? '/admin/crm' :
+                         payload.role === Role.TEACHER ? '/teacher/dashboard' : '/login';
+    return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 
   // Add user info to request headers for downstream use

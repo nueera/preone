@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
-// POST /api/crm/leads/[id]/convert — Convert an enrolled lead to a student
+// POST /api/crm/leads/[id]/convert — Convert an enrolled lead to a student (Admin + TaskMaster)
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 
 // GET /api/fees/overview — Fee collection summary
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     // Total invoiced
     const invoices = await db.invoice.findMany({

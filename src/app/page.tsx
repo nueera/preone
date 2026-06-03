@@ -10,7 +10,7 @@ const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
   TEACHER: '/teacher/dashboard',
   PARENT: '/parent/dashboard',
-  TASK_MASTER: '/taskmaster/dashboard',
+  TASK_MASTER: '/admin/crm',
 };
 
 export default function RootPage() {

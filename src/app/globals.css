@@ -323,6 +323,8 @@
    ============================================================ */
 
 /* ── Admin Portal: Purple / Violet ── */
+[data-portal="admin"][data-role="admin"],
+[data-portal="admin"][data-role="taskmaster"],
 [data-portal="admin"] {
   --portal: #7C3AED;
   --portal-foreground: #FFFFFF;

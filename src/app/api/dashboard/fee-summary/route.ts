@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
 // GET /api/dashboard/fee-summary — Fee breakdown by invoice status
 // Returns collected, pending, and overdue amounts.
@@ -8,7 +8,7 @@ import { requireAdmin } from '@/lib/auth';
 export async function GET(request: NextRequest) {
   try {
     // ── Verify ADMIN role ──
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     // ── Calculate fee breakdown from Invoice table ──

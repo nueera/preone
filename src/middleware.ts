@@ -64,9 +64,10 @@ async function verifyToken(token: string): Promise<VerifiedPayload | null> {
 
 // ============================================================
 // Route Permission Map
+// TASK_MASTER has same access as Admin for CRM routes
 // ============================================================
 
-type RoleName = 'Admin' | 'Teacher' | 'Parent';
+type RoleName = 'Admin' | 'Teacher' | 'Parent' | 'TaskMaster';
 
 interface RouteRule {
   pattern: RegExp;
@@ -74,17 +75,18 @@ interface RouteRule {
 }
 
 const ROUTE_RULES: RouteRule[] = [
-  { pattern: /^\/api\/parent\//,        allowedRoles: ['Parent'] },
-  { pattern: /^\/api\/teacher\//,        allowedRoles: ['Teacher'] },
-  { pattern: /^\/api\/students\//,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/teachers\//,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/attendance\//,     allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/fees\//,           allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/crm\//,            allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/dashboard\//,      allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/growth\//,         allowedRoles: ['Admin', 'Teacher'] },
-  { pattern: /^\/api\/communication\//,  allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/auth\/me$/,        allowedRoles: ['Admin', 'Teacher', 'Parent'] },
+  { pattern: /^\/api\/parent\/?/,        allowedRoles: ['Parent'] },
+  { pattern: /^\/api\/teacher\/?/,        allowedRoles: ['Teacher'] },
+  { pattern: /^\/api\/students\/?/,       allowedRoles: ['Admin'] },
+  { pattern: /^\/api\/teachers\/?/,       allowedRoles: ['Admin'] },
+  { pattern: /^\/api\/attendance\/?/,     allowedRoles: ['Admin'] },
+  { pattern: /^\/api\/fees\/?/,           allowedRoles: ['Admin'] },
+  // CRM routes: both Admin and TaskMaster can access
+  { pattern: /^\/api\/crm\/?/,            allowedRoles: ['Admin', 'TaskMaster'] },
+  { pattern: /^\/api\/dashboard\/?/,      allowedRoles: ['Admin', 'TaskMaster'] },
+  { pattern: /^\/api\/growth\/?/,         allowedRoles: ['Admin', 'Teacher'] },
+  { pattern: /^\/api\/communication\/?/,  allowedRoles: ['Admin'] },
+  { pattern: /^\/api\/auth\/me$/,        allowedRoles: ['Admin', 'Teacher', 'Parent', 'TaskMaster'] },
 ];
 
 // Auth routes that skip authentication entirely
@@ -129,7 +131,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const matchedRule = ROUTE_RULES.find((rule) => rule.pattern.test(pathname));
 
   if (matchedRule) {
-    if (!matchedRule.allowedRoles.includes(payload.role as RoleName)) {
+    // Map role string to RoleName for comparison
+    const roleMap: Record<string, RoleName> = {
+      'ADMIN': 'Admin',
+      'TEACHER': 'Teacher',
+      'PARENT': 'Parent',
+      'TASK_MASTER': 'TaskMaster',
+    };
+    const roleName = roleMap[payload.role] as RoleName;
+    if (!roleName || !matchedRule.allowedRoles.includes(roleName)) {
       return NextResponse.json(
         { error: true, message: 'You do not have permission to access this resource' },
         { status: 403 },

@@ -42,9 +42,9 @@ interface LoginResponse {
 
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
+  TASK_MASTER: '/admin/crm',
   TEACHER: '/teacher/dashboard',
   PARENT: '/parent/dashboard',
-  TASK_MASTER: '/taskmaster/dashboard',
 };
 
 // ============================================================
@@ -442,6 +442,7 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { role: 'Admin', email: 'admin@preone.com', password: 'admin123' },
+                  { role: 'Task Master', email: 'taskmaster@preone.com', password: 'admin123' },
                   { role: 'Teacher', email: 'kavitha.raman@littlestars.com', password: 'password123' },
                   { role: 'Parent', email: 'rajesh.sharma@email.com', password: 'password123' },
                 ].map((cred) => (

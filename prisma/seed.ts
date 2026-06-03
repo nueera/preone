@@ -128,6 +128,24 @@ async function main() {
   console.log('  ✓ Admin user created (admin@preone.com / admin123)');
 
   // ============================================================
+  // 2b. TASK_MASTER USER (CRM-only access within Admin portal)
+  // ============================================================
+  console.log('  Creating Task Master User...');
+  const taskMasterUser = await prisma.user.create({
+    data: {
+      email: 'taskmaster@preone.com',
+      password: adminPasswordHash,
+      name: 'CRM Manager',
+      phone: '9876543211',
+      role: 'TASK_MASTER',
+      isActive: true,
+      schoolId: school.id,
+      branchId: branch.id,
+    },
+  });
+  console.log('  ✓ Task Master user created (taskmaster@preone.com / admin123)');
+
+  // ============================================================
   // 3. PROGRAMS (Nursery, LKG, UKG)
   // ============================================================
   console.log('  Creating Programs...');
@@ -1207,6 +1225,7 @@ async function main() {
   console.log(`  Announcements: ${announcementDefs.length}`);
   console.log('\n  🔑 Login credentials:');
   console.log('    Admin:    admin@preone.com / admin123');
+  console.log('    Task Master: taskmaster@preone.com / admin123');
   console.log('    Teacher:  kavitha.raman@littlestars.com / password123');
   console.log('    Parent:   rajesh.sharma@email.com / password123');
 }

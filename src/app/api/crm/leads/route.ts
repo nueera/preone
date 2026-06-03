@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, requireAdmin } from '@/lib/auth';
+import { getAuthUser, requireRole, Role } from '@/lib/auth';
 
-// GET /api/crm/leads — List leads with filters & pagination
+// GET /api/crm/leads — List leads with filters & pagination (Admin + TaskMaster)
 export async function GET(request: NextRequest) {
   try {
-    const authResult = getAuthUser(request);
-    if (!authResult) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
+    if (authResult instanceof NextResponse) return authResult;
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
@@ -105,10 +103,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/crm/leads — Create a new lead
+// POST /api/crm/leads — Create a new lead (Admin + TaskMaster)
 export async function POST(request: NextRequest) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const body = await request.json();

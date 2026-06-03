@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireRole, Role } from '@/lib/auth';
 
-// GET /api/crm/leads/[id]/followups — List follow-ups for a lead
+// GET /api/crm/leads/[id]/followups — List follow-ups for a lead (Admin + TaskMaster)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
@@ -30,13 +30,13 @@ export async function GET(
   }
 }
 
-// POST /api/crm/leads/[id]/followups — Add a follow-up
+// POST /api/crm/leads/[id]/followups — Add a follow-up (Admin + TaskMaster)
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = requireAdmin(request);
+    const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;

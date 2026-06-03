@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthUser, unauthorized, requireAdmin } from '@/lib/auth';
-import { hashPassword } from '@/lib/auth';
+import { requireAdmin, hashPassword } from '@/lib/auth';
 
-// GET /api/teachers — List all teachers with pagination + filters
+// GET /api/teachers — List all teachers with pagination + filters (Admin only)
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
-    if (!user) return unauthorized();
+    const authResult = requireAdmin(request);
+    if (authResult instanceof NextResponse) return authResult;
 
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search') || '';
