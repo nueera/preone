@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, unauthorized } from '@/lib/auth';
+import { getBranchFromRequest } from '@/lib/branch';
 import { createBulkNotifications, NotificationTemplates } from '@/lib/notifications';
 
 // GET /api/communication/announcements — List announcements
@@ -8,6 +9,10 @@ export async function GET(request: NextRequest) {
   try {
     const user = getAuthUser(request);
     if (!user) return unauthorized();
+
+    // Branch isolation — Announcement has no schoolId/branchId,
+    // so filter by school via createdBy user
+    const branchScope = getBranchFromRequest(request, user);
 
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type') || '';
@@ -20,6 +25,16 @@ export async function GET(request: NextRequest) {
     if (type) where.type = type;
     if (target) where.target = target;
     if (priority) where.priority = priority;
+
+    // School isolation — filter announcements by createdBy users in the school
+    if (branchScope.schoolId) {
+      const schoolUsers = await db.user.findMany({
+        where: { schoolId: branchScope.schoolId },
+        select: { id: true },
+      });
+      const schoolUserIds = schoolUsers.map(u => u.id);
+      where.createdBy = { in: schoolUserIds };
+    }
 
     const skip = (page - 1) * limit;
 

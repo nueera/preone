@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React from 'react';
 import Link from 'next/link';
@@ -25,6 +26,7 @@ import {
   GitBranch,
   Bell,
   FileBarChart,
+  Shield,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -89,6 +91,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Growth', icon: TrendingUp, href: '/admin/growth', roles: ['ADMIN'] },
   { label: 'Communication', icon: MessageSquare, href: '/admin/communication', roles: ['ADMIN'] },
   { label: 'Reports', icon: FileBarChart, href: '/admin/reports', roles: ['ADMIN'] },
+  { label: 'Audit Logs', icon: Shield, href: '/admin/audit-logs', roles: ['ADMIN'] },
   { label: 'Notifications', icon: Bell, href: '/admin/notifications', roles: ['ADMIN', 'TASK_MASTER'] },
   { label: 'Transport', icon: Bus, href: '/admin/transport', roles: ['ADMIN'] },
   { label: 'Settings', icon: Settings, href: '/admin/settings', roles: ['ADMIN'] },

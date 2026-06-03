@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 import { createNotification, NotificationTemplates } from '@/lib/notifications';
+import { auditLog } from '@/lib/audit';
 
 // POST /api/fees/payments — Record payment against an invoice
 export async function POST(request: NextRequest) {
@@ -111,6 +112,20 @@ export async function POST(request: NextRequest) {
       }
     } catch (notifError) {
       console.error('Payment notification error:', notifError);
+    }
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'CREATE',
+        entity: 'Payment',
+        entityId: payment.id,
+        userId: user.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { invoiceId, amount: payAmount, method, invoiceStatus: newStatus },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
     }
 
     return NextResponse.json(

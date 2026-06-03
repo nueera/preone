@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Baby, ClipboardCheck, IndianRupee, Sun,
   Eye, TrendingUp, MessageSquare, Settings,
   ChevronsLeft, ChevronsRight, ChevronDown, Bell, FileBarChart,
+  BookOpen,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -41,6 +42,7 @@ const theme = PORTAL_THEMES.parent;
 const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/parent/dashboard' },
   { label: 'My Children', icon: Baby, href: '/parent/children' },
+  { label: 'Childhood Passport', icon: BookOpen, href: '/parent/children' },
   { label: 'Attendance', icon: ClipboardCheck, href: '/parent/attendance' },
   { label: 'Fees', icon: IndianRupee, href: '/parent/fees' },
   { label: 'Daily Updates', icon: Sun, href: '/parent/daily-updates' },

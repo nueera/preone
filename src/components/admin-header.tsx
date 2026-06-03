@@ -10,6 +10,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
+import { BranchSwitcher } from '@/components/ui/branch-switcher';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -137,8 +138,11 @@ export function AdminHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Search, Notifications, User Menu ── */}
+      {/* ── Right: Branch Switcher, Search, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
+        {/* Branch Switcher */}
+        <BranchSwitcher />
+
         {/* Search Button */}
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Search className="h-4 w-4" />

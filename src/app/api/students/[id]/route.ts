@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { auditLog } from '@/lib/audit';
 
 // GET /api/students/[id] — Get complete student details with all relations
 export async function GET(
@@ -129,6 +130,26 @@ export async function PATCH(
       },
     });
 
+    // ── Audit log ──
+    try {
+      const oldVals: Record<string, unknown> = {};
+      const newVals: Record<string, unknown> = {};
+      for (const field of Object.keys(updateData)) {
+        oldVals[field] = (existing as Record<string, unknown>)[field];
+        newVals[field] = updateData[field];
+      }
+      await auditLog.update({
+        entity: 'Student',
+        entityId: id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        oldValues: oldVals,
+        newValues: newVals,
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
+
     return NextResponse.json({ message: 'Student updated successfully', student });
   } catch (error) {
     console.error('Update student error:', error);
@@ -156,6 +177,20 @@ export async function DELETE(
       where: { id },
       data: { status: 'INACTIVE' },
     });
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'DELETE',
+        entity: 'Student',
+        entityId: id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { deactivated: true, name: `${existing.firstName} ${existing.lastName}` },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
 
     return NextResponse.json({
       message: 'Student deactivated successfully',

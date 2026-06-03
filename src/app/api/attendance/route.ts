@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { getBranchFromRequest, withBranchFilter } from '@/lib/branch';
 import { createNotification, NotificationTemplates } from '@/lib/notifications';
+import { auditLog } from '@/lib/audit';
 
 // GET /api/attendance — Get attendance records (filter by date, class)
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // Branch isolation
+    const branchScope = getBranchFromRequest(request, authResult);
+    const branchFilter = withBranchFilter(branchScope);
 
     const searchParams = request.nextUrl.searchParams;
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
@@ -23,6 +29,12 @@ export async function GET(request: NextRequest) {
     if (type === 'staff') {
       const where: Record<string, unknown> = {
         date: { gte: dateStart, lte: dateEnd },
+        // Branch filter via teacher relation
+        ...(Object.keys(branchFilter).length > 0
+          ? { teacher: branchFilter }
+          : branchScope.isAllBranches && branchScope.schoolId
+            ? { teacher: { branch: { schoolId: branchScope.schoolId } } }
+            : {}),
       };
       if (status) where.status = status;
 
@@ -42,6 +54,12 @@ export async function GET(request: NextRequest) {
     // Student attendance
     const where: Record<string, unknown> = {
       date: { gte: dateStart, lte: dateEnd },
+      // Branch filter via student relation
+      ...(Object.keys(branchFilter).length > 0
+        ? { student: branchFilter }
+        : branchScope.isAllBranches && branchScope.schoolId
+          ? { student: { branch: { schoolId: branchScope.schoolId } } }
+          : {}),
     };
     if (status) where.status = status;
 
@@ -162,6 +180,19 @@ export async function POST(request: NextRequest) {
 
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'CREATE',
+        entity: 'Attendance',
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { type, successCount, failCount, recordCount: records.length },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
 
     // ── Notify parents of absent students ──
     if (type !== 'staff' && authResult.schoolId) {

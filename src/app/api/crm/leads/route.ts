@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, requireRole, Role } from '@/lib/auth';
+import { getBranchFromRequest } from '@/lib/branch';
 import { createNotification, NotificationTemplates } from '@/lib/notifications';
+import { auditLog } from '@/lib/audit';
 
 // GET /api/crm/leads — List leads with filters & pagination (Admin + TaskMaster)
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireRole(request, Role.ADMIN, Role.TASK_MASTER);
     if (authResult instanceof NextResponse) return authResult;
+
+    // Branch isolation — Lead has no schoolId/branchId,
+    // filter by school via CrmTask.schoolId or assignedTo user's school
+    const branchScope = getBranchFromRequest(request, authResult);
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
@@ -24,6 +30,24 @@ export async function GET(request: NextRequest) {
 
     // Build where clause
     const where: Record<string, unknown> = {};
+
+    // School isolation — filter leads associated with this school
+    // Lead doesn't have schoolId, so filter via CrmTask.schoolId or assignedTo user
+    // We use AND at the top level so this combines correctly with search OR filters
+    const schoolFilters: Record<string, unknown>[] = [];
+    if (branchScope.schoolId) {
+      const schoolUsers = await db.user.findMany({
+        where: { schoolId: branchScope.schoolId },
+        select: { id: true },
+      });
+      const schoolUserIds = schoolUsers.map(u => u.id);
+      schoolFilters.push({
+        OR: [
+          { assignedTo: { in: schoolUserIds } },
+          { crmTasks: { some: { schoolId: branchScope.schoolId } } },
+        ],
+      });
+    }
 
     // Stage filter (comma-separated for multi-select)
     if (stage) {
@@ -73,9 +97,14 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Apply school isolation as AND wrapper to combine with other filters
+    const finalWhere = schoolFilters.length > 0
+      ? { AND: [...schoolFilters, where] }
+      : where;
+
     const [leads, total] = await Promise.all([
       db.lead.findMany({
-        where,
+        where: finalWhere,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -86,7 +115,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      db.lead.count({ where }),
+      db.lead.count({ where: finalWhere }),
     ]);
 
     return NextResponse.json({
@@ -187,6 +216,20 @@ export async function POST(request: NextRequest) {
       }
     } catch (notifError) {
       console.error('Lead notification error:', notifError);
+    }
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'CREATE',
+        entity: 'Lead',
+        entityId: lead.id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { parentName: parentName.trim(), childName: childName.trim(), source },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
     }
 
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
+import { auditLog } from '@/lib/audit';
 
 // GET /api/crm/leads/[id] — Get lead by ID with follow-ups (Admin + TaskMaster)
 export async function GET(
@@ -80,6 +81,26 @@ export async function PATCH(
       },
     });
 
+    // ── Audit log ──
+    try {
+      const oldVals: Record<string, unknown> = {};
+      const newVals: Record<string, unknown> = {};
+      for (const field of Object.keys(updateData)) {
+        oldVals[field] = (existing as Record<string, unknown>)[field];
+        newVals[field] = updateData[field];
+      }
+      await auditLog.update({
+        entity: 'Lead',
+        entityId: id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        oldValues: oldVals,
+        newValues: newVals,
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
+
     return NextResponse.json({ message: 'Lead updated successfully', lead });
   } catch (error) {
     console.error('Update lead error:', error);
@@ -107,6 +128,20 @@ export async function DELETE(
     // Delete follow-ups first (cascade)
     await db.followUp.deleteMany({ where: { leadId: id } });
     await db.lead.delete({ where: { id } });
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'DELETE',
+        entity: 'Lead',
+        entityId: id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { parentName: existing.parentName, childName: existing.childName },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
 
     return NextResponse.json({ message: 'Lead deleted successfully' });
   } catch (error) {

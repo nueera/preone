@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { getBranchFromRequest, withBranchViaRelationFilter } from '@/lib/branch';
+import { auditLog } from '@/lib/audit';
 
 // GET /api/students — List students with pagination, search, and filters
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // Branch isolation
+    const branchScope = getBranchFromRequest(request, authResult);
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
@@ -19,8 +24,8 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
-    const where: Record<string, unknown> = {};
+    // Build where clause — start with branch filter (Student has branchId, no schoolId)
+    const where: Record<string, unknown> = withBranchViaRelationFilter(branchScope);
 
     if (classId) {
       where.classId = classId;
@@ -326,6 +331,20 @@ export async function POST(request: NextRequest) {
         medicalRecords: true,
       },
     });
+
+    // ── Audit log ──
+    try {
+      await auditLog.create({
+        action: 'CREATE',
+        entity: 'Student',
+        entityId: student.id,
+        userId: authResult.userId,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        details: { firstName, lastName, gender, classId: classId || null, branchId: branchId || null },
+      });
+    } catch (auditErr) {
+      console.error('Audit log error:', auditErr);
+    }
 
     return NextResponse.json(
       { message: 'Student created successfully', student: completeStudent },

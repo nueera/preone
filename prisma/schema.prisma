@@ -1033,3 +1033,17 @@ model AuditLog {
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
 }
+
+model Reaction {
+  id          String   @id @default(cuid())
+  studentId   String
+  parentId    String
+  targetType  String   // 'memory' | 'achievement' | 'certificate'
+  targetId    String
+  reaction    String   // 'love' | 'celebrate' | 'proud' | 'wow' | 'heart'
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  @@unique([parentId, targetType, targetId])
+  @@index([studentId, targetType, targetId])
+}

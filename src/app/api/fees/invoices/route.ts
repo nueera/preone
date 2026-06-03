@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, unauthorized } from '@/lib/auth';
+import { getBranchFromRequest, withBranchFilter } from '@/lib/branch';
 import { randomBytes } from 'crypto';
 
 // GET /api/fees/invoices — List invoices
@@ -9,13 +10,25 @@ export async function GET(request: NextRequest) {
     const user = getAuthUser(request);
     if (!user) return unauthorized();
 
+    // Branch isolation
+    const branchScope = getBranchFromRequest(request, user);
+    const branchFilter = withBranchFilter(branchScope);
+
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status') || '';
     const studentId = searchParams.get('studentId') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: Record<string, unknown> = {};
+    // Build where — start with branch filter via student relation
+    // Invoice doesn't have branchId, so filter through student
+    const branchWhere = Object.keys(branchFilter).length > 0
+      ? { student: branchFilter }
+      : branchScope.isAllBranches && branchScope.schoolId
+        ? { student: { branch: { schoolId: branchScope.schoolId } } }
+        : {};
+
+    const where: Record<string, unknown> = { ...branchWhere };
     if (status) where.status = status;
     if (studentId) where.studentId = studentId;
 

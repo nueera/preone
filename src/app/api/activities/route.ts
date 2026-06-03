@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, requireAdmin } from '@/lib/auth';
+import { getBranchFromRequest, withBranchFilter } from '@/lib/branch';
 
 // GET /api/activities — List activities with filters & pagination
 export async function GET(request: NextRequest) {
@@ -9,6 +10,10 @@ export async function GET(request: NextRequest) {
     if (!authResult) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
+
+    // Branch isolation
+    const branchScope = getBranchFromRequest(request, authResult);
+    const branchFilter = withBranchFilter(branchScope);
 
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
@@ -23,7 +28,15 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = {};
+    // Build where clause — start with branch filter via class relation
+    // Activity doesn't have branchId, so filter through class.branchId
+    const branchWhere = Object.keys(branchFilter).length > 0
+      ? { class: branchFilter }
+      : branchScope.isAllBranches && branchScope.schoolId
+        ? { class: { branch: { schoolId: branchScope.schoolId } } }
+        : {};
+
+    const where: Record<string, unknown> = { ...branchWhere };
 
     // Type filter (comma-separated for multi-select)
     if (type) {

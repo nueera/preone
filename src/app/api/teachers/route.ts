@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin, hashPassword } from '@/lib/auth';
+import { getBranchFromRequest, withBranchViaRelationFilter } from '@/lib/branch';
 
 // GET /api/teachers — List all teachers with pagination + filters (Admin only)
 export async function GET(request: NextRequest) {
   try {
     const authResult = requireAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // Branch isolation
+    const branchScope = getBranchFromRequest(request, authResult);
 
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search') || '';
@@ -19,7 +23,8 @@ export async function GET(request: NextRequest) {
     const qualification = searchParams.get('qualification') || '';
     const branchId = searchParams.get('branchId') || '';
 
-    const where: Record<string, unknown> = {};
+    // Build where clause — start with branch filter (Teacher has branchId, no schoolId)
+    const where: Record<string, unknown> = withBranchViaRelationFilter(branchScope);
 
     if (search) {
       where.OR = [
