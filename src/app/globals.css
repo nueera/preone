@@ -14,7 +14,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -813,4 +813,398 @@
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }
+}
+
+/* ============================================================
+   PREONE LIVING UNIVERSE — Refined Design System
+   Brand Primary: Indigo-Purple (#6366F1)
+   Dark Mode: Cosmic Deep Space (#0a0a1a)
+   ============================================================ */
+
+:root {
+  /* ── Living Universe Brand Tokens ── */
+  --preone-primary: #6366F1;
+  --preone-primary-dark: #4F46E5;
+  --preone-primary-light: #818CF8;
+  --preone-primary-50: #EEF2FF;
+  --preone-primary-100: #E0E7FF;
+  
+  --preone-blue: #0096C7;
+  --preone-orange: #FFB700;
+  --preone-pink: #FF4D6D;
+  --preone-green: #34D399;
+  --preone-coral: #FB7185;
+  
+  /* ── Warm-tinted Neutrals ── */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border-default: #E5E7EB;
+  --border-light: #F3F4F6;
+  
+  /* ── Typography Scale ── */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.5rem;
+  
+  /* ── Font Families ── */
+  --font-primary: var(--font-poppins), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: var(--font-outfit), sans-serif;
+}
+
+/* ── Dark Cosmic Mode (Living Universe) ── */
+.dark {
+  /* Deep Space Backgrounds */
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #121234;
+  --bg-tertiary: #1a1a3a;
+  --bg-glass: rgba(18, 18, 52, 0.7);
+  
+  /* Cosmic Accents */
+  --preone-primary: #6c5ce7;
+  --preone-primary-light: #a29bfe;
+  --preone-blue: #00d2d3;
+  --preone-orange: #fdcb6e;
+  --preone-pink: #ff7675;
+  --preone-green: #55efc4;
+  
+  /* Glass Effects */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-blur: 20px;
+  
+  /* Text overrides for dark */
+  --text-primary: #FFFFFF;
+  --text-secondary: #b2bec3;
+  --text-tertiary: #636e72;
+  --text-muted: #4a5568;
+  --border-default: #2d2d4a;
+  --border-light: #1a1a3a;
+}
+
+/* ============================================================
+   PREONE CARD SYSTEM — Living Universe
+   ============================================================ */
+
+.preone-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.preone-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.dark .preone-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark .preone-card:hover {
+  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.15);
+  border-color: rgba(108, 92, 231, 0.3);
+}
+
+/* Hero Card — Gradient background with planet decoration */
+.preone-hero-card {
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--preone-primary), var(--preone-primary-light));
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.preone-hero-card::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.05);
+}
+
+/* Achievement Card — Golden border */
+.preone-achievement-card {
+  position: relative;
+  border: 1px solid rgba(252, 211, 77, 0.3);
+  background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.dark .preone-achievement-card {
+  background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(253, 203, 110, 0.05));
+  border-color: rgba(253, 203, 110, 0.2);
+}
+
+/* Glass Card — Dark mode glass morphism */
+.preone-glass-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(0px);
+}
+
+.dark .preone-glass-card {
+  background: var(--bg-glass);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ============================================================
+   PREONE BUTTON SYSTEM — Living Universe
+   ============================================================ */
+
+.preone-btn-primary {
+  background: linear-gradient(135deg, var(--preone-primary), var(--preone-primary-light));
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: var(--font-primary);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  border: none;
+  cursor: pointer;
+}
+
+.preone-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.preone-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.preone-btn-secondary {
+  background: transparent;
+  color: var(--preone-primary);
+  border: 1px solid var(--preone-primary);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preone-btn-secondary:hover {
+  background: var(--preone-primary-50);
+}
+
+.preone-btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preone-btn-icon:hover {
+  background: var(--preone-primary-50);
+  color: var(--preone-primary);
+}
+
+/* ============================================================
+   AURORA BACKGROUND — Dark Mode Only
+   ============================================================ */
+
+.dark body {
+  background: #0a0a1a;
+  position: relative;
+}
+
+.dark .aurora-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 210, 211, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(255, 118, 117, 0.06) 0%, transparent 50%);
+  animation: aurora-shift 25s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-shift {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.7; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.dark .aurora-bg main,
+.dark .aurora-bg header,
+.dark .aurora-bg aside,
+.dark .aurora-bg nav {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   TYPOGRAPHY — Living Universe
+   Poppins for headings, Inter for body
+   ============================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+}
+
+body, p, span, div {
+  font-family: var(--font-secondary);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.text-hero {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  font-family: var(--font-primary);
+  line-height: 1.2;
+}
+
+.text-page-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  font-family: var(--font-primary);
+}
+
+.text-section-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  font-family: var(--font-primary);
+}
+
+.text-card-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-family: var(--font-primary);
+}
+
+.text-body {
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.text-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.text-badge {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   EMOTIONAL TIMELINE — Story Circles
+   ============================================================ */
+
+.story-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(to top right, #6c5ce7, #ff7675, #fdcb6e);
+}
+
+.story-circle-viewed {
+  background: #d1d5db;
+}
+
+.dark .story-circle-viewed {
+  background: #4a5568;
+}
+
+.story-circle-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.dark .story-circle-inner {
+  border-color: #121234;
+}
+
+/* ============================================================
+   SIDEBAR — Living Universe Refined
+   ============================================================ */
+
+.preone-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.preone-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.preone-sidebar-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+}
+
+.dark .preone-sidebar-item {
+  color: var(--text-secondary);
+}
+
+.dark .preone-sidebar-item:hover {
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--preone-primary);
+}
+
+.dark .preone-sidebar-item.active {
+  background: rgba(108, 92, 231, 0.15);
+  color: var(--preone-primary);
 }

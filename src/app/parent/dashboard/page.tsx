@@ -1,9 +1,9 @@
 'use client';
 
 // ============================================================
-// PreOne — Parent Dashboard Page
-// Shows: welcome, child info, today's summary, quick stats,
-// fee status, announcements, growth snapshot, quick actions
+// PreOne — Parent Dashboard Page (Living Universe Design)
+// Shows: emotion-first hero, timeline, growth galaxy,
+// fee status, announcements, AI companion
 // ============================================================
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -13,7 +13,8 @@ import {
   Utensils, BedDouble, Droplets, Smile, Meh, Frown, Zap,
   Calendar, Bell, ArrowRight, RefreshCw, AlertCircle,
   Baby, MessageSquare, CreditCard, BarChart3,
-  Megaphone, Loader2, ChevronDown,
+  Megaphone, Loader2, ChevronDown, Star, Camera,
+  Palette, MessageCircle,
 } from 'lucide-react';
 import {
   Card, CardContent, CardHeader, CardTitle, CardDescription,
@@ -28,17 +29,29 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer,
-} from 'recharts';
 import { useParentAuth } from '@/lib/parent-auth';
 import { parentFetch } from '@/lib/parent-api';
 import { PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
 const theme = PORTAL_THEMES.parent;
 
+// ── Living Universe imports ──
+import { StudentPlanet } from '@/components/cosmic/StudentPlanet';
+import { AiCompanion } from '@/components/cosmic/AiCompanion';
+import { EmotionalTimeline, type TimelineMoment } from '@/components/cosmic/EmotionalTimeline';
+import { AchievementGalaxy } from '@/components/cosmic/AchievementGalaxy';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
+import { PreOneButton } from '@/components/ui/preone-button';
+import {
+  getGreeting,
+  getTimeEmoji,
+  getDayAdjective,
+  getDayAdjectiveEmoji,
+  getDayMessage,
+  getAiInsight,
+} from '@/lib/time-theme';
+
 // ============================================================
-// TYPES
+// TYPES (kept from original)
 // ============================================================
 
 interface TodayUpdate {
@@ -120,15 +133,8 @@ interface DashboardData {
 }
 
 // ============================================================
-// HELPERS
+// HELPERS (kept from original)
 // ============================================================
-
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
 
 function formatCurrency(value: number): string {
   if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
@@ -181,6 +187,111 @@ const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
 };
 
 // ============================================================
+// HELPER: Build timeline moments from today's update
+// ============================================================
+
+function buildTimelineMoments(update: TodayUpdate | null): TimelineMoment[] {
+  if (!update) return [];
+
+  const moments: TimelineMoment[] = [];
+
+  // Morning check-in
+  if (update.moodMorning) {
+    moments.push({
+      id: 'morning-checkin',
+      time: '8:30 AM',
+      title: 'Morning Check-in',
+      emoji: getMoodEmoji(update.moodMorning),
+      description: `${update.moodMorning} morning`,
+    });
+  }
+
+  // Breakfast
+  if (update.breakfast) {
+    const bf = getFoodStatus(update.breakfast);
+    moments.push({
+      id: 'breakfast',
+      time: '9:30 AM',
+      title: 'Breakfast Time',
+      emoji: '🍳',
+      description: bf.label,
+    });
+  }
+
+  // Mid-morning activity
+  if (update.highlights) {
+    moments.push({
+      id: 'mid-morning',
+      time: '10:30 AM',
+      title: 'Activities',
+      emoji: '🎨',
+      description: update.highlights.length > 60
+        ? update.highlights.slice(0, 60) + '...'
+        : update.highlights,
+    });
+  }
+
+  // Lunch
+  if (update.lunch) {
+    const ln = getFoodStatus(update.lunch);
+    moments.push({
+      id: 'lunch',
+      time: '12:30 PM',
+      title: 'Lunch Time',
+      emoji: '🍱',
+      description: ln.label,
+    });
+  }
+
+  // Nap / Sleep
+  if (update.sleepStart) {
+    moments.push({
+      id: 'nap',
+      time: update.sleepStart,
+      title: 'Nap Time',
+      emoji: '😴',
+      description: update.sleepEnd
+        ? `Slept ${update.sleepStart} – ${update.sleepEnd}`
+        : 'Resting',
+    });
+  }
+
+  // Snacks
+  if (update.snacks) {
+    const sn = getFoodStatus(update.snacks);
+    moments.push({
+      id: 'snacks',
+      time: '3:30 PM',
+      title: 'Snack Time',
+      emoji: '🍪',
+      description: sn.label,
+    });
+  }
+
+  // Afternoon mood
+  if (update.moodAfternoon) {
+    moments.push({
+      id: 'afternoon-mood',
+      time: '4:00 PM',
+      title: 'Afternoon Mood',
+      emoji: getMoodEmoji(update.moodAfternoon),
+      description: `${update.moodAfternoon} afternoon`,
+    });
+  }
+
+  // End of day
+  moments.push({
+    id: 'day-end',
+    time: '5:00 PM',
+    title: 'Day Complete',
+    emoji: '🌟',
+    description: `${update.waterGlasses} water glasses today`,
+  });
+
+  return moments;
+}
+
+// ============================================================
 // MAIN COMPONENT
 // ============================================================
 
@@ -223,15 +334,15 @@ export default function ParentDashboard() {
   if (loading && !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-24 w-full rounded-3xl" />
+        <Skeleton className="h-32 w-full rounded-3xl" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-3xl" />
+            <Skeleton key={i} className="h-24 rounded-3xl" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Skeleton className="h-80 rounded-3xl" />
-          <Skeleton className="h-80 rounded-3xl" />
+          <Skeleton className="h-72 rounded-3xl" />
+          <Skeleton className="h-72 rounded-3xl" />
         </div>
       </div>
     );
@@ -260,302 +371,317 @@ export default function ParentDashboard() {
   }
 
   const { selectedChild: child, todayUpdate, stats, nextFeeDue, recentAnnouncements, growthSnapshot, otherChildren } = data;
-  const childName = `${child.firstName} ${child.lastName}`;
+  const childName = child.firstName; // Use first name for emotional feel
+  const childFullName = `${child.firstName} ${child.lastName}`;
   const greeting = getGreeting();
-  const totalFees = stats.feesDue + stats.feesPaid + stats.feesOverdue;
+  const timeEmoji = getTimeEmoji();
 
-  // Growth radar data
-  const growthRadarData = growthSnapshot
+  // ── Day adjective ──
+  const dayAdjective = getDayAdjective({
+    hasUpdate: !!todayUpdate,
+    moodMorning: todayUpdate?.moodMorning,
+    moodAfternoon: todayUpdate?.moodAfternoon,
+    highlights: todayUpdate?.highlights,
+    attendancePresent: true,
+  });
+  const dayEmoji = getDayAdjectiveEmoji(dayAdjective);
+  const dayMessage = getDayMessage(childName, dayAdjective);
+
+  // ── Timeline moments ──
+  const timelineMoments = buildTimelineMoments(todayUpdate);
+
+  // ── Skill planets for AchievementGalaxy ──
+  const skillPlanets = growthSnapshot
     ? [
-        { subject: 'Creativity', value: growthSnapshot.creativity, fullMark: 100 },
-        { subject: 'Communication', value: growthSnapshot.communication, fullMark: 100 },
-        { subject: 'Social', value: growthSnapshot.social, fullMark: 100 },
-        { subject: 'Confidence', value: growthSnapshot.confidence, fullMark: 100 },
-        { subject: 'Cognitive', value: growthSnapshot.cognitive, fullMark: 100 },
-        { subject: 'Physical', value: growthSnapshot.physical, fullMark: 100 },
+        { key: 'creativity', label: 'Creativity', score: growthSnapshot.creativity, emoji: '🎨' },
+        { key: 'communication', label: 'Communication', score: growthSnapshot.communication, emoji: '💬' },
+        { key: 'social', label: 'Social', score: growthSnapshot.social, emoji: '🤝' },
+        { key: 'confidence', label: 'Confidence', score: growthSnapshot.confidence, emoji: '💪' },
+        { key: 'cognitive', label: 'Cognitive', score: growthSnapshot.cognitive, emoji: '🧠' },
+        { key: 'physical', label: 'Physical', score: growthSnapshot.physical, emoji: '🏃' },
       ]
     : [];
 
-  // Strongest/weakest dimensions
-  const strongest = growthSnapshot
-    ? Object.entries(growthSnapshot)
-        .filter(([k]) => !['period', 'overall'].includes(k))
-        .sort(([, a], [, b]) => (b as number) - (a as number))[0]
-    : null;
-  const weakest = growthSnapshot
-    ? Object.entries(growthSnapshot)
-        .filter(([k]) => !['period', 'overall'].includes(k))
-        .sort(([, a], [, b]) => (a as number) - (b as number))[0]
-    : null;
+  // ── Quick card counts ──
+  const artworkCount = todayUpdate?.highlights ? 1 : 0;
+  const photoCount = 3; // Placeholder — would come from API
+  const starCount = 145; // Placeholder — would come from API
+  const messageCount = stats.unacknowledgedObservations || 0;
+
+  // ── Fee calculation ──
+  const totalFees = stats.feesDue + stats.feesPaid + stats.feesOverdue;
+
+  // ── AI Insight ──
+  const aiMessage = getAiInsight({
+    childName,
+    moodMorning: todayUpdate?.moodMorning,
+    moodAfternoon: todayUpdate?.moodAfternoon,
+    highlights: todayUpdate?.highlights,
+    breakfast: todayUpdate?.breakfast,
+    lunch: todayUpdate?.lunch,
+    creativity: growthSnapshot?.creativity ?? null,
+    communication: growthSnapshot?.communication ?? null,
+    social: growthSnapshot?.social ?? null,
+  });
 
   return (
     <div className="space-y-6">
-      {/* ── Welcome Section ── */}
-      <Card className={`rounded-3xl border-0 bg-gradient-to-r ${theme.btnGradientClass} text-white shadow-lg`}>
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {greeting}, {parent?.firstName || 'Parent'}! 👋
-              </h1>
-              <p className="text-sky-100 mt-1 flex items-center gap-2 flex-wrap">
-                <span>Viewing:</span>
-                <span className="font-semibold text-white">{childName}</span>
-                <span className="text-sky-200">|</span>
-                <span>{child.className || 'No class'}</span>
-                {child.rollNumber && (
-                  <>
-                    <span className="text-sky-200">|</span>
-                    <span>Roll No: {child.rollNumber}</span>
-                  </>
-                )}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Switch Child Button */}
-              {children.length > 1 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="bg-white/20 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm"
-                    >
-                      <ChevronDown className="h-4 w-4 mr-1" />
-                      Switch Child
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {children.map((c) => (
-                      <DropdownMenuItem
-                        key={c.id}
-                        className={c.id === selectedChildId ? 'bg-sky-50' : ''}
-                        onClick={() => selectChild(c.id)}
-                      >
-                        <Avatar className="h-5 w-5 mr-2">
-                          <AvatarFallback className="text-[8px] bg-sky-100 text-sky-700">
-                            {c.firstName[0]}{c.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        {c.firstName} {c.lastName} — {c.className || 'No class'}
-                        {c.id === selectedChildId && (
-                          <Badge className="ml-2 bg-sky-100 text-sky-700 text-[9px]">Active</Badge>
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              <div className="text-right">
-                <p className="text-sm text-sky-100">
-                  {new Date().toLocaleDateString('en-IN', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                  })}
+      {/* ═══════════════════════════════════════════════════════
+          1. WELCOME SECTION — Personal greeting with stats
+          ═══════════════════════════════════════════════════════ */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {greeting}, {parent?.firstName || 'Parent'}! {timeEmoji}
+          </h1>
+          <p className="text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
+            <span>{new Date().toLocaleDateString('en-IN', {
+              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            })}</span>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Star count */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+            <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{starCount}</span>
+          </div>
+
+          {/* Notifications */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800">
+            <Bell className="h-4 w-4 text-sky-500" />
+            <span className="text-sm font-semibold text-sky-700 dark:text-sky-400">{messageCount}</span>
+          </div>
+
+          {/* Switch Child */}
+          {children.length > 1 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl gap-1"
+                >
+                  <Avatar className="h-5 w-5">
+                    <AvatarFallback className="text-[8px] bg-sky-100 text-sky-700">
+                      {child.firstName[0]}{child.lastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  {childName}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {children.map((c) => (
+                  <DropdownMenuItem
+                    key={c.id}
+                    className={c.id === selectedChildId ? 'bg-sky-50' : ''}
+                    onClick={() => selectChild(c.id)}
+                  >
+                    <Avatar className="h-5 w-5 mr-2">
+                      <AvatarFallback className="text-[8px] bg-sky-100 text-sky-700">
+                        {c.firstName[0]}{c.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    {c.firstName} {c.lastName}
+                    {c.id === selectedChildId && (
+                      <Badge className="ml-2 bg-sky-100 text-sky-700 text-[9px]">Active</Badge>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          2. HERO CARD — Emotion-first day summary
+          ═══════════════════════════════════════════════════════ */}
+      <PreOneCard variant="hero" className="overflow-hidden">
+        <PreOneCardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {/* Left — Emotional message + pills */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold">{dayMessage}</h2>
+                <p className="text-sky-100 mt-1">
+                  {todayUpdate ? (
+                    <>
+                      {childFullName} • {child.className || 'No class'}
+                      {todayUpdate.moodMorning && (
+                        <span className="ml-2">
+                          Morning: {getMoodEmoji(todayUpdate.moodMorning)}
+                          {todayUpdate.moodAfternoon && (
+                            <> → {getMoodEmoji(todayUpdate.moodAfternoon)}</>
+                          )}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>Check back later — updates usually appear by end of day 💫</>
+                  )}
                 </p>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* ── Child Info Card (compact) ── */}
-      <Card className="rounded-3xl">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-14 w-14 border-2 border-sky-200">
-              <AvatarImage src={child.photo || undefined} />
-              <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-lg font-bold`}>
-                {child.firstName[0]}{child.lastName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg">{childName}</h3>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-1">
-                <span>{child.className || 'No class'}</span>
-                {child.rollNumber && <span>Roll: {child.rollNumber}</span>}
-                {child.programName && <span>{child.programName}</span>}
-                <Badge variant="outline" className="text-[10px] border-emerald-200 text-emerald-700 bg-emerald-50">
-                  {child.status}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── Today's Summary Card ── */}
-      <Card className="rounded-3xl">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-sky-600" />
-              Today&apos;s Summary — {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </CardTitle>
-            {todayUpdate && (
-              <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">Published</Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {todayUpdate ? (
-            <div className="space-y-3">
-              {/* Attendance */}
-              <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                <div>
-                  <p className="text-sm font-medium text-emerald-800">Present Today</p>
-                  <p className="text-xs text-emerald-600">Attendance marked</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {/* Mood */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">Mood</p>
-                  <p className="text-sm font-medium">
-                    {getMoodEmoji(todayUpdate.moodMorning)} {todayUpdate.moodMorning || 'Not recorded'}
-                    {todayUpdate.moodAfternoon && (
-                      <span className="text-muted-foreground"> → {getMoodEmoji(todayUpdate.moodAfternoon)} {todayUpdate.moodAfternoon}</span>
-                    )}
-                  </p>
-                </div>
-
-                {/* Breakfast */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">🍳 Breakfast</p>
-                  <p className={`text-sm font-medium ${getFoodStatus(todayUpdate.breakfast).color}`}>
-                    {todayUpdate.breakfast || 'Not recorded'}
-                  </p>
-                </div>
-
-                {/* Lunch */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">🍱 Lunch</p>
-                  <p className={`text-sm font-medium ${getFoodStatus(todayUpdate.lunch).color}`}>
-                    {todayUpdate.lunch || 'Not recorded'}
-                  </p>
-                </div>
-
-                {/* Snacks */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">🍪 Snacks</p>
-                  <p className={`text-sm font-medium ${getFoodStatus(todayUpdate.snacks).color}`}>
-                    {todayUpdate.snacks || 'Not recorded'}
-                  </p>
-                </div>
-
-                {/* Sleep */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">😴 Sleep</p>
-                  <p className="text-sm font-medium">
-                    {todayUpdate.sleepStart && todayUpdate.sleepEnd
-                      ? `${todayUpdate.sleepStart}–${todayUpdate.sleepEnd}`
-                      : 'Not recorded'}
-                    {todayUpdate.sleepQuality && (
-                      <span className="text-muted-foreground"> ({todayUpdate.sleepQuality})</span>
-                    )}
-                  </p>
-                </div>
-
-                {/* Water + Potty */}
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-1">💧 Water / 🚽 Potty</p>
-                  <p className="text-sm font-medium">
-                    {todayUpdate.waterGlasses} glasses / {todayUpdate.pottyCount}x
-                    {todayUpdate.pottyType && ` (${todayUpdate.pottyType})`}
-                  </p>
-                </div>
-              </div>
-
-              {/* Highlights */}
-              {todayUpdate.highlights && (
-                <div className={`p-3 rounded-xl border border-portal-200 ${theme.selectedClass}`}>
-                  <p className="text-xs font-medium mb-1">📝 Highlights</p>
-                  <p className="text-sm">{todayUpdate.highlights}</p>
+              {/* Highlight pills */}
+              {todayUpdate && (
+                <div className="flex flex-wrap gap-2">
+                  {todayUpdate.highlights && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium backdrop-blur-sm">
+                      🎨 Created Artwork
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium backdrop-blur-sm">
+                    📸 {photoCount} New Photos
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium backdrop-blur-sm">
+                    ⭐ Earned {Math.max(1, Math.round(stats.growthOverall / 20))} Stars
+                  </span>
                 </div>
               )}
 
+              {/* View Day Summary button */}
+              {todayUpdate && (
+                <PreOneButton
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/90 hover:text-white hover:bg-white/20 rounded-xl"
+                  onClick={() => router.push('/parent/daily-updates')}
+                >
+                  View Day Summary <ArrowRight className="h-4 w-4 ml-1" />
+                </PreOneButton>
+              )}
+            </div>
+
+            {/* Right — StudentPlanet */}
+            <div className="shrink-0 hidden sm:block">
+              <StudentPlanet
+                name={child.firstName}
+                photo={child.photo}
+                mood={todayUpdate?.moodMorning}
+                size="lg"
+              />
+            </div>
+          </div>
+        </PreOneCardContent>
+      </PreOneCard>
+
+      {/* ═══════════════════════════════════════════════════════
+          3. EMOTIONAL TIMELINE — Instagram Stories style
+          ═══════════════════════════════════════════════════════ */}
+      <PreOneCard variant="default" className="rounded-3xl">
+        <PreOneCardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-sky-500" />
+              Today&apos;s Story
+            </h3>
+            {todayUpdate && (
+              <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">
+                {timelineMoments.length} Moments
+              </Badge>
+            )}
+          </div>
+          <EmotionalTimeline moments={timelineMoments} />
+        </PreOneCardContent>
+      </PreOneCard>
+
+      {/* ═══════════════════════════════════════════════════════
+          4. QUICK CARDS ROW — Emotion cards
+          ═══════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <PreOneCard variant="emotional" className="hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => router.push('/parent/daily-updates')}>
+          <PreOneCardContent className="p-4 flex flex-col items-center text-center gap-2">
+            <span className="text-3xl">🎨</span>
+            <p className="text-2xl font-bold">{artworkCount}</p>
+            <p className="text-xs text-muted-foreground">Artwork</p>
+          </PreOneCardContent>
+        </PreOneCard>
+
+        <PreOneCard variant="emotional" className="hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => router.push('/parent/daily-updates')}>
+          <PreOneCardContent className="p-4 flex flex-col items-center text-center gap-2">
+            <span className="text-3xl">📸</span>
+            <p className="text-2xl font-bold">{photoCount}</p>
+            <p className="text-xs text-muted-foreground">Photos</p>
+          </PreOneCardContent>
+        </PreOneCard>
+
+        <PreOneCard variant="emotional" className="hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => router.push('/parent/growth')}>
+          <PreOneCardContent className="p-4 flex flex-col items-center text-center gap-2">
+            <span className="text-3xl">⭐</span>
+            <p className="text-2xl font-bold">{starCount}</p>
+            <p className="text-xs text-muted-foreground">Stars</p>
+          </PreOneCardContent>
+        </PreOneCard>
+
+        <PreOneCard variant="emotional" className="hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => router.push('/parent/communication')}>
+          <PreOneCardContent className="p-4 flex flex-col items-center text-center gap-2">
+            <span className="text-3xl">💬</span>
+            <p className="text-2xl font-bold">{messageCount}</p>
+            <p className="text-xs text-muted-foreground">Messages</p>
+          </PreOneCardContent>
+        </PreOneCard>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          5. GROWTH + FEE ROW — Two cards side by side
+          ═══════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Growth Galaxy Card */}
+        <PreOneCard variant="cosmic" className="rounded-3xl">
+          <PreOneCardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-purple-500" />
+                Growth Galaxy — {growthSnapshot?.period || 'No Data'}
+              </h3>
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
-                onClick={() => router.push('/parent/daily-updates')}
+                onClick={() => router.push('/parent/growth')}
               >
-                View Full Update <ArrowRight className="h-3 w-3 ml-1" />
+                Details <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
             </div>
-          ) : (
-            <div className="text-center py-8 space-y-3">
-              <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
-                <Sun className="h-8 w-8 text-amber-500" />
+            {growthSnapshot ? (
+              <AchievementGalaxy
+                skills={skillPlanets}
+                overallScore={growthSnapshot.overall}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <TrendingUp className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No growth data yet</p>
+                <p className="text-xs text-muted-foreground">Growth assessments will appear here</p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Today&apos;s update hasn&apos;t been published yet.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Check back later! Teachers usually publish updates by end of day.
-              </p>
+            )}
+          </PreOneCardContent>
+        </PreOneCard>
+
+        {/* Fee Status Card */}
+        <PreOneCard variant="glass" className="rounded-3xl">
+          <PreOneCardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold flex items-center gap-2">
+                <IndianRupee className="h-4 w-4 text-sky-600" />
+                Fee Status
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
+                onClick={() => router.push('/parent/fees')}
+              >
+                View All <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── Quick Stats Row ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: 'Attendance Rate',
-            value: `${stats.attendanceRate}%`,
-            icon: CheckCircle2,
-            iconBg: 'bg-emerald-100',
-            iconColor: 'text-emerald-600',
-          },
-          {
-            label: 'Fees Due',
-            value: formatCurrency(stats.feesDue + stats.feesOverdue),
-            icon: IndianRupee,
-            iconBg: 'bg-red-100',
-            iconColor: 'text-red-600',
-          },
-          {
-            label: 'Growth Score',
-            value: `${stats.growthOverall}/100`,
-            icon: TrendingUp,
-            iconBg: 'bg-purple-100',
-            iconColor: 'text-purple-600',
-          },
-          {
-            label: 'New Observations',
-            value: stats.unacknowledgedObservations,
-            icon: Eye,
-            iconBg: 'bg-orange-100',
-            iconColor: 'text-orange-600',
-          },
-        ].map((stat) => (
-          <Card key={stat.label} className="rounded-3xl">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${stat.iconBg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
-                </div>
-              </div>
-              <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ── Fee Status Card ── */}
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <IndianRupee className="h-4 w-4 text-sky-600" />
-              Fee Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
             {totalFees > 0 ? (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -577,9 +703,9 @@ export default function ParentDashboard() {
                 </div>
 
                 {nextFeeDue && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-xs text-amber-700 font-medium">Next Due</p>
-                    <p className="text-sm text-amber-800">
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                    <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Next Due</p>
+                    <p className="text-sm text-amber-800 dark:text-amber-300">
                       {formatDate(nextFeeDue.dueDate)} — {formatCurrency(nextFeeDue.amount)}
                     </p>
                   </div>
@@ -594,227 +720,88 @@ export default function ParentDashboard() {
                   >
                     View Details
                   </Button>
-                  <Button
+                  <PreOneButton
                     size="sm"
-                    className={`flex-1 bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl hover:${theme.btnGradientHoverClass} text-xs`}
+                    className="flex-1 text-xs"
                     onClick={() => router.push('/parent/fees')}
                   >
                     <CreditCard className="h-3 w-3 mr-1" />
                     Pay Now
-                  </Button>
+                  </PreOneButton>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
                 <IndianRupee className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">No fees due</p>
-                <p className="text-xs text-muted-foreground">All payments are up to date!</p>
+                <p className="text-xs text-muted-foreground">All payments are up to date! 🎉</p>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* ── Recent Announcements Card ── */}
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Megaphone className="h-4 w-4 text-sky-600" />
-                Announcements
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
-                onClick={() => router.push('/parent/communication')}
-              >
-                View All <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {recentAnnouncements.length > 0 ? (
-              <div className="space-y-2">
-                {recentAnnouncements.map((ann) => {
-                  const priority = PRIORITY_CONFIG[ann.priority] || PRIORITY_CONFIG.NORMAL;
-                  return (
-                    <div
-                      key={ann.id}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="text-base shrink-0">{priority.label}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{ann.title}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {ann.type} • {ann.publishedAt ? formatDate(ann.publishedAt) : 'Draft'}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`text-[9px] shrink-0 ${priority.color}`}
-                      >
-                        {ann.priority}
-                      </Badge>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No announcements</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </PreOneCardContent>
+        </PreOneCard>
       </div>
 
-      {/* ── Growth Snapshot + Quick Actions Row ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Growth Snapshot */}
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-sky-600" />
-                Growth — {growthSnapshot?.period || 'No Data'}
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
-                onClick={() => router.push('/parent/growth')}
-              >
-                View Details <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {growthSnapshot ? (
-              <div className="space-y-4">
-                <div className="h-52">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={growthRadarData}>
-                      <PolarGrid stroke={CHART_PALETTE.grid} />
-                      <PolarAngleAxis
-                        dataKey="subject"
-                        tick={{ fontSize: 10, fill: CHART_PALETTE.axis }}
-                      />
-                      <PolarRadiusAxis
-                        angle={90}
-                        domain={[0, 100]}
-                        tick={{ fontSize: 8, fill: CHART_PALETTE.axisLight }}
-                      />
-                      <Radar
-                        name="Score"
-                        dataKey="value"
-                        stroke={CHART_PALETTE.series[1]}
-                        fill={CHART_PALETTE.series[1]}
-                        fillOpacity={0.2}
-                        strokeWidth={2}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{growthSnapshot.overall}<span className="text-sm font-normal text-muted-foreground">/100</span></p>
-                  <p className="text-xs text-muted-foreground">Overall Score</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {strongest && (
-                    <div className="p-2 bg-emerald-50 rounded-xl text-center">
-                      <p className="text-[10px] text-emerald-600">Strongest</p>
-                      <p className="text-sm font-medium text-emerald-700">
-                        {strongest[0].charAt(0).toUpperCase() + strongest[0].slice(1)} ({strongest[1] as number}) 💪
+      {/* ═══════════════════════════════════════════════════════
+          6. ANNOUNCEMENTS — With new card styling
+          ═══════════════════════════════════════════════════════ */}
+      <PreOneCard variant="default" className="rounded-3xl">
+        <PreOneCardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold flex items-center gap-2">
+              <Megaphone className="h-4 w-4 text-sky-600" />
+              Announcements
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
+              onClick={() => router.push('/parent/communication')}
+            >
+              View All <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
+          </div>
+          {recentAnnouncements.length > 0 ? (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {recentAnnouncements.map((ann) => {
+                const priority = PRIORITY_CONFIG[ann.priority] || PRIORITY_CONFIG.NORMAL;
+                return (
+                  <div
+                    key={ann.id}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+                  >
+                    <span className="text-base shrink-0">{priority.label}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{ann.title}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {ann.type} • {ann.publishedAt ? formatDate(ann.publishedAt) : 'Draft'}
                       </p>
                     </div>
-                  )}
-                  {weakest && (
-                    <div className="p-2 bg-amber-50 rounded-xl text-center">
-                      <p className="text-[10px] text-amber-600">Needs Work</p>
-                      <p className="text-sm font-medium text-amber-700">
-                        {weakest[0].charAt(0).toUpperCase() + weakest[0].slice(1)} ({weakest[1] as number}) 📢
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <TrendingUp className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No growth data yet</p>
-                <p className="text-xs text-muted-foreground">Growth assessments will appear here</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions Grid */}
-        <Card className="rounded-3xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-sky-600" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "View Today's Update", icon: Sun, href: '/parent/daily-updates', color: 'from-amber-500 to-orange-500' },
-                { label: 'Pay Fees', icon: IndianRupee, href: '/parent/fees', color: 'from-red-500 to-rose-500' },
-                { label: 'View Growth Report', icon: BarChart3, href: '/parent/growth', color: 'from-violet-500 to-purple-500' },
-                { label: 'Chat with Teacher', icon: MessageSquare, href: '/parent/communication', color: theme.btnGradientClass },
-              ].map((action) => (
-                <Card
-                  key={action.label}
-                  className="rounded-2xl cursor-pointer hover:shadow-md transition-all group"
-                  onClick={() => router.push(action.href)}
-                >
-                  <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-                    <div className={`p-3 rounded-xl bg-gradient-to-r ${action.color} shadow-sm group-hover:shadow-md transition-shadow`}>
-                      <action.icon className="h-5 w-5 text-white" />
-                    </div>
-                    <span className="text-xs font-medium">{action.label}</span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Sibling Quick Access */}
-            {otherChildren.length > 0 && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-xs text-muted-foreground mb-2">Other Children</p>
-                <div className="space-y-2">
-                  {otherChildren.map((sibling) => (
-                    <div
-                      key={sibling.id}
-                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors"
+                    <Badge
+                      variant="outline"
+                      className={`text-[9px] shrink-0 ${priority.color}`}
                     >
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className={`${theme.avatarFallbackClass} text-xs`}>
-                          {sibling.firstName[0]}{sibling.lastName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{sibling.firstName} {sibling.lastName}</p>
-                        <p className="text-xs text-muted-foreground">{sibling.className || 'No class'}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-sky-600 hover:text-sky-700 rounded-xl"
-                        onClick={() => selectChild(sibling.id)}
-                      >
-                        Switch <ArrowRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                      {ann.priority}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No announcements</p>
+            </div>
+          )}
+        </PreOneCardContent>
+      </PreOneCard>
+
+      {/* ═══════════════════════════════════════════════════════
+          7. AI COMPANION — Floating at bottom right
+          ═══════════════════════════════════════════════════════ */}
+      <AiCompanion
+        message={aiMessage}
+        childName={childName}
+      />
     </div>
   );
 }

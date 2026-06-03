@@ -496,3 +496,79 @@ export function canAccessModule(role: string, module: string): boolean {
   }
   return false;
 }
+
+// ============================================================
+// LIVING UNIVERSE — Refined Design Tokens
+// ============================================================
+
+export const LIVING_UNIVERSE = {
+  /** Brand Primary — Indigo-Purple hybrid */
+  primary: '#6366F1',
+  primaryDark: '#4F46E5',
+  primaryLight: '#818CF8',
+  primary50: '#EEF2FF',
+  primary100: '#E0E7FF',
+
+  /** Brand Secondary */
+  blue: '#0096C7',
+  orange: '#FFB700',
+  pink: '#FF4D6D',
+  green: '#34D399',
+  coral: '#FB7185',
+
+  /** Dark Mode Cosmic Accents */
+  dark: {
+    primary: '#6c5ce7',
+    primaryLight: '#a29bfe',
+    blue: '#00d2d3',
+    orange: '#fdcb6e',
+    pink: '#ff7675',
+    green: '#55efc4',
+    bgPrimary: '#0a0a1a',
+    bgSecondary: '#121234',
+    bgTertiary: '#1a1a3a',
+    bgGlass: 'rgba(18, 18, 52, 0.7)',
+    glassBorder: 'rgba(255, 255, 255, 0.08)',
+    borderDefault: '#2d2d4a',
+  },
+
+  /** Skill Planet colors for Achievement Galaxy */
+  skillPlanets: {
+    art:     { color: '#FB7185', icon: '🎨', name: 'Art Planet' },
+    math:    { color: '#60A5FA', icon: '🔢', name: 'Math Planet' },
+    reading: { color: '#34D399', icon: '📚', name: 'Reading Planet' },
+    sports:  { color: '#F59E0B', icon: '🏆', name: 'Sports Planet' },
+    social:  { color: '#818CF8', icon: '💬', name: 'Social Planet' },
+  },
+
+  /** Reaction emojis */
+  reactions: {
+    love: '❤️',
+    celebrate: '🎉',
+    proud: '🌟',
+    wow: '😮',
+    heart: '💙',
+  },
+
+  /** Theme packs for customization */
+  themePacks: [
+    { id: 'cosmic', name: 'Cosmic Purple', icon: '🌌', primary: '#6366F1' },
+    { id: 'ocean', name: 'Ocean Blue', icon: '🌊', primary: '#0EA5E9' },
+    { id: 'forest', name: 'Forest Green', icon: '🌳', primary: '#10B981' },
+    { id: 'sunset', name: 'Sunset Orange', icon: '🌅', primary: '#F97316' },
+    { id: 'rose', name: 'Rose Garden', icon: '🌹', primary: '#EC4899' },
+    { id: 'midnight', name: 'Midnight', icon: '🌙', primary: '#6c5ce7' },
+  ],
+
+  /** Day adjectives for emotional language */
+  dayAdjectives: {
+    amazing: { emoji: '🌈', text: 'amazing' },
+    great: { emoji: '✨', text: 'great' },
+    good: { emoji: '😊', text: 'good' },
+    nice: { emoji: '👍', text: 'nice' },
+    okay: { emoji: '🙂', text: 'okay' },
+    quiet: { emoji: '🤫', text: 'quiet' },
+    tired: { emoji: '😴', text: 'tired' },
+    fussy: { emoji: '😤', text: 'a bit fussy' },
+  },
+} as const;

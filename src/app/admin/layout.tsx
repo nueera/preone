@@ -5,13 +5,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
+import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
 
 // TASK_MASTER can only access these admin routes
 const TASK_MASTER_ALLOWED = ['/admin/dashboard', '/admin/crm'];
 
 /**
  * Admin Layout — Client component wrapping the PreOne admin portal.
- * Provides the sidebar + header + main content structure.
+ * Provides the sidebar + header + main content structure with Aurora Background.
  * Supports both ADMIN and TASK_MASTER roles.
  * TASK_MASTER sees same layout but sidebar only shows CRM + Dashboard.
  * data-portal="admin" for CSS theme scoping.
@@ -70,18 +71,20 @@ export default function AdminLayout({
   }, [userRole, pathname, router]);
 
   return (
-    <SidebarProvider>
-      <AdminSidebar />
-      <div className="flex flex-1 flex-col min-h-screen">
-        <AdminHeader />
-        <main
-          className="flex-1 bg-background p-6 overflow-auto"
-          data-portal="admin"
-          data-role={userRole.toLowerCase()}
-        >
-          {children}
-        </main>
-      </div>
-    </SidebarProvider>
+    <AuroraBackground intensity="subtle">
+      <SidebarProvider>
+        <AdminSidebar />
+        <div className="flex flex-1 flex-col min-h-screen">
+          <AdminHeader />
+          <main
+            className="flex-1 bg-background/80 p-6 overflow-auto"
+            data-portal="admin"
+            data-role={userRole.toLowerCase()}
+          >
+            {children}
+          </main>
+        </div>
+      </SidebarProvider>
+    </AuroraBackground>
   );
 }
