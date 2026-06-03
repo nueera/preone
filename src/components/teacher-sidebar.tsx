@@ -17,6 +17,7 @@ import {
   Settings,
   ChevronsLeft,
   ChevronsRight,
+  Bell,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -48,6 +49,7 @@ const NAV_ITEMS = [
   { label: 'Growth', icon: TrendingUp, href: '/teacher/growth' },
   { label: 'Schedule', icon: Calendar, href: '/teacher/schedule' },
   { label: 'Communication', icon: MessageSquare, href: '/teacher/communication' },
+  { label: 'Notifications', icon: Bell, href: '/teacher/notifications' },
   { label: 'Settings', icon: Settings, href: '/teacher/settings' },
 ];
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, unauthorized } from '@/lib/auth';
+import { createBulkNotifications, NotificationTemplates } from '@/lib/notifications';
 
 // GET /api/communication/announcements — List announcements
 export async function GET(request: NextRequest) {
@@ -75,6 +76,56 @@ export async function POST(request: NextRequest) {
         createdBy: user.userId,
       },
     });
+
+    // ── Notify target audience when published (not scheduled) ──
+    if (!isScheduled && user.schoolId) {
+      try {
+        const template = NotificationTemplates.newAnnouncement(title);
+        // Determine target audience and find their user IDs
+        const targetRole = target === 'Teachers' ? 'TEACHER' :
+                          target === 'Parents' ? 'PARENT' : null;
+
+        if (targetRole) {
+          const targetUsers = await db.user.findMany({
+            where: { schoolId: user.schoolId, role: targetRole as any, isActive: true },
+            select: { id: true },
+          });
+          if (targetUsers.length > 0) {
+            await createBulkNotifications(
+              targetUsers.map((u) => u.id),
+              {
+                schoolId: user.schoolId,
+                ...template,
+                link: targetRole === 'TEACHER' ? '/teacher/communication' : '/parent/communication',
+                senderId: user.userId,
+              }
+            );
+          }
+        } else {
+          // 'All' — notify all teachers + parents in the school
+          const allUsers = await db.user.findMany({
+            where: {
+              schoolId: user.schoolId,
+              role: { in: ['TEACHER', 'PARENT'] },
+              isActive: true,
+            },
+            select: { id: true },
+          });
+          if (allUsers.length > 0) {
+            await createBulkNotifications(
+              allUsers.map((u) => u.id),
+              {
+                schoolId: user.schoolId,
+                ...template,
+                senderId: user.userId,
+              }
+            );
+          }
+        }
+      } catch (notifError) {
+        console.error('Announcement notification error:', notifError);
+      }
+    }
 
     return NextResponse.json(
       { message: 'Announcement created successfully', announcement },

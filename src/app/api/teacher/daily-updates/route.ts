@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
 import { getParentUserId } from '@/lib/api-auth';
+import { createNotification, NotificationTemplates } from '@/lib/notifications';
 
 // ── GET /api/teacher/daily-updates — Get all daily updates for teacher's class on a date ──
 export async function GET(request: NextRequest) {
@@ -290,16 +291,17 @@ export async function POST(request: NextRequest) {
         if (parentLink?.parentId) {
           const notifyUserId = await getParentUserId(parentLink.parentId);
           if (notifyUserId) {
-            await db.notification.create({
-              data: {
+              const template = NotificationTemplates.dailyUpdatePosted(
+                `${student.firstName} ${student.lastName}`
+              );
+              await createNotification({
                 userId: notifyUserId,
-                title: `Daily Update - ${student.firstName} ${student.lastName}`,
-                message: `Today's update is now available`,
-                type: 'DAILY_UPDATE',
-                actionUrl: `/parent/daily-updates?student=${studentId}&date=${date}`,
-              },
-            });
-          }
+                schoolId: user.schoolId || '',
+                ...template,
+                link: `/parent/daily-updates?student=${studentId}&date=${date}`,
+                senderId: user.userId,
+              });
+            }
         }
       } catch (notifError) {
         console.error('Failed to send notification:', notifError);

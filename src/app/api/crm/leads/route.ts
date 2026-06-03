@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthUser, requireRole, Role } from '@/lib/auth';
+import { createNotification, NotificationTemplates } from '@/lib/notifications';
 
 // GET /api/crm/leads — List leads with filters & pagination (Admin + TaskMaster)
 export async function GET(request: NextRequest) {
@@ -171,6 +172,22 @@ export async function POST(request: NextRequest) {
         followUps: true,
       },
     });
+
+    // ── Notify assigned user about new lead ──
+    try {
+      if (assignedTo && authResult.schoolId) {
+        const template = NotificationTemplates.newLead(parentName.trim());
+        await createNotification({
+          userId: assignedTo,
+          schoolId: authResult.schoolId,
+          ...template,
+          link: `/admin/crm/leads/${lead.id}`,
+          senderId: authResult.userId,
+        });
+      }
+    } catch (notifError) {
+      console.error('Lead notification error:', notifError);
+    }
 
     return NextResponse.json(
       { message: 'Lead created successfully', lead },

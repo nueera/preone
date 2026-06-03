@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { randomBytes } from 'crypto';
+import { createNotification, NotificationTemplates } from '@/lib/notifications';
 
 // POST /api/fees/payments — Record payment against an invoice
 export async function POST(request: NextRequest) {
@@ -75,6 +76,42 @@ export async function POST(request: NextRequest) {
         paidDate: newStatus === 'PAID' ? new Date() : invoice.paidDate,
       },
     });
+
+    // ── Notify parent about payment ──
+    try {
+      if (user.schoolId) {
+        const studentName = `${invoice.student.firstName} ${invoice.student.lastName}`;
+        // Find parent via StudentParent
+        const parentLink = await db.studentParent.findFirst({
+          where: { studentId: invoice.studentId, isPrimary: true },
+          select: { parentId: true },
+        });
+        if (parentLink?.parentId) {
+          const parent = await db.parent.findUnique({
+            where: { id: parentLink.parentId },
+            select: { email: true },
+          });
+          if (parent?.email) {
+            const parentUser = await db.user.findUnique({
+              where: { email: parent.email },
+              select: { id: true },
+            });
+            if (parentUser) {
+              const template = NotificationTemplates.feePaymentReceived(studentName, payAmount);
+              await createNotification({
+                userId: parentUser.id,
+                schoolId: user.schoolId,
+                ...template,
+                link: '/parent/fees',
+                senderId: user.userId,
+              });
+            }
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error('Payment notification error:', notifError);
+    }
 
     return NextResponse.json(
       {

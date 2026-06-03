@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { createNotification, NotificationTemplates } from '@/lib/notifications';
 
 // GET /api/attendance — Get attendance records (filter by date, class)
 export async function GET(request: NextRequest) {
@@ -161,6 +162,58 @@ export async function POST(request: NextRequest) {
 
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
+
+    // ── Notify parents of absent students ──
+    if (type !== 'staff' && authResult.schoolId) {
+      try {
+        const absentRecords = records.filter(
+          (r: Record<string, unknown>, i: number) => r.status === 'ABSENT' && results[i]?.success
+        );
+        for (const record of absentRecords) {
+          const studentId = record.studentId as string;
+          // Look up student + parent
+          const student = await db.student.findUnique({
+            where: { id: studentId },
+            select: {
+              firstName: true, lastName: true,
+              class: { select: { name: true } },
+              parents: {
+                where: { isPrimary: true },
+                take: 1,
+                select: { parentId: true },
+              },
+            },
+          });
+          if (student && student.parents[0]?.parentId) {
+            // Resolve parent → user ID
+            const parent = await db.parent.findUnique({
+              where: { id: student.parents[0].parentId },
+              select: { email: true },
+            });
+            if (parent?.email) {
+              const parentUser = await db.user.findUnique({
+                where: { email: parent.email },
+                select: { id: true },
+              });
+              if (parentUser) {
+                const template = NotificationTemplates.studentAbsent(
+                  `${student.firstName} ${student.lastName}`,
+                  student.class?.name || 'Unknown Class'
+                );
+                await createNotification({
+                  userId: parentUser.id,
+                  schoolId: authResult.schoolId,
+                  ...template,
+                  link: '/parent/attendance',
+                });
+              }
+            }
+          }
+        }
+      } catch (notifError) {
+        console.error('Attendance notification error:', notifError);
+      }
+    }
 
     return NextResponse.json({
       message: `${successCount} attendance records processed`,

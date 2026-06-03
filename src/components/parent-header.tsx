@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Bell, User, Settings, LogOut, ChevronDown,
+  User, Settings, LogOut, ChevronDown,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/ui/notification-bell';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -138,11 +139,7 @@ export function ParentHeader() {
         )}
 
         {/* Notification Bell */}
-        <Button variant="ghost" size="icon" className="relative h-9 w-9">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         {/* User Avatar Dropdown */}
         <DropdownMenu>

@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Bell,
   User,
   Settings,
   LogOut,
   Zap,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/ui/notification-bell';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -130,12 +130,8 @@ export function TeacherHeader() {
           Mark Attendance
         </Button>
 
-        {/* Notification Bell with badge */}
-        <Button variant="ghost" size="icon" className="relative h-9 w-9">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        {/* Notification Bell */}
+        <NotificationBell />
 
         {/* User Avatar Dropdown */}
         <DropdownMenu>

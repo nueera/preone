@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Baby, ClipboardCheck, IndianRupee, Sun,
   Eye, TrendingUp, MessageSquare, Settings,
-  ChevronsLeft, ChevronsRight, ChevronDown,
+  ChevronsLeft, ChevronsRight, ChevronDown, Bell,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -47,6 +47,7 @@ const NAV_ITEMS = [
   { label: 'Observations', icon: Eye, href: '/parent/observations' },
   { label: 'Growth', icon: TrendingUp, href: '/parent/growth' },
   { label: 'Communication', icon: MessageSquare, href: '/parent/communication' },
+  { label: 'Notifications', icon: Bell, href: '/parent/notifications' },
   { label: 'Settings', icon: Settings, href: '/parent/settings' },
 ];
 
