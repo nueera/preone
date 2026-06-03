@@ -18,6 +18,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Bell,
+  FileBarChart,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -49,6 +50,7 @@ const NAV_ITEMS = [
   { label: 'Growth', icon: TrendingUp, href: '/teacher/growth' },
   { label: 'Schedule', icon: Calendar, href: '/teacher/schedule' },
   { label: 'Communication', icon: MessageSquare, href: '/teacher/communication' },
+  { label: 'Reports', icon: FileBarChart, href: '/teacher/reports' },
   { label: 'Notifications', icon: Bell, href: '/teacher/notifications' },
   { label: 'Settings', icon: Settings, href: '/teacher/settings' },
 ];
