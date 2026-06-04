@@ -13,16 +13,11 @@ import {
   AlertTriangle,
   Calendar,
   Megaphone,
-  ArrowUpRight,
-  ArrowDownRight,
+  FileText,
+  BarChart3,
+  ClipboardList,
+  Wallet,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -39,6 +34,15 @@ import {
   Cell,
 } from 'recharts';
 import { PORTAL_THEMES, CHART_PALETTE, FEE_COLORS } from '@/lib/theme-tokens';
+import { getTimeOfDay, TIME_THEME_CONFIG } from '@/lib/theme/cosmic-theme';
+import { PreOneCard } from '@/components/ui/preone-card';
+import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
+import {
+  PageTransition,
+  StaggerContainer,
+  StaggerItem,
+} from '@/components/ui/page-transition';
+
 const theme = PORTAL_THEMES.admin;
 
 // ============================================================
@@ -141,138 +145,77 @@ const ACTIVITY_COLORS: Record<string, string> = {
 };
 
 const ACTIVITY_BG: Record<string, string> = {
-  ADMISSION: 'bg-emerald-50',
-  PAYMENT: 'bg-emerald-50',
-  LEAD: 'bg-portal-50',
-  ATTENDANCE: 'bg-red-50',
-  LEAVE: 'bg-orange-50',
-  ANNOUNCEMENT: 'bg-blue-50',
+  ADMISSION: 'bg-emerald-50 dark:bg-emerald-950/40',
+  PAYMENT: 'bg-emerald-50 dark:bg-emerald-950/40',
+  LEAD: 'bg-portal-50 dark:bg-purple-950/40',
+  ATTENDANCE: 'bg-red-50 dark:bg-red-950/40',
+  LEAVE: 'bg-orange-50 dark:bg-orange-950/40',
+  ANNOUNCEMENT: 'bg-blue-50 dark:bg-blue-950/40',
 };
 
-// ── Stat card config ──
+// ── Stat card config (mapped to CosmicStatCard) ──
 const STAT_CARDS: {
   key: keyof DashboardStats;
   label: string;
-  icon: React.ElementType;
-  iconColorClass: string;
+  icon: React.ReactNode;
+  color: string;
   trendKey: keyof DashboardStats['trends'];
-  isCurrency?: boolean;
-  isPercent?: boolean;
+  suffix?: string;
 }[] = [
   {
     key: 'totalStudents',
     label: 'Total Students',
-    icon: GraduationCap,
-    iconColorClass: 'bg-portal-100 text-portal-600',
+    icon: <GraduationCap className="w-5 h-5" />,
+    color: 'bg-purple-500',
     trendKey: 'students',
   },
   {
     key: 'totalTeachers',
     label: 'Total Teachers',
-    icon: Users,
-    iconColorClass: 'bg-blue-100 text-blue-600',
+    icon: <Users className="w-5 h-5" />,
+    color: 'bg-sky-500',
     trendKey: 'teachers',
   },
   {
     key: 'monthlyRevenue',
     label: 'Monthly Revenue',
-    icon: IndianRupee,
-    iconColorClass: 'bg-emerald-100 text-emerald-600',
+    icon: <IndianRupee className="w-5 h-5" />,
+    color: 'bg-emerald-500',
     trendKey: 'revenue',
-    isCurrency: true,
+    suffix: '₹',
   },
   {
     key: 'newAdmissions',
     label: 'New Admissions',
-    icon: UserPlus,
-    iconColorClass: 'bg-pink-100 text-pink-600', // Admission pink — no portal token
+    icon: <UserPlus className="w-5 h-5" />,
+    color: 'bg-pink-500',
     trendKey: 'admissions',
   },
   {
     key: 'occupancyRate',
     label: 'Occupancy Rate',
-    icon: Building2,
-    iconColorClass: 'bg-orange-100 text-orange-600',
+    icon: <Building2 className="w-5 h-5" />,
+    color: 'bg-orange-500',
     trendKey: 'occupancy',
-    isPercent: true,
+    suffix: '%',
   },
   {
     key: 'attendanceRate',
     label: 'Attendance Rate',
-    icon: CheckCircle,
-    iconColorClass: 'bg-teal-100 text-teal-600',
+    icon: <CheckCircle className="w-5 h-5" />,
+    color: 'bg-teal-500',
     trendKey: 'attendance',
-    isPercent: true,
+    suffix: '%',
   },
 ];
 
-// ============================================================
-// COMPONENT: StatCard
-// ============================================================
-
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  iconColorClass,
-  trend,
-  loading,
-}: {
-  label: string;
-  value: string | number;
-  icon: React.ElementType;
-  iconColorClass: string;
-  trend: number;
-  loading: boolean;
-}) {
-  const isPositive = trend >= 0;
-
-  return (
-    <Card className="rounded-xl shadow-sm border-0 bg-white">
-      <CardContent className="p-6">
-        {loading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-16" />
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full ${iconColorClass}`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500">{label}</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold tracking-tight">
-                  {value}
-                </span>
-                {trend !== 0 && (
-                  <span
-                    className={`inline-flex items-center text-xs font-medium ${
-                      isPositive ? 'text-emerald-600' : 'text-red-600'
-                    }`}
-                  >
-                    {isPositive ? (
-                      <ArrowUpRight className="h-3 w-3 mr-0.5" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 mr-0.5" />
-                    )}
-                    {Math.abs(trend)}%
-                  </span>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+// ── Quick report links ──
+const QUICK_REPORTS = [
+  { label: 'Fee Collection Report', icon: Wallet, href: '/admin/fees' },
+  { label: 'Attendance Summary', icon: ClipboardList, href: '/admin/attendance' },
+  { label: 'Admission Pipeline', icon: BarChart3, href: '/admin/crm' },
+  { label: 'Monthly Revenue', icon: FileText, href: '/admin/reports' },
+];
 
 // ============================================================
 // COMPONENT: RevenueChart
@@ -290,7 +233,6 @@ function RevenueChart({
   onPeriodChange: (p: string) => void;
 }) {
   const filteredData = useMemo(() => {
-    // Show all 12 months or filter based on period
     return data.length > 0
       ? data
       : [
@@ -310,11 +252,15 @@ function RevenueChart({
   }, [data]);
 
   return (
-    <Card className="rounded-xl shadow-sm border-0 bg-white">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+    <PreOneCard variant="strip" className="p-0">
+      <div className="flex flex-row items-center justify-between p-6 pb-2">
         <div>
-          <CardTitle className="text-base font-semibold">Revenue Overview</CardTitle>
-          <CardDescription>Monthly revenue vs collections</CardDescription>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">
+            Revenue Overview
+          </h3>
+          <p className="text-sm text-[var(--text-tertiary)] mt-0.5">
+            Monthly revenue vs collections
+          </p>
         </div>
         <div className="flex gap-1">
           {['This Year', 'Last Year'].map((p) => (
@@ -324,8 +270,8 @@ function RevenueChart({
               size="sm"
               className={`h-7 text-xs rounded-lg ${
                 period === p
-                  ? 'bg-portal-600 hover:bg-portal-700 text-white'
-                  : ''
+                  ? 'bg-[var(--preone-primary)] hover:bg-[var(--preone-primary-dark)] text-white'
+                  : 'dark:bg-[rgba(255,255,255,0.06)] dark:text-[var(--text-secondary)] dark:border-[rgba(255,255,255,0.08)]'
               }`}
               onClick={() => onPeriodChange(p)}
             >
@@ -333,8 +279,8 @@ function RevenueChart({
             </Button>
           ))}
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="px-6 pb-6">
         {loading ? (
           <Skeleton className="h-[300px] w-full rounded-lg" />
         ) : (
@@ -356,20 +302,27 @@ function RevenueChart({
                   <stop offset="95%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={CHART_PALETTE.gridLight} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid, #f0f0f0)" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: 'var(--text-tertiary)' }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: 'var(--text-tertiary)' }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={formatYAxis}
               />
               <RTooltip
+                contentStyle={{
+                  backgroundColor: 'var(--card, #fff)',
+                  borderColor: 'var(--border, #e5e7eb)',
+                  borderRadius: '12px',
+                  color: 'var(--text-primary)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                }}
                 formatter={(value: number, name: string) => [
                   `₹${value.toLocaleString('en-IN')}`,
                   name === 'revenue' ? 'Revenue' : 'Collections',
@@ -394,8 +347,8 @@ function RevenueChart({
             </AreaChart>
           </ResponsiveContainer>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </PreOneCard>
   );
 }
 
@@ -422,12 +375,16 @@ function FeeBreakdownPie({
   );
 
   return (
-    <Card className="rounded-xl shadow-sm border-0 bg-white">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Fee Breakdown</CardTitle>
-        <CardDescription>Current fee collection status</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <PreOneCard variant="default" className="p-0">
+      <div className="p-6 pb-2">
+        <h3 className="text-base font-semibold text-[var(--text-primary)]">
+          Fee Breakdown
+        </h3>
+        <p className="text-sm text-[var(--text-tertiary)] mt-0.5">
+          Current fee collection status
+        </p>
+      </div>
+      <div className="px-6 pb-6">
         {loading ? (
           <Skeleton className="h-[280px] w-full rounded-lg" />
         ) : (
@@ -457,8 +414,10 @@ function FeeBreakdownPie({
               {/* Center label */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
-                  <p className="text-lg font-bold">{formatINR(total)}</p>
-                  <p className="text-[10px] text-gray-400">Total</p>
+                  <p className="text-lg font-bold text-[var(--text-primary)]">
+                    {formatINR(total)}
+                  </p>
+                  <p className="text-[10px] text-[var(--text-tertiary)]">Total</p>
                 </div>
               </div>
             </div>
@@ -474,16 +433,18 @@ function FeeBreakdownPie({
                       className="h-3 w-3 rounded-full"
                       style={{ backgroundColor: d.color }}
                     />
-                    <span className="text-gray-600">{d.name}</span>
+                    <span className="text-[var(--text-secondary)]">{d.name}</span>
                   </div>
-                  <span className="font-medium">{formatINR(d.value)}</span>
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {formatINR(d.value)}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </PreOneCard>
   );
 }
 
@@ -499,12 +460,16 @@ function ActivityFeed({
   loading: boolean;
 }) {
   return (
-    <Card className="rounded-xl shadow-sm border-0 bg-white">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
-        <CardDescription>Latest actions and events</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <PreOneCard variant="strip" className="p-0">
+      <div className="p-6 pb-2">
+        <h3 className="text-base font-semibold text-[var(--text-primary)]">
+          Recent Activity
+        </h3>
+        <p className="text-sm text-[var(--text-tertiary)] mt-0.5">
+          Latest actions and events
+        </p>
+      </div>
+      <div className="px-6 pb-6">
         {loading ? (
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -519,16 +484,16 @@ function ActivityFeed({
           </div>
         ) : activities.length > 0 ? (
           <ScrollArea className="max-h-[400px]">
-            <div className="space-y-3 pr-2">
+            <div className="space-y-1 pr-2">
               {activities.map((a, idx) => {
                 const Icon = ACTIVITY_ICONS[a.type] || Megaphone;
-                const color = ACTIVITY_COLORS[a.type] || 'text-gray-500';
-                const bg = ACTIVITY_BG[a.type] || 'bg-gray-50';
+                const color = ACTIVITY_COLORS[a.type] || 'text-gray-500 dark:text-gray-400';
+                const bg = ACTIVITY_BG[a.type] || 'bg-gray-50 dark:bg-gray-800/40';
 
                 return (
                   <div
                     key={`${a.type}-${idx}`}
-                    className="flex items-start gap-3 rounded-lg p-2 hover:bg-gray-50 transition-colors"
+                    className="flex items-start gap-3 rounded-xl p-2.5 hover:bg-[var(--hover-bg,rgba(0,0,0,0.02))] dark:hover:bg-[rgba(255,255,255,0.03)] transition-colors"
                   >
                     <div
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${bg}`}
@@ -536,10 +501,10 @@ function ActivityFeed({
                       <Icon className={`h-4 w-4 ${color}`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">
                         {a.message}
                       </p>
-                      <p className="text-xs text-gray-400">{a.time}</p>
+                      <p className="text-xs text-[var(--text-tertiary)]">{a.time}</p>
                     </div>
                   </div>
                 );
@@ -547,12 +512,12 @@ function ActivityFeed({
             </div>
           </ScrollArea>
         ) : (
-          <p className="text-sm text-gray-400 py-8 text-center">
+          <p className="text-sm text-[var(--text-tertiary)] py-8 text-center">
             No recent activity
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </PreOneCard>
   );
 }
 
@@ -573,14 +538,16 @@ function AdmissionPipeline({
   );
 
   return (
-    <Card className="rounded-xl shadow-sm border-0 bg-white">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">
+    <PreOneCard variant="default" className="p-0">
+      <div className="p-6 pb-2">
+        <h3 className="text-base font-semibold text-[var(--text-primary)]">
           Admission Pipeline
-        </CardTitle>
-        <CardDescription>Lead conversion funnel</CardDescription>
-      </CardHeader>
-      <CardContent>
+        </h3>
+        <p className="text-sm text-[var(--text-tertiary)] mt-0.5">
+          Lead conversion funnel
+        </p>
+      </div>
+      <div className="px-6 pb-6">
         {loading ? (
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -596,10 +563,10 @@ function AdmissionPipeline({
                 className="block group"
               >
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="text-xs font-medium text-gray-600 w-20 capitalize">
+                  <span className="text-xs font-medium text-[var(--text-secondary)] w-20 capitalize">
                     {stage.name}
                   </span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden relative">
+                  <div className="flex-1 bg-[var(--bg-secondary,#f3f4f6)] dark:bg-[rgba(255,255,255,0.06)] rounded-full h-8 overflow-hidden relative">
                     <div
                       className="h-full rounded-full transition-all duration-500 flex items-center justify-end pr-3"
                       style={{
@@ -615,24 +582,60 @@ function AdmissionPipeline({
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs font-medium text-gray-500 w-16 text-right">
+                  <span className="text-xs font-medium text-[var(--text-tertiary)] w-16 text-right">
                     {formatINR(stage.value)}
                   </span>
                 </div>
               </Link>
             ))}
-            <div className="pt-3 mt-3 border-t">
+            <div className="pt-3 mt-3 border-t border-[var(--border,rgba(0,0,0,0.06))] dark:border-[rgba(255,255,255,0.06)]">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Total Pipeline</span>
-                <span className="font-semibold">
+                <span className="text-[var(--text-secondary)]">Total Pipeline</span>
+                <span className="font-semibold text-[var(--text-primary)]">
                   {formatINR(stages.reduce((s, st) => s + st.value, 0))}
                 </span>
               </div>
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </PreOneCard>
+  );
+}
+
+// ============================================================
+// COMPONENT: QuickReports
+// ============================================================
+
+function QuickReports() {
+  return (
+    <PreOneCard variant="glass" className="p-0">
+      <div className="p-6 pb-3">
+        <h3 className="text-base font-semibold text-[var(--text-primary)]">
+          Quick Reports
+        </h3>
+        <p className="text-sm text-[var(--text-tertiary)] mt-0.5">
+          Jump to frequently used reports
+        </p>
+      </div>
+      <div className="px-6 pb-6 space-y-1">
+        {QUICK_REPORTS.map((report) => {
+          const Icon = report.icon;
+          return (
+            <Link
+              key={report.label}
+              href={report.href}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg,rgba(0,0,0,0.03))] dark:hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--preone-primary-50,rgba(99,102,241,0.08))] dark:bg-[rgba(129,140,248,0.1)]">
+                <Icon className="h-4 w-4 text-[var(--preone-primary)] dark:text-[var(--preone-primary-light)]" />
+              </div>
+              {report.label}
+            </Link>
+          );
+        })}
+      </div>
+    </PreOneCard>
   );
 }
 
@@ -661,6 +664,10 @@ export default function AdminDashboardPage() {
 
   // ── Chart period ──
   const [period, setPeriod] = useState('This Year');
+
+  // ── Time-of-day greeting ──
+  const timeOfDay = useMemo(() => getTimeOfDay(), []);
+  const greetingConfig = TIME_THEME_CONFIG[timeOfDay];
 
   // ── Fetch stats ──
   const fetchStats = useCallback(async () => {
@@ -752,74 +759,94 @@ export default function AdminDashboardPage() {
     fetchRevenue();
   }, [fetchRevenue]);
 
-  // ── Format stat value ──
-  const formatStatValue = (
-    key: keyof DashboardStats,
-    value: number,
-    isCurrency?: boolean,
-    isPercent?: boolean,
-  ): string => {
-    if (isCurrency) return formatINR(value);
-    if (isPercent) return `${value}%`;
-    return value.toLocaleString('en-IN');
-  };
-
   return (
-    <div className="space-y-6">
-      {/* ── Page Title ── */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Dashboard
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Welcome back! Here&apos;s your preschool overview.
-        </p>
-      </div>
+    <PageTransition>
+      <StaggerContainer className="space-y-6">
+        {/* ── Greeting Section ── */}
+        <StaggerItem>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl" role="img" aria-label={timeOfDay}>
+              {greetingConfig.icon}
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+                {greetingConfig.greeting}
+              </h1>
+              <p className="text-sm text-[var(--text-secondary)] mt-0.5">
+                Here&apos;s your preschool overview at a glance.
+              </p>
+            </div>
+          </div>
+        </StaggerItem>
 
-      {/* ── Stat Cards Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {STAT_CARDS.map((card) => (
-          <StatCard
-            key={card.key}
-            label={card.label}
-            icon={card.icon}
-            iconColorClass={card.iconColorClass}
-            value={
-              stats
-                ? formatStatValue(
-                    card.key,
-                    stats[card.key] as number,
-                    card.isCurrency,
-                    card.isPercent,
-                  )
-                : '—'
-            }
-            trend={stats?.trends?.[card.trendKey] ?? 0}
-            loading={loadingStats}
-          />
-        ))}
-      </div>
+        {/* ── Stat Cards Row ── */}
+        <StaggerItem>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {loadingStats
+              ? STAT_CARDS.map((card) => (
+                  <PreOneCard key={card.key} variant="strip" className="p-5">
+                    <div className="space-y-3">
+                      <Skeleton className="h-10 w-10 rounded-xl" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-8 w-16" />
+                    </div>
+                  </PreOneCard>
+                ))
+              : STAT_CARDS.map((card) => (
+                  <CosmicStatCard
+                    key={card.key}
+                    label={card.label}
+                    value={(stats?.[card.key] as number) ?? 0}
+                    suffix={card.suffix}
+                    icon={card.icon}
+                    color={card.color}
+                    trend={
+                      stats?.trends
+                        ? {
+                            value: Math.abs(stats.trends[card.trendKey]),
+                            positive: stats.trends[card.trendKey] >= 0,
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+          </div>
+        </StaggerItem>
 
-      {/* ── Revenue Chart (2/3) + Fee Breakdown (1/3) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <RevenueChart
-            data={revenueData}
-            loading={loadingRevenue}
-            period={period}
-            onPeriodChange={setPeriod}
-          />
+        {/* ── Main Content Grid: 2/3 left, 1/3 right ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            <StaggerItem>
+              <RevenueChart
+                data={revenueData}
+                loading={loadingRevenue}
+                period={period}
+                onPeriodChange={setPeriod}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <ActivityFeed
+                activities={activities}
+                loading={loadingActivities}
+              />
+            </StaggerItem>
+          </div>
+
+          {/* Right Column (1/3) */}
+          <div className="space-y-6">
+            <StaggerItem>
+              <FeeBreakdownPie data={feeSummary} loading={loadingFee} />
+            </StaggerItem>
+            <StaggerItem>
+              <QuickReports />
+            </StaggerItem>
+            <StaggerItem>
+              <AdmissionPipeline stages={pipeline} loading={loadingPipeline} />
+            </StaggerItem>
+          </div>
         </div>
-        <div>
-          <FeeBreakdownPie data={feeSummary} loading={loadingFee} />
-        </div>
-      </div>
-
-      {/* ── Activity Feed (1/2) + Admission Pipeline (1/2) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivityFeed activities={activities} loading={loadingActivities} />
-        <AdmissionPipeline stages={pipeline} loading={loadingPipeline} />
-      </div>
-    </div>
+      </StaggerContainer>
+    </PageTransition>
   );
 }

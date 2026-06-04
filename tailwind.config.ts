@@ -15,6 +15,20 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'var(--font-inter)', 'sans-serif'],
+        display: ['Outfit', 'Poppins', 'sans-serif'],
+        mono: ['JetBrains Mono', 'var(--font-geist-mono)', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+        'xs': ['0.75rem', { lineHeight: '1rem' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base': ['1rem', { lineHeight: '1.5rem' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['clamp(1.5rem, 2vw, 1.875rem)', { lineHeight: '2.25rem' }],
+        '4xl': ['clamp(1.875rem, 3vw, 2.25rem)', { lineHeight: '2.5rem' }],
       },
       colors: {
         background: 'var(--background)',
@@ -56,7 +70,7 @@ const config: Config = {
           '4': 'var(--chart-4)',
           '5': 'var(--chart-5)',
         },
-        /** Portal-scoped colors — auto-switch based on [data-portal] */
+        /** Portal-scoped colors */
         portal: {
           DEFAULT: 'var(--portal)',
           foreground: 'var(--portal-foreground)',
@@ -71,6 +85,34 @@ const config: Config = {
           800: 'var(--portal-800)',
           900: 'var(--portal-900)',
         },
+        /** PreOne Cosmic colors */
+        preone: {
+          primary: 'var(--preone-primary)',
+          'primary-dark': 'var(--preone-primary-dark)',
+          'primary-light': 'var(--preone-primary-light)',
+          'primary-50': 'var(--preone-primary-50)',
+          'primary-100': 'var(--preone-primary-100)',
+          blue: 'var(--preone-blue)',
+          orange: 'var(--preone-orange)',
+          pink: 'var(--preone-pink)',
+          green: 'var(--preone-green)',
+          coral: 'var(--preone-coral)',
+        },
+        /** Cosmic text colors */
+        cosmic: {
+          'text-primary': 'var(--text-primary)',
+          'text-secondary': 'var(--text-secondary)',
+          'text-tertiary': 'var(--text-tertiary)',
+          'text-muted': 'var(--text-muted)',
+          'bg-primary': 'var(--bg-primary)',
+          'bg-secondary': 'var(--bg-secondary)',
+          'bg-tertiary': 'var(--bg-tertiary)',
+          'border-default': 'var(--border-default)',
+          'border-light': 'var(--border-light)',
+        },
+      },
+      screens: {
+        'xs': '475px',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -80,7 +122,6 @@ const config: Config = {
         '2xl': '24px',
         '3xl': '28px',
         '4xl': '32px',
-        /** Semantic border-radius tokens */
         card: '24px',
         container: '20px',
         element: '16px',
@@ -91,6 +132,10 @@ const config: Config = {
         'card-hover': '0px 20px 40px rgba(15,23,42,0.08)',
         floating: '0px 30px 60px rgba(15,23,42,0.10)',
         portal: '0px 8px 24px rgba(15,23,42,0.06)',
+        glow: '0 0 20px rgba(99, 102, 241, 0.15)',
+        'glow-dark': '0 0 20px rgba(108, 92, 231, 0.25)',
+        'hero': '0 10px 25px rgba(99, 102, 241, 0.25)',
+        'hero-dark': '0 10px 25px rgba(108, 92, 231, 0.35)',
       },
       keyframes: {
         twinkle: {
@@ -101,10 +146,21 @@ const config: Config = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-8px)' },
         },
+        'aurora-shift': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        'glow-pulse': {
+          '0%, 100%': { boxShadow: '0 0 8px rgba(99, 102, 241, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)' },
+        },
       },
       animation: {
         twinkle: 'twinkle 3s ease-in-out infinite',
         float: 'float 4s ease-in-out infinite',
+        'aurora-shift': 'aurora-shift 15s ease infinite',
+        'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
       },
     },
   },
