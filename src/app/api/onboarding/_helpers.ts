@@ -1,15 +1,15 @@
 import { db } from '@/lib/db';
 
-export async function markStepComplete(schoolId: string, stepIndex: number) {
-  const draft = await db.onboardingDraft.findUnique({ where: { schoolId } });
+export async function markStepComplete(sessionId: string, stepIndex: number) {
+  const draft = await db.onboardingDraft.findUnique({ where: { id: sessionId } });
   if (!draft) return;
   const completed = JSON.parse(draft.completedSteps || '[]') as number[];
   if (!completed.includes(stepIndex)) {
     completed.push(stepIndex);
   }
   await db.onboardingDraft.update({
-    where: { schoolId },
-    data: { completedSteps: JSON.stringify(completed), currentStep: stepIndex + 1 },
+    where: { id: sessionId },
+    data: { completedSteps: JSON.stringify(completed), currentStep: stepIndex + 1, status: 'IN_PROGRESS' },
   });
 }
 

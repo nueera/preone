@@ -20,6 +20,7 @@ model User {
   password      String
   name          String
   phone         String?
+  username      String?   @unique
   role          Role      @default(PARENT)
   avatar        String?
   isActive      Boolean   @default(true)
@@ -72,7 +73,7 @@ model School {
   users               User[]
   notifications       Notification[]
   dailyUpdateConfig   DailyUpdateConfig?
-  onboardingDraft     OnboardingDraft?
+  onboardingDrafts    OnboardingDraft[]
 }
 
 model Branch {
@@ -1087,23 +1088,36 @@ model DailyUpdateConfig {
   updatedAt       DateTime @updatedAt
 }
 
-model OnboardingDraft {
-  id              String   @id @default(cuid())
-  schoolId        String   @unique
-  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+enum OnboardingSessionStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  ARCHIVED
+}
 
-  currentStep     Int      @default(0)
-  completedSteps  String   @default("[]")                 // JSON array: [0, 1, 2, ...]
+model OnboardingDraft {
+  id              String                  @id @default(cuid())
+  schoolId        String
+  school          School                  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  name            String                  @default("New Setup")
+  status          OnboardingSessionStatus @default(DRAFT)
+  academicYear    String?                                           // e.g. "2025-2026"
+
+  currentStep     Int                     @default(0)
+  completedSteps  String                  @default("[]")              // JSON array: [0, 1, 2, ...]
 
   // Step data (saved as draft so user can resume)
-  step1School     String?                                  // JSON string
-  step2Branch     String?                                  // JSON string
-  step3Academic   String?                                  // JSON string
-  step4Subjects   String?                                  // JSON string
-  step5Teachers   String?                                  // JSON string
-  step6Students   String?                                  // JSON string
-  step7Updates    String?                                  // JSON string
+  step1School     String?                                           // JSON string
+  step2Branch     String?                                           // JSON string
+  step3Academic   String?                                           // JSON string
+  step4Subjects   String?                                           // JSON string
+  step5Teachers   String?                                           // JSON string
+  step6Students   String?                                           // JSON string
+  step7Updates    String?                                           // JSON string
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([schoolId, status])
 }

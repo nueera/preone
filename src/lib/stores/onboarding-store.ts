@@ -3,6 +3,10 @@
 import { create } from 'zustand';
 
 export interface OnboardingDraft {
+  /** Session identifiers */
+  sessionId: string;
+  sessionName: string;
+
   /** School profile data */
   schoolName: string;
   schoolLogo: string;
@@ -104,6 +108,9 @@ interface OnboardingState {
   /** Set the current step */
   setCurrentStep: (step: number) => void;
 
+  /** Set session identity */
+  setSession: (id: string, name: string) => void;
+
   /** Mark saving state */
   setSaving: (saving: boolean) => void;
 
@@ -118,6 +125,8 @@ interface OnboardingState {
 }
 
 const INITIAL_DRAFT: OnboardingDraft = {
+  sessionId: '',
+  sessionName: '',
   schoolName: '',
   schoolLogo: '',
   schoolPhone: '',
@@ -181,6 +190,11 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
   setCurrentStep: (step) =>
     set((state) => ({
       draft: { ...state.draft, currentStep: step },
+    })),
+
+  setSession: (id, name) =>
+    set((state) => ({
+      draft: { ...state.draft, sessionId: id, sessionName: name },
     })),
 
   setSaving: (saving) => set({ isSaving: saving }),

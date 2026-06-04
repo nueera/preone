@@ -1050,7 +1050,6 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between pt-4">
           <Button
             onClick={() => {
-              localStorage.removeItem('preone_onboarding_complete');
               window.location.href = '/admin/onboarding';
             }}
             variant="outline"

@@ -14,23 +14,36 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Username/email and password are required' },
         { status: 400 }
       );
     }
 
-    // Find user by email
-    const user = await db.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+    // Find user by email OR username
+    const identifier = email.toLowerCase().trim();
+
+    let user = await db.user.findUnique({
+      where: { email: identifier },
       include: {
         branch: true,
         teacher: true,
       },
     });
 
+    // If not found by email, try username
+    if (!user) {
+      user = await db.user.findUnique({
+        where: { username: identifier },
+        include: {
+          branch: true,
+          teacher: true,
+        },
+      });
+    }
+
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -47,7 +60,7 @@ export async function POST(request: NextRequest) {
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }

@@ -76,7 +76,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email || !password) {
-      toast.error('Please enter email and password');
+      toast.error('Please enter username/email and password');
       return;
     }
 
@@ -251,13 +251,13 @@ export default function LoginPage() {
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email Address
+                  Email / Username
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
-                    type="email"
+                    type="text"
                     placeholder="admin@preone.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

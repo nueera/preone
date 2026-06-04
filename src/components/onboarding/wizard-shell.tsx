@@ -21,6 +21,7 @@ interface WizardShellProps {
   children: React.ReactNode;
   currentStep: number;
   completedSteps: number[];
+  sessionId?: string;
   onStepClick?: (step: number) => void;
   onNext?: () => void;
   onBack?: () => void;
@@ -36,6 +37,7 @@ export function WizardShell({
   children,
   currentStep,
   completedSteps,
+  sessionId,
   onStepClick,
   onNext,
   onBack,
@@ -51,7 +53,8 @@ export function WizardShell({
     if (onBack) {
       onBack();
     } else if (currentStep > 1) {
-      router.push(`/admin/onboarding/step/${currentStep - 1}`);
+      const base = sessionId ? `/admin/onboarding/${sessionId}` : '/admin/onboarding';
+      router.push(`${base}/step/${currentStep - 1}`);
     }
   };
 
@@ -64,7 +67,8 @@ export function WizardShell({
     if (onNext) {
       onNext();
     } else {
-      router.push(`/admin/onboarding/step/${currentStep + 1}`);
+      const base = sessionId ? `/admin/onboarding/${sessionId}` : '/admin/onboarding';
+      router.push(`${base}/step/${currentStep + 1}`);
     }
   };
 

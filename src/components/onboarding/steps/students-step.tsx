@@ -93,7 +93,9 @@ export function StudentsStep() {
     };
 
     updateDraft('students', [...draft.students, newStudent]);
-    toast.success(`${name} added as a student!`);
+    toast.success(`${firstName} added! Parent login will be auto-generated: username based on "${firstName.toLowerCase()}", password = parent phone`, {
+      duration: 4000,
+    });
     resetForm();
   };
 
@@ -139,7 +141,7 @@ export function StudentsStep() {
       );
 
       updateDraft('students', [...draft.students, ...newStudents]);
-      toast.success(`Imported ${newStudents.length} students!`);
+      toast.success(`Imported ${data.imported} students! ${data.credentials?.length || 0} parent accounts auto-generated.`, { duration: 5000 });
     } catch {
       toast.error('Failed to import students. Please check your CSV file.');
     } finally {
@@ -191,6 +193,17 @@ export function StudentsStep() {
             <GraduationCap className="w-5 h-5 text-[var(--preone-primary)]" />
             Add Student
           </h3>
+
+          {/* Auto-Automation Info Banner */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-4">
+            <div className="flex items-start gap-2">
+              <span className="text-blue-500 text-sm mt-0.5">✨</span>
+              <div className="text-xs text-blue-700 dark:text-blue-300">
+                <strong>Auto-Automation:</strong> Seat number and parent portal account are auto-generated when you complete onboarding. 
+                Parent username = student name, Password = parent phone number.
+              </div>
+            </div>
+          </div>
 
           {/* Student Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

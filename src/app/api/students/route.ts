@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { getBranchFromRequest, withBranchViaRelationFilter } from '@/lib/branch';
 import { auditLog } from '@/lib/audit';
+import { generateRollNumber, autoCreateParentAccount } from '@/lib/student-automation';
 
 // GET /api/students — List students with pagination, search, and filters
 export async function GET(request: NextRequest) {
@@ -219,6 +220,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Auto-generate roll number (seat number) if not provided
+    const finalRollNumber = rollNumber || await generateRollNumber(classId || null, authResult.schoolId!);
+
     // Create student + parents + medical in a transaction
     const student = await db.$transaction(async (tx) => {
       // 1. Create student
@@ -232,7 +236,7 @@ export async function POST(request: NextRequest) {
           aadhaarNumber: aadhaarNumber || null,
           classId: classId || null,
           branchId: branchId || null,
-          rollNumber: rollNumber || null,
+          rollNumber: finalRollNumber,
           admissionDate: admissionDate ? new Date(admissionDate) : new Date(),
           photo: photo || null,
           status: 'ACTIVE',
@@ -346,8 +350,34 @@ export async function POST(request: NextRequest) {
       console.error('Audit log error:', auditErr);
     }
 
+    // Auto-create parent portal account
+    let parentCredentials: { username: string; password: string; email: string } | null = null;
+    try {
+      const result = await autoCreateParentAccount({
+        studentFirstName: firstName,
+        studentLastName: lastName,
+        parentName: `${fatherFirstName} ${fatherLastName}`,
+        parentPhone: fatherPhone,
+        parentEmail: fatherEmail || null,
+        schoolId: authResult.schoolId!,
+        branchId: branchId || null,
+      });
+      parentCredentials = {
+        username: result.username,
+        password: result.password,
+        email: result.email,
+      };
+    } catch (err) {
+      console.error('Failed to auto-create parent account:', err);
+      // Don't fail the whole student creation
+    }
+
     return NextResponse.json(
-      { message: 'Student created successfully', student: completeStudent },
+      {
+        message: 'Student created successfully',
+        student: completeStudent,
+        parentCredentials, // Auto-generated parent login credentials
+      },
       { status: 201 }
     );
   } catch (error) {

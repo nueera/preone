@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, hashPasswordSync } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { generatePassword } from '../../_helpers';
+import { generateRollNumber, autoCreateParentAccount } from '@/lib/student-automation';
 
 function parseCSV(text: string): string[][] {
   const lines = text.trim().split('\n');
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
 
   const [_header, ...dataRows] = rows;
   const errors: { row: number; message: string }[] = [];
+  const importedCredentials: Array<{ row: number; studentName: string; username: string; password: string }> = [];
   let imported = 0;
 
   for (let i = 0; i < dataRows.length; i++) {
@@ -70,7 +71,10 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Create Student
+      // Auto-generate roll number
+      const rollNo = await generateRollNumber(classId, schoolId);
+
+      // Create Student with auto roll number
       const student = await db.student.create({
         data: {
           firstName,
@@ -80,10 +84,11 @@ export async function POST(request: NextRequest) {
           bloodGroup: bloodGroup || null,
           classId,
           branchId,
+          rollNumber: rollNo,
         },
       });
 
-      // Create Parent records if info provided
+      // Create Parent records and auto portal account
       if (fatherName && fatherPhone) {
         const father = await db.parent.create({
           data: {
@@ -100,23 +105,26 @@ export async function POST(request: NextRequest) {
           data: { studentId: student.id, parentId: father.id, isPrimary: true },
         });
 
-        // Create User for parent if email exists
-        if (parentEmail) {
-          const existingUser = await db.user.findUnique({ where: { email: parentEmail } });
-          if (!existingUser) {
-            const password = generatePassword();
-            const hashedPassword = hashPasswordSync(password);
-            await db.user.create({
-              data: {
-                email: parentEmail,
-                password: hashedPassword,
-                name: `${fatherName} ${lastName}`,
-                phone: fatherPhone,
-                role: 'PARENT',
-                schoolId,
-              },
-            });
-          }
+        // Auto-create parent portal account
+        try {
+          const creds = await autoCreateParentAccount({
+            studentFirstName: firstName,
+            studentLastName: lastName,
+            parentName: `${fatherName} ${lastName}`,
+            parentPhone: fatherPhone,
+            parentEmail: parentEmail || null,
+            schoolId,
+            branchId,
+          });
+          // Store credentials in the result
+          importedCredentials.push({
+            row: i + 2,
+            studentName: `${firstName} ${lastName}`,
+            username: creds.username,
+            password: creds.password,
+          });
+        } catch {
+          // Skip if account creation fails
         }
       }
 
@@ -144,5 +152,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ imported, errors });
+  return NextResponse.json({ imported, errors, credentials: importedCredentials });
 }

@@ -3,45 +3,33 @@ import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { markStepComplete } from '../_helpers';
 
-interface SubjectInput {
-  name: string;
-  type?: string;
-  color?: string;
-  classId?: string;
-}
-
 export async function POST(request: NextRequest) {
   const user = requireAdmin(request);
   if (user instanceof NextResponse) return user;
-
   const schoolId = user.schoolId;
-  if (!schoolId) {
-    return NextResponse.json({ error: 'No school associated with this account' }, { status: 400 });
-  }
+  if (!schoolId) return NextResponse.json({ error: 'No school associated with this account' }, { status: 400 });
 
   const body = await request.json();
-  const { subjects } = body as { subjects: SubjectInput[] };
+  const { sessionId } = body;
+  if (!sessionId) return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
 
-  if (!subjects || !Array.isArray(subjects) || subjects.length === 0) {
-    return NextResponse.json({ error: 'At least one subject is required' }, { status: 400 });
-  }
+  const session = await db.onboardingDraft.findUnique({ where: { id: sessionId } });
+  if (!session || session.schoolId !== schoolId) return NextResponse.json({ error: 'Invalid session' }, { status: 403 });
 
   // Store subjects as JSON in SchoolSetting
-  await db.schoolSetting.upsert({
-    where: { schoolId_key: { schoolId, key: 'subjects' } },
-    update: { value: JSON.stringify(subjects) },
-    create: { schoolId, key: 'subjects', value: JSON.stringify(subjects) },
+  if (body.subjects && Array.isArray(body.subjects) && body.subjects.length > 0) {
+    await db.schoolSetting.upsert({
+      where: { schoolId_key: { schoolId, key: 'subjects' } },
+      update: { value: JSON.stringify(body.subjects) },
+      create: { schoolId, key: 'subjects', value: JSON.stringify(body.subjects) },
+    });
+  }
+
+  await db.onboardingDraft.update({
+    where: { id: sessionId },
+    data: { step4Subjects: JSON.stringify(body) },
   });
 
-  // Save to onboarding draft
-  await db.onboardingDraft.upsert({
-    where: { schoolId },
-    update: { step4Subjects: JSON.stringify(body) },
-    create: { schoolId, step4Subjects: JSON.stringify(body) },
-  });
-
-  // Mark step 3 as completed
-  await markStepComplete(schoolId, 3);
-
-  return NextResponse.json({ success: true, subjects });
+  await markStepComplete(sessionId, 3);
+  return NextResponse.json({ success: true });
 }
