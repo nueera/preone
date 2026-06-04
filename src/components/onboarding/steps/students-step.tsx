@@ -109,11 +109,16 @@ export function StudentsStep() {
   const handleCSVImport = async (file: File) => {
     setIsImporting(true);
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
       const formData = new FormData();
       formData.append('file', file);
 
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch('/api/onboarding/students/import', {
         method: 'POST',
+        headers,
         body: formData,
       });
 

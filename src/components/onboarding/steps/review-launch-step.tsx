@@ -93,9 +93,13 @@ export function ReviewLaunchStep() {
     setIsLaunching(true);
 
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch('/api/onboarding/complete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(draft),
       });
 

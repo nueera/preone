@@ -16,6 +16,14 @@ import { StudentsStep } from '@/components/onboarding/steps/students-step';
 import { DailyUpdatesStep } from '@/components/onboarding/steps/daily-updates-step';
 import { ReviewLaunchStep } from '@/components/onboarding/steps/review-launch-step';
 
+/** Get auth headers for API calls */
+function getAuthHeaders(): Record<string, string> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
 /**
  * Step metadata for placeholder rendering
  * Each step component will be created in separate files later
@@ -203,7 +211,9 @@ export default function OnboardingStepPage() {
     if (isLoading) {
       const fetchStatus = async () => {
         try {
-          const res = await fetch('/api/onboarding/status');
+          const res = await fetch('/api/onboarding/status', {
+            headers: getAuthHeaders(),
+          });
           if (!res.ok) throw new Error('Failed to fetch status');
 
           const data = await res.json();
@@ -239,9 +249,9 @@ export default function OnboardingStepPage() {
     const timeout = setTimeout(async () => {
       setSaving(true);
       try {
-        const res = await fetch('/api/onboarding/status', {
+        const res = await fetch('/api/onboarding/draft', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(draft),
         });
         if (res.ok) markSaved();

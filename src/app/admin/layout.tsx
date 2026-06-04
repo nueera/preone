@@ -74,30 +74,28 @@ export default function AdminLayout({
   // redirect to the onboarding wizard (unless already there)
   useEffect(() => {
     if (userRole === 'ADMIN' && !pathname.startsWith('/admin/onboarding')) {
-      const onboardingComplete = localStorage.getItem('preone_onboarding_complete');
-      if (onboardingComplete !== 'true') {
-        // Check onboarding status from API
-        const checkOnboarding = async () => {
-          try {
-            const token = localStorage.getItem('preone_token');
-            if (!token) return;
-            const res = await fetch('/api/onboarding/status', {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (!data.onboardingComplete) {
-                router.replace('/admin/onboarding');
-              } else {
-                localStorage.setItem('preone_onboarding_complete', 'true');
-              }
+      const checkOnboarding = async () => {
+        try {
+          const token = localStorage.getItem('preone_token');
+          if (!token) return;
+          const res = await fetch('/api/onboarding/status', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.onboardingComplete) {
+              localStorage.setItem('preone_onboarding_complete', 'true');
+            } else {
+              // Clear stale cache if present
+              localStorage.removeItem('preone_onboarding_complete');
+              router.replace('/admin/onboarding');
             }
-          } catch {
-            // Silently ignore — don't block the user
           }
-        };
-        checkOnboarding();
-      }
+        } catch {
+          // Silently ignore — don't block the user
+        }
+      };
+      checkOnboarding();
     }
   }, [userRole, pathname, router]);
 

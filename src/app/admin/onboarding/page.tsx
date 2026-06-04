@@ -7,6 +7,14 @@ import { WizardShell } from '@/components/onboarding/wizard-shell';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { motion } from 'framer-motion';
 
+/** Get auth headers for API calls */
+function getAuthHeaders(): Record<string, string> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
+
 /**
  * Onboarding Entry Page
  *
@@ -39,13 +47,16 @@ export default function OnboardingPage() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await fetch('/api/onboarding/status');
+        const res = await fetch('/api/onboarding/status', {
+          headers: getAuthHeaders(),
+        });
         if (!res.ok) throw new Error('Failed to fetch status');
 
         const data = await res.json();
 
         if (data.onboardingComplete) {
           // Onboarding already done — redirect to dashboard
+          localStorage.setItem('preone_onboarding_complete', 'true');
           router.replace('/admin/dashboard');
           return;
         }
@@ -79,9 +90,9 @@ export default function OnboardingPage() {
 
     setSaving(true);
     try {
-      const res = await fetch('/api/onboarding/status', {
+      const res = await fetch('/api/onboarding/draft', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(draft),
       });
 
