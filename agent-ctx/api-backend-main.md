@@ -1,6 +1,7 @@
 # PreOne Preschool ERP API Backend - Implementation Summary
 
 ## Task ID: api-backend
+
 ## Agent: main
 
 ## What Was Built
@@ -59,6 +60,7 @@ src/
 ## Key Features
 
 ### Authentication
+
 - HMAC-SHA256 password hashing with salt
 - In-memory token store (24h expiry) — ready for Redis/DB upgrade
 - Bearer token authentication on all protected routes
@@ -67,6 +69,7 @@ src/
 - Auto-creation of Teacher/Parent profiles during registration
 
 ### All Routes Include
+
 - Proper TypeScript types
 - try/catch error handling
 - Correct HTTP status codes (200, 201, 400, 401, 403, 404, 409, 500)
@@ -75,7 +78,9 @@ src/
 - Authentication requirement (except register/login)
 
 ### Tested Endpoints
+
 All endpoints compile and respond correctly:
+
 - POST /api/auth/register → 201 (creates user + token)
 - POST /api/auth/login → 200 (validates credentials + returns token)
 - GET /api/auth/me → 200 (returns user profile)
@@ -90,4 +95,5 @@ All endpoints compile and respond correctly:
 - GET /api/communication/stats → 200 (comm stats)
 
 ## Lint Status
+
 ✅ All files pass ESLint with no errors

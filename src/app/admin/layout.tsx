@@ -70,6 +70,48 @@ export default function AdminLayout({
     }
   }, [userRole, pathname, router]);
 
+  // Onboarding redirect: if admin's school hasn't completed onboarding,
+  // redirect to the onboarding wizard (unless already there)
+  useEffect(() => {
+    if (userRole === 'ADMIN' && !pathname.startsWith('/admin/onboarding')) {
+      const onboardingComplete = localStorage.getItem('preone_onboarding_complete');
+      if (onboardingComplete !== 'true') {
+        // Check onboarding status from API
+        const checkOnboarding = async () => {
+          try {
+            const token = localStorage.getItem('preone_token');
+            if (!token) return;
+            const res = await fetch('/api/onboarding/status', {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (!data.onboardingComplete) {
+                router.replace('/admin/onboarding');
+              } else {
+                localStorage.setItem('preone_onboarding_complete', 'true');
+              }
+            }
+          } catch {
+            // Silently ignore — don't block the user
+          }
+        };
+        checkOnboarding();
+      }
+    }
+  }, [userRole, pathname, router]);
+
+  // Onboarding routes are standalone full-page — no sidebar/header
+  const isOnboarding = pathname.startsWith('/admin/onboarding');
+
+  if (isOnboarding) {
+    return (
+      <div data-portal="admin" data-role={userRole.toLowerCase()}>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <AuroraBackground intensity="subtle">
       <SidebarProvider>

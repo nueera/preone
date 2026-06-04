@@ -53,6 +53,7 @@
    - Handles missing days gracefully with null values
 
 ### Implementation Patterns
+
 - All routes use `import { db } from '@/lib/db'` for Prisma client
 - All routes use `import { getAuthUser } from '@/lib/auth'` for authentication
 - Consistent error handling with try/catch and proper status codes

@@ -1047,7 +1047,17 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex justify-end pt-4">
+        <div className="flex items-center justify-between pt-4">
+          <Button
+            onClick={() => {
+              localStorage.removeItem('preone_onboarding_complete');
+              window.location.href = '/admin/onboarding';
+            }}
+            variant="outline"
+            className="rounded-xl text-sm"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" /> Re-run Setup Wizard
+          </Button>
           <Button
             onClick={handleSaveSchool}
             disabled={savingSchool}

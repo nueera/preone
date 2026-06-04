@@ -49,34 +49,44 @@ model Otp {
 }
 
 model School {
-  id           String          @id @default(cuid())
-  name         String
-  logo         String?
-  address      String?
-  city         String?
-  state        String?
-  pincode      String?
-  phone        String?
-  email        String?
-  website      String?
-  academicYear String?
-  board        String?
-  schoolCode   String?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  branches     Branch[]
-  settings     SchoolSetting[]
-  users        User[]
-  notifications Notification[]
+  id                  String             @id @default(cuid())
+  name                String
+  logo                String?
+  address             String?
+  city                String?
+  state               String?
+  pincode             String?
+  phone               String?
+  email               String?
+  website             String?
+  academicYear        String?
+  board               String?
+  schoolCode          String?
+  country             String?
+  theme               String?            // space, rainbow, animals, fairytale, nature, adventure
+  onboardingComplete  Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  branches            Branch[]
+  settings            SchoolSetting[]
+  users               User[]
+  notifications       Notification[]
+  dailyUpdateConfig   DailyUpdateConfig?
+  onboardingDraft     OnboardingDraft?
 }
 
 model Branch {
   id            String   @id @default(cuid())
   schoolId      String
   name          String
+  code          String?
   address       String?
   phone         String?
   capacity      Int      @default(0)
+  startTime     String   @default("08:00")
+  endTime       String   @default("14:00")
+  workingDays   String   @default("[1,2,3,4,5]")
+  isHeadOffice  Boolean  @default(false)
   inChargeName  String?
   inChargePhone String?
   isActive      Boolean  @default(true)
@@ -1046,4 +1056,54 @@ model Reaction {
 
   @@unique([parentId, targetType, targetId])
   @@index([studentId, targetType, targetId])
+}
+
+model DailyUpdateConfig {
+  id              String   @id @default(cuid())
+  schoolId        String   @unique
+  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // What updates to send
+  sendAttendance  Boolean  @default(true)
+  sendMood        Boolean  @default(true)
+  sendActivities  Boolean  @default(true)
+  sendMeals       Boolean  @default(true)
+  sendNap         Boolean  @default(true)
+  sendPhotos      Boolean  @default(true)
+  sendNotes       Boolean  @default(true)
+
+  // When to send
+  sendTime        String   @default("end_of_day")        // real_time, hourly, end_of_day
+  sendAt          String?                                  // Specific time if end_of_day (e.g., "14:30")
+
+  // Parent notification preferences
+  notifyVia       String   @default("app,email")          // comma-separated: app, email, sms, whatsapp
+
+  // Templates
+  templates       String   @default("{}")                 // JSON string for custom message templates per type
+
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model OnboardingDraft {
+  id              String   @id @default(cuid())
+  schoolId        String   @unique
+  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  currentStep     Int      @default(0)
+  completedSteps  String   @default("[]")                 // JSON array: [0, 1, 2, ...]
+
+  // Step data (saved as draft so user can resume)
+  step1School     String?                                  // JSON string
+  step2Branch     String?                                  // JSON string
+  step3Academic   String?                                  // JSON string
+  step4Subjects   String?                                  // JSON string
+  step5Teachers   String?                                  // JSON string
+  step6Students   String?                                  // JSON string
+  step7Updates    String?                                  // JSON string
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

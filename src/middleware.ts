@@ -86,6 +86,8 @@ const ROUTE_RULES: RouteRule[] = [
   { pattern: /^\/api\/dashboard\/?/,      allowedRoles: ['Admin', 'TaskMaster'] },
   { pattern: /^\/api\/growth\/?/,         allowedRoles: ['Admin', 'Teacher'] },
   { pattern: /^\/api\/communication\/?/,  allowedRoles: ['Admin'] },
+  // Onboarding routes: Admin only
+  { pattern: /^\/api\/onboarding\/?/,     allowedRoles: ['Admin'] },
   { pattern: /^\/api\/auth\/me$/,        allowedRoles: ['Admin', 'Teacher', 'Parent', 'TaskMaster'] },
 ];
 
