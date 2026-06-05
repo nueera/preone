@@ -1,175 +1,81 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
 
-// ============================================================
-// Token Verification (Edge-compatible — uses Web Crypto API)
-// Mirrors the Node.js crypto logic in src/lib/auth.ts
-// ============================================================
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const path = req.nextUrl.pathname;
 
-const TOKEN_SECRET = process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
+    // ====== ROLE-BASED ROUTE PROTECTION ======
 
-async function sign(data: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(TOKEN_SECRET),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
-  return Array.from(new Uint8Array(signature))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-interface VerifiedPayload {
-  userId: string;
-  email: string;
-  role: string;
-  branchId?: string | null;
-}
-
-async function verifyToken(token: string): Promise<VerifiedPayload | null> {
-  try {
-    const [payloadB64, signature] = token.split('.');
-    if (!payloadB64 || !signature) return null;
-
-    const expectedSig = await sign(payloadB64);
-
-    // Timing-safe comparison
-    if (signature.length !== expectedSig.length) return null;
-    let mismatch = 0;
-    for (let i = 0; i < signature.length; i++) {
-      mismatch |= signature.charCodeAt(i) ^ expectedSig.charCodeAt(i);
+    // Admin routes: only ADMIN and TASK_MASTER
+    if (path.startsWith('/admin')) {
+      if (!['ADMIN', 'TASK_MASTER'].includes(token?.role as string)) {
+        return NextResponse.rewrite(new URL('/login', req.url));
+      }
+      // TASK_MASTER can only access CRM pages
+      if (token?.role === 'TASK_MASTER') {
+        const allowedPaths = ['/admin/crm', '/admin/chat', '/admin/announcements', '/admin/settings'];
+        const isAllowed = allowedPaths.some(p => path.startsWith(p)) || path === '/admin';
+        if (!isAllowed && path !== '/admin/dashboard') {
+          // Redirect to CRM if trying to access non-CRM admin pages
+          return NextResponse.redirect(new URL('/admin/crm', req.url));
+        }
+      }
     }
-    if (mismatch !== 0) return null;
 
-    // Decode payload
-    const payloadJson = atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/'));
-    const payload = JSON.parse(payloadJson);
-
-    // Check expiry
-    if (Date.now() > payload.expiresAt) return null;
-
-    return {
-      userId: payload.userId,
-      email: payload.email,
-      role: payload.role,
-      branchId: payload.branchId,
-    };
-  } catch {
-    return null;
-  }
-}
-
-// ============================================================
-// Route Permission Map
-// TASK_MASTER has same access as Admin for CRM routes
-// ============================================================
-
-type RoleName = 'Admin' | 'Teacher' | 'Parent' | 'TaskMaster';
-
-interface RouteRule {
-  pattern: RegExp;
-  allowedRoles: RoleName[];
-}
-
-const ROUTE_RULES: RouteRule[] = [
-  { pattern: /^\/api\/parent\/?/,        allowedRoles: ['Parent'] },
-  { pattern: /^\/api\/teacher\/?/,        allowedRoles: ['Teacher'] },
-  { pattern: /^\/api\/students\/?/,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/teachers\/?/,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/attendance\/?/,     allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/fees\/?/,           allowedRoles: ['Admin'] },
-  // CRM routes: both Admin and TaskMaster can access
-  { pattern: /^\/api\/crm\/?/,            allowedRoles: ['Admin', 'TaskMaster'] },
-  { pattern: /^\/api\/dashboard\/?/,      allowedRoles: ['Admin', 'TaskMaster'] },
-  { pattern: /^\/api\/growth\/?/,         allowedRoles: ['Admin', 'Teacher'] },
-  { pattern: /^\/api\/communication\/?/,  allowedRoles: ['Admin'] },
-  // Onboarding routes: Admin only
-  { pattern: /^\/api\/onboarding\/?/,     allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/auth\/me$/,        allowedRoles: ['Admin', 'Teacher', 'Parent', 'TaskMaster'] },
-];
-
-// Auth routes that skip authentication entirely
-const AUTH_ROUTE_PATTERNS: RegExp[] = [
-  /^\/api\/auth\/login$/,
-  /^\/api\/auth\/register$/,
-  /^\/api\/auth\/otp\//,
-];
-
-// ============================================================
-// Middleware (Edge-compatible auth proxy)
-// Note: Next.js 16 deprecates "middleware" in favor of "proxy",
-// but Turbopack has a build bug with proxy.ts (NFT trace fails).
-// Keeping middleware.ts until the Turbopack bug is fixed.
-// ============================================================
-
-export async function middleware(request: NextRequest): Promise<NextResponse> {
-  const { pathname } = request.nextUrl;
-
-  // ── Skip auth routes (login, register, OTP) ──────────────
-  if (AUTH_ROUTE_PATTERNS.some((p) => p.test(pathname))) {
-    return NextResponse.next();
-  }
-
-  // ── Extract Bearer token ─────────────────────────────────
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json(
-      { error: true, message: 'Authentication required' },
-      { status: 401 },
-    );
-  }
-
-  const token = authHeader.substring(7);
-  const payload = await verifyToken(token);
-
-  if (!payload) {
-    return NextResponse.json(
-      { error: true, message: 'Invalid or expired token' },
-      { status: 401 },
-    );
-  }
-
-  // ── Find matching route rule ─────────────────────────────
-  const matchedRule = ROUTE_RULES.find((rule) => rule.pattern.test(pathname));
-
-  if (matchedRule) {
-    // Map role string to RoleName for comparison
-    const roleMap: Record<string, RoleName> = {
-      'ADMIN': 'Admin',
-      'TEACHER': 'Teacher',
-      'PARENT': 'Parent',
-      'TASK_MASTER': 'TaskMaster',
-    };
-    const roleName = roleMap[payload.role] as RoleName;
-    if (!roleName || !matchedRule.allowedRoles.includes(roleName)) {
-      return NextResponse.json(
-        { error: true, message: 'You do not have permission to access this resource' },
-        { status: 403 },
-      );
+    // Teacher routes: only TEACHER
+    if (path.startsWith('/teacher')) {
+      if (token?.role !== 'TEACHER') {
+        return NextResponse.rewrite(new URL('/login', req.url));
+      }
     }
+
+    // Parent routes: only PARENT
+    if (path.startsWith('/parent')) {
+      if (token?.role !== 'PARENT') {
+        return NextResponse.rewrite(new URL('/login', req.url));
+      }
+    }
+
+    // ====== ONBOARDING REDIRECT ======
+    // If admin hasn't completed onboarding, redirect to onboarding
+    // (except if already on onboarding page)
+    if (token?.role === 'ADMIN' && !token?.onboardingComplete) {
+      if (!path.startsWith('/admin/onboarding') && !path.startsWith('/api/')) {
+        return NextResponse.redirect(new URL('/admin/onboarding', req.url));
+      }
+    }
+
+    // ====== API ROUTE PROTECTION ======
+    // API routes are protected — auth routes are excluded by the matcher
+    // The existing Bearer token auth in API routes provides a second layer
+    // NextAuth session check provides the first layer
+
+    // ====== SECURITY HEADERS ======
+    const response = NextResponse.next();
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    return response;
+  },
+  {
+    pages: {
+      signIn: '/login',
+    },
   }
-
-  // ── Inject decoded payload into request headers for downstream use ──
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-id', payload.userId);
-  requestHeaders.set('x-user-email', payload.email);
-  requestHeaders.set('x-user-role', payload.role);
-  if (payload.branchId) {
-    requestHeaders.set('x-user-branch-id', payload.branchId);
-  }
-
-  return NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-}
-
-// ============================================================
-// Matcher — only run on API routes
-// ============================================================
+);
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: [
+    // Protect all portal routes
+    '/admin/:path*',
+    '/teacher/:path*',
+    '/parent/:path*',
+
+    // Protect API routes (except NextAuth routes)
+    '/api/((?!auth/(?!me)|socketio).*)/:path*',
+  ],
 };

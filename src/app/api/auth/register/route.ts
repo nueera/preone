@@ -1,114 +1,112 @@
-// ============================================================
-// POST /api/auth/register
-// Creates a new user account, returns JWT token
-// ============================================================
-
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { hashPassword, generateToken, Role, ALL_ROLES } from '@/lib/auth';
+import { z } from 'zod';
+import { prisma } from '@/lib/db';
+import { hashPassword } from '@/lib/auth-utils';
+
+const registerSchema = z.object({
+  schoolName: z.string().min(2, 'School name must be at least 2 characters'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(7, 'Phone number must be at least 7 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name, phone, role, schoolId } = body;
+    const result = registerSchema.safeParse(body);
 
-    // Validation
-    if (!email || !password || !name || !role) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Email, password, name, and role are required' },
+        {
+          error: true,
+          message: 'Validation failed',
+          details: result.error.issues.map((i) => ({
+            field: i.path.join('.'),
+            message: i.message,
+          })),
+        },
         { status: 400 }
       );
     }
 
-    // Validate role against enum
-    const validRoles = ALL_ROLES.map(r => r as string);
-    if (!validRoles.includes(role)) {
-      return NextResponse.json(
-        { error: `Invalid role. Must be one of: ${validRoles.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    const { schoolName, name, email, phone, password } = result.data;
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
-
-    // Check email uniqueness
-    const existingUser = await db.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+    // Check if email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: true, message: 'An account with this email already exists' },
         { status: 409 }
       );
     }
 
-    // Hash password
+    // Hash the password
     const hashedPassword = await hashPassword(password);
 
-    // Create user
-    const user = await db.user.create({
-      data: {
-        email: email.toLowerCase().trim(),
-        password: hashedPassword,
-        name,
-        phone: phone || null,
-        role: role as Role,
-        schoolId: schoolId || null,
-        isActive: true,
-      },
-      include: {
-        branch: true,
-      },
-    });
-
-    // Generate JWT token
-    const token = generateToken({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role as Role,
-      branchId: user.branchId,
-      schoolId: user.schoolId,
-    });
-
-    // Create audit log
-    await db.auditLog.create({
-      data: {
-        userId: user.id,
-        action: 'REGISTER',
-        entity: 'User',
-        entityId: user.id,
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null,
-      },
-    });
-
-    return NextResponse.json(
-      {
-        message: 'Registration successful',
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          schoolId: user.schoolId,
-          branchId: user.branchId,
-          phone: user.phone,
-          isActive: user.isActive,
+    // Create school + admin user in a transaction
+    const { school, user } = await prisma.$transaction(async (tx) => {
+      // Create the school
+      const school = await tx.school.create({
+        data: {
+          name: schoolName,
+          phone,
+          email: email.toLowerCase(),
         },
-      },
-      { status: 201 }
-    );
+      });
+
+      // Create the admin user
+      const user = await tx.user.create({
+        data: {
+          name,
+          email: email.toLowerCase(),
+          phone,
+          password: hashedPassword,
+          role: 'ADMIN',
+          schoolId: school.id,
+          isActive: true,
+        },
+      });
+
+      // Create an audit log for the registration
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          action: 'REGISTER',
+          entity: 'User',
+          entityId: user.id,
+          details: JSON.stringify({
+            schoolName,
+            email: email.toLowerCase(),
+          }),
+        },
+      });
+
+      return { school, user };
+    });
+
+    const response: Record<string, unknown> = {
+      error: false,
+      message: 'Registration successful',
+      userId: user.id,
+      schoolId: school.id,
+    };
+
+    // In development mode, also return the OTP code for testing
+    if (process.env.NODE_ENV === 'development') {
+      const { createOTP } = await import('@/lib/auth-utils');
+      const otp = await createOTP(email.toLowerCase(), 'LOGIN');
+      response.devOtpCode = otp.code;
+    }
+
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('[REGISTER] Error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: true, message: 'Internal server error' },
       { status: 500 }
     );
   }

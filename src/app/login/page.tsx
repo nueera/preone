@@ -2,39 +2,48 @@
 
 // ============================================================
 // PreOne — Login Page
-// Beautiful preschool-themed login with brand gradient
+// Beautiful cosmic-themed login with Email+Password & OTP tabs
+// Uses NextAuth signIn for credential-based authentication
 // ============================================================
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, GraduationCap, Loader2, Mail, Lock, ArrowLeft, KeyRound } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  Loader2,
+  Mail,
+  Lock,
+  Phone,
+  KeyRound,
+  GraduationCap,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { toast } from 'sonner';
-import { CHART_PALETTE } from '@/lib/theme-tokens';
-
-// ============================================================
-// Types
-// ============================================================
-
-interface LoginResponse {
-  message: string;
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: 'ADMIN' | 'TEACHER' | 'PARENT' | 'TASK_MASTER';
-    schoolId?: string | null;
-    branchId?: string | null;
-    phone?: string | null;
-    avatar?: string | null;
-  };
-}
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 // ============================================================
 // Role-based redirect mapping
@@ -54,62 +63,62 @@ const ROLE_DASHBOARD: Record<string, string> = {
 export default function LoginPage() {
   const router = useRouter();
 
-  // Login form state
+  // ── Email+Password state ──
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Forgot password dialog state
-  const [forgotOpen, setForgotOpen] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotStep, setForgotStep] = useState<'email' | 'otp' | 'reset'>('email');
+  // ── OTP state ──
+  const [phone, setPhone] = useState('');
   const [otpValue, setOtpValue] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [isForgotLoading, setIsForgotLoading] = useState(false);
+  const [otpStep, setOtpStep] = useState<'phone' | 'verify'>('phone');
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
 
   // ============================================================
-  // Login Handler
+  // Email+Password Login
   // ============================================================
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleCredentialLogin(e: React.FormEvent) {
     e.preventDefault();
 
     if (!email || !password) {
-      toast.error('Please enter username/email and password');
+      toast.error('Please enter email and password');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Invalid credentials');
+      if (result?.error) {
+        toast.error('Invalid email or password');
         return;
       }
 
-      const { token, user } = data as LoginResponse;
+      if (result?.ok) {
+        toast.success('Welcome back!');
 
-      // Store token and user data in localStorage
-      localStorage.setItem('preone_token', token);
-      localStorage.setItem('preone_user', JSON.stringify(user));
+        // Fetch session to determine role-based redirect
+        const sessionRes = await fetch('/api/auth/session');
+        const session = await sessionRes.json();
+        const role = session?.user?.role as string;
+        const onboardingComplete = session?.user?.onboardingComplete;
 
-      // Also store token in cookie so middleware can read it
-      document.cookie = `preone_token=${token}; path=/; max-age=${24 * 60 * 60}; SameSite=Lax`;
+        // If admin hasn't completed onboarding, redirect there
+        if (role === 'ADMIN' && !onboardingComplete) {
+          router.push('/admin/onboarding');
+          return;
+        }
 
-      toast.success(`Welcome back, ${user.name}!`);
-
-      // Redirect based on role
-      const dashboardPath = ROLE_DASHBOARD[user.role] || '/login';
-      router.push(dashboardPath);
+        const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
+        router.push(dashboardPath);
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Something went wrong. Please try again.');
@@ -119,41 +128,43 @@ export default function LoginPage() {
   }
 
   // ============================================================
-  // Forgot Password Handlers
+  // OTP Login
   // ============================================================
 
   async function handleSendOTP(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!forgotEmail) {
-      toast.error('Please enter your email');
+    if (!phone || phone.length < 10) {
+      toast.error('Please enter a valid phone number');
       return;
     }
 
-    setIsForgotLoading(true);
+    setIsOtpLoading(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: JSON.stringify({ phone, purpose: 'login' }),
       });
 
-      if (response.ok) {
-        toast.success('OTP sent to your email (check console for demo)');
-        setForgotStep('otp');
-      } else {
-        const data = await response.json();
+      const data = await response.json();
+
+      if (!response.ok) {
         toast.error(data.error || 'Failed to send OTP');
+        return;
       }
+
+      toast.success('OTP sent to your phone (check console for demo)');
+      setOtpStep('verify');
     } catch {
       toast.error('Something went wrong');
     } finally {
-      setIsForgotLoading(false);
+      setIsOtpLoading(false);
     }
   }
 
-  async function handleVerifyOTPAndReset(e: React.FormEvent) {
+  async function handleVerifyOTP(e: React.FormEvent) {
     e.preventDefault();
 
     if (otpValue.length !== 6) {
@@ -161,48 +172,36 @@ export default function LoginPage() {
       return;
     }
 
-    if (!newPassword || newPassword.length < 6) {
-      toast.error('New password must be at least 6 characters');
-      return;
-    }
-
-    setIsForgotLoading(true);
+    setIsOtpLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: forgotEmail,
-          otp: otpValue,
-          newPassword,
-        }),
+      const result = await signIn('credentials', {
+        phone,
+        otp: otpValue,
+        authType: 'otp',
+        redirect: false,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success('Password reset successful! Please login.');
-        setForgotOpen(false);
-        setForgotStep('email');
-        setOtpValue('');
-        setNewPassword('');
-        setForgotEmail('');
-      } else {
-        toast.error(data.error || 'Failed to reset password');
+      if (result?.error) {
+        toast.error('Invalid or expired OTP');
+        return;
       }
-    } catch {
+
+      if (result?.ok) {
+        toast.success('Welcome back!');
+
+        const sessionRes = await fetch('/api/auth/session');
+        const session = await sessionRes.json();
+        const role = session?.user?.role as string;
+        const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
+        router.push(dashboardPath);
+      }
+    } catch (error) {
+      console.error('OTP login error:', error);
       toast.error('Something went wrong');
     } finally {
-      setIsForgotLoading(false);
+      setIsOtpLoading(false);
     }
-  }
-
-  function resetForgotDialog() {
-    setForgotStep('email');
-    setOtpValue('');
-    setNewPassword('');
-    setForgotEmail('');
   }
 
   // ============================================================
@@ -213,17 +212,25 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-login-gradient">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Floating circles */}
         <div className="absolute top-20 left-20 w-72 h-72 bg-purple-200/30 dark:bg-purple-500/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-pink-200/30 dark:bg-pink-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-200/20 dark:bg-sky-500/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
-
-        {/* Space dots pattern */}
+        <div
+          className="absolute bottom-20 right-20 w-96 h-96 bg-pink-200/30 dark:bg-pink-500/10 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: '2s' }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-200/20 dark:bg-sky-500/5 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: '4s' }}
+        />
         <div className="absolute inset-0 space-dots opacity-30" />
       </div>
 
       {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md mx-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md mx-4"
+      >
         {/* Logo & Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-brand-gradient shadow-xl shadow-purple-500/25 mb-4">
@@ -240,211 +247,231 @@ export default function LoginPage() {
         {/* Login Card */}
         <Card className="border-0 shadow-2xl shadow-purple-500/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl card-preone">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Welcome back
+            </CardTitle>
             <CardDescription className="text-center">
               Sign in to your PreOne account
             </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email / Username
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="text"
-                    placeholder="admin@preone.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 rounded-xl border-purple-200 dark:border-purple-800/50 focus:border-purple-500 focus:ring-purple-500/20"
-                    disabled={isLoading}
-                    autoComplete="email"
-                  />
-                </div>
-              </div>
+            <Tabs defaultValue="email" className="w-full">
+              <TabsList className="w-full mb-4">
+                <TabsTrigger value="email" className="flex-1 gap-1.5">
+                  <Mail className="h-3.5 w-3.5" />
+                  Email
+                </TabsTrigger>
+                <TabsTrigger value="otp" className="flex-1 gap-1.5">
+                  <Phone className="h-3.5 w-3.5" />
+                  OTP
+                </TabsTrigger>
+              </TabsList>
 
-              {/* Password Field */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Password
-                  </Label>
-                  <Dialog open={forgotOpen} onOpenChange={(open) => { setForgotOpen(open); if (!open) resetForgotDialog(); }}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
+              {/* ── Email + Password Tab ── */}
+              <TabsContent value="email">
+                <form onSubmit={handleCredentialLogin} className="space-y-4">
+                  {/* Email Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email / Username
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="text"
+                        placeholder="admin@preone.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10 h-11 rounded-xl border-purple-200 dark:border-purple-800/50 focus:border-purple-500 focus:ring-purple-500/20"
+                        disabled={isLoading}
+                        autoComplete="email"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Password
+                      </Label>
+                      <Link
+                        href="/forgot-password"
                         className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-medium hover:underline transition-colors"
                       >
                         Forgot Password?
+                      </Link>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10 pr-10 h-11 rounded-xl border-purple-200 dark:border-purple-800/50 focus:border-purple-500 focus:ring-purple-500/20"
+                        disabled={isLoading}
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
-                    </DialogTrigger>
+                    </div>
+                  </div>
 
-                    {/* Forgot Password Dialog */}
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          <KeyRound className="h-5 w-5" style={{ color: CHART_PALETTE.series[0] }} />
-                          Reset Password
-                        </DialogTitle>
-                        <DialogDescription>
-                          {forgotStep === 'email' && 'Enter your email to receive a verification code'}
-                          {forgotStep === 'otp' && 'Enter the 6-digit code sent to your email'}
-                          {forgotStep === 'reset' && 'Enter your new password'}
-                        </DialogDescription>
-                      </DialogHeader>
-
-                      {/* Step 1: Email */}
-                      {forgotStep === 'email' && (
-                        <form onSubmit={handleSendOTP} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="forgot-email">Email Address</Label>
-                            <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                id="forgot-email"
-                                type="email"
-                                placeholder="Enter your email"
-                                value={forgotEmail}
-                                onChange={(e) => setForgotEmail(e.target.value)}
-                                className="pl-10"
-                                disabled={isForgotLoading}
-                              />
-                            </div>
-                          </div>
-                          <Button
-                            type="submit"
-                            className="w-full btn-brand"
-                            disabled={isForgotLoading}
-                          >
-                            {isForgotLoading ? (
-                              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending OTP...</>
-                            ) : (
-                              'Send Verification Code'
-                            )}
-                          </Button>
-                        </form>
-                      )}
-
-                      {/* Step 2: OTP + New Password */}
-                      {forgotStep === 'otp' && (
-                        <form onSubmit={handleVerifyOTPAndReset} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label>Verification Code</Label>
-                            <div className="flex justify-center">
-                              <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
-                                <InputOTPGroup>
-                                  <InputOTPSlot index={0} />
-                                  <InputOTPSlot index={1} />
-                                  <InputOTPSlot index={2} />
-                                  <InputOTPSlot index={3} />
-                                  <InputOTPSlot index={4} />
-                                  <InputOTPSlot index={5} />
-                                </InputOTPGroup>
-                              </InputOTP>
-                            </div>
-                            <p className="text-xs text-muted-foreground text-center">
-                              Code sent to {forgotEmail} (check console for demo)
-                            </p>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="new-password">New Password</Label>
-                            <div className="relative">
-                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                id="new-password"
-                                type="password"
-                                placeholder="Minimum 6 characters"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                className="pl-10"
-                                disabled={isForgotLoading}
-                                minLength={6}
-                              />
-                            </div>
-                          </div>
-
-                          <Button
-                            type="submit"
-                            className="w-full btn-brand"
-                            disabled={isForgotLoading || otpValue.length !== 6}
-                          >
-                            {isForgotLoading ? (
-                              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Resetting...</>
-                            ) : (
-                              'Reset Password'
-                            )}
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="w-full"
-                            onClick={() => setForgotStep('email')}
-                          >
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back
-                          </Button>
-                        </form>
-                      )}
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 rounded-xl border-purple-200 dark:border-purple-800/50 focus:border-purple-500 focus:ring-purple-500/20"
+                  {/* Sign In Button */}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 text-base font-semibold rounded-xl btn-brand shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
                     disabled={isLoading}
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    tabIndex={-1}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
 
-              {/* Sign In Button */}
-              <Button
-                type="submit"
-                className="w-full h-11 text-base font-semibold rounded-xl btn-brand shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Signing in...
-                  </>
+              {/* ── OTP Tab ── */}
+              <TabsContent value="otp">
+                {otpStep === 'phone' ? (
+                  <form onSubmit={handleSendOTP} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-sm font-medium">
+                        Phone Number
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="Enter your phone number"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="pl-10 h-11 rounded-xl border-purple-200 dark:border-purple-800/50 focus:border-purple-500 focus:ring-purple-500/20"
+                          disabled={isOtpLoading}
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-11 text-base font-semibold rounded-xl btn-brand shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
+                      disabled={isOtpLoading}
+                    >
+                      {isOtpLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending OTP...
+                        </>
+                      ) : (
+                        'Send OTP'
+                      )}
+                    </Button>
+                  </form>
                 ) : (
-                  'Sign In'
+                  <form onSubmit={handleVerifyOTP} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Verification Code
+                      </Label>
+                      <div className="flex justify-center">
+                        <InputOTP
+                          maxLength={6}
+                          value={otpValue}
+                          onChange={setOtpValue}
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Code sent to {phone} (check console for demo)
+                      </p>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-11 text-base font-semibold rounded-xl btn-brand shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200"
+                      disabled={isOtpLoading || otpValue.length !== 6}
+                    >
+                      {isOtpLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Verifying...
+                        </>
+                      ) : (
+                        'Verify & Sign In'
+                      )}
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full"
+                      onClick={() => {
+                        setOtpStep('phone');
+                        setOtpValue('');
+                      }}
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back
+                    </Button>
+                  </form>
                 )}
-              </Button>
-            </form>
+              </TabsContent>
+            </Tabs>
 
             {/* Demo Credentials */}
             <div className="mt-6 pt-4 border-t border-purple-100 dark:border-purple-800/30">
-              <p className="text-xs text-muted-foreground text-center mb-3">Demo Credentials</p>
+              <p className="text-xs text-muted-foreground text-center mb-3">
+                Demo Credentials
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { role: 'Admin', email: 'admin@preone.com', password: 'admin123' },
-                  { role: 'Task Master', email: 'taskmaster@preone.com', password: 'admin123' },
-                  { role: 'Teacher', email: 'kavitha.raman@littlestars.com', password: 'password123' },
-                  { role: 'Parent', email: 'rajesh.sharma@email.com', password: 'password123' },
+                  {
+                    role: 'Admin',
+                    email: 'admin@preone.com',
+                    password: 'admin123',
+                  },
+                  {
+                    role: 'Task Master',
+                    email: 'taskmaster@preone.com',
+                    password: 'admin123',
+                  },
+                  {
+                    role: 'Teacher',
+                    email: 'kavitha.raman@littlestars.com',
+                    password: 'password123',
+                  },
+                  {
+                    role: 'Parent',
+                    email: 'rajesh.sharma@email.com',
+                    password: 'password123',
+                  },
                 ].map((cred) => (
                   <button
                     key={cred.role}
@@ -455,8 +482,12 @@ export default function LoginPage() {
                     }}
                     className="text-left p-2 rounded-lg bg-purple-50/50 dark:bg-purple-900/20 hover:bg-purple-100/70 dark:hover:bg-purple-900/30 transition-colors border border-purple-100/50 dark:border-purple-800/30"
                   >
-                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">{cred.role}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{cred.email}</p>
+                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                      {cred.role}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {cred.email}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -464,11 +495,25 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
+        {/* Register Link */}
+        <div className="text-center mt-4">
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/register"
+              className="font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 hover:underline transition-colors"
+            >
+              Register your school
+            </Link>
+          </p>
+        </div>
+
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          PreOne &copy; {new Date().getFullYear()} &mdash; Built with love for little learners
+        <p className="text-center text-xs text-muted-foreground mt-4">
+          PreOne &copy; {new Date().getFullYear()} &mdash; Built with love for
+          little learners
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

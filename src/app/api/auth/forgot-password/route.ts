@@ -1,73 +1,88 @@
-// ============================================================
-// POST /api/auth/forgot-password
-// Generates a 6-digit OTP, saves to Otp table with 10min expiry
-// ============================================================
-
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { z } from 'zod';
+import { checkRateLimit, createOTP } from '@/lib/auth-utils';
+import { prisma } from '@/lib/db';
 
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const result = forgotPasswordSchema.safeParse(body);
 
-    if (!email) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Email is required' },
+        {
+          error: true,
+          message: 'Validation failed',
+          details: result.error.issues.map((i) => ({
+            field: i.path.join('.'),
+            message: i.message,
+          })),
+        },
         { status: 400 }
       );
     }
 
-    // Find user by email
-    const user = await db.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+    const { email } = result.data;
+    const normalizedEmail = email.toLowerCase();
+
+    // Check if user exists with this email
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
     });
 
     // Always return success to prevent email enumeration
-    if (!user) {
+    // But only actually send OTP if user exists
+    if (!existingUser) {
       return NextResponse.json({
-        message: 'If an account with this email exists, an OTP has been sent',
+        error: false,
+        message: 'If an account with this email exists, an OTP has been sent.',
       });
     }
 
-    // Generate 6-digit OTP
-    const otp = generateOTP();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    if (!existingUser.isActive) {
+      return NextResponse.json({
+        error: false,
+        message: 'If an account with this email exists, an OTP has been sent.',
+      });
+    }
 
-    // Save OTP to database (invalidate any existing unused OTPs for this email first)
-    await db.otp.updateMany({
-      where: {
-        email: email.toLowerCase().trim(),
-        purpose: 'PASSWORD_RESET',
-        isUsed: false,
-      },
-      data: { isUsed: true },
-    });
+    // Rate limit check: max 5 OTP per 15 minutes per email
+    const rateLimitKey = `otp:${normalizedEmail}:FORGOT_PASSWORD`;
+    const rateLimit = checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000);
 
-    await db.otp.create({
-      data: {
-        email: email.toLowerCase().trim(),
-        code: otp,
-        purpose: 'PASSWORD_RESET',
-        expiresAt,
-      },
-    });
+    if (!rateLimit.allowed) {
+      // Don't reveal rate limiting to prevent enumeration
+      return NextResponse.json({
+        error: false,
+        message: 'If an account with this email exists, an OTP has been sent.',
+      });
+    }
 
-    // In production, send OTP via email/SMS
-    // For now, log it to the console
-    console.log(`[FORGOT PASSWORD] OTP for ${email}: ${otp}`);
+    // Create the OTP for password reset
+    const otp = await createOTP(normalizedEmail, 'FORGOT_PASSWORD');
 
-    return NextResponse.json({
-      message: 'If an account with this email exists, an OTP has been sent',
-    });
+    const response: Record<string, unknown> = {
+      error: false,
+      message: 'If an account with this email exists, an OTP has been sent.',
+    };
+
+    // In development mode, return the OTP code for testing
+    if (process.env.NODE_ENV === 'development') {
+      response.devOtpCode = otp.code;
+    }
+
+    // TODO: Send OTP via email/SMS in production
+    // await sendOtpEmail(normalizedEmail, otp.code);
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('[FORGOT_PASSWORD] Error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: true, message: 'Internal server error' },
       { status: 500 }
     );
   }

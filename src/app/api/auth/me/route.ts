@@ -1,52 +1,81 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getAuthUser, unauthorized } from '@/lib/auth';
+import { NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth-utils';
+import { prisma } from '@/lib/db';
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (req) => {
   try {
-    const authUser = getAuthUser(request);
+    const user = req.user;
 
-    if (!authUser) {
-      return unauthorized();
-    }
-
-    const user = await db.user.findUnique({
-      where: { id: authUser.userId },
+    // Fetch fresh user data from DB with related info
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
       include: {
-        branch: true,
-        teacher: true,
+        school: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+            onboardingComplete: true,
+            theme: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+        teacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            status: true,
+            branchId: true,
+          },
+        },
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: true, message: 'User not found' },
         { status: 404 }
       );
     }
 
-    const { password: _, ...userWithoutPassword } = user;
+    if (!dbUser.isActive) {
+      return NextResponse.json(
+        { error: true, message: 'Account has been deactivated' },
+        { status: 403 }
+      );
+    }
 
     return NextResponse.json({
+      error: false,
       user: {
-        id: userWithoutPassword.id,
-        email: userWithoutPassword.email,
-        name: userWithoutPassword.name,
-        role: userWithoutPassword.role,
-        branchId: userWithoutPassword.branchId,
-        schoolId: userWithoutPassword.schoolId,
-        phone: userWithoutPassword.phone,
-        avatar: userWithoutPassword.avatar,
-        isActive: userWithoutPassword.isActive,
-        branch: userWithoutPassword.branch,
-        teacher: userWithoutPassword.teacher,
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        phone: dbUser.phone,
+        role: dbUser.role,
+        avatar: dbUser.avatar,
+        isActive: dbUser.isActive,
+        schoolId: dbUser.schoolId,
+        branchId: dbUser.branchId,
+        lastLogin: dbUser.lastLogin,
+        createdAt: dbUser.createdAt,
+        school: dbUser.school,
+        branch: dbUser.branch,
+        teacher: dbUser.teacher,
       },
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('[AUTH_ME] Error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: true, message: 'Internal server error' },
       { status: 500 }
     );
   }
-}
+});
