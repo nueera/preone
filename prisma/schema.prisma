@@ -84,6 +84,9 @@ model School {
   onboardingDrafts    OnboardingDraft[]
   chatThreads         ChatThread[]
   announcements       Announcement[]
+  mealItems           MealItem[]
+  mealPlans           MealPlan[]
+  mealTemplates       MealTemplate[]
 }
 
 model Branch {
@@ -110,6 +113,7 @@ model Branch {
   teachers      Teacher[]
   programs      Program[]
   chatThreads   ChatThread[]
+  mealPlans     MealPlan[]
 }
 
 model SchoolSetting {
@@ -164,6 +168,8 @@ model Student {
   certificates  Certificate[]
   milestoneTimelines MilestoneTimeline[]
   aiObservations AIObservation[]
+  allergies      StudentAllergy[]
+  mealFeedbacks  MealFeedback[]
 }
 
 model Parent {
@@ -1404,4 +1410,216 @@ model ErrorLog {
   @@index([lastSeenAt])
   @@index([severity, status])
   @@index([firstSeenAt])
+}
+
+// ============================================
+// MEAL & NUTRITION PLANNER SYSTEM
+// ============================================
+
+enum MealType {
+  BREAKFAST
+  MID_MORNING_SNACK
+  LUNCH
+  AFTERNOON_SNACK
+}
+
+enum AllergenType {
+  MILK
+  EGGS
+  FISH
+  SHELLFISH
+  TREE_NUTS
+  PEANUTS
+  WHEAT
+  SOYBEAN
+  SESAME
+  CELERY
+  MUSTARD
+  LUPIN
+  MOLLUSCS
+  SULPHITES
+  GLUTEN
+  HONEY
+  SUGAR
+}
+
+enum AllergySeverity {
+  MILD
+  MODERATE
+  SEVERE
+  LIFE_THREATENING
+}
+
+enum MealPlanStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model MealItem {
+  id              String      @id @default(cuid())
+  schoolId        String
+  name            String
+  description     String?
+  image           String?
+  mealType        MealType
+  isVegetarian    Boolean     @default(true)
+  isVegan         Boolean     @default(false)
+  isEggless       Boolean     @default(true)
+  servingSize     String      @default("1 serving")
+
+  // Nutrition per serving
+  calories        Int         @default(0)
+  protein         Float       @default(0)
+  carbohydrates   Float       @default(0)
+  fat             Float       @default(0)
+  fiber           Float       @default(0)
+  sugar           Float       @default(0)
+  calcium         Int         @default(0)
+  iron            Float       @default(0)
+  vitaminC        Float       @default(0)
+  vitamins        String      @default("{}")    // JSON: { vitA, vitD, vitB12, etc. }
+
+  // Allergen tracking (JSON arrays for SQLite compat)
+  allergens       String      @default("[]")    // JSON: ["MILK", "PEANUTS", ...]
+  mayContain      String      @default("[]")    // JSON: ["GLUTEN", ...]
+
+  // Ingredients
+  ingredients     String      @default("[]")    // JSON: [{ name, quantity, isAllergen }]
+  prepTime        Int?                           // Minutes
+  cookTime        Int?                           // Minutes
+  recipe          String?                        // Preparation instructions
+
+  // Categorization
+  category        String?                        // Indian, Continental, Fruit, Healthy, Snack, Beverage
+  cuisine         String?                        // South Indian, North Indian, Continental, Universal
+  tags            String      @default("[]")    // JSON array of tags
+  suitableAgeMin  Int?
+  suitableAgeMax  Int?
+  costPerServing  Float?
+
+  // Tracking
+  usageCount      Int         @default(0)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  school          School      @relation(fields: [schoolId], references: [id])
+  planItems       MealPlanItem[]
+
+  @@index([schoolId, mealType])
+  @@index([schoolId, isActive])
+  @@index([schoolId, usageCount])
+}
+
+model MealPlan {
+  id              String          @id @default(cuid())
+  schoolId        String
+  branchId        String?
+  name            String
+  description     String?
+  startDate       DateTime
+  endDate         DateTime
+  mealTypes       String      @default("[\"BREAKFAST\",\"MID_MORNING_SNACK\",\"LUNCH\",\"AFTERNOON_SNACK\"]") // JSON array
+  targetClassIds  String?                              // JSON array of class IDs
+  status          MealPlanStatus  @default(DRAFT)
+
+  // Nutrition averages (auto-calculated)
+  avgDailyCalories  Int           @default(0)
+  avgDailyProtein   Float         @default(0)
+  avgDailyIron      Float         @default(0)
+  avgDailyCalcium   Int           @default(0)
+  avgDailyVitaminC  Float         @default(0)
+
+  // Publishing
+  publishedAt     DateTime?
+  publishedBy     String?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  school          School          @relation(fields: [schoolId], references: [id])
+  branch          Branch?         @relation(fields: [branchId], references: [id])
+  items           MealPlanItem[]
+
+  @@index([schoolId, status])
+  @@index([schoolId, startDate])
+  @@index([branchId])
+}
+
+model MealPlanItem {
+  id              String      @id @default(cuid())
+  mealPlanId      String
+  mealItemId      String
+  dayOfWeek       Int                             // 1=Monday, 5=Friday
+  mealType        MealType
+  isAlternative   Boolean     @default(false)      // Alternative for allergy students
+  alternativeFor  String?                          // Allergen this is an alternative for
+  sortOrder       Int         @default(0)
+
+  mealPlan        MealPlan    @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  mealItem        MealItem    @relation(fields: [mealItemId], references: [id])
+
+  @@index([mealPlanId, dayOfWeek, mealType])
+  @@index([mealItemId])
+}
+
+model StudentAllergy {
+  id              String          @id @default(cuid())
+  studentId       String
+  allergen        AllergenType
+  severity        AllergySeverity @default(MILD)
+  reaction        String?                              // Rash, Swelling, Anaphylaxis, etc.
+  notes           String?
+  diagnosedDate   DateTime?
+  diagnosedBy     String?                              // Doctor name
+  actionPlan      String?                              // Emergency action plan URL or text
+  isVerified      Boolean         @default(false)       // Verified by parent/doctor
+  verifiedBy      String?                              // Parent userId who verified
+  verifiedAt      DateTime?
+  isActive        Boolean         @default(true)        // Some allergies are outgrown
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  student         Student         @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, allergen])
+  @@index([studentId, isActive])
+  @@index([allergen, severity])
+  @@index([severity])
+}
+
+model MealFeedback {
+  id              String   @id @default(cuid())
+  mealPlanItemId  String                            // Which meal plan item
+  studentId       String
+  date            DateTime                          // Which day the feedback is for
+  mealType        MealType
+  rating          Int                               // 1-5 stars
+  eatenPercent    Int                               // 0%, 25%, 50%, 75%, 100%
+  comments        String?                           // "Didn't like the taste", "Loved it!"
+  reportedBy      String?                           // Teacher who observed
+  createdAt       DateTime @default(now())
+
+  student         Student  @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, date, mealType])
+  @@index([mealPlanItemId])
+  @@index([date])
+  @@index([studentId, date])
+}
+
+model MealTemplate {
+  id              String   @id @default(cuid())
+  schoolId        String
+  name            String                            // "Standard Week Template", "Summer Menu Template"
+  description     String?
+  mealTypes       String   @default("[\"BREAKFAST\",\"MID_MORNING_SNACK\",\"LUNCH\",\"AFTERNOON_SNACK\"]") // JSON array
+  templateData    String   @default("[]")            // JSON: [{ day: 1, meals: { BREAKFAST: { mealItemId: "..." }, ... } }]
+  usageCount      Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  school          School   @relation(fields: [schoolId], references: [id])
+
+  @@index([schoolId, isActive])
 }

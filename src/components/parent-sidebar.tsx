@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Baby, ClipboardCheck, IndianRupee, Sun,
   Eye, TrendingUp, MessageSquare, MessageCircle, Megaphone, Settings,
   ChevronsLeft, ChevronsRight, ChevronDown, Bell, FileBarChart,
-  BookOpen,
+  BookOpen, Utensils,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -47,6 +47,7 @@ const NAV_ITEMS: { label: string; icon: React.ElementType; href: string; badge?:
   { label: 'Attendance', icon: ClipboardCheck, href: '/parent/attendance' },
   { label: 'Fees', icon: IndianRupee, href: '/parent/fees' },
   { label: 'Daily Updates', icon: Sun, href: '/parent/daily-updates' },
+  { label: 'Meals', icon: Utensils, href: '/parent/meals' },
   { label: 'Observations', icon: Eye, href: '/parent/observations' },
   { label: 'Growth', icon: TrendingUp, href: '/parent/growth' },
   { label: 'Communication', icon: MessageSquare, href: '/parent/communication' },

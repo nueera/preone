@@ -9,6 +9,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Users,
+  UtensilsCrossed,
   CheckSquare,
   IndianRupee,
   Zap,
@@ -30,6 +31,7 @@ import {
   FileBarChart,
   Shield,
   Rocket,
+  Salad,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -94,6 +96,21 @@ const NAV_ITEMS: NavItem[] = [
   },
   { label: 'Activities', icon: Palette, href: '/admin/activities', roles: ['ADMIN'] },
   { label: 'Growth', icon: TrendingUp, href: '/admin/growth', roles: ['ADMIN'] },
+  // ===== MEALS SECTION — Meal & Nutrition Planner =====
+  {
+    label: 'Meals',
+    icon: Salad,
+    href: '/admin/meals/plans',
+    roles: ['ADMIN'],
+    children: [
+      { label: 'Meal Items', icon: UtensilsCrossed, href: '/admin/meals/items', roles: ['ADMIN'] },
+      { label: 'Meal Plans', icon: Salad, href: '/admin/meals/plans', roles: ['ADMIN'] },
+      { label: 'Allergies', icon: AlertTriangle, href: '/admin/meals/allergies', roles: ['ADMIN'] },
+      { label: 'Calendar', icon: LayoutDashboard, href: '/admin/meals/calendar', roles: ['ADMIN'] },
+      { label: 'Templates', icon: FileBarChart, href: '/admin/meals/templates', roles: ['ADMIN'] },
+      { label: 'Analytics', icon: TrendingUp, href: '/admin/meals/analytics', roles: ['ADMIN'] },
+    ],
+  },
   { label: 'Communication', icon: MessageSquare, href: '/admin/communication', roles: ['ADMIN'] },
   { label: 'Reports', icon: FileBarChart, href: '/admin/reports', roles: ['ADMIN'] },
   { label: 'Audit Logs', icon: Shield, href: '/admin/audit-logs', roles: ['ADMIN'] },
@@ -143,7 +160,7 @@ export function AdminSidebar() {
   // Check if a nav item is active
   const isActive = (href: string, hasChildren?: boolean) => {
     if (hasChildren) {
-      return pathname.startsWith('/admin/crm');
+      return pathname.startsWith('/admin/crm') || pathname.startsWith('/admin/meals');
     }
     if (href === '/admin/dashboard') {
       return pathname === '/admin/dashboard';

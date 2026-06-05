@@ -48,6 +48,8 @@ const PATH_LABELS: Record<string, string> = {
   attendance: 'Attendance',
   fees: 'Fees',
   'daily-updates': 'Daily Updates',
+  meals: 'Meals',
+  allergies: 'Allergies',
   observations: 'Observations',
   growth: 'Growth',
   communication: 'Communication',

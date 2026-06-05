@@ -11,6 +11,7 @@ Completed all three phases for the PreOne preschool ERP project authentication s
 Updated all three portal layouts to use server-side authentication via `getServerSession`:
 
 ### Admin Layout (`src/app/admin/layout.tsx`)
+
 - Converted from `'use client'` to async server component
 - Added `getServerSession` check at top
 - Redirects to `/login` if no session
@@ -20,6 +21,7 @@ Updated all three portal layouts to use server-side authentication via `getServe
 - Removed localStorage-based role detection (now uses session data)
 
 ### Teacher Layout (`src/app/teacher/layout.tsx`)
+
 - Converted to async server component
 - Redirects to `/login` if no session
 - Only allows `TEACHER` role
@@ -27,6 +29,7 @@ Updated all three portal layouts to use server-side authentication via `getServe
 - Removed `TeacherAuthProvider` wrapper (session is now from NextAuth)
 
 ### Parent Layout (`src/app/parent/layout.tsx`)
+
 - Converted to async server component
 - Redirects to `/login` if no session
 - Only allows `PARENT` role
@@ -79,12 +82,14 @@ Created 7 API endpoints under `/api/auth/`:
 ## Phase 6: Client-Side Auth Hooks and Role Guard
 
 ### `src/hooks/use-auth.ts`
+
 - `useAuth()` hook wrapping `next-auth/react`'s `useSession`
 - Exposes: user, isLoading, isAuthenticated, isUnauthenticated, logout
 - Role helpers: isAdmin, isTaskMaster, isTeacher, isParent
 - School/branch context: role, schoolId, branchId
 
 ### `src/components/auth/role-guard.tsx`
+
 - `RoleGuard` component for client-side role-based access control
 - Accepts `allowedRoles` and optional `fallback`
 - Shows loading spinner while session loads
@@ -92,11 +97,13 @@ Created 7 API endpoints under `/api/auth/`:
 - Shows "Access Denied" if role not in allowedRoles (or renders fallback)
 
 ## Files Modified
+
 - `src/app/admin/layout.tsx` - Converted to server component with auth check
 - `src/app/teacher/layout.tsx` - Converted to server component with auth check
 - `src/app/parent/layout.tsx` - Converted to server component with auth check
 
 ## Files Created
+
 - `src/app/admin/admin-layout-client.tsx` - Client component for admin layout
 - `src/app/teacher/teacher-layout-client.tsx` - Client component for teacher layout
 - `src/app/parent/parent-layout-client.tsx` - Client component for parent layout
@@ -111,6 +118,7 @@ Created 7 API endpoints under `/api/auth/`:
 - `src/components/auth/role-guard.tsx`
 
 ## Verification
+
 - ESLint passes (0 errors, 1 pre-existing warning)
 - TypeScript compilation has 0 errors in all new/modified files
 - Pre-existing errors in other files are unrelated
