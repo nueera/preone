@@ -17,21 +17,22 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const childId = searchParams.get('childId');
 
-    // Use the userId from requireParent (already resolved)
     const parentUserId = auth.userId;
 
     // Get all threads where this parent user is a participant
     const participations = await db.chatParticipant.findMany({
-      where: { userId: parentUserId },
+      where: { userId: parentUserId, leftAt: null },
       include: {
         thread: {
           include: {
             participants: {
+              where: { leftAt: null },
               include: {
-                // We need to find the teacher among participants
+                user: { select: { id: true, name: true, avatar: true, role: true } },
               },
             },
             messages: {
+              where: { isDeleted: false },
               orderBy: { createdAt: 'desc' },
               take: 1,
             },
@@ -49,18 +50,41 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const threads = [];
+    const threads: {
+      id: string;
+      type: string;
+      name: string | null;
+      teacher: {
+        id: string;
+        name: string;
+        photo: string | null;
+        className: string | null;
+        phone: string;
+      };
+      lastMessage: {
+        content: string;
+        createdAt: string;
+        senderId: string;
+      } | null;
+      unreadCount: number;
+      isPinned: boolean;
+      isMuted: boolean;
+      lastMessageAt: string | null;
+    }[] = [];
 
     for (const participation of participations) {
       const thread = participation.thread;
 
-      // Find the other participant (teacher)
-      const otherParticipant = thread.participants.find(p => p.userId !== parentUserId);
-      if (!otherParticipant) continue;
+      // Find the other participant(s)
+      const otherParticipants = thread.participants.filter(p => p.userId !== parentUserId);
+      if (otherParticipants.length === 0) continue;
 
-      // Get teacher info
+      // For DMs, find the teacher
+      const otherUser = otherParticipants[0].user;
+      if (!otherUser) continue;
+
       const teacher = await db.teacher.findFirst({
-        where: { userId: otherParticipant.userId },
+        where: { userId: otherUser.id },
         include: {
           assignedClass: {
             select: { name: true },
@@ -73,19 +97,12 @@ export async function GET(request: NextRequest) {
       // If filtering by child, check if this teacher teaches the child's class
       if (teacherIds && !teacherIds.includes(teacher.id)) continue;
 
-      // Count unread messages (from teacher, not read by parent)
-      const unreadCount = await db.message.count({
-        where: {
-          threadId: thread.id,
-          senderId: otherParticipant.userId,
-          isRead: false,
-        },
-      });
-
       const lastMessage = thread.messages[0];
 
       threads.push({
         id: thread.id,
+        type: thread.type,
+        name: thread.name,
         teacher: {
           id: teacher.id,
           name: `${teacher.firstName} ${teacher.lastName}`,
@@ -100,15 +117,18 @@ export async function GET(request: NextRequest) {
               senderId: lastMessage.senderId,
             }
           : null,
-        unreadCount,
+        unreadCount: participation.unreadCount,
+        isPinned: participation.isPinned,
+        isMuted: participation.isMuted,
+        lastMessageAt: thread.lastMessageAt?.toISOString() || null,
       });
     }
 
-    // Sort by last message time (most recent first)
+    // Sort: pinned first, then by last message time (most recent first)
     threads.sort((a, b) => {
-      const aTime = a.lastMessage?.createdAt || '';
-      const bTime = b.lastMessage?.createdAt || '';
-      return bTime.localeCompare(aTime);
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return (b.lastMessageAt || '').localeCompare(a.lastMessageAt || '');
     });
 
     return NextResponse.json({ threads });
@@ -143,7 +163,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'You can only chat with your child\'s class teacher' }, { status: 403 });
     }
 
-    // Use the userId from requireParent (already resolved)
     const parentUserId = auth.userId;
 
     // Get teacher's user record
@@ -154,11 +173,11 @@ export async function POST(request: NextRequest) {
 
     // Check if thread already exists between these two users
     const allParentParticipations = await db.chatParticipant.findMany({
-      where: { userId: parentUserId },
+      where: { userId: parentUserId, leftAt: null },
       include: {
         thread: {
           include: {
-            participants: true,
+            participants: { where: { leftAt: null } },
           },
         },
       },
@@ -175,26 +194,31 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Get schoolId from parent user
+    const parentUser = await db.user.findUnique({
+      where: { id: parentUserId },
+      select: { schoolId: true },
+    });
+
     // Create new thread
     const thread = await db.chatThread.create({
       data: {
         type: 'DIRECT',
-        title: `${auth.parent.firstName} ${auth.parent.lastName} - ${teacher.firstName} ${teacher.lastName}`,
+        name: `${auth.parent.firstName} ${auth.parent.lastName} - ${teacher.firstName} ${teacher.lastName}`,
+        schoolId: parentUser?.schoolId || '',
+        classId: child.class?.id,
+        participants: {
+          create: [
+            { userId: parentUserId, role: 'member' },
+            ...(teacher.userId ? [{ userId: teacher.userId, role: 'admin' as const }] : []),
+          ],
+        },
       },
     });
 
-    await db.chatParticipant.create({
-      data: { threadId: thread.id, userId: parentUserId, role: 'PARENT' },
-    });
-
-    // Teacher must have a linked User account to be a chat participant
     if (!teacher.userId) {
       return NextResponse.json({ error: 'Teacher has no user account' }, { status: 400 });
     }
-
-    await db.chatParticipant.create({
-      data: { threadId: thread.id, userId: teacher.userId, role: 'TEACHER' },
-    });
 
     return NextResponse.json({
       threadId: thread.id,

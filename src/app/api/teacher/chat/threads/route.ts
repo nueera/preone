@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireRole, Role } from '@/lib/auth';
-import { getParentUserId } from '@/lib/api-auth';
 
 // GET /api/teacher/chat/threads — Get all chat threads for the teacher
 export async function GET(request: NextRequest) {
@@ -11,8 +10,8 @@ export async function GET(request: NextRequest) {
 
     // Find all chat threads where the teacher is a participant
     const teacherParticipants = await db.chatParticipant.findMany({
-      where: { userId: user.userId },
-      select: { threadId: true },
+      where: { userId: user.userId, leftAt: null },
+      select: { threadId: true, unreadCount: true, isPinned: true },
     });
 
     const threadIds = teacherParticipants.map((p) => p.threadId);
@@ -21,84 +20,82 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ threads: [] });
     }
 
+    const unreadMap = new Map(teacherParticipants.map((p) => [p.threadId, p.unreadCount]));
+    const pinnedSet = new Set(teacherParticipants.filter((p) => p.isPinned).map((p) => p.threadId));
+
     // Get thread details with other participant and last message
     const threads = await db.chatThread.findMany({
-      where: { id: { in: threadIds } },
+      where: { id: { in: threadIds }, isActive: true },
       include: {
-        participants: true,
+        participants: {
+          where: { leftAt: null },
+          include: {
+            user: { select: { id: true, name: true, avatar: true, role: true } },
+          },
+        },
         messages: {
+          where: { isDeleted: false },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
       },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { lastMessageAt: { sort: 'desc', nulls: 'last' } },
     });
-
-    // Get unread counts for the teacher in each thread
-    const unreadCounts = await db.message.groupBy({
-      by: ['threadId'],
-      where: {
-        threadId: { in: threadIds },
-        senderId: { not: user.userId },
-        isRead: false,
-      },
-      _count: { id: true },
-    });
-
-    const unreadMap = new Map(unreadCounts.map((u) => [u.threadId, u._count.id]));
 
     // Build response with other participant info
     const formattedThreads = await Promise.all(
       threads.map(async (thread) => {
-        // Find the other participant (parent)
-        const otherParticipant = thread.participants.find((p) => p.userId !== user.userId);
+        // Find the other participant(s)
+        const otherParticipants = thread.participants.filter((p) => p.userId !== user.userId);
 
-        let participantInfo = null;
-        let childName = null;
+        let participantInfo: {
+          userId: string;
+          name: string;
+          avatar: string | null;
+          role: string;
+          childName: string | null;
+        } | null = null;
+        let childName: string | null = null;
 
-        if (otherParticipant) {
-          // Get user info for the other participant
-          const otherUser = await db.user.findUnique({
-            where: { id: otherParticipant.userId },
-            select: { id: true, name: true, role: true },
-          });
+        if (otherParticipants.length === 1) {
+          const other = otherParticipants[0];
+          const otherUser = other.user;
 
-          if (otherUser) {
-            // If parent, find their child
-            if (otherUser.role === 'PARENT') {
-              // Find Parent record by matching User email/phone
-              const parentRecord = await db.parent.findFirst({
-                where: {
-                  OR: [
-                    { email: otherUser.email },
-                    { phone: otherUser.email },
-                  ],
-                },
-                select: { id: true, firstName: true, lastName: true },
-              });
+          if (otherUser && otherUser.role === 'PARENT') {
+            const parentRecord = await db.parent.findFirst({
+              where: {
+                OR: [
+                  { email: otherUser.name },
+                  { phone: otherUser.name },
+                ],
+              },
+              select: { id: true, firstName: true, lastName: true },
+            });
 
-              if (parentRecord) {
-                const studentParent = await db.studentParent.findFirst({
-                  where: { parentId: parentRecord.id },
-                  include: {
-                    student: {
-                      select: { firstName: true, lastName: true, class: { select: { name: true } } },
-                    },
+            if (parentRecord) {
+              const studentParent = await db.studentParent.findFirst({
+                where: { parentId: parentRecord.id },
+                include: {
+                  student: {
+                    select: { firstName: true, lastName: true, class: { select: { name: true } } },
                   },
-                });
-                if (studentParent) {
-                  childName = `${studentParent.student.firstName} ${studentParent.student.lastName}`;
-                }
+                },
+              });
+              if (studentParent) {
+                childName = `${studentParent.student.firstName} ${studentParent.student.lastName}`;
               }
             }
-
-            participantInfo = {
-              userId: otherUser.id,
-              name: otherUser.name,
-              role: otherUser.role,
-              childName,
-            };
           }
+
+          participantInfo = otherUser
+            ? {
+                userId: otherUser.id,
+                name: otherUser.name,
+                avatar: otherUser.avatar,
+                role: otherUser.role,
+                childName,
+              }
+            : null;
         }
 
         const lastMessage = thread.messages[0] || null;
@@ -106,7 +103,7 @@ export async function GET(request: NextRequest) {
         return {
           id: thread.id,
           type: thread.type,
-          title: thread.title,
+          name: thread.name,
           participant: participantInfo,
           lastMessage: lastMessage
             ? {
@@ -117,16 +114,19 @@ export async function GET(request: NextRequest) {
               }
             : null,
           unreadCount: unreadMap.get(thread.id) || 0,
-          updatedAt: thread.updatedAt.toISOString(),
+          isPinned: pinnedSet.has(thread.id),
+          lastMessageAt: thread.lastMessageAt?.toISOString() || null,
         };
       })
     );
 
-    // Sort: unread first, then by last message time
+    // Sort: pinned first, then unread, then by last message time
     formattedThreads.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
       if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
       if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      return (b.lastMessageAt || '').localeCompare(a.lastMessageAt || '');
     });
 
     return NextResponse.json({ threads: formattedThreads });
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     if (user instanceof NextResponse) return user;
 
     const body = await request.json();
-    const { parentId, type } = body;
+    const { parentId, type, name } = body;
 
     if (!parentId) {
       return NextResponse.json({ error: 'parentId is required' }, { status: 400 });
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     const assignedClass = await db.class.findFirst({
       where: { teacherId: teacher.id },
-      select: { id: true },
+      select: { id: true, branchId: true },
     });
 
     if (!assignedClass) {
@@ -169,10 +169,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify parent exists and has a child in teacher's class
-    // parentId in request body is a User ID — find the Parent record by matching email
     const parentUser = await db.user.findUnique({
       where: { id: parentId },
-      select: { email: true },
+      select: { email: true, name: true, schoolId: true },
     });
 
     if (!parentUser) {
@@ -209,7 +208,7 @@ export async function POST(request: NextRequest) {
 
     // Check if a thread already exists between this teacher and parent
     const existingTeacherThreads = await db.chatParticipant.findMany({
-      where: { userId: user.userId },
+      where: { userId: user.userId, leftAt: null },
       select: { threadId: true },
     });
 
@@ -220,14 +219,14 @@ export async function POST(request: NextRequest) {
         where: {
           userId: parentId,
           threadId: { in: teacherThreadIds },
+          leftAt: null,
         },
       });
 
       if (existingParentInThread) {
-        // Thread already exists, return it
         const existingThread = await db.chatThread.findUnique({
           where: { id: existingParentInThread.threadId },
-          include: { participants: true },
+          include: { participants: { where: { leftAt: null } } },
         });
 
         return NextResponse.json({
@@ -244,15 +243,18 @@ export async function POST(request: NextRequest) {
     // Create new thread
     const thread = await db.chatThread.create({
       data: {
-        type: type || 'PARENT_TEACHER',
+        type: type || 'DIRECT',
+        name: name || `${user.name} - ${parentUser.name}`,
+        schoolId: parentUser.schoolId || user.schoolId || '',
+        branchId: assignedClass.branchId,
         participants: {
           create: [
-            { userId: user.userId, role: 'TEACHER' },
-            { userId: parentId, role: 'PARENT' },
+            { userId: user.userId, role: 'admin' },
+            { userId: parentId, role: 'member' },
           ],
         },
       },
-      include: { participants: true },
+      include: { participants: { where: { leftAt: null } } },
     });
 
     return NextResponse.json(
@@ -261,6 +263,7 @@ export async function POST(request: NextRequest) {
         thread: {
           id: thread.id,
           type: thread.type,
+          name: thread.name,
           participantId: parentId,
         },
       },

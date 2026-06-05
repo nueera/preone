@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Baby, ClipboardCheck, IndianRupee, Sun,
-  Eye, TrendingUp, MessageSquare, Settings,
+  Eye, TrendingUp, MessageSquare, MessageCircle, Megaphone, Settings,
   ChevronsLeft, ChevronsRight, ChevronDown, Bell, FileBarChart,
   BookOpen,
 } from 'lucide-react';
@@ -35,11 +35,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useParentAuth } from '@/lib/parent-auth';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import { useChatStore } from '@/lib/stores/chat-store';
 
 const theme = PORTAL_THEMES.parent;
 
 // ── Navigation items for Parent portal ──
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; icon: React.ElementType; href: string; badge?: string }[] = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/parent/dashboard' },
   { label: 'My Children', icon: Baby, href: '/parent/children' },
   { label: 'Childhood Passport', icon: BookOpen, href: '/parent/children' },
@@ -51,6 +52,8 @@ const NAV_ITEMS = [
   { label: 'Communication', icon: MessageSquare, href: '/parent/communication' },
   { label: 'Reports', icon: FileBarChart, href: '/parent/reports' },
   { label: 'Notifications', icon: Bell, href: '/parent/notifications' },
+  { label: 'Chat', icon: MessageCircle, href: '/parent/chat', badge: 'chat' },
+  { label: 'Announcements', icon: Megaphone, href: '/parent/announcements' },
   { label: 'Settings', icon: Settings, href: '/parent/settings' },
 ];
 
@@ -63,6 +66,7 @@ export function ParentSidebar() {
   const pathname = usePathname();
   const { state, toggleSidebar } = useSidebar();
   const { children, selectedChild, selectChild } = useParentAuth();
+  const totalUnread = useChatStore((s) => s.totalUnread);
 
   const hasMultipleChildren = children.length > 1;
 
@@ -199,9 +203,14 @@ export function ParentSidebar() {
                         ${isActive ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} className="flex items-center gap-3 flex-1">
                         <item.icon className="h-4 w-4 shrink-0" />
                         <span>{item.label}</span>
+                        {item.badge === 'chat' && totalUnread > 0 && (
+                          <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                            {totalUnread > 99 ? '99+' : totalUnread}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

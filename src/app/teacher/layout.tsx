@@ -6,6 +6,7 @@ import { TeacherHeader } from '@/components/teacher-header';
 import { QueryProvider } from '@/components/providers';
 import { TeacherAuthProvider } from '@/lib/teacher-auth';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { useChatInit } from '@/hooks/use-chat';
 
 /**
  * Teacher Layout — Wraps the PreOne teacher portal.
@@ -18,6 +19,9 @@ export default function TeacherLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Initialize chat socket connection
+  useChatInit();
+
   return (
     <QueryProvider>
       <TeacherAuthProvider>

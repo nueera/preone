@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Baby, Sun, IndianRupee, MessageSquare, TrendingUp,
+  LayoutDashboard, Baby, Sun, IndianRupee, TrendingUp,
+  MessageCircle,
 } from 'lucide-react';
 import { useParentAuth } from '@/lib/parent-auth';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
@@ -17,7 +18,7 @@ const MOBILE_NAV_ITEMS = [
   { label: 'Kids', icon: Baby, href: '/parent/children' },
   { label: 'Updates', icon: Sun, href: '/parent/daily-updates' },
   { label: 'Growth', icon: TrendingUp, href: '/parent/growth' },
-  { label: 'Chat', icon: MessageSquare, href: '/parent/communication' },
+  { label: 'Chat', icon: MessageCircle, href: '/parent/chat' },
 ];
 
 /**

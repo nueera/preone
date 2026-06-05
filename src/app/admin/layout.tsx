@@ -6,6 +6,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes
 const TASK_MASTER_ALLOWED = ['/admin/dashboard', '/admin/crm'];
@@ -40,6 +41,9 @@ export default function AdminLayout({
     }
     return 'ADMIN';
   });
+
+  // Initialize chat socket connection
+  useChatInit();
 
   // Sync on storage changes (e.g., login/logout in another tab)
   useEffect(() => {

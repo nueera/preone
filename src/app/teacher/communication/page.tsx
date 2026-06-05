@@ -779,7 +779,7 @@ function CommunicationContent() {
                               }`}>
                                 <span className="text-[9px]">{formatMessageTime(msg.createdAt)}</span>
                                 {isOwn && (
-                                  msg.isRead
+                                  msg.isRead || msg.readByOthers
                                     ? <CheckCheck className="h-3 w-3" />
                                     : <Check className="h-3 w-3" />
                                 )}

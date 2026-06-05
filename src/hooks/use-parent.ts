@@ -574,6 +574,8 @@ export interface GrowthComparisonResponse {
 
 export interface ChatThreadData {
   id: string;
+  type: string;
+  name: string | null;
   teacher: {
     id: string;
     name: string;
@@ -587,6 +589,9 @@ export interface ChatThreadData {
     senderId: string;
   } | null;
   unreadCount: number;
+  isPinned: boolean;
+  isMuted: boolean;
+  lastMessageAt: string | null;
 }
 
 export interface ChatThreadsResponse {
@@ -602,7 +607,15 @@ export interface ChatMessageData {
   content: string;
   type: string;
   senderId: string;
-  isRead: boolean;
+  sender: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  } | null;
+  mediaUrl: string | null;
+  replyToId: string | null;
+  isEdited: boolean;
+  reactions: Record<string, string[]>;
   createdAt: string;
 }
 

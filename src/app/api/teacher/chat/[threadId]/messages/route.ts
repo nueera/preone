@@ -26,12 +26,12 @@ export async function GET(
       },
     });
 
-    if (!participant) {
+    if (!participant || participant.leftAt) {
       return NextResponse.json({ error: 'You are not a participant in this thread' }, { status: 403 });
     }
 
     // Build where clause for pagination
-    const where: Record<string, unknown> = { threadId };
+    const where: Record<string, unknown> = { threadId, isDeleted: false };
     if (before) {
       where.createdAt = { lt: new Date(before) };
     }
@@ -41,25 +41,27 @@ export async function GET(
       where,
       orderBy: { createdAt: 'asc' },
       take: limit,
+      include: {
+        sender: { select: { id: true, name: true, avatar: true } },
+      },
     });
 
-    // Mark unread messages as read (messages sent by others)
-    await db.message.updateMany({
-      where: {
-        threadId,
-        senderId: { not: user.userId },
-        isRead: false,
-      },
-      data: { isRead: true },
+    // Mark thread as read for this teacher (reset unread count)
+    await db.chatParticipant.update({
+      where: { threadId_userId: { threadId, userId: user.userId } },
+      data: { unreadCount: 0, lastReadAt: new Date() },
     });
 
     const formatted = messages.map((m) => ({
       id: m.id,
       senderId: m.senderId,
+      sender: m.sender,
       content: m.content,
       type: m.type,
       mediaUrl: m.mediaUrl,
-      isRead: m.isRead,
+      replyToId: m.replyToId,
+      isEdited: m.isEdited,
+      reactions: m.reactions ? JSON.parse(m.reactions) : {},
       createdAt: m.createdAt.toISOString(),
     }));
 
@@ -91,12 +93,12 @@ export async function POST(
       },
     });
 
-    if (!participant) {
+    if (!participant || participant.leftAt) {
       return NextResponse.json({ error: 'You are not a participant in this thread' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { content, type, mediaUrl } = body;
+    const { content, type, mediaUrl, replyToId } = body;
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
@@ -110,14 +112,30 @@ export async function POST(
         content: content.trim(),
         type: type || 'TEXT',
         mediaUrl: mediaUrl || null,
-        isRead: false,
+        replyToId: replyToId || null,
+      },
+      include: {
+        sender: { select: { id: true, name: true, avatar: true } },
       },
     });
 
-    // Update thread's updatedAt
+    // Update thread's last message cache
     await db.chatThread.update({
       where: { id: threadId },
-      data: { updatedAt: new Date() },
+      data: {
+        lastMessagePreview: content.trim().substring(0, 100),
+        lastMessageAt: new Date(),
+      },
+    });
+
+    // Increment unread for other participants
+    await db.chatParticipant.updateMany({
+      where: {
+        threadId,
+        userId: { not: user.userId },
+        leftAt: null,
+      },
+      data: { unreadCount: { increment: 1 } },
     });
 
     // Create notification for other participants
@@ -125,11 +143,16 @@ export async function POST(
       where: {
         threadId,
         userId: { not: user.userId },
+        leftAt: null,
       },
       select: { userId: true },
     });
 
-    // Get teacher name for notification
+    const thread = await db.chatThread.findUnique({
+      where: { id: threadId },
+      select: { schoolId: true, type: true, name: true },
+    });
+
     const teacher = await db.teacher.findUnique({
       where: { userId: user.userId },
       select: { firstName: true, lastName: true },
@@ -137,16 +160,20 @@ export async function POST(
 
     const teacherName = teacher ? `${teacher.firstName} ${teacher.lastName}` : 'Teacher';
 
-    for (const other of otherParticipants) {
-      await db.notification.create({
-        data: {
-          userId: other.userId,
-          title: `Message from ${teacherName}`,
-          message: content.trim().length > 50 ? content.trim().substring(0, 50) + '...' : content.trim(),
-          type: 'CHAT',
-          actionUrl: `/parent/communication`,
-        },
-      });
+    if (thread) {
+      for (const other of otherParticipants) {
+        await db.notification.create({
+          data: {
+            schoolId: thread.schoolId,
+            userId: other.userId,
+            title: `Message from ${teacherName}`,
+            message: content.trim().length > 100 ? content.trim().substring(0, 100) + '...' : content.trim(),
+            type: 'CHAT',
+            category: 'COMMUNICATION',
+            link: `/parent/communication`,
+          },
+        });
+      }
     }
 
     return NextResponse.json(
@@ -155,10 +182,11 @@ export async function POST(
         msg: {
           id: message.id,
           senderId: message.senderId,
+          sender: message.sender,
           content: message.content,
           type: message.type,
           mediaUrl: message.mediaUrl,
-          isRead: message.isRead,
+          replyToId: message.replyToId,
           createdAt: message.createdAt.toISOString(),
         },
       },

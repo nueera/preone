@@ -217,10 +217,12 @@ export async function POST(request: NextRequest) {
             await db.notification.create({
               data: {
                 userId: notifyUserId,
+                schoolId: user.schoolId || '',
                 title: `New Observation - ${student.firstName} ${student.lastName}`,
                 message: `Your child's teacher has shared a ${category.toLowerCase()} observation`,
                 type: 'OBSERVATION',
-                actionUrl: '/parent/observations',
+                category: 'GROWTH',
+                link: '/parent/observations',
               },
             });
           }

@@ -217,10 +217,12 @@ export async function POST(request: NextRequest) {
         await db.notification.create({
           data: {
             userId: admin.id,
+            schoolId: user.schoolId || '',
             title: `Leave Request - ${teacher.firstName} ${teacher.lastName}`,
             message: `${LEAVE_ENTITLEMENTS[upperLeaveType]?.label || upperLeaveType} requested for ${dateStr} (${days} day${days > 1 ? 's' : ''})`,
             type: 'LEAVE',
-            actionUrl: `/admin/teachers/${teacher.id}`,
+            category: 'SYSTEM',
+            link: `/admin/teachers/${teacher.id}`,
           },
         });
       }

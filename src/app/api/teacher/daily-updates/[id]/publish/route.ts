@@ -61,10 +61,12 @@ export async function PATCH(
           await db.notification.create({
             data: {
               userId: notifyUserId,
+              schoolId: user.schoolId || '',
               title: `Daily Update - ${dailyUpdate.student.firstName} ${dailyUpdate.student.lastName}`,
               message: `Today's update is now available`,
               type: 'DAILY_UPDATE',
-              actionUrl: `/parent/daily-updates?student=${dailyUpdate.studentId}&date=${dailyUpdate.date.toISOString().split('T')[0]}`,
+              category: 'COMMUNICATION',
+              link: `/parent/daily-updates?student=${dailyUpdate.studentId}&date=${dailyUpdate.date.toISOString().split('T')[0]}`,
             },
           });
         }

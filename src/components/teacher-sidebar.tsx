@@ -14,6 +14,8 @@ import {
   TrendingUp,
   Calendar,
   MessageSquare,
+  MessageCircle,
+  Megaphone,
   Settings,
   ChevronsLeft,
   ChevronsRight,
@@ -36,11 +38,12 @@ import {
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import { useChatStore } from '@/lib/stores/chat-store';
 
 const theme = PORTAL_THEMES.teacher;
 
 // ── Navigation items for Teacher portal ──
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; icon: React.ElementType; href: string; badge?: string }[] = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/teacher/dashboard' },
   { label: 'My Class', icon: GraduationCap, href: '/teacher/my-class' },
   { label: 'Attendance', icon: CheckSquare, href: '/teacher/attendance' },
@@ -52,6 +55,8 @@ const NAV_ITEMS = [
   { label: 'Communication', icon: MessageSquare, href: '/teacher/communication' },
   { label: 'Reports', icon: FileBarChart, href: '/teacher/reports' },
   { label: 'Notifications', icon: Bell, href: '/teacher/notifications' },
+  { label: 'Chat', icon: MessageCircle, href: '/teacher/chat', badge: 'chat' },
+  { label: 'Announcements', icon: Megaphone, href: '/teacher/announcements' },
   { label: 'Settings', icon: Settings, href: '/teacher/settings' },
 ];
 
@@ -62,6 +67,7 @@ const NAV_ITEMS = [
 export function TeacherSidebar() {
   const pathname = usePathname();
   const { state, toggleSidebar } = useSidebar();
+  const totalUnread = useChatStore((s) => s.totalUnread);
 
   return (
     <Sidebar
@@ -125,9 +131,14 @@ export function TeacherSidebar() {
                         ${isActive ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} className="flex items-center gap-3 flex-1">
                         <item.icon className="h-4 w-4 shrink-0" />
                         <span>{item.label}</span>
+                        {item.badge === 'chat' && totalUnread > 0 && (
+                          <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                            {totalUnread > 99 ? '99+' : totalUnread}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

@@ -15,6 +15,7 @@ import {
   Palette,
   TrendingUp,
   MessageSquare,
+  MessageCircle,
   Bus,
   Settings,
   ChevronsLeft,
@@ -49,6 +50,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { PORTAL_THEMES, ROLE_THEMES } from '@/lib/theme-tokens';
+import { useChatStore } from '@/lib/stores/chat-store';
 
 const theme = PORTAL_THEMES.admin;
 
@@ -66,6 +68,7 @@ interface NavItem {
   href: string;
   roles: string[];  // Which roles can see this item
   children?: NavChild[];
+  badge?: string;   // Optional badge identifier (e.g. 'chat' for unread count)
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -94,6 +97,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Reports', icon: FileBarChart, href: '/admin/reports', roles: ['ADMIN'] },
   { label: 'Audit Logs', icon: Shield, href: '/admin/audit-logs', roles: ['ADMIN'] },
   { label: 'Notifications', icon: Bell, href: '/admin/notifications', roles: ['ADMIN', 'TASK_MASTER'] },
+  { label: 'Chat', icon: MessageCircle, href: '/admin/chat', roles: ['ADMIN', 'TASK_MASTER'], badge: 'chat' },
+  { label: 'Announcements', icon: Megaphone, href: '/admin/announcements', roles: ['ADMIN'] },
   { label: 'Transport', icon: Bus, href: '/admin/transport', roles: ['ADMIN'] },
   { label: 'Onboarding', icon: Rocket, href: '/admin/onboarding', roles: ['ADMIN'] },
   { label: 'Settings', icon: Settings, href: '/admin/settings', roles: ['ADMIN'] },
@@ -109,6 +114,7 @@ const NAV_ITEMS: NavItem[] = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const { state, toggleSidebar } = useSidebar();
+  const totalUnread = useChatStore((s) => s.totalUnread);
 
   // Get current user role from localStorage
   const [userRole, setUserRole] = React.useState<string>('ADMIN');
@@ -281,9 +287,14 @@ export function AdminSidebar() {
                         ${active ? theme.navActiveClass : theme.navInactiveClass}
                       `}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} className="flex items-center gap-3 flex-1">
                         <item.icon className="h-4 w-4 shrink-0" />
                         <span>{item.label}</span>
+                        {item.badge === 'chat' && totalUnread > 0 && (
+                          <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                            {totalUnread > 99 ? '99+' : totalUnread}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

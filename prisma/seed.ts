@@ -820,24 +820,26 @@ async function main() {
       const thread1 = await prisma.chatThread.create({
         data: {
           type: 'DIRECT',
-          title: 'Rajesh Sharma - Kavitha Raman',
+          name: 'Rajesh Sharma - Kavitha Raman',
+          schoolId: school.id,
+          branchId: branch.id,
         },
       });
 
       await prisma.chatParticipant.create({
-        data: { threadId: thread1.id, userId: parentUser.id, role: 'PARENT' },
+        data: { threadId: thread1.id, userId: parentUser.id, role: 'member' },
       });
       await prisma.chatParticipant.create({
-        data: { threadId: thread1.id, userId: teacherUser.id, role: 'TEACHER' },
+        data: { threadId: thread1.id, userId: teacherUser.id, role: 'admin' },
       });
 
       // Messages in thread 1
       const messages1 = [
-        { senderId: teacherUser.id, content: 'Good morning! Raj had a great day today. He participated well in the art activity.', type: 'TEXT' },
-        { senderId: parentUser.id, content: 'That\'s wonderful to hear! He was excited about painting this morning.', type: 'TEXT' },
-        { senderId: teacherUser.id, content: 'Yes, he was very creative. I\'ll share some photos of his artwork soon.', type: 'TEXT' },
-        { senderId: parentUser.id, content: 'Thank you for the update! Looking forward to seeing them.', type: 'TEXT' },
-        { senderId: teacherUser.id, content: 'Raj is doing well today. He made a new friend during outdoor play.', type: 'TEXT' },
+        { senderId: teacherUser.id, content: 'Good morning! Raj had a great day today. He participated well in the art activity.', type: 'TEXT' as const },
+        { senderId: parentUser.id, content: 'That\'s wonderful to hear! He was excited about painting this morning.', type: 'TEXT' as const },
+        { senderId: teacherUser.id, content: 'Yes, he was very creative. I\'ll share some photos of his artwork soon.', type: 'TEXT' as const },
+        { senderId: parentUser.id, content: 'Thank you for the update! Looking forward to seeing them.', type: 'TEXT' as const },
+        { senderId: teacherUser.id, content: 'Raj is doing well today. He made a new friend during outdoor play.', type: 'TEXT' as const },
       ];
 
       for (let mi = 0; mi < messages1.length; mi++) {
@@ -848,7 +850,6 @@ async function main() {
             senderId: msg.senderId,
             content: msg.content,
             type: msg.type,
-            isRead: mi < messages1.length - 1, // last message unread for parent
             createdAt: daysAgo(messages1.length - 1 - mi),
           },
         });
@@ -867,20 +868,22 @@ async function main() {
       const thread2 = await prisma.chatThread.create({
         data: {
           type: 'DIRECT',
-          title: 'Rajesh Sharma - Priya Nair',
+          name: 'Rajesh Sharma - Priya Nair',
+          schoolId: school.id,
+          branchId: branch.id,
         },
       });
 
       await prisma.chatParticipant.create({
-        data: { threadId: thread2.id, userId: parentUser.id, role: 'PARENT' },
+        data: { threadId: thread2.id, userId: parentUser.id, role: 'member' },
       });
       await prisma.chatParticipant.create({
-        data: { threadId: thread2.id, userId: teacher2User.id, role: 'TEACHER' },
+        data: { threadId: thread2.id, userId: teacher2User.id, role: 'admin' },
       });
 
       const messages2 = [
-        { senderId: teacher2User.id, content: 'Hello! Welcome to the new academic year. Looking forward to working with your child.', type: 'TEXT' },
-        { senderId: parentUser.id, content: 'Thank you! We\'re excited about the year ahead.', type: 'TEXT' },
+        { senderId: teacher2User.id, content: 'Hello! Welcome to the new academic year. Looking forward to working with your child.', type: 'TEXT' as const },
+        { senderId: parentUser.id, content: 'Thank you! We\'re excited about the year ahead.', type: 'TEXT' as const },
       ];
 
       for (let mi = 0; mi < messages2.length; mi++) {
@@ -891,7 +894,6 @@ async function main() {
             senderId: msg.senderId,
             content: msg.content,
             type: msg.type,
-            isRead: true,
             createdAt: daysAgo(3 - mi),
           },
         });
@@ -1091,22 +1093,23 @@ async function main() {
   // ============================================================
   console.log('  Creating Announcements...');
   const announcementDefs = [
-    { title: 'Annual Day Celebration', type: 'Event', priority: 'HIGH' as const, target: 'All', content: 'Annual day celebration on June 20th. All parents are cordially invited. Cultural performances by students from all classes. Please ensure your child attends the practice sessions.' },
-    { title: 'Fee Payment Reminder', type: 'Fee', priority: 'NORMAL' as const, target: 'Parents', content: 'June month fee is due by 5th. Late fee of Rs 50 per day applicable after 10th. Please pay on time to avoid penalties. Payment can be made via UPI, bank transfer, or at the school office.' },
-    { title: 'Summer Camp Registration', type: 'Academic', priority: 'NORMAL' as const, target: 'All', content: 'Summer camp registrations are now open! Limited seats available. Activities include art, dance, swimming, and nature exploration. Register before June 15th for early bird discount.' },
-    { title: 'Health Check-up Drive', type: 'Health', priority: 'HIGH' as const, target: 'All', content: 'Annual health check-up for all students scheduled for next week. Pediatrician visit and dental check-up included. Please send your child in comfortable clothing.' },
-    { title: 'Parent-Teacher Meeting', type: 'Academic', priority: 'HIGH' as const, target: 'Parents', content: 'PTM scheduled for June 25th. Individual time slots will be shared via WhatsApp. Please ensure attendance to discuss your child progress and development.' },
+    { title: 'Annual Day Celebration', type: 'EVENT' as const, priority: 'HIGH' as const, target: 'ALL', content: 'Annual day celebration on June 20th. All parents are cordially invited. Cultural performances by students from all classes. Please ensure your child attends the practice sessions.' },
+    { title: 'Fee Payment Reminder', type: 'FEE_REMINDER' as const, priority: 'NORMAL' as const, target: 'PARENTS', content: 'June month fee is due by 5th. Late fee of Rs 50 per day applicable after 10th. Please pay on time to avoid penalties. Payment can be made via UPI, bank transfer, or at the school office.' },
+    { title: 'Summer Camp Registration', type: 'GENERAL' as const, priority: 'NORMAL' as const, target: 'ALL', content: 'Summer camp registrations are now open! Limited seats available. Activities include art, dance, swimming, and nature exploration. Register before June 15th for early bird discount.' },
+    { title: 'Health Check-up Drive', type: 'CONCERN' as const, priority: 'HIGH' as const, target: 'ALL', content: 'Annual health check-up for all students scheduled for next week. Pediatrician visit and dental check-up included. Please send your child in comfortable clothing.' },
+    { title: 'Parent-Teacher Meeting', type: 'GENERAL' as const, priority: 'HIGH' as const, target: 'PARENTS', content: 'PTM scheduled for June 25th. Individual time slots will be shared via WhatsApp. Please ensure attendance to discuss your child progress and development.' },
   ];
 
   for (const ann of announcementDefs) {
     await prisma.announcement.create({
       data: {
+        schoolId: school.id,
         title: ann.title,
         content: ann.content,
         type: ann.type,
         target: ann.target,
         priority: ann.priority,
-        status: 'Published',
+        status: 'PUBLISHED',
         publishedAt: daysAgo(randomInt(1, 10)),
         createdBy: adminUser.id,
       },

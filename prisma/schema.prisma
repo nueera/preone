@@ -37,6 +37,10 @@ model User {
   crmTasksAssigned CrmTask[] @relation("CrmTaskAssignee")
   notifications       Notification[]  @relation("UserNotifications")
   sentNotifications   Notification[]  @relation("SentNotifications")
+  chatThreads         ChatParticipant[]
+  sentMessages        Message[]
+  announcementReads   AnnouncementRead[]
+  createdAnnouncements Announcement[]
 }
 
 model Otp {
@@ -74,6 +78,8 @@ model School {
   notifications       Notification[]
   dailyUpdateConfig   DailyUpdateConfig?
   onboardingDrafts    OnboardingDraft[]
+  chatThreads         ChatThread[]
+  announcements       Announcement[]
 }
 
 model Branch {
@@ -99,6 +105,7 @@ model Branch {
   students      Student[]
   teachers      Teacher[]
   programs      Program[]
+  chatThreads   ChatThread[]
 }
 
 model SchoolSetting {
@@ -372,6 +379,7 @@ model Class {
   activities Activity[]
   teacher   Teacher? @relation(fields: [teacherId], references: [id])
   sections  Section[]
+  chatThreads ChatThread[]
 }
 
 model Section {
@@ -655,54 +663,177 @@ model DailyUpdate {
   @@unique([studentId, date])
 }
 
+// ============================================
+// COMMUNICATION — Chat + Announcements
+// ============================================
+
+enum ChatThreadType {
+  DIRECT
+  CLASS_GROUP
+  BRANCH_GROUP
+  CUSTOM_GROUP
+}
+
 model ChatThread {
-  id          String           @id @default(cuid())
-  type        String
-  title       String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  participants ChatParticipant[]
-  messages    Message[]
+  id                   String            @id @default(cuid())
+  type                 ChatThreadType     @default(DIRECT)
+  name                 String?            // Group name (null for DMs)
+  schoolId             String
+  branchId             String?
+  classId              String?
+  lastMessagePreview   String?            // Cached last message text
+  lastMessageAt        DateTime?          // Cached timestamp
+  onlyAdminsCanMessage Boolean            @default(false)
+  isActive             Boolean            @default(true)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  school               School             @relation(fields: [schoolId], references: [id])
+  branch               Branch?            @relation(fields: [branchId], references: [id])
+  class                Class?             @relation(fields: [classId], references: [id])
+  participants         ChatParticipant[]
+  messages             Message[]
 }
 
 model ChatParticipant {
-  id       String      @id @default(cuid())
-  threadId String
-  userId   String
-  role     String?
-  joinedAt DateTime    @default(now())
-  thread   ChatThread  @relation(fields: [threadId], references: [id])
+  id           String     @id @default(cuid())
+  threadId     String
+  userId       String
+  role         String     @default("member")  // admin, member
+  unreadCount  Int        @default(0)
+  lastReadAt   DateTime?
+  isMuted      Boolean    @default(false)
+  isPinned     Boolean    @default(false)
+  joinedAt     DateTime   @default(now())
+  leftAt       DateTime?
+
+  thread       ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id])
+
   @@unique([threadId, userId])
+  @@index([userId, lastReadAt])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  VOICE
+  ANNOUNCEMENT
+  SYSTEM
 }
 
 model Message {
-  id        String     @id @default(cuid())
-  threadId  String
-  senderId  String
-  content   String
-  type      String     @default("TEXT")
-  mediaUrl  String?
-  isRead    Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  thread    ChatThread @relation(fields: [threadId], references: [id])
+  id            String      @id @default(cuid())
+  threadId      String
+  senderId      String
+  content       String
+  type          MessageType @default(TEXT)
+  mediaUrl      String?
+  mediaThumbnail String?
+  mediaType     String?     // image/jpeg, application/pdf, audio/ogg
+  mediaSize     Int?
+  replyToId     String?
+  isEdited      Boolean     @default(false)
+  isDeleted     Boolean     @default(false)
+  reactions     String      @default("{}")   // JSON: {"emoji": ["userId1", "userId2"]}
+  metadata      String      @default("{}")   // JSON: extra data (announcementId, etc.)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  thread        ChatThread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender        User        @relation(fields: [senderId], references: [id])
+  replyTo       Message?    @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies       Message[]   @relation("MessageReplies")
+
+  @@index([threadId, createdAt])
+  @@index([senderId])
+}
+
+model MessageReadReceipt {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+enum AnnouncementType {
+  GENERAL
+  EVENT
+  HOLIDAY
+  FEE_REMINDER
+  EMERGENCY
+  ACHIEVEMENT
+  CONCERN
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  EXPIRED
 }
 
 model Announcement {
-  id          String   @id @default(cuid())
-  title       String
-  type        String
-  target      String
-  targetIds   String?
-  priority    Priority
-  content     String
-  attachments String?
-  status      String   @default("DRAFT")
-  publishedAt DateTime?
-  scheduledAt DateTime?
-  channels    String?
-  createdBy   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String             @id @default(cuid())
+  schoolId        String
+  title           String
+  content         String
+  type            AnnouncementType    @default(GENERAL)
+  priority        Priority           @default(NORMAL)
+  target          String             @default("ALL")   // ALL, BRANCH, CLASS, TEACHERS, PARENTS, SPECIFIC
+  targetIds       String?            // JSON array of userIds for SPECIFIC target
+  branchId        String?
+  classId         String?
+
+  // Media
+  attachments     String?            @default("[]")    // JSON: [{url, name, type, size}]
+  coverImage      String?
+
+  // Publishing
+  status          AnnouncementStatus @default(DRAFT)
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  expiresAt       DateTime?
+
+  // Delivery channels
+  channels        String             @default("[\"app\"]")  // JSON: ["app", "email", "sms", "whatsapp"]
+  sendAsChat      Boolean            @default(true)
+
+  // Author
+  createdBy       String?
+
+  // Read tracking
+  totalRecipients Int                @default(0)
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  school          School             @relation(fields: [schoolId], references: [id])
+  creator         User?              @relation(fields: [createdBy], references: [id])
+  reads           AnnouncementRead[]
+
+  @@index([schoolId, status])
+  @@index([schoolId, publishedAt])
+  @@index([scheduledAt])
+}
+
+model AnnouncementRead {
+  id              String   @id @default(cuid())
+  announcementId  String
+  userId          String
+  readAt          DateTime @default(now())
+
+  announcement    Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user            User @relation(fields: [userId], references: [id])
+
+  @@unique([announcementId, userId])
+  @@index([announcementId])
+  @@index([userId])
 }
 
 model GrowthScore {

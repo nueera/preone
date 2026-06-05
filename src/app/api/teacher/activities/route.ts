@@ -222,10 +222,12 @@ export async function POST(request: NextRequest) {
               await db.notification.create({
                 data: {
                   userId: notifyUserId,
+                  schoolId: user.schoolId || '',
                   title: `New Activity: ${title}`,
                   message: `Your child has a ${type.toLowerCase()} activity ${date === today ? 'today' : 'on ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}`,
                   type: 'ACTIVITY',
-                  actionUrl: '/parent/activities',
+                  category: 'ACTIVITY',
+                  link: '/parent/activities',
                 },
               });
             }

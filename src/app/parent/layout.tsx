@@ -7,6 +7,7 @@ import { ParentMobileNav } from '@/components/parent-mobile-nav';
 import { QueryProvider } from '@/components/providers';
 import { ParentAuthProvider } from '@/lib/parent-auth';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { useChatInit } from '@/hooks/use-chat';
 
 /**
  * Parent Layout — Wraps the PreOne parent portal.
@@ -19,6 +20,9 @@ export default function ParentLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Initialize chat socket connection
+  useChatInit();
+
   return (
     <QueryProvider>
       <ParentAuthProvider>

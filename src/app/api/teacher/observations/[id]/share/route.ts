@@ -67,10 +67,12 @@ export async function PATCH(
             await db.notification.create({
               data: {
                 userId: notifyUserId,
+                schoolId: user.schoolId || '',
                 title: `New Observation - ${existing.student.firstName} ${existing.student.lastName}`,
                 message: `Your child's teacher has shared a ${existing.category.toLowerCase()} observation`,
                 type: 'OBSERVATION',
-                actionUrl: '/parent/observations',
+                category: 'GROWTH',
+                link: '/parent/observations',
               },
             });
           }

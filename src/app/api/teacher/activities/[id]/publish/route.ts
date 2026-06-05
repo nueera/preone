@@ -67,10 +67,12 @@ export async function PATCH(
               await db.notification.create({
                 data: {
                   userId: notifyUserId,
+                  schoolId: user.schoolId || '',
                   title: `New Activity: ${existing.title}`,
                   message: `Your child has a ${existing.type.toLowerCase()} activity scheduled`,
                   type: 'ACTIVITY',
-                  actionUrl: '/parent/activities',
+                  category: 'ACTIVITY',
+                  link: '/parent/activities',
                 },
               });
             }

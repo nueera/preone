@@ -89,10 +89,12 @@ export async function POST(request: NextRequest) {
         await db.notification.create({
           data: {
             userId: admin.id,
+            schoolId: auth.user.schoolId || '',
             title: 'KYC Document Uploaded',
             message: `${auth.parent.firstName} ${auth.parent.lastName} has uploaded a ${documentType.toLowerCase().replace('_', ' ')} document for verification.`,
             type: 'KYC_UPLOAD',
-            actionUrl: `/admin/parents/${auth.parent.id}`,
+            category: 'SYSTEM',
+            link: `/admin/parents/${auth.parent.id}`,
           },
         });
       }

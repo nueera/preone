@@ -19,11 +19,10 @@ export async function GET(
 
     const { threadId } = await params;
 
-    // Use the userId from requireParent (already resolved)
     const parentUserId = auth.userId;
 
     const participation = await db.chatParticipant.findFirst({
-      where: { threadId, userId: parentUserId },
+      where: { threadId, userId: parentUserId, leftAt: null },
     });
 
     if (!participation) {
@@ -35,35 +34,40 @@ export async function GET(
     const before = searchParams.get('before'); // cursor for pagination
 
     // Fetch messages with correct cursor-based pagination
-    // When loading older messages (before cursor), query desc then reverse for display
     const messages = await db.message.findMany({
       where: {
         threadId,
+        isDeleted: false,
         ...(before ? { createdAt: { lt: new Date(before) } } : {}),
       },
       orderBy: { createdAt: before ? 'desc' : 'asc' },
       take: limit,
+      include: {
+        sender: { select: { id: true, name: true, avatar: true } },
+      },
     });
 
     // Reverse for display order (oldest first) when using cursor
     const displayMessages = before ? messages.reverse() : messages;
 
-    // Mark unread messages from teacher as read
-    await db.message.updateMany({
-      where: {
-        threadId,
-        senderId: { not: parentUserId },
-        isRead: false,
-      },
-      data: { isRead: true },
+    // Mark thread as read for this parent (reset unread count)
+    await db.chatParticipant.update({
+      where: { threadId_userId: { threadId, userId: parentUserId } },
+      data: { unreadCount: 0, lastReadAt: new Date() },
     });
 
     // Get teacher info for the thread
     const otherParticipant = await db.chatParticipant.findFirst({
-      where: { threadId, userId: { not: parentUserId } },
+      where: { threadId, userId: { not: parentUserId }, leftAt: null },
     });
 
-    let teacherInfo = null;
+    let teacherInfo: {
+      id: string;
+      name: string;
+      photo: string | null;
+      className: string | null;
+      phone: string;
+    } | null = null;
     if (otherParticipant) {
       const teacher = await db.teacher.findFirst({
         where: { userId: otherParticipant.userId },
@@ -88,7 +92,11 @@ export async function GET(
         content: m.content,
         type: m.type,
         senderId: m.senderId,
-        isRead: m.isRead,
+        sender: m.sender,
+        mediaUrl: m.mediaUrl,
+        replyToId: m.replyToId,
+        isEdited: m.isEdited,
+        reactions: m.reactions ? JSON.parse(m.reactions) : {},
         createdAt: m.createdAt.toISOString(),
       })),
     });
@@ -108,17 +116,16 @@ export async function POST(
 
     const { threadId } = await params;
     const body = await request.json();
-    const { content, type = 'TEXT' } = body;
+    const { content, type = 'TEXT', mediaUrl, replyToId } = body;
 
     if (!content || !content.trim()) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
     }
 
-    // Use the userId from requireParent (already resolved)
     const parentUserId = auth.userId;
 
     const participation = await db.chatParticipant.findFirst({
-      where: { threadId, userId: parentUserId },
+      where: { threadId, userId: parentUserId, leftAt: null },
     });
 
     if (!participation) {
@@ -132,29 +139,53 @@ export async function POST(
         senderId: parentUserId,
         content: content.trim(),
         type,
-        isRead: false,
+        mediaUrl: mediaUrl || null,
+        replyToId: replyToId || null,
+      },
+      include: {
+        sender: { select: { id: true, name: true, avatar: true } },
       },
     });
 
-    // Update thread's updatedAt
+    // Update thread's last message cache
     await db.chatThread.update({
       where: { id: threadId },
-      data: { updatedAt: new Date() },
+      data: {
+        lastMessagePreview: content.trim().substring(0, 100),
+        lastMessageAt: new Date(),
+      },
+    });
+
+    // Increment unread for other participants
+    await db.chatParticipant.updateMany({
+      where: {
+        threadId,
+        userId: { not: parentUserId },
+        leftAt: null,
+      },
+      data: { unreadCount: { increment: 1 } },
     });
 
     // Create notification for teacher
     const otherParticipant = await db.chatParticipant.findFirst({
-      where: { threadId, userId: { not: parentUserId } },
+      where: { threadId, userId: { not: parentUserId }, leftAt: null },
     });
 
-    if (otherParticipant) {
+    const thread = await db.chatThread.findUnique({
+      where: { id: threadId },
+      select: { schoolId: true },
+    });
+
+    if (otherParticipant && thread) {
       await db.notification.create({
         data: {
+          schoolId: thread.schoolId,
           userId: otherParticipant.userId,
           title: 'New Message',
           message: `${auth.parent.firstName} ${auth.parent.lastName} sent you a message`,
           type: 'CHAT',
-          actionUrl: `/teacher/communication?thread=${threadId}`,
+          category: 'COMMUNICATION',
+          link: `/teacher/communication?thread=${threadId}`,
         },
       });
     }
@@ -165,7 +196,9 @@ export async function POST(
         content: message.content,
         type: message.type,
         senderId: message.senderId,
-        isRead: message.isRead,
+        sender: message.sender,
+        mediaUrl: message.mediaUrl,
+        replyToId: message.replyToId,
         createdAt: message.createdAt.toISOString(),
       },
     }, { status: 201 });
