@@ -1,18 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { getAuthUser, requireAdmin, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
 // ============================================================
-// GET /api/meal-templates/[id] — Single template
+// Helper: Parse [id] from URL
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+function getIdFromUrl(request: NextRequest): string {
+  const parts = request.url.split('/');
+  const apiIndex = parts.indexOf('api');
+  return parts[apiIndex + 2] || '';
+}
+
+// ============================================================
+// GET /api/meal-templates/[id] — Single template
+// Any authenticated user
+// ============================================================
+
+export async function GET(request: NextRequest) {
   try {
-    const { id } = await ctx.params;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+    if (!user.schoolId) {
+      return NextResponse.json({ error: true, message: 'No school assigned' }, { status: 403 });
+    }
+
+    const id = getIdFromUrl(request);
 
     const template = await prisma.mealTemplate.findFirst({
-      where: { id, schoolId: req.user.schoolId },
+      where: { id, schoolId: user.schoolId },
     });
 
     if (!template) {
@@ -30,7 +47,7 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // PATCH /api/meal-templates/[id] — Update template (Admin only)
@@ -46,88 +63,94 @@ const updateTemplateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const PATCH = withAuth(
-  async (req, ctx) => {
-    try {
-      const { id } = await ctx.params;
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+    if (!user.schoolId) {
+      return NextResponse.json({ error: true, message: 'No school assigned' }, { status: 403 });
+    }
 
-      const existing = await prisma.mealTemplate.findFirst({
-        where: { id, schoolId: req.user.schoolId },
-      });
+    const id = getIdFromUrl(request);
 
-      if (!existing) {
-        return NextResponse.json(
-          { error: true, message: 'Meal template not found' },
-          { status: 404 }
-        );
-      }
+    const existing = await prisma.mealTemplate.findFirst({
+      where: { id, schoolId: user.schoolId },
+    });
 
-      const body = await req.json();
-      const validated = updateTemplateSchema.parse(body);
-
-      const updateData: Record<string, unknown> = {};
-      if (validated.name !== undefined) updateData.name = validated.name;
-      if (validated.description !== undefined) updateData.description = validated.description;
-      if (validated.mealTypes) updateData.mealTypes = JSON.stringify(validated.mealTypes);
-      if (validated.templateData !== undefined)
-        updateData.templateData = JSON.stringify(validated.templateData);
-      if (validated.isActive !== undefined) updateData.isActive = validated.isActive;
-
-      const template = await prisma.mealTemplate.update({
-        where: { id },
-        data: updateData,
-      });
-
-      return NextResponse.json({ template });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: true, message: 'Validation failed', details: error.issues },
-          { status: 400 }
-        );
-      }
-      console.error('[MEAL_TEMPLATE_PATCH]', error);
+    if (!existing) {
       return NextResponse.json(
-        { error: true, message: 'Failed to update meal template' },
-        { status: 500 }
+        { error: true, message: 'Meal template not found' },
+        { status: 404 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+
+    const body = await request.json();
+    const validated = updateTemplateSchema.parse(body);
+
+    const updateData: Record<string, unknown> = {};
+    if (validated.name !== undefined) updateData.name = validated.name;
+    if (validated.description !== undefined) updateData.description = validated.description;
+    if (validated.mealTypes) updateData.mealTypes = JSON.stringify(validated.mealTypes);
+    if (validated.templateData !== undefined)
+      updateData.templateData = JSON.stringify(validated.templateData);
+    if (validated.isActive !== undefined) updateData.isActive = validated.isActive;
+
+    const template = await prisma.mealTemplate.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return NextResponse.json({ template });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: true, message: 'Validation failed', details: error.issues },
+        { status: 400 }
+      );
+    }
+    console.error('[MEAL_TEMPLATE_PATCH]', error);
+    return NextResponse.json(
+      { error: true, message: 'Failed to update meal template' },
+      { status: 500 }
+    );
+  }
+}
 
 // ============================================================
 // DELETE /api/meal-templates/[id] — Delete template (Admin only)
 // ============================================================
 
-export const DELETE = withAuth(
-  async (req, ctx) => {
-    try {
-      const { id } = await ctx.params;
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+    if (!user.schoolId) {
+      return NextResponse.json({ error: true, message: 'No school assigned' }, { status: 403 });
+    }
 
-      const existing = await prisma.mealTemplate.findFirst({
-        where: { id, schoolId: req.user.schoolId },
-      });
+    const id = getIdFromUrl(request);
 
-      if (!existing) {
-        return NextResponse.json(
-          { error: true, message: 'Meal template not found' },
-          { status: 404 }
-        );
-      }
+    const existing = await prisma.mealTemplate.findFirst({
+      where: { id, schoolId: user.schoolId },
+    });
 
-      await prisma.mealTemplate.delete({
-        where: { id },
-      });
-
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      console.error('[MEAL_TEMPLATE_DELETE]', error);
+    if (!existing) {
       return NextResponse.json(
-        { error: true, message: 'Failed to delete meal template' },
-        { status: 500 }
+        { error: true, message: 'Meal template not found' },
+        { status: 404 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+
+    await prisma.mealTemplate.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[MEAL_TEMPLATE_DELETE]', error);
+    return NextResponse.json(
+      { error: true, message: 'Failed to delete meal template' },
+      { status: 500 }
+    );
+  }
+}

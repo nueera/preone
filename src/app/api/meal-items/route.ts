@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, getAuthUser, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
@@ -52,11 +52,15 @@ const createMealItemSchema = z.object({
 
 // ============================================================
 // GET /api/meal-items — List meal items with filters
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const { searchParams } = new URL(request.url);
     const mealType = searchParams.get('mealType');
     const category = searchParams.get('category');
     const search = searchParams.get('search');
@@ -66,7 +70,7 @@ export const GET = withAuth(async (req, ctx) => {
     const isActive = searchParams.get('isActive');
 
     const where: Record<string, unknown> = {
-      schoolId: req.user.schoolId,
+      schoolId: user.schoolId!,
     };
 
     // Default to active items only, unless explicitly requested
@@ -134,20 +138,23 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // POST /api/meal-items — Create meal item (Admin only)
 // ============================================================
 
-export const POST = withAuth(async (req, ctx) => {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+
+    const body = await request.json();
     const validated = createMealItemSchema.parse(body);
 
     const mealItem = await prisma.mealItem.create({
       data: {
-        schoolId: req.user.schoolId,
+        schoolId: user.schoolId!,
         name: validated.name,
         description: validated.description,
         image: validated.image,
@@ -196,4 +203,4 @@ export const POST = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-}, { roles: ['ADMIN'] });
+}

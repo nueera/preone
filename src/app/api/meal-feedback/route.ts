@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { getAuthUser, requireRole, Role, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
 // ============================================================
 // GET /api/meal-feedback — Query by filters
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const { searchParams } = new URL(request.url);
     const studentId = searchParams.get('studentId');
     const date = searchParams.get('date');
     const mealType = searchParams.get('mealType');
@@ -63,7 +67,7 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // POST /api/meal-feedback — Submit feedback (Teacher or Admin)
@@ -86,100 +90,100 @@ const singleFeedbackSchema = z.object({
   comments: z.string().optional(),
 });
 
-export const POST = withAuth(
-  async (req) => {
-    try {
-      const body = await req.json();
+export async function POST(request: NextRequest) {
+  try {
+    const user = requireRole(request, Role.TEACHER, Role.ADMIN);
+    if (user instanceof NextResponse) return user;
 
-      // Support both single object and array of feedbacks
-      let feedbacks: z.infer<typeof singleFeedbackSchema>[];
+    const body = await request.json();
 
-      if (Array.isArray(body)) {
-        feedbacks = z.array(singleFeedbackSchema).parse(body);
-      } else {
-        const validated = singleFeedbackSchema.parse(body);
-        feedbacks = [validated];
-      }
+    // Support both single object and array of feedbacks
+    let feedbacks: z.infer<typeof singleFeedbackSchema>[];
 
-      let createdCount = 0;
+    if (Array.isArray(body)) {
+      feedbacks = z.array(singleFeedbackSchema).parse(body);
+    } else {
+      const validated = singleFeedbackSchema.parse(body);
+      feedbacks = [validated];
+    }
 
-      for (const fb of feedbacks) {
-        const feedbackDate = new Date(fb.date);
-        const startOfDay = new Date(fb.date);
-        startOfDay.setHours(0, 0, 0, 0);
+    let createdCount = 0;
 
-        // Create MealFeedback record
-        await prisma.mealFeedback.create({
-          data: {
-            mealPlanItemId: fb.mealPlanItemId,
-            studentId: fb.studentId,
-            date: feedbackDate,
-            mealType: fb.mealType,
-            rating: fb.rating,
-            eatenPercent: fb.eatenPercent,
-            comments: fb.comments ?? null,
-            reportedBy: req.user.id,
-          },
-        });
+    for (const fb of feedbacks) {
+      const feedbackDate = new Date(fb.date);
+      const startOfDay = new Date(fb.date);
+      startOfDay.setHours(0, 0, 0, 0);
 
-        createdCount++;
+      // Create MealFeedback record
+      await prisma.mealFeedback.create({
+        data: {
+          mealPlanItemId: fb.mealPlanItemId,
+          studentId: fb.studentId,
+          date: feedbackDate,
+          mealType: fb.mealType,
+          rating: fb.rating,
+          eatenPercent: fb.eatenPercent,
+          comments: fb.comments ?? null,
+          reportedBy: user.userId,
+        },
+      });
 
-        // ---- Backward compatibility: update DailyUpdate flat fields ----
-        // Map mealType to DailyUpdate field names
-        const fieldMapping: Record<string, { meal: string; menu: string }> = {
-          BREAKFAST: { meal: 'breakfast', menu: 'breakfastMenu' },
-          MID_MORNING_SNACK: { meal: 'snacks', menu: 'snacksMenu' },
-          LUNCH: { meal: 'lunch', menu: 'lunchMenu' },
-          AFTERNOON_SNACK: { meal: 'snacks', menu: 'snacksMenu' },
-        };
+      createdCount++;
 
-        const fields = fieldMapping[fb.mealType];
-        if (!fields) continue;
+      // ---- Backward compatibility: update DailyUpdate flat fields ----
+      // Map mealType to DailyUpdate field names
+      const fieldMapping: Record<string, { meal: string; menu: string }> = {
+        BREAKFAST: { meal: 'breakfast', menu: 'breakfastMenu' },
+        MID_MORNING_SNACK: { meal: 'snacks', menu: 'snacksMenu' },
+        LUNCH: { meal: 'lunch', menu: 'lunchMenu' },
+        AFTERNOON_SNACK: { meal: 'snacks', menu: 'snacksMenu' },
+      };
 
-        // Get the meal item name for the menu field
-        const mealPlanItem = await prisma.mealPlanItem.findUnique({
-          where: { id: fb.mealPlanItemId },
-          include: { mealItem: { select: { name: true } } },
-        });
+      const fields = fieldMapping[fb.mealType];
+      if (!fields) continue;
 
-        const menuName = mealPlanItem?.mealItem?.name ?? '';
-        const mealStatus = `${fb.eatenPercent}% eaten`;
+      // Get the meal item name for the menu field
+      const mealPlanItem = await prisma.mealPlanItem.findUnique({
+        where: { id: fb.mealPlanItemId },
+        include: { mealItem: { select: { name: true } } },
+      });
 
-        // Upsert DailyUpdate using the @@unique(studentId, date) key
-        await prisma.dailyUpdate.upsert({
-          where: {
-            studentId_date: {
-              studentId: fb.studentId,
-              date: startOfDay,
-            },
-          },
-          create: {
+      const menuName = mealPlanItem?.mealItem?.name ?? '';
+      const mealStatus = `${fb.eatenPercent}% eaten`;
+
+      // Upsert DailyUpdate using the @@unique(studentId, date) key
+      await prisma.dailyUpdate.upsert({
+        where: {
+          studentId_date: {
             studentId: fb.studentId,
             date: startOfDay,
-            [fields.meal]: mealStatus,
-            [fields.menu]: menuName,
           },
-          update: {
-            [fields.meal]: mealStatus,
-            [fields.menu]: menuName,
-          },
-        });
-      }
+        },
+        create: {
+          studentId: fb.studentId,
+          date: startOfDay,
+          [fields.meal]: mealStatus,
+          [fields.menu]: menuName,
+        },
+        update: {
+          [fields.meal]: mealStatus,
+          [fields.menu]: menuName,
+        },
+      });
+    }
 
-      return NextResponse.json({ created: createdCount }, { status: 201 });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: true, message: 'Validation failed', details: error.issues },
-          { status: 400 }
-        );
-      }
-      console.error('[MEAL_FEEDBACK_POST]', error);
+    return NextResponse.json({ created: createdCount }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: true, message: 'Failed to submit meal feedback' },
-        { status: 500 }
+        { error: true, message: 'Validation failed', details: error.issues },
+        { status: 400 }
       );
     }
-  },
-  { roles: ['TEACHER', 'ADMIN'] }
-);
+    console.error('[MEAL_FEEDBACK_POST]', error);
+    return NextResponse.json(
+      { error: true, message: 'Failed to submit meal feedback' },
+      { status: 500 }
+    );
+  }
+}

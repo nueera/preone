@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { getAuthUser, requireAdmin, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
 // ============================================================
 // GET /api/meal-templates — List templates for school
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const { searchParams } = new URL(request.url);
+    const schoolId = searchParams.get('schoolId') ?? user.schoolId ?? undefined;
+
+    const where: Record<string, unknown> = {};
+
+    if (schoolId) {
+      where.schoolId = schoolId;
+    }
+
     const isActive = searchParams.get('isActive');
-
-    const where: Record<string, unknown> = {
-      schoolId: req.user.schoolId,
-    };
-
     if (isActive !== null) {
       where.isActive = isActive === 'true';
     }
@@ -33,7 +40,7 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // POST /api/meal-templates — Create template (Admin only)
@@ -48,36 +55,36 @@ const createTemplateSchema = z.object({
   templateData: z.union([z.array(z.unknown()), z.record(z.string(), z.unknown())]),
 });
 
-export const POST = withAuth(
-  async (req) => {
-    try {
-      const body = await req.json();
-      const validated = createTemplateSchema.parse(body);
+export async function POST(request: NextRequest) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
 
-      const template = await prisma.mealTemplate.create({
-        data: {
-          schoolId: req.user.schoolId,
-          name: validated.name,
-          description: validated.description ?? null,
-          mealTypes: JSON.stringify(validated.mealTypes),
-          templateData: JSON.stringify(validated.templateData),
-        },
-      });
+    const body = await request.json();
+    const validated = createTemplateSchema.parse(body);
 
-      return NextResponse.json({ template }, { status: 201 });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: true, message: 'Validation failed', details: error.issues },
-          { status: 400 }
-        );
-      }
-      console.error('[MEAL_TEMPLATES_POST]', error);
+    const template = await prisma.mealTemplate.create({
+      data: {
+        schoolId: user.schoolId!,
+        name: validated.name,
+        description: validated.description ?? null,
+        mealTypes: JSON.stringify(validated.mealTypes),
+        templateData: JSON.stringify(validated.templateData),
+      },
+    });
+
+    return NextResponse.json({ template }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: true, message: 'Failed to create meal template' },
-        { status: 500 }
+        { error: true, message: 'Validation failed', details: error.issues },
+        { status: 400 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+    console.error('[MEAL_TEMPLATES_POST]', error);
+    return NextResponse.json(
+      { error: true, message: 'Failed to create meal template' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin, getAuthUser, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
@@ -52,14 +52,26 @@ const updateMealItemSchema = z.object({
 
 // ============================================================
 // GET /api/meal-items/[id] — Single meal item
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { id } = await ctx.params;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Meal item ID is required' },
+        { status: 400 }
+      );
+    }
 
     const mealItem = await prisma.mealItem.findFirst({
-      where: { id, schoolId: req.user.schoolId },
+      where: { id, schoolId: user.schoolId! },
     });
 
     if (!mealItem) {
@@ -77,18 +89,29 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // PATCH /api/meal-items/[id] — Update meal item (Admin only)
 // ============================================================
 
-export const PATCH = withAuth(async (req, ctx) => {
+export async function PATCH(request: NextRequest) {
   try {
-    const { id } = await ctx.params;
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Meal item ID is required' },
+        { status: 400 }
+      );
+    }
 
     const existing = await prisma.mealItem.findFirst({
-      where: { id, schoolId: req.user.schoolId },
+      where: { id, schoolId: user.schoolId! },
     });
 
     if (!existing) {
@@ -98,7 +121,7 @@ export const PATCH = withAuth(async (req, ctx) => {
       );
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const validated = updateMealItemSchema.parse(body);
 
     // Build update data, converting JSON array/object fields to strings
@@ -132,18 +155,29 @@ export const PATCH = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-}, { roles: ['ADMIN'] });
+}
 
 // ============================================================
 // DELETE /api/meal-items/[id] — Soft delete (Admin only)
 // ============================================================
 
-export const DELETE = withAuth(async (req, ctx) => {
+export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await ctx.params;
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Meal item ID is required' },
+        { status: 400 }
+      );
+    }
 
     const existing = await prisma.mealItem.findFirst({
-      where: { id, schoolId: req.user.schoolId },
+      where: { id, schoolId: user.schoolId! },
     });
 
     if (!existing) {
@@ -166,4 +200,4 @@ export const DELETE = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-}, { roles: ['ADMIN'] });
+}

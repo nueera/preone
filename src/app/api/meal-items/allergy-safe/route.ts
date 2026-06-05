@@ -1,15 +1,19 @@
-import { NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUser, unauthorized } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 // ============================================================
 // GET /api/meal-items/allergy-safe — Allergy-safe meal items
+// Any authenticated user
 // Query: studentId (required), mealType (optional)
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const { searchParams } = new URL(request.url);
     const studentId = searchParams.get('studentId');
     const mealType = searchParams.get('mealType');
 
@@ -39,7 +43,7 @@ export const GET = withAuth(async (req, ctx) => {
 
     // Build base query for meal items
     const where: Record<string, unknown> = {
-      schoolId: req.user.schoolId,
+      schoolId: user.schoolId!,
       isActive: true,
     };
 
@@ -91,4 +95,4 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}

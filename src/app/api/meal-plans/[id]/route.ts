@@ -1,18 +1,28 @@
-import { NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUser, requireAdmin, unauthorized } from '@/lib/auth';
+import { db } from '@/lib/db';
 import { z } from 'zod';
 
 // ============================================================
 // GET /api/meal-plans/[id] — Single meal plan with items
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = await ctx.params;
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+    if (!user.schoolId) {
+      return NextResponse.json({ error: 'No school assigned' }, { status: 403 });
+    }
 
-    const mealPlan = await prisma.mealPlan.findFirst({
-      where: { id, schoolId: req.user.schoolId },
+    const { id } = await params;
+
+    const mealPlan = await db.mealPlan.findFirst({
+      where: { id, schoolId: user.schoolId },
       include: {
         branch: { select: { name: true } },
         items: {
@@ -43,7 +53,7 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // PATCH /api/meal-plans/[id] — Update meal plan (Admin only)
@@ -67,80 +77,38 @@ const updateMealPlanSchema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
 });
 
-export const PATCH = withAuth(
-  async (req, ctx) => {
-    try {
-      const { id } = await ctx.params;
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+    if (!user.schoolId) {
+      return NextResponse.json({ error: 'No school assigned' }, { status: 403 });
+    }
 
-      const existing = await prisma.mealPlan.findFirst({
-        where: { id, schoolId: req.user.schoolId },
-      });
+    const { id } = await params;
 
-      if (!existing) {
-        return NextResponse.json(
-          { error: 'Meal plan not found' },
-          { status: 404 }
-        );
-      }
+    const existing = await db.mealPlan.findFirst({
+      where: { id, schoolId: user.schoolId },
+    });
 
-      const body = await req.json();
-      const validated = updateMealPlanSchema.parse(body);
+    if (!existing) {
+      return NextResponse.json(
+        { error: 'Meal plan not found' },
+        { status: 404 }
+      );
+    }
 
-      // If status changed to ARCHIVED, just update and return
-      if (validated.status === 'ARCHIVED' && Object.keys(validated).length === 1) {
-        const mealPlan = await prisma.mealPlan.update({
-          where: { id },
-          data: { status: 'ARCHIVED' },
-          include: {
-            items: {
-              include: { mealItem: true },
-              orderBy: [
-                { dayOfWeek: 'asc' },
-                { mealType: 'asc' },
-                { sortOrder: 'asc' },
-              ],
-            },
-          },
-        });
-        return NextResponse.json({ mealPlan });
-      }
+    const body = await request.json();
+    const validated = updateMealPlanSchema.parse(body);
 
-      // Validate date range if dates are being updated
-      const startDate = validated.startDate ?? existing.startDate;
-      const endDate = validated.endDate ?? existing.endDate;
-
-      if (endDate < startDate) {
-        return NextResponse.json(
-          { error: 'End date must be after start date' },
-          { status: 400 }
-        );
-      }
-
-      // Build update data
-      const updateData: Record<string, unknown> = {};
-
-      if (validated.name !== undefined) updateData.name = validated.name;
-      if (validated.description !== undefined)
-        updateData.description = validated.description;
-      if (validated.branchId !== undefined)
-        updateData.branchId = validated.branchId;
-      if (validated.startDate !== undefined)
-        updateData.startDate = startDate;
-      if (validated.endDate !== undefined) updateData.endDate = endDate;
-
-      // Stringify mealTypes and targetClassIds before saving
-      if (validated.mealTypes !== undefined)
-        updateData.mealTypes = JSON.stringify(validated.mealTypes);
-      if (validated.targetClassIds !== undefined)
-        updateData.targetClassIds = validated.targetClassIds
-          ? JSON.stringify(validated.targetClassIds)
-          : null;
-
-      if (validated.status !== undefined) updateData.status = validated.status;
-
-      const mealPlan = await prisma.mealPlan.update({
+    // If status changed to ARCHIVED, just update and return
+    if (validated.status === 'ARCHIVED' && Object.keys(validated).length === 1) {
+      const mealPlan = await db.mealPlan.update({
         where: { id },
-        data: updateData,
+        data: { status: 'ARCHIVED' },
         include: {
           items: {
             include: { mealItem: true },
@@ -152,62 +120,116 @@ export const PATCH = withAuth(
           },
         },
       });
-
       return NextResponse.json({ mealPlan });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        );
-      }
-      console.error('[MEAL_PLAN_PATCH]', error);
+    }
+
+    // Validate date range if dates are being updated
+    const startDate = validated.startDate ?? existing.startDate;
+    const endDate = validated.endDate ?? existing.endDate;
+
+    if (endDate < startDate) {
       return NextResponse.json(
-        { error: 'Failed to update meal plan' },
-        { status: 500 }
+        { error: 'End date must be after start date' },
+        { status: 400 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+
+    // Build update data
+    const updateData: Record<string, unknown> = {};
+
+    if (validated.name !== undefined) updateData.name = validated.name;
+    if (validated.description !== undefined)
+      updateData.description = validated.description;
+    if (validated.branchId !== undefined)
+      updateData.branchId = validated.branchId;
+    if (validated.startDate !== undefined)
+      updateData.startDate = startDate;
+    if (validated.endDate !== undefined) updateData.endDate = endDate;
+
+    // Stringify mealTypes and targetClassIds before saving
+    if (validated.mealTypes !== undefined)
+      updateData.mealTypes = JSON.stringify(validated.mealTypes);
+    if (validated.targetClassIds !== undefined)
+      updateData.targetClassIds = validated.targetClassIds
+        ? JSON.stringify(validated.targetClassIds)
+        : null;
+
+    if (validated.status !== undefined) updateData.status = validated.status;
+
+    const mealPlan = await db.mealPlan.update({
+      where: { id },
+      data: updateData,
+      include: {
+        items: {
+          include: { mealItem: true },
+          orderBy: [
+            { dayOfWeek: 'asc' },
+            { mealType: 'asc' },
+            { sortOrder: 'asc' },
+          ],
+        },
+      },
+    });
+
+    return NextResponse.json({ mealPlan });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      );
+    }
+    console.error('[MEAL_PLAN_PATCH]', error);
+    return NextResponse.json(
+      { error: 'Failed to update meal plan' },
+      { status: 500 }
+    );
+  }
+}
 
 // ============================================================
 // DELETE /api/meal-plans/[id] — Delete meal plan (Admin only)
 // ============================================================
 
-export const DELETE = withAuth(
-  async (req, ctx) => {
-    try {
-      const { id } = await ctx.params;
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+    if (!user.schoolId) {
+      return NextResponse.json({ error: 'No school assigned' }, { status: 403 });
+    }
 
-      const existing = await prisma.mealPlan.findFirst({
-        where: { id, schoolId: req.user.schoolId },
-      });
+    const { id } = await params;
 
-      if (!existing) {
-        return NextResponse.json(
-          { error: 'Meal plan not found' },
-          { status: 404 }
-        );
-      }
+    const existing = await db.mealPlan.findFirst({
+      where: { id, schoolId: user.schoolId },
+    });
 
-      // Cascade will delete items, but be explicit
-      await prisma.mealPlanItem.deleteMany({
-        where: { mealPlanId: id },
-      });
-
-      await prisma.mealPlan.delete({
-        where: { id },
-      });
-
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      console.error('[MEAL_PLAN_DELETE]', error);
+    if (!existing) {
       return NextResponse.json(
-        { error: 'Failed to delete meal plan' },
-        { status: 500 }
+        { error: 'Meal plan not found' },
+        { status: 404 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+
+    // Delete items first (cascade), then plan
+    await db.mealPlanItem.deleteMany({
+      where: { mealPlanId: id },
+    });
+
+    await db.mealPlan.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[MEAL_PLAN_DELETE]', error);
+    return NextResponse.json(
+      { error: 'Failed to delete meal plan' },
+      { status: 500 }
+    );
+  }
+}

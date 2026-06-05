@@ -1,22 +1,29 @@
-import { NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth-utils';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUser, requireAdmin, unauthorized } from '@/lib/auth';
+import { db } from '@/lib/db';
 import { z } from 'zod';
 
 // ============================================================
 // GET /api/meal-plans — List meal plans with filters
+// Any authenticated user
 // ============================================================
 
-export const GET = withAuth(async (req, ctx) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+    if (!user.schoolId) {
+      return NextResponse.json({ error: 'No school assigned' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const from = searchParams.get('from');
     const to = searchParams.get('to');
     const branchId = searchParams.get('branchId');
 
     const where: Record<string, unknown> = {
-      schoolId: req.user.schoolId,
+      schoolId: user.schoolId,
     };
 
     if (status) {
@@ -37,7 +44,7 @@ export const GET = withAuth(async (req, ctx) => {
       });
     }
 
-    const mealPlans = await prisma.mealPlan.findMany({
+    const mealPlans = await db.mealPlan.findMany({
       where,
       include: {
         _count: { select: { items: true } },
@@ -54,7 +61,7 @@ export const GET = withAuth(async (req, ctx) => {
       { status: 500 }
     );
   }
-});
+}
 
 // ============================================================
 // POST /api/meal-plans — Create meal plan (Admin only)
@@ -82,76 +89,79 @@ const createMealPlanSchema = z.object({
   targetClassIds: z.array(z.string()).optional(),
 });
 
-export const POST = withAuth(
-  async (req) => {
-    try {
-      const body = await req.json();
-      const validated = createMealPlanSchema.parse(body);
+export async function POST(request: NextRequest) {
+  try {
+    const user = requireAdmin(request);
+    if (user instanceof NextResponse) return user;
+    if (!user.schoolId) {
+      return NextResponse.json({ error: 'No school assigned' }, { status: 403 });
+    }
 
-      // Validate endDate > startDate
-      if (validated.endDate <= validated.startDate) {
-        return NextResponse.json(
-          { error: 'End date must be after start date' },
-          { status: 400 }
-        );
-      }
+    const body = await request.json();
+    const validated = createMealPlanSchema.parse(body);
 
-      // Check for overlapping meal plans
-      // Same schoolId, same branchId (or both null), status in DRAFT/PUBLISHED, date ranges overlap
-      const overlapping = await prisma.mealPlan.findFirst({
-        where: {
-          schoolId: req.user.schoolId,
-          status: { in: ['DRAFT', 'PUBLISHED'] },
-          ...(validated.branchId
-            ? { branchId: validated.branchId }
-            : { branchId: null }),
-          startDate: { lte: validated.endDate },
-          endDate: { gte: validated.startDate },
-        },
-      });
-
-      if (overlapping) {
-        return NextResponse.json(
-          {
-            error:
-              'A meal plan already exists that overlaps with the specified date range for this branch',
-            overlappingPlan: { id: overlapping.id, name: overlapping.name },
-          },
-          { status: 409 }
-        );
-      }
-
-      // Stringify mealTypes and targetClassIds before saving (SQLite compat)
-      const mealPlan = await prisma.mealPlan.create({
-        data: {
-          schoolId: req.user.schoolId,
-          branchId: validated.branchId ?? null,
-          name: validated.name,
-          description: validated.description ?? null,
-          startDate: validated.startDate,
-          endDate: validated.endDate,
-          mealTypes: JSON.stringify(validated.mealTypes),
-          targetClassIds: validated.targetClassIds
-            ? JSON.stringify(validated.targetClassIds)
-            : null,
-          status: 'DRAFT',
-        },
-      });
-
-      return NextResponse.json({ mealPlan }, { status: 201 });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          { error: 'Validation failed', details: error.issues },
-          { status: 400 }
-        );
-      }
-      console.error('[MEAL_PLANS_POST]', error);
+    // Validate endDate > startDate
+    if (validated.endDate <= validated.startDate) {
       return NextResponse.json(
-        { error: 'Failed to create meal plan' },
-        { status: 500 }
+        { error: 'End date must be after start date' },
+        { status: 400 }
       );
     }
-  },
-  { roles: ['ADMIN'] }
-);
+
+    // Check for overlapping meal plans
+    // Same schoolId, same branchId (or both null), status in DRAFT/PUBLISHED, date ranges overlap
+    const overlapping = await db.mealPlan.findFirst({
+      where: {
+        schoolId: user.schoolId,
+        status: { in: ['DRAFT', 'PUBLISHED'] },
+        ...(validated.branchId
+          ? { branchId: validated.branchId }
+          : { branchId: null }),
+        startDate: { lte: validated.endDate },
+        endDate: { gte: validated.startDate },
+      },
+    });
+
+    if (overlapping) {
+      return NextResponse.json(
+        {
+          error:
+            'A meal plan already exists that overlaps with the specified date range for this branch',
+          overlappingPlan: { id: overlapping.id, name: overlapping.name },
+        },
+        { status: 409 }
+      );
+    }
+
+    // Stringify mealTypes and targetClassIds before saving (SQLite compat)
+    const mealPlan = await db.mealPlan.create({
+      data: {
+        schoolId: user.schoolId,
+        branchId: validated.branchId ?? null,
+        name: validated.name,
+        description: validated.description ?? null,
+        startDate: validated.startDate,
+        endDate: validated.endDate,
+        mealTypes: JSON.stringify(validated.mealTypes),
+        targetClassIds: validated.targetClassIds
+          ? JSON.stringify(validated.targetClassIds)
+          : null,
+        status: 'DRAFT',
+      },
+    });
+
+    return NextResponse.json({ mealPlan }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.issues },
+        { status: 400 }
+      );
+    }
+    console.error('[MEAL_PLANS_POST]', error);
+    return NextResponse.json(
+      { error: 'Failed to create meal plan' },
+      { status: 500 }
+    );
+  }
+}
