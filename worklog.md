@@ -1,5 +1,53 @@
 ---
 
+Task ID: 12
+Agent: Phase 7 - Communication System Integration
+Task: Add Chat + Announcements navigation links to all 3 portal sidebars and chat init hook to layouts
+
+Work Log:
+
+- Updated admin sidebar (src/components/admin-sidebar.tsx):
+  - Added MessageCircle and Megaphone icon imports
+  - Imported useChatStore for unread badge count
+  - Added badge field to NavItem interface
+  - Added Chat nav item (href: /admin/chat, icon: MessageCircle, badge: 'chat') after Notifications
+  - Added Announcements nav item (href: /admin/announcements, icon: Megaphone) after Chat
+  - Rendered unread count badge on Chat nav item (red pill with 99+ cap)
+  - Both items visible to ADMIN and TASK_MASTER roles
+
+- Updated teacher sidebar (src/components/teacher-sidebar.tsx):
+  - Added MessageCircle and Megaphone icon imports
+  - Imported useChatStore for unread badge count
+  - Added Chat nav item (href: /teacher/chat, icon: MessageCircle, badge: 'chat') after Notifications
+  - Added Announcements nav item (href: /teacher/announcements, icon: Megaphone) after Chat
+  - Rendered unread count badge on Chat nav item
+
+- Updated parent sidebar (src/components/parent-sidebar.tsx):
+  - Added MessageCircle and Megaphone icon imports
+  - Imported useChatStore for unread badge count
+  - Added Chat nav item (href: /parent/chat, icon: MessageCircle, badge: 'chat') after Notifications
+  - Added Announcements nav item (href: /parent/announcements, icon: Megaphone) after Chat
+  - Rendered unread count badge on Chat nav item
+
+- Updated parent mobile nav (src/components/parent-mobile-nav.tsx):
+  - Changed Chat link from /parent/communication to /parent/chat
+  - Updated icon from MessageSquare to MessageCircle
+
+- Updated mobile bottom nav (src/components/layout/mobile-bottom-nav.tsx):
+  - Changed all Chat links from /communication to /chat for all 3 roles
+
+- Added useChatInit() hook to all 3 portal layouts:
+  - src/app/admin/layout.tsx - imported and called useChatInit()
+  - src/app/teacher/layout.tsx - imported and called useChatInit()
+  - src/app/parent/layout.tsx - imported and called useChatInit()
+
+- Build test: Passed successfully (npx next build)
+  - All 6 new routes visible: /admin/chat, /admin/announcements, /teacher/chat, /teacher/announcements, /parent/chat, /parent/announcements
+
+- Pushed to repo: commit 53973c0 on main
+
+---
+
 Task ID: 1
 Agent: Main
 Task: Fix PreOne Onboarding Wizard visibility in admin portal
