@@ -15,6 +15,7 @@ ERP + Communication + AI Growth Platform for modern preschools.
 ## Features
 
 ### Admin Portal
+
 - Student management
 - Teacher management
 - Attendance tracking
@@ -28,6 +29,7 @@ ERP + Communication + AI Growth Platform for modern preschools.
 - System settings
 
 ### Teacher Portal
+
 - My class dashboard
 - Daily updates (meals/nap/mood)
 - Attendance marking
@@ -38,6 +40,7 @@ ERP + Communication + AI Growth Platform for modern preschools.
 - Communication
 
 ### Parent Portal
+
 - Child dashboard
 - Attendance view
 - Fee payments & receipts
@@ -47,12 +50,14 @@ ERP + Communication + AI Growth Platform for modern preschools.
 - Communication with teachers
 
 ### CRM (Task Master)
+
 - Lead pipeline (Kanban)
 - Follow-up management
 - Task tracking
 - Revenue estimation
 
 ### Cross-Portal
+
 - Real-time notifications
 - Role-based access control
 - Branch management
@@ -61,23 +66,24 @@ ERP + Communication + AI Growth Platform for modern preschools.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript 5 |
-| Database | Prisma ORM (SQLite dev / PostgreSQL prod) |
-| UI | Tailwind CSS 4, shadcn/ui, Radix UI, Framer Motion |
-| Charts | Recharts, TanStack Table |
-| Auth | Custom JWT (HMAC-SHA256), 4 roles |
-| State | Zustand, TanStack React Query |
-| Export | PDF (PDFKit), Excel (ExcelJS) |
-| Deployment | Vercel / Docker |
+| Layer      | Technology                                         |
+| ---------- | -------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Turbopack)                 |
+| Language   | TypeScript 5                                       |
+| Database   | Prisma ORM (SQLite dev / PostgreSQL prod)          |
+| UI         | Tailwind CSS 4, shadcn/ui, Radix UI, Framer Motion |
+| Charts     | Recharts, TanStack Table                           |
+| Auth       | Custom JWT (HMAC-SHA256), 4 roles                  |
+| State      | Zustand, TanStack React Query                      |
+| Export     | PDF (PDFKit), Excel (ExcelJS)                      |
+| Deployment | Vercel / Docker                                    |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or bun
 
@@ -142,31 +148,31 @@ preone/
 
 The API is organized into the following route groups:
 
-| Route Group | Description |
-|-------------|-------------|
-| `/api/auth` | Authentication & session management |
-| `/api/students` | Student CRUD operations |
-| `/api/teachers` | Teacher CRUD operations |
-| `/api/parents` | Parent CRUD operations |
-| `/api/attendance` | Attendance tracking |
-| `/api/fees` | Fee management, invoices & payments |
-| `/api/growth` | Growth tracking & assessments |
-| `/api/activities` | Activity management |
-| `/api/transport` | Transport management |
-| `/api/communication` | Messages & notifications |
-| `/api/crm` | CRM leads, pipeline & tasks |
-| `/api/reports` | Reports & data exports |
-| `/api/settings` | System configuration |
+| Route Group          | Description                         |
+| -------------------- | ----------------------------------- |
+| `/api/auth`          | Authentication & session management |
+| `/api/students`      | Student CRUD operations             |
+| `/api/teachers`      | Teacher CRUD operations             |
+| `/api/parents`       | Parent CRUD operations              |
+| `/api/attendance`    | Attendance tracking                 |
+| `/api/fees`          | Fee management, invoices & payments |
+| `/api/growth`        | Growth tracking & assessments       |
+| `/api/activities`    | Activity management                 |
+| `/api/transport`     | Transport management                |
+| `/api/communication` | Messages & notifications            |
+| `/api/crm`           | CRM leads, pipeline & tasks         |
+| `/api/reports`       | Reports & data exports              |
+| `/api/settings`      | System configuration                |
 
 ---
 
 ## Default Login Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@preone.com | admin123 |
+| Role    | Email              | Password   |
+| ------- | ------------------ | ---------- |
+| Admin   | admin@preone.com   | admin123   |
 | Teacher | teacher@preone.com | teacher123 |
-| Parent | parent@preone.com | parent123 |
+| Parent  | parent@preone.com  | parent123  |
 
 ---
 

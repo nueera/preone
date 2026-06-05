@@ -23,6 +23,7 @@ Thank you for contributing to PreOne! We appreciate your time and effort to help
 ## Development Setup
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or bun
 
@@ -71,17 +72,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
-| Prefix | Description |
-|--------|-------------|
-| `feat:` | A new feature |
-| `fix:` | A bug fix |
-| `chore:` | Maintenance tasks (build, dependencies, etc.) |
-| `docs:` | Documentation changes |
-| `style:` | Code style changes (formatting, whitespace) |
-| `refactor:` | Code refactoring without behavior changes |
-| `test:` | Adding or updating tests |
+| Prefix      | Description                                   |
+| ----------- | --------------------------------------------- |
+| `feat:`     | A new feature                                 |
+| `fix:`      | A bug fix                                     |
+| `chore:`    | Maintenance tasks (build, dependencies, etc.) |
+| `docs:`     | Documentation changes                         |
+| `style:`    | Code style changes (formatting, whitespace)   |
+| `refactor:` | Code refactoring without behavior changes     |
+| `test:`     | Adding or updating tests                      |
 
 Examples:
+
 ```
 feat: add daily update module for teacher portal
 fix: resolve attendance date filtering issue
@@ -115,11 +117,11 @@ test: add unit tests for growth tracking
 
 PreOne is organized into three distinct portals, each with its own routing and layout:
 
-| Portal | Route Prefix | Description |
-|--------|-------------|-------------|
-| **Admin** | `/admin/*` | School administration, management, and configuration |
+| Portal      | Route Prefix | Description                                           |
+| ----------- | ------------ | ----------------------------------------------------- |
+| **Admin**   | `/admin/*`   | School administration, management, and configuration  |
 | **Teacher** | `/teacher/*` | Classroom management, daily updates, and observations |
-| **Parent** | `/parent/*` | Child monitoring, payments, and communication |
+| **Parent**  | `/parent/*`  | Child monitoring, payments, and communication         |
 
 ### Key Architectural Decisions
 
@@ -133,18 +135,18 @@ PreOne is organized into three distinct portals, each with its own routing and l
 
 ## Directory Guidelines
 
-| Directory | Purpose |
-|-----------|---------|
-| `src/app/admin/` | Admin portal pages and layouts |
-| `src/app/teacher/` | Teacher portal pages and layouts |
-| `src/app/parent/` | Parent portal pages and layouts |
-| `src/app/api/` | API route handlers, grouped by module (e.g., `api/students/`, `api/fees/`) |
-| `src/components/ui/` | Shared UI components (shadcn/ui) |
-| `src/components/` | Portal-specific or feature-specific components |
-| `src/lib/` | Utility functions, auth helpers, database client, and shared logic |
-| `src/hooks/` | Custom React hooks |
-| `src/types/` | TypeScript type definitions and interfaces |
-| `prisma/` | Prisma schema and migrations |
+| Directory            | Purpose                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `src/app/admin/`     | Admin portal pages and layouts                                             |
+| `src/app/teacher/`   | Teacher portal pages and layouts                                           |
+| `src/app/parent/`    | Parent portal pages and layouts                                            |
+| `src/app/api/`       | API route handlers, grouped by module (e.g., `api/students/`, `api/fees/`) |
+| `src/components/ui/` | Shared UI components (shadcn/ui)                                           |
+| `src/components/`    | Portal-specific or feature-specific components                             |
+| `src/lib/`           | Utility functions, auth helpers, database client, and shared logic         |
+| `src/hooks/`         | Custom React hooks                                                         |
+| `src/types/`         | TypeScript type definitions and interfaces                                 |
+| `prisma/`            | Prisma schema and migrations                                               |
 
 ### Adding a New Component
 

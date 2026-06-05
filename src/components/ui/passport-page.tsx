@@ -1,6 +1,6 @@
 'use client';
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react-hooks/preserve-manual-memoization */
+ 
+ 
 
 // ============================================================
 // PassportPage — Shared Childhood Passport component
