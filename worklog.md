@@ -1,80 +1,73 @@
----
+# Work Log: Error Logging System + Error & Loading Pages
 
-Task ID: 12
-Agent: Phase 7 - Communication System Integration
-Task: Add Chat + Announcements navigation links to all 3 portal sidebars and chat init hook to layouts
+## Task Summary
 
-Work Log:
+Implemented a comprehensive error logging system and error/loading pages for the PreOne preschool ERP application.
 
-- Updated admin sidebar (src/components/admin-sidebar.tsx):
-  - Added MessageCircle and Megaphone icon imports
-  - Imported useChatStore for unread badge count
-  - Added badge field to NavItem interface
-  - Added Chat nav item (href: /admin/chat, icon: MessageCircle, badge: 'chat') after Notifications
-  - Added Announcements nav item (href: /admin/announcements, icon: Megaphone) after Chat
-  - Rendered unread count badge on Chat nav item (red pill with 99+ cap)
-  - Both items visible to ADMIN and TASK_MASTER roles
+## Files Created
 
-- Updated teacher sidebar (src/components/teacher-sidebar.tsx):
-  - Added MessageCircle and Megaphone icon imports
-  - Imported useChatStore for unread badge count
-  - Added Chat nav item (href: /teacher/chat, icon: MessageCircle, badge: 'chat') after Notifications
-  - Added Announcements nav item (href: /teacher/announcements, icon: Megaphone) after Chat
-  - Rendered unread count badge on Chat nav item
+### Phase 1: Database + Core Logger
 
-- Updated parent sidebar (src/components/parent-sidebar.tsx):
-  - Added MessageCircle and Megaphone icon imports
-  - Imported useChatStore for unread badge count
-  - Added Chat nav item (href: /parent/chat, icon: MessageCircle, badge: 'chat') after Notifications
-  - Added Announcements nav item (href: /parent/announcements, icon: Megaphone) after Chat
-  - Rendered unread count badge on Chat nav item
+- **prisma/schema.prisma** — Added ErrorLog model with ErrorSource, ErrorSeverity, ErrorStatus enums; added `errorLogs ErrorLog[]` to User model
+- **src/lib/error-logger.ts** — Core error logging library with fingerprinting, deduplication, severity escalation, sanitization, and convenience helpers (logApiError, logDbError, logAuthError, logFrontendError)
+- **src/lib/api-handler.ts** — Standardized API route handler wrapper with automatic error catching and Zod/Prisma/Auth error formatting
 
-- Updated parent mobile nav (src/components/parent-mobile-nav.tsx):
-  - Changed Chat link from /parent/communication to /parent/chat
-  - Updated icon from MessageSquare to MessageCircle
+### Phase 2: Backend APIs
 
-- Updated mobile bottom nav (src/components/layout/mobile-bottom-nav.tsx):
-  - Changed all Chat links from /communication to /chat for all 3 roles
+- **src/app/api/errors/route.ts** — POST endpoint for frontend error reporting with rate limiting
+- **src/app/api/errors/[id]/route.ts** — GET/PATCH/DELETE for individual error management (admin only)
+- **src/app/api/errors/stats/route.ts** — GET for error dashboard statistics (summary, severity, source, trend, resolution metrics)
+- **src/app/api/errors/bulk/route.ts** — POST for bulk actions (acknowledge, resolve, ignore, delete)
+- **src/app/api/errors/list/route.ts** — GET for paginated error list with filtering and search
 
-- Added useChatInit() hook to all 3 portal layouts:
-  - src/app/admin/layout.tsx - imported and called useChatInit()
-  - src/app/teacher/layout.tsx - imported and called useChatInit()
-  - src/app/parent/layout.tsx - imported and called useChatInit()
+### Phase 3: Global Error Pages
 
-- Build test: Passed successfully (npx next build)
-  - All 6 new routes visible: /admin/chat, /admin/announcements, /teacher/chat, /teacher/announcements, /parent/chat, /parent/announcements
+- **src/app/not-found.tsx** — Global 404 page with cosmic dark theme
+- **src/app/error.tsx** — Global error boundary page with error reporting
+- **src/app/global-error.tsx** — Root layout error page (minimal HTML, no React)
+- **src/app/loading.tsx** — Global loading spinner using CSS custom properties
 
-- Pushed to repo: commit 53973c0 on main
+### Phase 4: Frontend Error Capture
 
----
+- **src/lib/error-boundary.tsx** — React error boundary component with server reporting
+- **src/lib/client-error-handler.ts** — Global unhandled error/rejection/console.error capture with debouncing
+- **src/components/providers/error-handler-provider.tsx** — Session-aware error handler initialization provider
 
-Task ID: 1
-Agent: Main
-Task: Fix PreOne Onboarding Wizard visibility in admin portal
+### Phase 5: Skeleton Loaders
 
-Work Log:
+- **src/components/ui/skeleton-loader.tsx** — Comprehensive skeleton components (Skeleton, StatsSkeleton, TableSkeleton, ChartSkeleton, CardSkeleton, FormSkeleton, ListSkeleton, PageSkeleton)
+- **src/app/admin/loading.tsx** — Admin portal loading skeleton
+- **src/app/teacher/loading.tsx** — Teacher portal loading skeleton
+- **src/app/parent/loading.tsx** — Parent portal loading skeleton
 
-- Analyzed the full onboarding codebase: 8 step components, 17 API routes, Zustand store, wizard-shell, progress-bar
-- Identified critical bug: ALL fetch calls in onboarding pages missing Authorization header
-- Identified stale localStorage cache preventing redirect in admin layout
-- Identified missing POST handler in /api/onboarding/draft route
-- Enhanced /api/onboarding/complete to actually create real records (branches, programs, classes, teachers, students, parents, daily update config)
+### Phase 6: Portal Error Pages
 
-Fixes Applied:
+- **src/app/admin/error.tsx** — Admin portal error page with portal-aware styling
+- **src/app/admin/not-found.tsx** — Admin 404 page
+- **src/app/teacher/error.tsx** — Teacher portal error page
+- **src/app/teacher/not-found.tsx** — Teacher 404 page
+- **src/app/parent/error.tsx** — Parent portal error page
+- **src/app/parent/not-found.tsx** — Parent 404 page
 
-1. `src/app/admin/onboarding/page.tsx` - Added getAuthHeaders() helper, fixed all fetch calls to include auth tokens, changed auto-save to POST /api/onboarding/draft
-2. `src/app/admin/onboarding/step/[step]/page.tsx` - Added getAuthHeaders() helper, fixed fetch calls with auth tokens
-3. `src/app/admin/layout.tsx` - Removed stale localStorage cache check that prevented redirect, now always checks API
-4. `src/app/api/onboarding/draft/route.ts` - Added POST handler for auto-save, syncs school profile data alongside draft
-5. `src/app/api/onboarding/complete/route.ts` - Complete rewrite: creates real DB records from draft (branches, programs, classes, teachers, students, parents, daily update config)
-6. `src/components/onboarding/steps/review-launch-step.tsx` - Added auth headers to launch fetch
-7. `src/components/onboarding/steps/teachers-step.tsx` - Added auth headers to CSV import
-8. `src/components/onboarding/steps/students-step.tsx` - Added auth headers to CSV import
+### Phase 7: Admin Error Dashboard
 
-Stage Summary:
+- **src/app/admin/errors/page.tsx** — Full error monitoring dashboard with stats, severity breakdown, trend indicators, source distribution, error list with filtering/search, expandable error details, status changes, bulk actions, and pagination
 
-- All onboarding fetch calls now properly include Bearer token authorization
-- Admin layout always checks API for onboarding status (no stale cache blocking)
-- Draft API now supports POST for auto-save and syncs school data
-- Complete API now creates actual database records from wizard data
-- Build passes successfully with all routes visible
+## Files Modified
+
+- **prisma/schema.prisma** — Added ErrorLog model and errorLogs relation to User
+- **src/app/layout.tsx** — Added ErrorHandlerProvider wrapper around children
+- **src/components/admin-sidebar.tsx** — Added "Error Monitor" nav item with AlertTriangle icon
+
+## Key Adaptations
+
+- Used `admin/`, `teacher/`, `parent/` directories (not route groups `(admin)/`, etc.) matching existing project structure
+- Changed Prisma Json fields to String type (with JSON stringified values) for SQLite compatibility
+- Added `"use client"` directive to not-found.tsx since it uses onClick handlers
+- Added `/api/errors/list` endpoint not in original spec but needed by the dashboard for paginated queries
+
+## Verification
+
+- `bun run lint` passes with zero errors
+- `npx prisma db push` completed successfully
+- Dev server running without new errors

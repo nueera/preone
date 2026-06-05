@@ -44,6 +44,7 @@ model User {
   sessions            Session[]
   accounts            Account[]
   refreshTokens       RefreshToken[]
+  errorLogs           ErrorLog[]
 }
 
 model Otp {
@@ -1312,4 +1313,95 @@ model RefreshToken {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+// ============================================
+// ERROR LOGGING SYSTEM
+// ============================================
+
+enum ErrorSource {
+  FRONTEND
+  BACKEND
+  DATABASE
+  AUTH
+  EXTERNAL
+  SOCKET
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ErrorStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+  IGNORED
+}
+
+model ErrorLog {
+  id              String         @id @default(cuid())
+  fingerprint     String         @unique                        // Hash for deduplication
+  message         String                                         // Error message
+  stack           String?                                        // Full stack trace
+  type            String?                                        // Error class name (TypeError, ReferenceError, etc.)
+  source          ErrorSource                                    // Where it happened
+  severity        ErrorSeverity  @default(MEDIUM)
+  status          ErrorStatus    @default(NEW)
+
+  // Context — WHERE it happened
+  url             String?
+  method          String?
+  apiRoute        String?
+  lineNumber      Int?
+  columnName      Int?
+  fileName        String?
+
+  // Context — WHO & WHEN
+  userId          String?
+  userRole        String?
+  schoolId        String?
+  sessionId       String?
+  userAgent       String?
+  ipAddress       String?
+
+  // Request/Response
+  requestBody     String?
+  requestQuery    String?
+  statusCode      Int?
+  responseBody    String?
+
+  // Occurrence tracking
+  occurrenceCount Int            @default(1)
+  firstSeenAt     DateTime       @default(now())
+  lastSeenAt      DateTime       @default(now())
+
+  // Resolution
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolutionNote  String?
+  fixVersion      String?
+
+  // Tags & Metadata
+  tags            String         @default("[]")
+  metadata        String         @default("{}")
+  breadcrumbs     String         @default("[]")
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relations
+  user            User?          @relation(fields: [userId], references: [id])
+
+  @@index([source, severity])
+  @@index([status])
+  @@index([userId])
+  @@index([schoolId])
+  @@index([lastSeenAt])
+  @@index([severity, status])
+  @@index([firstSeenAt])
 }
