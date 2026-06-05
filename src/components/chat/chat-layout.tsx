@@ -86,6 +86,21 @@ export function ChatLayout() {
     markAsRead,
   } = useChatStore();
 
+  // Get current user ID from token for message alignment
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setCurrentUserId(payload.userId || payload.id);
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
   const [chatSearch, setChatSearch] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -332,7 +347,7 @@ export function ChatLayout() {
                   </div>
                 ) : (
                   currentMessages.map((msg) => {
-                    const isOwn = msg.senderId === activeThread?.participants?.[0]?.userId;
+                    const isOwn = msg.senderId === currentUserId;
                     return (
                       <div
                         key={msg.id}

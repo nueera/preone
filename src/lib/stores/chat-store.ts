@@ -313,11 +313,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // ────────────────────────────────────────
   loadThreads: async () => {
     try {
-      const res = await fetch('/api/chat/threads');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/chat/threads', { headers });
       if (!res.ok) throw new Error('Failed to load threads');
       const data = await res.json();
       const threads: ChatThread[] = data.threads || [];
-      const totalUnread = threads.reduce(
+      const totalUnread = data.totalUnread || threads.reduce(
         (sum, t) => sum + (t.unreadCount || 0),
         0,
       );
@@ -335,8 +339,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const params = new URLSearchParams({ limit: '50' });
       if (cursor) params.set('before', cursor);
 
+      const token = typeof window !== 'undefined' ? localStorage.getItem('preone_token') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch(
         `/api/chat/threads/${threadId}/messages?${params.toString()}`,
+        { headers },
       );
       if (!res.ok) throw new Error('Failed to load messages');
       const data = await res.json();

@@ -52,11 +52,10 @@ const NAV_ITEMS: { label: string; icon: React.ElementType; href: string; badge?:
   { label: 'Activities', icon: Palette, href: '/teacher/activities' },
   { label: 'Growth', icon: TrendingUp, href: '/teacher/growth' },
   { label: 'Schedule', icon: Calendar, href: '/teacher/schedule' },
-  { label: 'Communication', icon: MessageSquare, href: '/teacher/communication' },
-  { label: 'Reports', icon: FileBarChart, href: '/teacher/reports' },
-  { label: 'Notifications', icon: Bell, href: '/teacher/notifications' },
   { label: 'Chat', icon: MessageCircle, href: '/teacher/chat', badge: 'chat' },
   { label: 'Announcements', icon: Megaphone, href: '/teacher/announcements' },
+  { label: 'Reports', icon: FileBarChart, href: '/teacher/reports' },
+  { label: 'Notifications', icon: Bell, href: '/teacher/notifications' },
   { label: 'Settings', icon: Settings, href: '/teacher/settings' },
 ];
 

@@ -49,11 +49,10 @@ const NAV_ITEMS: { label: string; icon: React.ElementType; href: string; badge?:
   { label: 'Daily Updates', icon: Sun, href: '/parent/daily-updates' },
   { label: 'Observations', icon: Eye, href: '/parent/observations' },
   { label: 'Growth', icon: TrendingUp, href: '/parent/growth' },
-  { label: 'Communication', icon: MessageSquare, href: '/parent/communication' },
-  { label: 'Reports', icon: FileBarChart, href: '/parent/reports' },
-  { label: 'Notifications', icon: Bell, href: '/parent/notifications' },
   { label: 'Chat', icon: MessageCircle, href: '/parent/chat', badge: 'chat' },
   { label: 'Announcements', icon: Megaphone, href: '/parent/announcements' },
+  { label: 'Reports', icon: FileBarChart, href: '/parent/reports' },
+  { label: 'Notifications', icon: Bell, href: '/parent/notifications' },
   { label: 'Settings', icon: Settings, href: '/parent/settings' },
 ];
 

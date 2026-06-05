@@ -52,6 +52,15 @@ interface AnnouncementState {
 // Store
 // ────────────────────────────────────────────
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('preone_token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
   announcements: [],
   drafts: [],
@@ -65,7 +74,9 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
     set({ isLoading: true });
     try {
       const params = new URLSearchParams(filters);
-      const res = await fetch(`/api/announcements?${params.toString()}`);
+      const res = await fetch(`/api/announcements?${params.toString()}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error('Failed to fetch announcements');
       const data = await res.json();
       set({ announcements: data.announcements || [], isLoading: false });
@@ -80,7 +91,9 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
   // ────────────────────────────────────────
   fetchDrafts: async () => {
     try {
-      const res = await fetch('/api/announcements?status=DRAFT');
+      const res = await fetch('/api/announcements?status=DRAFT', {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error('Failed to fetch drafts');
       const data = await res.json();
       set({ drafts: data.announcements || [] });
@@ -96,7 +109,7 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
     try {
       const res = await fetch('/api/announcements', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to create announcement');
@@ -145,7 +158,7 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
     try {
       const res = await fetch(`/api/announcements/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to update announcement');
@@ -175,6 +188,7 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
     try {
       const res = await fetch(`/api/announcements/${id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error('Failed to delete announcement');
 
@@ -199,6 +213,7 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
     try {
       const res = await fetch(`/api/announcements/${id}/publish`, {
         method: 'POST',
+        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error('Failed to publish announcement');
 
@@ -242,6 +257,7 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
 
       await fetch(`/api/announcements/${id}/read`, {
         method: 'PUT',
+        headers: getAuthHeaders(),
       });
     } catch (err) {
       console.error('[AnnouncementStore] markAsRead error:', err);
