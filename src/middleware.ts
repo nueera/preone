@@ -99,7 +99,10 @@ const AUTH_ROUTE_PATTERNS: RegExp[] = [
 ];
 
 // ============================================================
-// Middleware (async for Web Crypto API)
+// Middleware (Edge-compatible auth proxy)
+// Note: Next.js 16 deprecates "middleware" in favor of "proxy",
+// but Turbopack has a build bug with proxy.ts (NFT trace fails).
+// Keeping middleware.ts until the Turbopack bug is fixed.
 // ============================================================
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
