@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+
+// Register tsx to handle TypeScript imports + path aliases
+require('tsx/cjs');
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
@@ -13,7 +17,7 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   });
 
-  // Initialize Socket.io
+  // Initialize Socket.io — tsx/cjs registration allows importing .ts files
   const { getSocketServer } = require('./src/lib/socket');
   getSocketServer(server);
 
