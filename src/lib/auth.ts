@@ -75,7 +75,7 @@ export interface TokenPayload {
   schoolId?: string | null;
 }
 
-// Secret key for signing tokens — JWT_SECRET in production
+// Secret key for signing tokens — JWT_SECRET takes priority
 const JWT_SECRET = process.env.JWT_SECRET || process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
 
 function sign(data: string): string {

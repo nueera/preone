@@ -20,7 +20,7 @@ node_modules
 # database
 *.db
 *.db-journal
-prisma/migrations/
+/db/
 
 # production
 /build
@@ -39,9 +39,11 @@ yarn-error.log*
 # env files
 .env
 .env.local
-.env.production
-# Keep .env.example
+.env.production.local
+.env.*.local
+# Keep templates
 !.env.example
+!.env.production
 
 # vercel
 .vercel

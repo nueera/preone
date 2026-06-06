@@ -14,7 +14,12 @@ app.prepare().then(() => {
   });
 
   // Initialize Socket.io
-  getSocketServer(server);
+  try {
+    getSocketServer(server);
+  } catch (e: any) {
+    console.warn('> Socket.io: Could not load socket module, running without WebSocket support');
+    console.warn('> Error:', e.message);
+  }
 
   const PORT = process.env.PORT || 3000;
   server.listen(PORT, () => {

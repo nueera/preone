@@ -1,0 +1,114 @@
+# ============================================================
+# PreOne — Docker Compose (Production-like)
+# PostgreSQL + Redis + Next.js App
+# ============================================================
+
+version: "3.9"
+
+services:
+  # ---- PostgreSQL Database ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: preone-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-preone}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-preone_secret_2024}
+      POSTGRES_DB: ${POSTGRES_DB:-preone}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-preone} -d ${POSTGRES_DB:-preone}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - preone-network
+
+  # ---- Redis (Session store, caching, Socket.io adapter) ----
+  redis:
+    image: redis:7-alpine
+    container_name: preone-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-preone_redis_2024}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-preone_redis_2024}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - preone-network
+
+  # ---- Next.js Application ----
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: preone-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-preone}:${POSTGRES_PASSWORD:-preone_secret_2024}@postgres:5432/${POSTGRES_DB:-preone}?schema=public
+      # Auth
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-min-32-chars-long}
+      JWT_EXPIRY: ${JWT_EXPIRY:-24h}
+      # App
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-PreOne}
+      NODE_ENV: production
+      PORT: 3000
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD:-preone_redis_2024}@redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_uploads:/app/upload
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - preone-network
+
+  # ---- Prisma Migrate (one-shot job for DB migrations) ----
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: preone-migrate
+    restart: "no"
+    entrypoint: ["npx", "prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-preone}:${POSTGRES_PASSWORD:-preone_secret_2024}@postgres:5432/${POSTGRES_DB:-preone}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - preone-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_uploads:
+    driver: local
+
+networks:
+  preone-network:
+    driver: bridge

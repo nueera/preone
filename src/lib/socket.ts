@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db';
 
 let io: SocketIOServer | null = null;
 
-const TOKEN_SECRET = process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
+const TOKEN_SECRET = process.env.JWT_SECRET || process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
 
 // ---- HMAC-SHA256 Sign (matches middleware.ts) ----
 async function sign(data: string): Promise<string> {
@@ -68,10 +68,13 @@ async function verifyToken(token: string): Promise<VerifiedPayload | null> {
 export function getSocketServer(server: HttpServer): SocketIOServer {
   if (io) return io;
 
+  // CORS: In production, restrict to allowed origins from env
+  const allowedOrigins = process.env.SOCKET_CORS_ORIGINS?.split(',').map(o => o.trim()) || '*';
+
   io = new SocketIOServer(server, {
     path: '/api/socketio',
     cors: {
-      origin: '*',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
     },
     transports: ['websocket', 'polling'],
