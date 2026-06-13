@@ -8,8 +8,13 @@ import { AdminHeader } from '@/components/admin-header';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
 import { useChatInit } from '@/hooks/use-chat';
 
-// TASK_MASTER can only access these admin routes
-const TASK_MASTER_ALLOWED = ['/admin/dashboard', '/admin/crm'];
+// TASK_MASTER can only access these admin routes (with sub-paths)
+const TASK_MASTER_ALLOWED = [
+  '/admin/dashboard',
+  '/admin/admissions',
+  '/admin/communication/chat',
+  '/admin/communication/announcements',
+];
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
@@ -21,8 +26,10 @@ interface AdminLayoutClientProps {
 /**
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
  * Provides the sidebar + header + main content structure with Aurora Background.
- * Supports both ADMIN and TASK_MASTER roles.
- * TASK_MASTER sees same layout but sidebar only shows CRM + Dashboard.
+ * Supports ADMIN, SUPER_ADMIN, and TASK_MASTER roles.
+ *   - SUPER_ADMIN: Full access including System section
+ *   - ADMIN: Full access except System section
+ *   - TASK_MASTER: Only Dashboard + Admissions + Communication (Chat, Announcements, Notifications)
  * data-portal="admin" for CSS theme scoping.
  * data-role attribute for role-specific styling.
  */
@@ -45,16 +52,23 @@ export function AdminLayoutClient({
         (route) => pathname === route || pathname.startsWith(route + '/')
       );
       if (!isAllowed) {
-        router.replace('/admin/crm');
+        router.replace('/admin/admissions');
       }
     }
   }, [userRole, pathname, router]);
 
-  // Onboarding redirect: if admin's school hasn't completed onboarding,
-  // redirect to the onboarding wizard (unless already there)
+  // SUPER_ADMIN / ADMIN system route guard — only SUPER_ADMIN can access /admin/system
   useEffect(() => {
-    if (userRole === 'ADMIN' && !onboardingComplete && !pathname.startsWith('/admin/onboarding')) {
-      router.replace('/admin/onboarding');
+    if (userRole === 'ADMIN' && pathname.startsWith('/admin/system')) {
+      router.replace('/admin/dashboard');
+    }
+  }, [userRole, pathname, router]);
+
+  // Onboarding redirect: if admin's school hasn't completed onboarding,
+  // redirect to the setup wizard (unless already there)
+  useEffect(() => {
+    if ((userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && !onboardingComplete && !pathname.startsWith('/admin/onboarding') && !pathname.startsWith('/admin/setup')) {
+      router.replace('/admin/setup');
     }
   }, [userRole, onboardingComplete, pathname, router]);
 

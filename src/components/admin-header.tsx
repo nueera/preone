@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   Zap,
+  Shield,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { BranchSwitcher } from '@/components/ui/branch-switcher';
@@ -49,19 +50,47 @@ interface AuthUser {
 const PATH_LABELS: Record<string, string> = {
   admin: 'Admin',
   dashboard: 'Dashboard',
-  students: 'Students',
-  teachers: 'Teachers',
-  attendance: 'Attendance',
-  fees: 'Fees',
-  crm: 'CRM',
+  setup: 'Setup & Onboarding',
+  school: 'School',
+  branches: 'Branches',
+  'academic-year': 'Academic Year',
+  classes: 'Classes',
+  'fee-structure': 'Fee Structure',
+  staff: 'Staff',
+  integrations: 'Integrations',
+  admissions: 'Admissions',
   leads: 'Leads',
-  followups: 'Follow-ups',
+  pipeline: 'Pipeline',
+  followups: 'Follow Ups',
+  visits: 'Visits',
   tasks: 'Tasks',
+  students: 'Students',
+  parents: 'Parents',
+  teachers: 'Teachers',
+  operations: 'Operations',
+  attendance: 'Attendance',
   activities: 'Activities',
-  growth: 'Growth',
-  communication: 'Communication',
+  calendar: 'Calendar',
   transport: 'Transport',
+  fees: 'Fees',
+  'growth-passport': 'Growth Passport',
+  communication: 'Communication',
+  chat: 'Chat',
+  announcements: 'Announcements',
+  notifications: 'Notifications',
+  whatsapp: 'WhatsApp',
+  templates: 'Templates',
+  reports: 'Reports',
+  'ai-center': 'AI Center',
   settings: 'Settings',
+  system: 'System',
+  'audit-logs': 'Audit Logs',
+  errors: 'Errors',
+  monitoring: 'Monitoring',
+  // Legacy labels for backward compatibility
+  crm: 'Admissions',
+  growth: 'Growth Passport',
+  onboarding: 'Setup',
 };
 
 /**
@@ -92,11 +121,25 @@ export function AdminHeader() {
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'A';
   const isTaskMaster = user?.role === 'TASK_MASTER';
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const roleTheme = isTaskMaster ? ROLE_THEMES.taskmaster : ROLE_THEMES.admin;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
-      {/* ── TASK_MASTER badge ── */}
+      {/* ── Role badge ── */}
+      {isSuperAdmin && (
+        <span
+          className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+          style={{
+            backgroundColor: PREONE_COLORS.purple[50],
+            color: PREONE_COLORS.purple[700],
+            borderColor: PREONE_COLORS.purple[200],
+          }}
+        >
+          <Shield className="h-3 w-3" />
+          Super Admin
+        </span>
+      )}
       {isTaskMaster && (
         <span
           className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"

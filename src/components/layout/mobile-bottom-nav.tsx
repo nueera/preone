@@ -55,7 +55,7 @@ const NAV_ITEMS: Record<NavRole, NavItem[]> = {
   admin: [
     { label: 'Home', icon: Home, href: '/admin/dashboard' },
     { label: 'Students', icon: Users, href: '/admin/students' },
-    { label: 'Chat', icon: MessageCircle, href: '/admin/chat' },
+    { label: 'Chat', icon: MessageCircle, href: '/admin/communication/chat' },
     { label: 'Reports', icon: BarChart3, href: '/admin/reports' },
     { label: 'Settings', icon: Settings, href: '/admin/settings' },
   ],

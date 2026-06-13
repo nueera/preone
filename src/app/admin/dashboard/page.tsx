@@ -212,8 +212,8 @@ const STAT_CARDS: {
 // ── Quick report links ──
 const QUICK_REPORTS = [
   { label: 'Fee Collection Report', icon: Wallet, href: '/admin/fees' },
-  { label: 'Attendance Summary', icon: ClipboardList, href: '/admin/attendance' },
-  { label: 'Admission Pipeline', icon: BarChart3, href: '/admin/crm' },
+  { label: 'Attendance Summary', icon: ClipboardList, href: '/admin/operations/attendance' },
+  { label: 'Admission Pipeline', icon: BarChart3, href: '/admin/admissions' },
   { label: 'Monthly Revenue', icon: FileText, href: '/admin/reports' },
 ];
 
@@ -559,7 +559,7 @@ function AdmissionPipeline({
             {stages.map((stage) => (
               <Link
                 key={stage.name}
-                href={`/admin/crm?stage=${stage.name}`}
+                href={`/admin/admissions?stage=${stage.name}`}
                 className="block group"
               >
                 <div className="flex items-center gap-3 mb-1">

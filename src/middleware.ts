@@ -102,7 +102,7 @@ const AUTH_API_PATTERNS: RegExp[] = [
 // API Route Permission Map
 // ============================================================
 
-type RoleName = 'Admin' | 'Teacher' | 'Parent' | 'TaskMaster';
+type RoleName = 'Admin' | 'Teacher' | 'Parent' | 'TaskMaster' | 'SuperAdmin';
 
 interface RouteRule {
   pattern: RegExp;
@@ -112,16 +112,18 @@ interface RouteRule {
 const API_ROUTE_RULES: RouteRule[] = [
   { pattern: /^\/api\/parent\/?/,        allowedRoles: ['Parent'] },
   { pattern: /^\/api\/teacher\/?/,        allowedRoles: ['Teacher'] },
-  { pattern: /^\/api\/students\/?/,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/teachers\/?/,       allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/attendance\/?/,     allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/fees\/?/,           allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/crm\/?/,            allowedRoles: ['Admin', 'TaskMaster'] },
-  { pattern: /^\/api\/dashboard\/?/,      allowedRoles: ['Admin', 'TaskMaster'] },
-  { pattern: /^\/api\/growth\/?/,         allowedRoles: ['Admin', 'Teacher'] },
-  { pattern: /^\/api\/communication\/?/,  allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/onboarding\/?/,     allowedRoles: ['Admin'] },
-  { pattern: /^\/api\/auth\/me$/,         allowedRoles: ['Admin', 'Teacher', 'Parent', 'TaskMaster'] },
+  { pattern: /^\/api\/students\/?/,       allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/teachers\/?/,       allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/attendance\/?/,     allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/fees\/?/,           allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/admissions\/?/,     allowedRoles: ['Admin', 'SuperAdmin', 'TaskMaster'] },
+  { pattern: /^\/api\/crm\/?/,            allowedRoles: ['Admin', 'SuperAdmin', 'TaskMaster'] },
+  { pattern: /^\/api\/dashboard\/?/,      allowedRoles: ['Admin', 'SuperAdmin', 'TaskMaster'] },
+  { pattern: /^\/api\/growth\/?/,         allowedRoles: ['Admin', 'SuperAdmin', 'Teacher'] },
+  { pattern: /^\/api\/communication\/?/,  allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/onboarding\/?/,     allowedRoles: ['Admin', 'SuperAdmin'] },
+  { pattern: /^\/api\/system\/?/,         allowedRoles: ['SuperAdmin'] },
+  { pattern: /^\/api\/auth\/me$/,         allowedRoles: ['Admin', 'SuperAdmin', 'Teacher', 'Parent', 'TaskMaster'] },
 ];
 
 // ============================================================
@@ -130,10 +132,28 @@ const API_ROUTE_RULES: RouteRule[] = [
 
 const TASK_MASTER_ALLOWED_PREFIXES = [
   '/admin/dashboard',
-  '/admin/crm',
-  '/admin/chat',
-  '/admin/announcements',
+  '/admin/admissions',
+  '/admin/communication/chat',
+  '/admin/communication/announcements',
 ];
+
+// ============================================================
+// Legacy route redirects
+// ============================================================
+
+const LEGACY_REDIRECTS: Record<string, string> = {
+  '/admin/crm': '/admin/admissions',
+  '/admin/chat': '/admin/communication/chat',
+  '/admin/announcements': '/admin/communication/announcements',
+  '/admin/notifications': '/admin/communication/notifications',
+  '/admin/onboarding': '/admin/setup',
+  '/admin/activities': '/admin/operations/activities',
+  '/admin/attendance': '/admin/operations/attendance',
+  '/admin/transport': '/admin/operations/transport',
+  '/admin/growth': '/admin/growth-passport',
+  '/admin/audit-logs': '/admin/system/audit-logs',
+  '/admin/errors': '/admin/system/errors',
+};
 
 // ============================================================
 // Middleware
@@ -188,6 +208,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (matchedRule) {
       const roleMap: Record<string, RoleName> = {
         'ADMIN': 'Admin',
+        'SUPER_ADMIN': 'SuperAdmin',
         'TEACHER': 'Teacher',
         'PARENT': 'Parent',
         'TASK_MASTER': 'TaskMaster',
@@ -221,15 +242,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     pathname.startsWith('/teacher') ||
     pathname.startsWith('/parent');
 
-  // Legacy /taskmaster routes → redirect to /admin/crm
+  // Legacy /taskmaster routes → redirect to /admin/admissions
   if (pathname.startsWith('/taskmaster')) {
     const token = request.cookies.get('preone_token')?.value;
     if (!token) {
       const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', '/admin/crm');
+      loginUrl.searchParams.set('redirect', '/admin/admissions');
       return NextResponse.redirect(loginUrl);
     }
-    return NextResponse.redirect(new URL('/admin/crm', request.url));
+    return NextResponse.redirect(new URL('/admin/admissions', request.url));
   }
 
   if (!isProtectedRoute) {
@@ -260,9 +281,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // ── Role-based page route access ───────────────────────────
 
-  // /admin routes: ADMIN and TASK_MASTER can access
+  // /admin routes: ADMIN, SUPER_ADMIN, and TASK_MASTER can access
   if (pathname.startsWith('/admin')) {
-    if (payload.role !== 'ADMIN' && payload.role !== 'TASK_MASTER') {
+    if (payload.role !== 'ADMIN' && payload.role !== 'TASK_MASTER' && payload.role !== 'SUPER_ADMIN') {
       const dashboardPath = payload.role === 'TEACHER' ? '/teacher/dashboard' :
                            payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
       return NextResponse.redirect(new URL(dashboardPath, request.url));
@@ -274,23 +295,36 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         pathname === prefix || pathname.startsWith(prefix + '/')
       );
       if (!isAllowed) {
-        return NextResponse.redirect(new URL('/admin/crm', request.url));
+        return NextResponse.redirect(new URL('/admin/admissions', request.url));
+      }
+    }
+
+    // /admin/system routes: only SUPER_ADMIN can access
+    if (pathname.startsWith('/admin/system') && payload.role !== 'SUPER_ADMIN') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+
+    // Legacy route redirects for /admin pages
+    for (const [oldPath, newPath] of Object.entries(LEGACY_REDIRECTS)) {
+      if (pathname === oldPath || pathname.startsWith(oldPath + '/')) {
+        const rewrittenPath = pathname.replace(oldPath, newPath);
+        return NextResponse.redirect(new URL(rewrittenPath, request.url));
       }
     }
   }
 
   // /teacher routes: only TEACHER
   if (pathname.startsWith('/teacher') && payload.role !== 'TEACHER') {
-    const defaultRoute = payload.role === 'ADMIN' ? '/admin/dashboard' :
-                         payload.role === 'TASK_MASTER' ? '/admin/crm' :
+    const defaultRoute = payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN' ? '/admin/dashboard' :
+                         payload.role === 'TASK_MASTER' ? '/admin/admissions' :
                          payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
     return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 
   // /parent routes: only PARENT
   if (pathname.startsWith('/parent') && payload.role !== 'PARENT') {
-    const defaultRoute = payload.role === 'ADMIN' ? '/admin/dashboard' :
-                         payload.role === 'TASK_MASTER' ? '/admin/crm' :
+    const defaultRoute = payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN' ? '/admin/dashboard' :
+                         payload.role === 'TASK_MASTER' ? '/admin/admissions' :
                          payload.role === 'TEACHER' ? '/teacher/dashboard' : '/login';
     return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
