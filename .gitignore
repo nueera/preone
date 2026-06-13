@@ -69,3 +69,8 @@ server.log
 
 # Skills directory
 /skills/
+
+# Keep the vitest setup file tracked — the broad `test` rule above would
+# otherwise ignore the entire src/test/ directory (vitest setupFiles).
+!src/test/
+!src/test/**
