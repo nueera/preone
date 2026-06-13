@@ -675,7 +675,7 @@ function StatCard({
   highlight?: boolean;
 }) {
   return (
-    <Card className={`p-4 bg-[var(--card)] border-[highlight?'border-[var(--preone-primary)]/30':'border-[var(--border-default)]'] ${highlight ? 'ring-1 ring-[var(--preone-primary)]/20' : ''}`}>
+    <Card className={`p-4 bg-[var(--card)] ${highlight ? 'border-[var(--preone-primary)]/30' : 'border-[var(--border-default)]'} ${highlight ? 'ring-1 ring-[var(--preone-primary)]/20' : ''}`}>
       <div className="flex items-center gap-2 mb-2">
         <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${color}`}>
           {icon}
