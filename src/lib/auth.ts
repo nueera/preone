@@ -140,10 +140,27 @@ export function verifyToken(token: string): TokenPayload | null {
 // Auth Helpers for API Routes
 // ============================================================
 
+// Read a cookie value from either a NextRequest (.cookies) or a plain Request
+// (parses the Cookie header). Lets cookie-based auth work in every handler.
+function getCookieValue(request: NextRequest | Request, name: string): string | undefined {
+  const anyReq = request as unknown as { cookies?: { get?: (n: string) => { value?: string } | undefined } };
+  if (anyReq.cookies?.get) {
+    return anyReq.cookies.get(name)?.value;
+  }
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+  const match = header.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
+}
+
 export function getAuthUser(request: NextRequest | Request): TokenPayload | null {
+  // Bearer header first (localStorage-token clients); fall back to the
+  // preone_token cookie (same-origin page requests, e.g. the admin portal).
   const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  const token = authHeader.substring(7);
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.substring(7)
+    : getCookieValue(request, 'preone_token');
+  if (!token) return null;
   return verifyToken(token);
 }
 

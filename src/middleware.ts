@@ -184,15 +184,22 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return NextResponse.next();
     }
 
+    // Accept the token from the Authorization header (parent/teacher fetch
+    // wrappers send `Bearer <token>`) OR the preone_token cookie (admin portal
+    // pages use same-origin fetch, which carries the cookie automatically).
     const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    const cookieToken = request.cookies.get('preone_token')?.value;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : cookieToken;
+
+    if (!token) {
       return NextResponse.json(
         { error: true, message: 'Authentication required' },
         { status: 401 },
       );
     }
 
-    const token = authHeader.substring(7);
     const payload = await verifyToken(token);
 
     if (!payload) {
