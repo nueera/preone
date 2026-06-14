@@ -1,7 +1,6 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-config';
-import { prisma } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { getAuthUser } from '@/lib/auth';
 
 // ====== PASSWORD UTILITIES ======
 
@@ -92,43 +91,28 @@ setInterval(() => {
   }
 }, 30 * 60 * 1000);
 
-// ====== SESSION HELPERS ======
-
-export async function getCurrentUser() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  return session.user;
-}
-
-export async function requireAuth() {
-  const user = await getCurrentUser();
-  if (!user) {
-    throw new Error('Authentication required');
-  }
-  return user;
-}
-
 // ====== withAuth WRAPPER for API routes ======
+// Authenticates via the custom preone_token (Authorization: Bearer header
+// OR the preone_token cookie — see getAuthUser). The handler receives the
+// request (with `user` attached) AND the user as a second argument, so both
+// `(req) => req.user` and `(req, user) => user` call styles work.
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  schoolId: string | null;
+  branchId: string | null;
+}
 
 interface AuthenticatedRequest extends NextRequest {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    schoolId: string;
-    branchId: string;
-    isActive: boolean;
-    onboardingComplete: boolean;
-    schoolName: string;
-    branchName: string;
-    teacherId?: string;
-    avatar?: string;
-  };
+  user: AuthUser;
 }
 
 type AuthenticatedHandler = (
   req: AuthenticatedRequest,
+  user: AuthUser,
   ctx: { params: Promise<Record<string, string>> }
 ) => Promise<NextResponse>;
 
@@ -141,33 +125,34 @@ export function withAuth(
   options: WithAuthOptions = {}
 ) {
   return async (req: NextRequest, ctx: { params: Promise<Record<string, string>> }) => {
-    const session = await getServerSession(authOptions);
+    const payload = getAuthUser(req);
 
-    if (!session?.user) {
+    if (!payload) {
       return NextResponse.json(
         { error: true, message: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    if (options.roles && !options.roles.includes(session.user.role)) {
+    if (options.roles && !options.roles.includes(payload.role)) {
       return NextResponse.json(
         { error: true, message: 'You do not have permission to access this resource' },
         { status: 403 }
       );
     }
 
-    if (!session.user.isActive) {
-      return NextResponse.json(
-        { error: true, message: 'Account has been deactivated' },
-        { status: 403 }
-      );
-    }
+    const user: AuthUser = {
+      id: payload.userId,
+      email: payload.email,
+      name: payload.name,
+      role: payload.role,
+      schoolId: payload.schoolId ?? null,
+      branchId: payload.branchId ?? null,
+    };
 
-    // Attach user to request
-    const authenticatedReq = Object.assign(req, { user: session.user });
+    const authenticatedReq = Object.assign(req, { user }) as AuthenticatedRequest;
 
-    return handler(authenticatedReq, ctx);
+    return handler(authenticatedReq, user, ctx);
   };
 }
 

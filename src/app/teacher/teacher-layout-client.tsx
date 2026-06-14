@@ -10,7 +10,7 @@ import { useChatInit } from '@/hooks/use-chat';
 /**
  * Teacher Layout Client — Wraps the PreOne teacher portal.
  * Provides: React Query, Aurora Background, Sidebar + Header + Main Content.
- * Auth guard is handled by the server layout with getServerSession.
+ * Auth guard is handled by the server layout (preone_token cookie).
  */
 export function TeacherLayoutClient({
   children,
