@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
 
     // Average resolution time
     const resolvedErrors = await prisma.errorLog.findMany({
-      where: { resolvedAt: { not: null }, firstSeenAt: { not: null }, schoolId },
+      where: { resolvedAt: { not: null }, schoolId },
       select: { firstSeenAt: true, resolvedAt: true },
       take: 100,
       orderBy: { resolvedAt: 'desc' },

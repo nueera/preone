@@ -3,7 +3,7 @@
 // ============================================================
 // PreOne — Login Page
 // Beautiful cosmic-themed login with Email+Password & OTP tabs
-// Uses NextAuth signIn for credential-based authentication
+// Authenticates via the custom /api/auth/login endpoint (preone_token)
 // ============================================================
 
 import { useState } from 'react';

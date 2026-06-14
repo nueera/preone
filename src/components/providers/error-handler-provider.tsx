@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { initClientErrorHandler } from '@/lib/client-error-handler';
 
 export function ErrorHandlerProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
-
   useEffect(() => {
-    initClientErrorHandler(
-      session?.user?.id,
-      (session?.user as any)?.role,
-      (session?.user as any)?.schoolId,
-    );
-  }, [session?.user?.id, (session?.user as any)?.role, (session?.user as any)?.schoolId]);
+    // Read the current user (set by the login flow) for error attribution.
+    let user: { id?: string; role?: string; schoolId?: string } = {};
+    try {
+      user = JSON.parse(localStorage.getItem('preone_user') || '{}');
+    } catch {
+      user = {};
+    }
+    initClientErrorHandler(user?.id, user?.role, user?.schoolId);
+  }, []);
 
   return <>{children}</>;
 }
