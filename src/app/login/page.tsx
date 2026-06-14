@@ -7,7 +7,6 @@
 // ============================================================
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -56,6 +55,18 @@ const ROLE_DASHBOARD: Record<string, string> = {
   PARENT: '/parent/dashboard',
 };
 
+const TOKEN_KEY = 'preone_token';
+const USER_KEY = 'preone_user';
+
+// Persist the auth token where the rest of the app reads it:
+// - localStorage: Bearer token for the parent/teacher fetch wrappers + API calls
+// - cookie: read by the middleware + server layouts for page-route auth
+function persistSession(token: string, user: unknown) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${24 * 60 * 60}; SameSite=Lax`;
+}
+
 // ============================================================
 // Login Page Component
 // ============================================================
@@ -90,35 +101,25 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
+      const data = await res.json();
 
-      if (result?.error) {
-        toast.error('Invalid email or password');
+      if (!res.ok) {
+        toast.error(data.error || 'Invalid email or password');
         return;
       }
 
-      if (result?.ok) {
-        toast.success('Welcome back!');
+      persistSession(data.token, data.user);
+      toast.success('Welcome back!');
 
-        // Fetch session to determine role-based redirect
-        const sessionRes = await fetch('/api/auth/session');
-        const session = await sessionRes.json();
-        const role = session?.user?.role as string;
-        const onboardingComplete = session?.user?.onboardingComplete;
-
-        // If admin hasn't completed onboarding, redirect there
-        if (role === 'ADMIN' && !onboardingComplete) {
-          router.push('/admin/onboarding');
-          return;
-        }
-
-        const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
-        router.push(dashboardPath);
-      }
+      const role = data.user?.role as string;
+      const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
+      router.push(dashboardPath);
+      router.refresh();
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Something went wrong. Please try again.');
@@ -175,27 +176,25 @@ export default function LoginPage() {
     setIsOtpLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        phone,
-        otp: otpValue,
-        authType: 'otp',
-        redirect: false,
+      const res = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code: otpValue, purpose: 'login' }),
       });
+      const data = await res.json();
 
-      if (result?.error) {
-        toast.error('Invalid or expired OTP');
+      if (!res.ok) {
+        toast.error(data.error || 'Invalid or expired OTP');
         return;
       }
 
-      if (result?.ok) {
-        toast.success('Welcome back!');
+      persistSession(data.token, data.user);
+      toast.success('Welcome back!');
 
-        const sessionRes = await fetch('/api/auth/session');
-        const session = await sessionRes.json();
-        const role = session?.user?.role as string;
-        const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
-        router.push(dashboardPath);
-      }
+      const role = data.user?.role as string;
+      const dashboardPath = ROLE_DASHBOARD[role] || '/admin/dashboard';
+      router.push(dashboardPath);
+      router.refresh();
     } catch (error) {
       console.error('OTP login error:', error);
       toast.error('Something went wrong');
@@ -454,23 +453,18 @@ export default function LoginPage() {
                 {[
                   {
                     role: 'Admin',
-                    email: 'admin@preone.com',
-                    password: 'admin123',
-                  },
-                  {
-                    role: 'Task Master',
-                    email: 'taskmaster@preone.com',
-                    password: 'admin123',
+                    email: 'admin@blossom.edu',
+                    password: 'Admin@123',
                   },
                   {
                     role: 'Teacher',
-                    email: 'kavitha.raman@littlestars.com',
-                    password: 'password123',
+                    email: 'priya@blossom.edu',
+                    password: 'Teacher@123',
                   },
                   {
                     role: 'Parent',
-                    email: 'rajesh.sharma@email.com',
-                    password: 'password123',
+                    email: 'raj@family.com',
+                    password: 'Parent@123',
                   },
                 ].map((cred) => (
                   <button

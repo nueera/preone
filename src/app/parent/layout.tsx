@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-config';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { verifyToken, Role } from '@/lib/auth';
 import { ParentLayoutClient } from './parent-layout-client';
 
 export default async function ParentLayout({
@@ -8,13 +8,14 @@ export default async function ParentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const token = (await cookies()).get('preone_token')?.value;
+  const payload = token ? verifyToken(token) : null;
 
-  if (!session) {
+  if (!payload) {
     redirect('/login');
   }
 
-  if (session.user.role !== 'PARENT') {
+  if (payload.role !== Role.PARENT) {
     redirect('/login');
   }
 

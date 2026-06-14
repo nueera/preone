@@ -62,17 +62,19 @@ export async function POST(request: NextRequest) {
 
       await db.user.update({
         where: { id: user.id },
-        data: { lastLoginAt: new Date() },
+        data: { lastLogin: new Date() },
       });
 
       const token = generateToken({
         userId: user.id,
         email: user.email,
+        name: user.name,
         role: user.role,
         branchId: user.branchId,
+        schoolId: user.schoolId,
       });
 
-      const { passwordHash: _, ...userWithoutPassword } = user;
+      const { password: _password, ...userWithoutPassword } = user;
 
       return NextResponse.json({
         message: 'OTP verified successfully',
