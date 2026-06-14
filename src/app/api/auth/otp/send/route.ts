@@ -27,10 +27,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Invalidate any existing OTPs for this user and purpose
+    // Invalidate any existing OTPs for this user and purpose.
+    // The Otp model is keyed by email; the user was looked up by phone.
     await db.otp.updateMany({
       where: {
-        userId: user.id,
+        email: user.email,
         purpose,
         isUsed: false,
       },
@@ -41,13 +42,13 @@ export async function POST(request: NextRequest) {
     const code = randomBytes(3).toString('hex').toUpperCase().substring(0, 6);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // Store OTP
+    // Store OTP (keyed by email — see Otp model)
     await db.otp.create({
       data: {
+        email: user.email,
         code,
         purpose,
         expiresAt,
-        userId: user.id,
       },
     });
 

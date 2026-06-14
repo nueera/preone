@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find valid OTP
+    // Find valid OTP (keyed by email — see Otp model)
     const otp = await db.otp.findFirst({
       where: {
-        userId: user.id,
+        email: user.email,
         purpose,
         code,
         isUsed: false,
