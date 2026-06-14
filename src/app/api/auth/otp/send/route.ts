@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { randomBytes } from 'crypto';
+import { sendOtpSms } from '@/lib/messaging';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,10 +27,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Invalidate any existing OTPs for this user and purpose
+    // Invalidate any existing OTPs for this user and purpose.
+    // The Otp model is keyed by email; the user was looked up by phone.
     await db.otp.updateMany({
       where: {
-        userId: user.id,
+        email: user.email,
         purpose,
         isUsed: false,
       },
@@ -40,24 +42,30 @@ export async function POST(request: NextRequest) {
     const code = randomBytes(3).toString('hex').toUpperCase().substring(0, 6);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // Store OTP
+    // Store OTP (keyed by email — see Otp model)
     await db.otp.create({
       data: {
+        email: user.email,
         code,
         purpose,
         expiresAt,
-        userId: user.id,
       },
     });
 
-    // In production, send OTP via SMS/WhatsApp
-    // For now, return it in the response (dev only)
-    return NextResponse.json({
+    // Send the OTP via SMS (logs to the server console in dev when no
+    // provider is configured — see src/lib/messaging.ts).
+    const delivery = await sendOtpSms(phone, code, purpose);
+
+    const response: Record<string, unknown> = {
       message: 'OTP sent successfully',
-      // Remove this in production!
-      otp: code,
       expiresIn: '5 minutes',
-    });
+    };
+    // Only expose the code in development for testing — never in production.
+    if (process.env.NODE_ENV === 'development') {
+      response.devOtpCode = code;
+      response.delivery = delivery;
+    }
+    return NextResponse.json(response);
   } catch (error) {
     console.error('OTP send error:', error);
     return NextResponse.json(
