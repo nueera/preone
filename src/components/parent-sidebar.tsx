@@ -191,7 +191,7 @@ export function ParentSidebar() {
                     pathname.startsWith(item.href));
 
                 return (
-                  <SidebarMenuItem key={item.href}>
+                  <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
