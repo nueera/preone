@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkRateLimit, createOTP } from '@/lib/auth-utils';
+import { sendOtpEmail } from '@/lib/messaging';
 
 const sendOtpSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -48,6 +49,10 @@ export async function POST(request: NextRequest) {
 
     // Create the OTP
     const otp = await createOTP(normalizedEmail, purpose);
+
+    // Deliver the code via email (logs to the server console in dev when no
+    // provider is configured — see src/lib/messaging.ts).
+    await sendOtpEmail(normalizedEmail, otp.code, purpose);
 
     const response: Record<string, unknown> = {
       error: false,

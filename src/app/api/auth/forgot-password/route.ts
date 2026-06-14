@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkRateLimit, createOTP } from '@/lib/auth-utils';
+import { sendOtpEmail } from '@/lib/messaging';
 import { prisma } from '@/lib/db';
 
 const forgotPasswordSchema = z.object({
@@ -75,8 +76,9 @@ export async function POST(request: NextRequest) {
       response.devOtpCode = otp.code;
     }
 
-    // TODO: Send OTP via email/SMS in production
-    // await sendOtpEmail(normalizedEmail, otp.code);
+    // Send the reset code via email (logs to the server console in dev
+    // when no provider is configured — see src/lib/messaging.ts).
+    await sendOtpEmail(normalizedEmail, otp.code, 'FORGOT_PASSWORD');
 
     return NextResponse.json(response);
   } catch (error) {
