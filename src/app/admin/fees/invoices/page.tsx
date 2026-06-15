@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,8 @@ import {
   IndianRupee,
   Send,
   Eye,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -39,16 +41,22 @@ interface Invoice {
   createdAt: string;
 }
 
-const MOCK_INVOICES: Invoice[] = [
-  { id: '1', invoiceNo: 'INV-2026-001', student: 'Aarav Kumar', class: 'Nursery-A', amount: 18750, dueDate: '2026-04-01', status: 'PAID', createdAt: '2026-03-15' },
-  { id: '2', invoiceNo: 'INV-2026-012', student: 'Priya Sharma', class: 'LKG-B', amount: 22500, dueDate: '2026-04-05', status: 'PAID', createdAt: '2026-03-20' },
-  { id: '3', invoiceNo: 'INV-2026-034', student: 'Vihaan Singh', class: 'UKG-A', amount: 23750, dueDate: '2026-07-01', status: 'PENDING', createdAt: '2026-06-01' },
-  { id: '4', invoiceNo: 'INV-2026-050', student: 'Isha Sharma', class: 'Nursery-B', amount: 15000, dueDate: '2026-03-01', status: 'OVERDUE', createdAt: '2026-02-15' },
-  { id: '5', invoiceNo: 'INV-2026-058', student: 'Arjun Patel', class: 'LKG-A', amount: 20000, dueDate: '2026-07-15', status: 'PENDING', createdAt: '2026-06-10' },
-  { id: '6', invoiceNo: 'INV-2026-063', student: 'Ananya Gupta', class: 'UKG-B', amount: 17500, dueDate: '2026-04-10', status: 'PARTIAL', createdAt: '2026-03-25' },
-  { id: '7', invoiceNo: 'INV-2026-075', student: 'Rohan Mehta', class: 'Nursery-A', amount: 18750, dueDate: '2026-04-01', status: 'PAID', createdAt: '2026-03-18' },
-  { id: '8', invoiceNo: 'INV-2026-080', student: 'Meera Joshi', class: 'LKG-B', amount: 22500, dueDate: '2026-02-28', status: 'OVERDUE', createdAt: '2026-02-10' },
-];
+// Shape of an invoice as returned by GET /api/fees/invoices
+interface ApiInvoice {
+  id: string;
+  invoiceNo: string;
+  amount: number;
+  netAmount: number | null;
+  status: Invoice['status'];
+  dueDate: string;
+  createdAt: string;
+  student: {
+    firstName: string;
+    lastName: string;
+    rollNumber: string | null;
+    class: { name: string } | null;
+  } | null;
+}
 
 const STATUS_BADGE: Record<string, string> = {
   PAID: 'bg-emerald-50 text-emerald-700',
@@ -60,16 +68,51 @@ const STATUS_BADGE: Record<string, string> = {
 export default function InvoicesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/fees/invoices?limit=100');
+        if (!res.ok) throw new Error('Failed to load invoices');
+        const data = await res.json();
+        if (!active) return;
+        const mapped: Invoice[] = (data.invoices || []).map((inv: ApiInvoice) => ({
+          id: inv.id,
+          invoiceNo: inv.invoiceNo,
+          student: inv.student ? `${inv.student.firstName} ${inv.student.lastName}` : '—',
+          class: inv.student?.class?.name || inv.student?.rollNumber || '—',
+          amount: inv.netAmount ?? inv.amount,
+          dueDate: inv.dueDate,
+          status: inv.status,
+          createdAt: inv.createdAt,
+        }));
+        setInvoices(mapped);
+      } catch (e) {
+        if (active) setError(e instanceof Error ? e.message : 'Failed to load invoices');
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredInvoices = useMemo(() => {
-    return MOCK_INVOICES.filter((inv) => {
+    return invoices.filter((inv) => {
       const matchSearch = !searchQuery ||
         inv.student.toLowerCase().includes(searchQuery.toLowerCase()) ||
         inv.invoiceNo.toLowerCase().includes(searchQuery.toLowerCase());
       const matchStatus = statusFilter === 'all' || inv.status === statusFilter;
       return matchSearch && matchStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, invoices]);
 
   const totalAmount = filteredInvoices.reduce((s, i) => s + i.amount, 0);
   const paidAmount = filteredInvoices.filter((i) => i.status === 'PAID').reduce((s, i) => s + i.amount, 0);
@@ -159,32 +202,53 @@ export default function InvoicesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredInvoices.map((inv) => (
-                    <TableRow key={inv.id} className="hover:bg-purple-50/30">
-                      <TableCell className="text-sm font-medium">{inv.invoiceNo}</TableCell>
-                      <TableCell className="text-sm">{inv.student}</TableCell>
-                      <TableCell className="text-sm text-gray-500">{inv.class}</TableCell>
-                      <TableCell className="text-sm font-medium">₹{inv.amount.toLocaleString('en-IN')}</TableCell>
-                      <TableCell className="text-sm text-gray-500">
-                        {new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${STATUS_BADGE[inv.status]} text-[10px]`}>{inv.status}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="h-7 text-xs">
-                            <Eye className="w-3 h-3 mr-1" /> View
-                          </Button>
-                          {inv.status !== 'PAID' && (
-                            <Button variant="ghost" size="sm" className="h-7 text-xs text-purple-600">
-                              <Send className="w-3 h-3 mr-1" /> Remind
-                            </Button>
-                          )}
-                        </div>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-12 text-center text-gray-500">
+                        <Loader2 className="w-5 h-5 mx-auto animate-spin" />
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : error ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-12 text-center text-red-500">
+                        <AlertCircle className="w-5 h-5 mx-auto mb-2" />
+                        {error}
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredInvoices.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-12 text-center text-gray-500 text-sm">
+                        No invoices found.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredInvoices.map((inv) => (
+                      <TableRow key={inv.id} className="hover:bg-purple-50/30">
+                        <TableCell className="text-sm font-medium">{inv.invoiceNo}</TableCell>
+                        <TableCell className="text-sm">{inv.student}</TableCell>
+                        <TableCell className="text-sm text-gray-500">{inv.class}</TableCell>
+                        <TableCell className="text-sm font-medium">₹{inv.amount.toLocaleString('en-IN')}</TableCell>
+                        <TableCell className="text-sm text-gray-500">
+                          {new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${STATUS_BADGE[inv.status]} text-[10px]`}>{inv.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" className="h-7 text-xs">
+                              <Eye className="w-3 h-3 mr-1" /> View
+                            </Button>
+                            {inv.status !== 'PAID' && (
+                              <Button variant="ghost" size="sm" className="h-7 text-xs text-purple-600">
+                                <Send className="w-3 h-3 mr-1" /> Remind
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
