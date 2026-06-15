@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   Clock,
   TrendingUp,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -35,28 +36,37 @@ interface Payment {
   receiptNo: string;
   student: string;
   amount: number;
-  method: 'Cash' | 'UPI' | 'Bank Transfer' | 'Card';
-  status: 'COMPLETED' | 'PENDING' | 'FAILED';
+  method: string;
+  status: string;
   date: string;
   invoiceNo: string;
 }
 
-const MOCK_PAYMENTS: Payment[] = [
-  { id: '1', receiptNo: 'RCP-001', student: 'Aarav Kumar', amount: 18750, method: 'UPI', status: 'COMPLETED', date: '2026-03-28', invoiceNo: 'INV-2026-001' },
-  { id: '2', receiptNo: 'RCP-002', student: 'Priya Sharma', amount: 22500, method: 'Bank Transfer', status: 'COMPLETED', date: '2026-04-02', invoiceNo: 'INV-2026-012' },
-  { id: '3', receiptNo: 'RCP-003', student: 'Ananya Gupta', amount: 10000, method: 'Cash', status: 'COMPLETED', date: '2026-04-05', invoiceNo: 'INV-2026-063' },
-  { id: '4', receiptNo: 'RCP-004', student: 'Rohan Mehta', amount: 18750, method: 'Card', status: 'COMPLETED', date: '2026-03-30', invoiceNo: 'INV-2026-075' },
-  { id: '5', receiptNo: 'RCP-005', student: 'Vihaan Singh', amount: 23750, method: 'UPI', status: 'PENDING', date: '2026-06-15', invoiceNo: 'INV-2026-034' },
-  { id: '6', receiptNo: 'RCP-006', student: 'Sara Khan', amount: 15000, method: 'Bank Transfer', status: 'FAILED', date: '2026-06-12', invoiceNo: 'INV-2026-088' },
-  { id: '7', receiptNo: 'RCP-007', student: 'Kabir Reddy', amount: 20000, method: 'Cash', status: 'COMPLETED', date: '2026-05-20', invoiceNo: 'INV-2026-042' },
-  { id: '8', receiptNo: 'RCP-008', student: 'Diya Nair', amount: 17500, method: 'UPI', status: 'COMPLETED', date: '2026-05-28', invoiceNo: 'INV-2026-055' },
-];
+// Shape of a payment as returned by GET /api/fees/payments
+interface ApiPayment {
+  id: string;
+  amount: number;
+  method: string;
+  paymentDate: string;
+  transactionRef: string | null;
+  student?: { firstName: string; lastName: string } | null;
+  invoice?: { invoiceNo: string } | null;
+}
+
+const METHOD_LABEL: Record<string, string> = {
+  CASH: 'Cash',
+  UPI: 'UPI',
+  BANK_TRANSFER: 'Bank Transfer',
+  CHEQUE: 'Cheque',
+  ONLINE: 'Online',
+};
 
 const METHOD_ICON: Record<string, React.ElementType> = {
   Cash: Banknote,
   UPI: Smartphone,
   'Bank Transfer': CreditCard,
-  Card: CreditCard,
+  Cheque: CreditCard,
+  Online: Smartphone,
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -68,19 +78,50 @@ const STATUS_BADGE: Record<string, string> = {
 export default function PaymentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [methodFilter, setMethodFilter] = useState<string>('all');
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/fees/payments?limit=100');
+        if (!res.ok) throw new Error('Failed to load payments');
+        const data = await res.json();
+        const mapped: Payment[] = (data.payments || []).map((p: ApiPayment) => ({
+          id: p.id,
+          receiptNo: p.transactionRef || `PMT-${p.id.slice(-6).toUpperCase()}`,
+          student: p.student ? `${p.student.firstName} ${p.student.lastName}` : '—',
+          amount: p.amount,
+          method: METHOD_LABEL[p.method] || p.method,
+          // Payment rows are records of completed payments.
+          status: 'COMPLETED',
+          date: p.paymentDate,
+          invoiceNo: p.invoice?.invoiceNo || '—',
+        }));
+        setPayments(mapped);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load payments');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredPayments = useMemo(() => {
-    return MOCK_PAYMENTS.filter((p) => {
+    return payments.filter((p) => {
       const matchSearch = !searchQuery ||
         p.student.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.receiptNo.toLowerCase().includes(searchQuery.toLowerCase());
       const matchMethod = methodFilter === 'all' || p.method === methodFilter;
       return matchSearch && matchMethod;
     });
-  }, [searchQuery, methodFilter]);
+  }, [payments, searchQuery, methodFilter]);
 
-  const totalCollected = MOCK_PAYMENTS.filter((p) => p.status === 'COMPLETED').reduce((s, p) => s + p.amount, 0);
-  const pendingAmount = MOCK_PAYMENTS.filter((p) => p.status === 'PENDING').reduce((s, p) => s + p.amount, 0);
+  const totalCollected = payments.filter((p) => p.status === 'COMPLETED').reduce((s, p) => s + p.amount, 0);
+  const pendingAmount = payments.filter((p) => p.status === 'PENDING').reduce((s, p) => s + p.amount, 0);
 
   return (
     <PageTransition>
@@ -138,7 +179,7 @@ export default function PaymentsPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Transactions</p>
-                  <p className="text-lg font-bold text-purple-700">{MOCK_PAYMENTS.length}</p>
+                  <p className="text-lg font-bold text-purple-700">{payments.length}</p>
                 </div>
               </div>
             </PreOneCard>
@@ -149,7 +190,7 @@ export default function PaymentsPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Failed</p>
-                  <p className="text-lg font-bold text-red-700">{MOCK_PAYMENTS.filter((p) => p.status === 'FAILED').length}</p>
+                  <p className="text-lg font-bold text-red-700">{payments.filter((p) => p.status === 'FAILED').length}</p>
                 </div>
               </div>
             </PreOneCard>
@@ -169,7 +210,7 @@ export default function PaymentsPage() {
               />
             </div>
             <div className="flex gap-1.5">
-              {['all', 'Cash', 'UPI', 'Bank Transfer', 'Card'].map((m) => (
+              {['all', 'Cash', 'UPI', 'Bank Transfer', 'Cheque', 'Online'].map((m) => (
                 <Badge
                   key={m}
                   variant={methodFilter === m ? 'default' : 'outline'}
@@ -199,28 +240,44 @@ export default function PaymentsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPayments.map((p) => {
-                    const MethodIcon = METHOD_ICON[p.method] || CreditCard;
-                    return (
-                      <TableRow key={p.id} className="hover:bg-purple-50/30">
-                        <TableCell className="text-sm font-medium">{p.receiptNo}</TableCell>
-                        <TableCell className="text-sm">{p.student}</TableCell>
-                        <TableCell className="text-sm font-medium">₹{p.amount.toLocaleString('en-IN')}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5 text-sm">
-                            <MethodIcon className="w-3.5 h-3.5 text-gray-400" />
-                            {p.method}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-gray-500">
-                          {new Date(p.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={`${STATUS_BADGE[p.status]} text-[10px]`}>{p.status}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                        <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading payments…
+                      </TableCell>
+                    </TableRow>
+                  ) : error ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-10 text-red-500 text-sm">{error}</TableCell>
+                    </TableRow>
+                  ) : filteredPayments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-10 text-gray-400 text-sm">No payments recorded yet.</TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredPayments.map((p) => {
+                      const MethodIcon = METHOD_ICON[p.method] || CreditCard;
+                      return (
+                        <TableRow key={p.id} className="hover:bg-purple-50/30">
+                          <TableCell className="text-sm font-medium">{p.receiptNo}</TableCell>
+                          <TableCell className="text-sm">{p.student}</TableCell>
+                          <TableCell className="text-sm font-medium">₹{p.amount.toLocaleString('en-IN')}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <MethodIcon className="w-3.5 h-3.5 text-gray-400" />
+                              {p.method}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-500">
+                            {new Date(p.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`${STATUS_BADGE[p.status]} text-[10px]`}>{p.status}</Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
                 </TableBody>
               </Table>
             </div>
