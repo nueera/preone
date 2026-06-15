@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           student: {
-            select: { id: true, firstName: true, lastName: true, rollNumber: true },
+            select: {
+              id: true, firstName: true, lastName: true, rollNumber: true,
+              class: { select: { name: true } },
+            },
           },
           feeStructure: {
             select: { id: true, name: true, type: true, frequency: true },
