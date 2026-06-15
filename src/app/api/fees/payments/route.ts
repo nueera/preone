@@ -1,9 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, getAuthUser, unauthorized } from '@/lib/auth';
+import { getBranchFromRequest, withBranchFilter } from '@/lib/branch';
 import { randomBytes } from 'crypto';
 import { createNotification, NotificationTemplates } from '@/lib/notifications';
 import { auditLog } from '@/lib/audit';
+
+// GET /api/fees/payments — List recorded payments
+export async function GET(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    // Branch isolation via the student relation (Payment has no branchId)
+    const branchScope = getBranchFromRequest(request, user);
+    const branchFilter = withBranchFilter(branchScope);
+    const branchWhere =
+      Object.keys(branchFilter).length > 0
+        ? { student: branchFilter }
+        : branchScope.isAllBranches && branchScope.schoolId
+          ? { student: { branch: { schoolId: branchScope.schoolId } } }
+          : {};
+
+    const sp = request.nextUrl.searchParams;
+    const page = parseInt(sp.get('page') || '1');
+    const limit = parseInt(sp.get('limit') || '50');
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = { ...branchWhere };
+
+    const [payments, total] = await Promise.all([
+      db.payment.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { paymentDate: 'desc' },
+        include: {
+          student: { select: { id: true, firstName: true, lastName: true } },
+          invoice: { select: { invoiceNo: true } },
+        },
+      }),
+      db.payment.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      payments,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    console.error('List payments error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
 
 // POST /api/fees/payments — Record payment against an invoice
 export async function POST(request: NextRequest) {
