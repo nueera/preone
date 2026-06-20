@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { PORTAL_THEMES, ACHIEVEMENT_COLORS, GROWTH_COLORS } from '@/lib/theme-tokens';
+import { PORTAL_THEMES, GROWTH_COLORS } from '@/lib/theme-tokens';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Trophy,
@@ -14,12 +14,8 @@ import {
   Search,
   Award,
   Star,
-  Medal,
   Target,
-  BookOpen,
-  Sparkles,
-  CalendarDays,
-  Filter,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -29,24 +25,21 @@ interface Achievement {
   student: string;
   title: string;
   category: string;
-  type: 'CERTIFICATE' | 'BADGE' | 'MILESTONE' | 'AWARD';
+  type: string;
   date: string;
   description: string;
   icon: string;
 }
 
-const MOCK_ACHIEVEMENTS: Achievement[] = [
-  { id: '1', student: 'Aarav Kumar', title: 'First Steps', category: 'physical', type: 'MILESTONE', date: '2026-03-15', description: 'Completed the walking milestone independently', icon: '🚶' },
-  { id: '2', student: 'Priya Sharma', title: 'Story Star', category: 'language', type: 'BADGE', date: '2026-05-20', description: 'Told 5 complete stories in class', icon: '⭐' },
-  { id: '3', student: 'Vihaan Singh', title: 'Perfect Attendance', category: 'social', type: 'CERTIFICATE', date: '2026-04-01', description: 'No absences for the entire month of March', icon: '📜' },
-  { id: '4', student: 'Isha Sharma', title: 'Little Artist', category: 'creativity', type: 'AWARD', date: '2026-06-10', description: 'Won first place in the art exhibition', icon: '🎨' },
-  { id: '5', student: 'Ananya Gupta', title: 'Number Whiz', category: 'cognitive', type: 'BADGE', date: '2026-05-15', description: 'Can count to 20 and recognize all numerals', icon: '🔢' },
-  { id: '6', student: 'Arjun Patel', title: 'Kindness Champion', category: 'social', type: 'AWARD', date: '2026-04-20', description: 'Recognized for consistently helping classmates', icon: '💝' },
-  { id: '7', student: 'Meera Joshi', title: 'Science Explorer', category: 'cognitive', type: 'BADGE', date: '2026-03-28', description: 'Asked 20 thoughtful questions during nature walk', icon: '🔬' },
-  { id: '8', student: 'Rohan Mehta', title: 'Team Player', category: 'social', type: 'CERTIFICATE', date: '2026-06-05', description: 'Demonstrated excellent teamwork in sports day', icon: '🤝' },
-  { id: '9', student: 'Sara Khan', title: 'Rhyme Master', category: 'language', type: 'MILESTONE', date: '2026-05-10', description: 'Can recite 10 nursery rhymes from memory', icon: '🎵' },
-  { id: '10', student: 'Kabir Reddy', title: 'Building Blocks', category: 'cognitive', type: 'MILESTONE', date: '2026-04-15', description: 'Built a 10-block tower independently', icon: '🏗️' },
-];
+// Shape from GET /api/growth/achievements
+interface ApiAchievement {
+  id: string;
+  student: string;
+  title: string;
+  description: string;
+  icon: string;
+  date: string;
+}
 
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
   CERTIFICATE: { icon: Award, color: 'text-purple-700', bg: 'bg-purple-50' },
@@ -58,14 +51,45 @@ const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: 
 export default function AchievementsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/growth/achievements');
+        if (!res.ok) throw new Error('Failed to load achievements');
+        const data = await res.json();
+        const mapped: Achievement[] = (data.achievements || []).map((a: ApiAchievement) => ({
+          id: a.id,
+          student: a.student,
+          title: a.title,
+          description: a.description,
+          icon: a.icon || '🏆',
+          date: a.date,
+          // The Achievement model has no type/category — default for display.
+          type: 'BADGE',
+          category: 'general',
+        }));
+        setAchievements(mapped);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load achievements');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filtered = useMemo(() => {
-    return MOCK_ACHIEVEMENTS.filter((a) => {
+    return achievements.filter((a) => {
       const matchSearch = !searchQuery || a.student.toLowerCase().includes(searchQuery.toLowerCase()) || a.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchType = typeFilter === 'all' || a.type === typeFilter;
       return matchSearch && matchType;
     });
-  }, [searchQuery, typeFilter]);
+  }, [achievements, searchQuery, typeFilter]);
 
   return (
     <PageTransition>
@@ -90,7 +114,7 @@ export default function AchievementsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(TYPE_CONFIG).map(([type, cfg]) => {
               const Icon = cfg.icon;
-              const count = MOCK_ACHIEVEMENTS.filter((a) => a.type === type).length;
+              const count = achievements.filter((a) => a.type === type).length;
               return (
                 <PreOneCard key={type} variant="strip" hover className={`p-4 cursor-pointer ${typeFilter === type ? 'ring-2 ring-purple-400' : ''}`} onClick={() => setTypeFilter(typeFilter === type ? 'all' : type)}>
                   <div className="flex items-center gap-3">
@@ -108,7 +132,7 @@ export default function AchievementsPage() {
           </div>
         </StaggerItem>
 
-        {/* Search & Filter */}
+        {/* Search */}
         <StaggerItem>
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -123,35 +147,42 @@ export default function AchievementsPage() {
           <PreOneCard variant="default">
             <PreOneCardContent>
               <h3 className="font-semibold text-gray-900 mb-4">All Achievements</h3>
-              <ScrollArea className="max-h-96">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {filtered.map((a) => {
-                    const typeCfg = TYPE_CONFIG[a.type];
-                    const growthCfg = GROWTH_COLORS[a.category];
-                    const TypeIcon = typeCfg.icon;
-                    return (
-                      <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl border hover:shadow-sm transition-shadow">
-                        <div className="text-2xl">{a.icon}</div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <h4 className="text-sm font-medium text-gray-900 truncate">{a.title}</h4>
-                            <div className={`w-6 h-6 rounded-full ${typeCfg.bg} flex items-center justify-center shrink-0`}>
-                              <TypeIcon className={`w-3 h-3 ${typeCfg.color}`} />
+              {loading ? (
+                <p className="text-sm text-gray-400 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading achievements…</p>
+              ) : error ? (
+                <p className="text-sm text-red-500 py-10 text-center">{error}</p>
+              ) : filtered.length === 0 ? (
+                <p className="text-sm text-gray-400 py-10 text-center">No achievements recorded yet.</p>
+              ) : (
+                <ScrollArea className="max-h-96">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {filtered.map((a) => {
+                      const typeCfg = TYPE_CONFIG[a.type] || TYPE_CONFIG.BADGE;
+                      const growthCfg = GROWTH_COLORS[a.category];
+                      const TypeIcon = typeCfg.icon;
+                      return (
+                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl border hover:shadow-sm transition-shadow">
+                          <div className="text-2xl">{a.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{a.title}</h4>
+                              <div className={`w-6 h-6 rounded-full ${typeCfg.bg} flex items-center justify-center shrink-0`}>
+                                <TypeIcon className={`w-3 h-3 ${typeCfg.color}`} />
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">{a.student}</p>
+                            <p className="text-xs text-gray-400 mb-1.5 line-clamp-2">{a.description}</p>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-[9px]">{a.type}</Badge>
+                              {a.date && <span className="text-[10px] text-gray-400">{new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-1">{a.student}</p>
-                          <p className="text-xs text-gray-400 mb-1.5 line-clamp-2">{a.description}</p>
-                          <div className="flex items-center gap-2">
-                            <Badge className={`${growthCfg?.bg || 'bg-gray-50'} ${growthCfg?.text || 'text-gray-700'} text-[9px] capitalize`}>{a.category}</Badge>
-                            <Badge variant="outline" className="text-[9px]">{a.type}</Badge>
-                            <span className="text-[10px] text-gray-400">{new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )}
             </PreOneCardContent>
           </PreOneCard>
         </StaggerItem>

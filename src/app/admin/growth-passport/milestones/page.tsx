@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { PORTAL_THEMES, GROWTH_COLORS } from '@/lib/theme-tokens';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import {
-  Milestone,
   Plus,
   Search,
   Brain,
@@ -17,23 +15,18 @@ import {
   Baby,
   MessageSquare,
   Target,
-  CheckCircle2,
-  Clock,
   Star,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
 
-type MilestoneCategory = 'Motor' | 'Cognitive' | 'Social' | 'Language';
-
 interface MilestoneTemplate {
   id: string;
   name: string;
-  category: MilestoneCategory;
+  category: string;
   ageRange: string;
   description: string;
-  criteria: string;
-  isDefault: boolean;
 }
 
 const CATEGORY_CONFIG: Record<string, { color: string; bg: string; icon: React.ElementType; hex: string }> = {
@@ -42,39 +35,54 @@ const CATEGORY_CONFIG: Record<string, { color: string; bg: string; icon: React.E
   Social:    { color: 'text-green-700', bg: 'bg-green-50', icon: Users, hex: '#22c55e' },
   Language:  { color: 'text-sky-700', bg: 'bg-sky-50', icon: MessageSquare, hex: '#0ea5e9' },
 };
-
-const MOCK_MILESTONES: MilestoneTemplate[] = [
-  { id: '1', name: 'Walks Independently', category: 'Motor', ageRange: '12-18 months', description: 'Child can walk without support for at least 5 steps', criteria: '5 consecutive steps unaided', isDefault: true },
-  { id: '2', name: 'Stacks 4 Blocks', category: 'Motor', ageRange: '18-24 months', description: 'Can stack at least 4 blocks on top of each other', criteria: '4 blocks stacked without falling', isDefault: true },
-  { id: '3', name: 'Holds Crayon', category: 'Motor', ageRange: '24-36 months', description: 'Holds crayon with tripod grip', criteria: 'Can draw a circle', isDefault: true },
-  { id: '4', name: 'Object Permanence', category: 'Cognitive', ageRange: '8-12 months', description: 'Understands that objects exist even when hidden', criteria: 'Searches for hidden toy', isDefault: true },
-  { id: '5', name: 'Sorts by Color', category: 'Cognitive', ageRange: '24-36 months', description: 'Can sort objects by one attribute (color)', criteria: 'Sorts 3 colors correctly', isDefault: true },
-  { id: '6', name: 'Counts to 5', category: 'Cognitive', ageRange: '36-48 months', description: 'Can count objects up to 5', criteria: 'Correctly counts 5 objects', isDefault: true },
-  { id: '7', name: 'Parallel Play', category: 'Social', ageRange: '24-36 months', description: 'Plays alongside other children', criteria: 'Engages in parallel play for 10 min', isDefault: true },
-  { id: '8', name: 'Shares Toys', category: 'Social', ageRange: '36-48 months', description: 'Willingly shares toys with peers', criteria: 'Shares without prompting 3 times', isDefault: true },
-  { id: '9', name: 'Takes Turns', category: 'Social', ageRange: '36-48 months', description: 'Can wait for turn in games', criteria: 'Waits turn in group activity', isDefault: false },
-  { id: '10', name: 'First Words', category: 'Language', ageRange: '10-14 months', description: 'Says first meaningful words', criteria: '3 meaningful words', isDefault: true },
-  { id: '11', name: '2-Word Sentences', category: 'Language', ageRange: '18-24 months', description: 'Combines 2 words to communicate', criteria: '5 two-word combinations', isDefault: true },
-  { id: '12', name: 'Tells Simple Story', category: 'Language', ageRange: '36-48 months', description: 'Can narrate a simple sequence of events', criteria: '3-sentence narrative', isDefault: true },
-];
+const FALLBACK_CFG = { color: 'text-gray-700', bg: 'bg-gray-50', icon: Target, hex: '#6b7280' };
+const cfgFor = (cat: string) => CATEGORY_CONFIG[cat] || FALLBACK_CFG;
 
 export default function MilestonesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [milestones, setMilestones] = useState<MilestoneTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/growth/milestones');
+        if (!res.ok) throw new Error('Failed to load milestones');
+        const data = await res.json();
+        const mapped: MilestoneTemplate[] = (data.milestones || []).map((m: { id: string; name: string; category: string; ageGroup: string; description: string | null }) => ({
+          id: m.id,
+          name: m.name,
+          category: m.category,
+          ageRange: m.ageGroup,
+          description: m.description || '',
+        }));
+        setMilestones(mapped);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load milestones');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredMilestones = useMemo(() => {
-    return MOCK_MILESTONES.filter((m) => {
+    return milestones.filter((m) => {
       const matchSearch = !searchQuery || m.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchCategory = categoryFilter === 'all' || m.category === categoryFilter;
       return matchSearch && matchCategory;
     });
-  }, [searchQuery, categoryFilter]);
+  }, [milestones, searchQuery, categoryFilter]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, MilestoneTemplate[]> = {};
     filteredMilestones.forEach((m) => {
-      if (!groups[m.category]) groups[m.category] = [];
-      groups[m.category].push(m);
+      const c = m.category || 'Other';
+      if (!groups[c]) groups[c] = [];
+      groups[c].push(m);
     });
     return groups;
   }, [filteredMilestones]);
@@ -102,7 +110,7 @@ export default function MilestonesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(CATEGORY_CONFIG).map(([cat, cfg]) => {
               const Icon = cfg.icon;
-              const count = MOCK_MILESTONES.filter((m) => m.category === cat).length;
+              const count = milestones.filter((m) => m.category === cat).length;
               return (
                 <PreOneCard
                   key={cat}
@@ -134,42 +142,49 @@ export default function MilestonesPage() {
           </div>
         </StaggerItem>
 
-        {/* Milestone Grid by Category */}
-        {Object.entries(grouped).map(([category, milestones]) => {
-          const cfg = CATEGORY_CONFIG[category];
-          const Icon = cfg.icon;
-          return (
-            <StaggerItem key={category}>
-              <PreOneCard variant="default">
-                <PreOneCardContent>
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center`}>
-                      <Icon className={`w-4 h-4 ${cfg.color}`} />
-                    </div>
-                    <h3 className="font-semibold text-gray-900">{category} Development</h3>
-                    <Badge className={`${cfg.bg} ${cfg.color} text-[10px]`}>{milestones.length} milestones</Badge>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {milestones.map((m) => (
-                      <div key={m.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-medium text-gray-900">{m.name}</h4>
-                          {m.isDefault && <Star className="w-3 h-3 text-amber-400 fill-amber-400" />}
-                        </div>
-                        <p className="text-xs text-gray-500 mb-2">{m.description}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-[9px]">{m.ageRange}</Badge>
-                          <Button variant="ghost" size="sm" className="h-6 text-[10px]">Edit</Button>
-                        </div>
-                        <p className="text-[10px] text-gray-400 mt-1">Criteria: {m.criteria}</p>
+        {/* Grid by Category */}
+        {loading ? (
+          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-gray-400"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading milestones…</PreOneCard></StaggerItem>
+        ) : error ? (
+          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-red-500 text-sm">{error}</PreOneCard></StaggerItem>
+        ) : milestones.length === 0 ? (
+          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">No milestone templates defined yet.</PreOneCard></StaggerItem>
+        ) : (
+          Object.entries(grouped).map(([category, list]) => {
+            const cfg = cfgFor(category);
+            const Icon = cfg.icon;
+            return (
+              <StaggerItem key={category}>
+                <PreOneCard variant="default">
+                  <PreOneCardContent>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center`}>
+                        <Icon className={`w-4 h-4 ${cfg.color}`} />
                       </div>
-                    ))}
-                  </div>
-                </PreOneCardContent>
-              </PreOneCard>
-            </StaggerItem>
-          );
-        })}
+                      <h3 className="font-semibold text-gray-900">{category} Development</h3>
+                      <Badge className={`${cfg.bg} ${cfg.color} text-[10px]`}>{list.length} milestones</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {list.map((m) => (
+                        <div key={m.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-sm font-medium text-gray-900">{m.name}</h4>
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                          </div>
+                          <p className="text-xs text-gray-500 mb-2">{m.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-[9px]">{m.ageRange}</Badge>
+                            <Button variant="ghost" size="sm" className="h-6 text-[10px]">Edit</Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </PreOneCardContent>
+                </PreOneCard>
+              </StaggerItem>
+            );
+          })
+        )}
       </StaggerContainer>
     </PageTransition>
   );
