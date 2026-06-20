@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import {
   GraduationCap,
   PartyPopper,
   Plane,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -35,18 +36,37 @@ interface CalendarEvent {
   description?: string;
 }
 
-const MOCK_EVENTS: CalendarEvent[] = [
-  { id: '1', title: 'Annual Day Rehearsal', date: '2026-06-15', type: 'activity', time: '9:00 AM', description: 'Practice for annual day performances' },
-  { id: '2', title: 'Parent-Teacher Meeting', date: '2026-06-20', type: 'ptm', time: '10:00 AM', description: 'Q1 progress review meeting' },
-  { id: '3', title: 'Eid-ul-Adha Holiday', date: '2026-06-25', type: 'holiday', description: 'School closed' },
-  { id: '4', title: 'Summer Camp Begins', date: '2026-06-01', type: 'event', time: '8:30 AM', description: 'Two-week summer camp program' },
-  { id: '5', title: 'Art Exhibition', date: '2026-06-10', type: 'activity', time: '11:00 AM', description: 'Student artwork display' },
-  { id: '6', title: 'Mid-Term Assessments', date: '2026-06-18', type: 'exam', time: '9:00 AM', description: 'Mid-term evaluations begin' },
-  { id: '7', title: 'Yoga Day Celebration', date: '2026-06-21', type: 'event', time: '8:00 AM', description: 'International Yoga Day activities' },
-  { id: '8', title: 'Staff Development Day', date: '2026-06-28', type: 'event', time: '9:00 AM', description: 'Teacher training workshop' },
-  { id: '9', title: 'Raksha Bandhan Holiday', date: '2026-08-09', type: 'holiday', description: 'School closed' },
-  { id: '10', title: 'Independence Day', date: '2026-08-15', type: 'holiday', description: 'School closed — flag hoisting ceremony' },
-];
+interface ApiEvent {
+  id: string;
+  title: string;
+  description?: string | null;
+  date: string;
+  startTime?: string | null;
+  type?: string | null;
+  isHoliday?: boolean;
+}
+
+const KNOWN_TYPES = ['holiday', 'activity', 'event', 'ptm', 'exam'] as const;
+
+// Map a stored Event/Holiday to the calendar's typed shape
+function toCalendarEvent(e: ApiEvent): CalendarEvent {
+  const lowered = (e.type || '').toLowerCase();
+  const type: CalendarEvent['type'] = e.isHoliday
+    ? 'holiday'
+    : (KNOWN_TYPES as readonly string[]).includes(lowered)
+      ? (lowered as CalendarEvent['type'])
+      : 'event';
+  const d = new Date(e.date);
+  const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return {
+    id: e.id,
+    title: e.title,
+    date: ymd,
+    type,
+    time: e.startTime || undefined,
+    description: e.description || undefined,
+  };
+}
 
 const TYPE_CONFIG: Record<string, { color: string; bg: string; icon: React.ElementType; label: string }> = {
   holiday:  { color: 'text-green-700', bg: 'bg-green-50', icon: Plane, label: 'Holiday' },
@@ -57,9 +77,29 @@ const TYPE_CONFIG: Record<string, { color: string; bg: string; icon: React.Eleme
 };
 
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 1));
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/events');
+        if (!res.ok) throw new Error('Failed to load events');
+        const data = await res.json();
+        setEvents((data.events || []).map(toCalendarEvent));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load events');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -76,16 +116,16 @@ export default function CalendarPage() {
   }, [firstDay, daysInMonth]);
 
   const filteredEvents = useMemo(() => {
-    return MOCK_EVENTS.filter((e) => {
+    return events.filter((e) => {
       const matchSearch = !searchQuery || e.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchType = selectedType === 'all' || e.type === selectedType;
       return matchSearch && matchType;
     });
-  }, [searchQuery, selectedType]);
+  }, [events, searchQuery, selectedType]);
 
   const getEventsForDay = (day: number) => {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return MOCK_EVENTS.filter((e) => e.date === dateStr);
+    return events.filter((e) => e.date === dateStr);
   };
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
@@ -228,7 +268,11 @@ export default function CalendarPage() {
                 {/* Event List */}
                 <ScrollArea className="max-h-96">
                   <div className="space-y-2">
-                    {filteredEvents.length === 0 ? (
+                    {loading ? (
+                      <div className="flex items-center justify-center py-6 text-gray-400"><Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading events…</div>
+                    ) : error ? (
+                      <p className="text-sm text-red-500 text-center py-6">{error}</p>
+                    ) : filteredEvents.length === 0 ? (
                       <p className="text-sm text-gray-400 text-center py-6">No events found</p>
                     ) : (
                       filteredEvents.map((ev) => {
