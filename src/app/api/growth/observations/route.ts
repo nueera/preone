@@ -1,6 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireRole, Role } from '@/lib/auth';
+import { requireRole, Role, getAuthUser, unauthorized } from '@/lib/auth';
+import { getBranchFromRequest, withBranchFilter } from '@/lib/branch';
+
+// GET /api/growth/observations — List observations
+export async function GET(request: NextRequest) {
+  try {
+    const user = getAuthUser(request);
+    if (!user) return unauthorized();
+
+    const branchScope = getBranchFromRequest(request, user);
+    const branchFilter = withBranchFilter(branchScope);
+    const studentWhere =
+      Object.keys(branchFilter).length > 0
+        ? branchFilter
+        : branchScope.isAllBranches && branchScope.schoolId
+          ? { branch: { schoolId: branchScope.schoolId } }
+          : null;
+    const where: Record<string, unknown> = studentWhere ? { student: studentWhere } : {};
+
+    const observations = await db.observation.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+      include: { student: { select: { firstName: true, lastName: true } } },
+    });
+
+    // Observation.teacherId has no relation — resolve teacher names in one query.
+    const teacherIds = [...new Set(observations.map((o) => o.teacherId).filter(Boolean))] as string[];
+    const teachers = teacherIds.length
+      ? await db.teacher.findMany({ where: { id: { in: teacherIds } }, select: { id: true, firstName: true, lastName: true } })
+      : [];
+    const teacherMap: Record<string, string> = {};
+    for (const t of teachers) teacherMap[t.id] = `${t.firstName} ${t.lastName}`;
+
+    return NextResponse.json({
+      observations: observations.map((o) => ({
+        id: o.id,
+        student: `${o.student.firstName} ${o.student.lastName}`,
+        category: o.category,
+        content: o.content,
+        teacher: o.teacherId ? teacherMap[o.teacherId] || '—' : '—',
+        date: o.createdAt,
+        photo: !!o.media,
+      })),
+    });
+  } catch (error) {
+    console.error('List observations error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
 
 // POST /api/growth/observations — Add teacher observation
 export async function POST(request: NextRequest) {
