@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { PORTAL_THEMES, FEE_COLORS } from '@/lib/theme-tokens';
+import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Table,
@@ -22,14 +21,12 @@ import {
   Send,
   Plus,
   Search,
-  Clock,
-  CheckCircle2,
   AlertTriangle,
   Mail,
   MessageSquare,
   Phone,
   History,
-  FileText,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -41,7 +38,6 @@ interface OverduePayment {
   amount: number;
   dueDate: string;
   daysOverdue: number;
-  parentContact: string;
   remindersSent: number;
 }
 
@@ -59,30 +55,33 @@ interface ReminderHistory {
   template: string;
   channel: string;
   sentAt: string;
-  status: 'DELIVERED' | 'FAILED' | 'PENDING';
+  status: string;
 }
 
-const MOCK_OVERDUE: OverduePayment[] = [
-  { id: '1', student: 'Isha Sharma', class: 'Nursery-B', amount: 15000, dueDate: '2026-03-01', daysOverdue: 104, parentContact: '+91 98765 43210', remindersSent: 3 },
-  { id: '2', student: 'Meera Joshi', class: 'LKG-B', amount: 22500, dueDate: '2026-02-28', daysOverdue: 105, parentContact: '+91 87654 32109', remindersSent: 2 },
-  { id: '3', student: 'Karan Verma', class: 'UKG-A', amount: 18000, dueDate: '2026-04-15', daysOverdue: 59, parentContact: '+91 76543 21098', remindersSent: 1 },
-  { id: '4', student: 'Sneha Das', class: 'Nursery-A', amount: 16000, dueDate: '2026-05-01', daysOverdue: 43, parentContact: '+91 65432 10987', remindersSent: 1 },
-  { id: '5', student: 'Arjun Nair', class: 'LKG-A', amount: 20000, dueDate: '2026-05-10', daysOverdue: 34, parentContact: '+91 54321 09876', remindersSent: 0 },
-];
+// Shapes returned by the APIs
+interface ApiInvoice {
+  id: string;
+  amount: number;
+  netAmount?: number;
+  dueDate: string;
+  student?: { firstName: string; lastName: string; class?: { name: string } | null } | null;
+}
+interface ApiReminder {
+  id: string;
+  invoiceId: string;
+  type: string;
+  channel: string;
+  sentAt: string | null;
+  status: string;
+  invoice?: { student?: { firstName: string; lastName: string } | null } | null;
+}
 
-const MOCK_TEMPLATES: ReminderTemplate[] = [
+// Built-in reminder presets — intentional defaults (no backend template model yet).
+const DEFAULT_TEMPLATES: ReminderTemplate[] = [
   { id: '1', name: 'Gentle Reminder', channel: 'WhatsApp', subject: 'Fee Reminder', body: 'Dear Parent, this is a gentle reminder that the fee for {student_name} of ₹{amount} is due. Please pay at the earliest.' },
   { id: '2', name: 'Overdue Notice', channel: 'SMS', subject: 'Fee Overdue', body: 'Fee of ₹{amount} for {student_name} is overdue by {days} days. Kindly clear the dues immediately.' },
   { id: '3', name: 'Final Warning', channel: 'Email', subject: 'Urgent: Fee Payment Required', body: 'Dear Parent, despite previous reminders, the fee of ₹{amount} for {student_name} remains unpaid for {days} days. This is the final reminder before further action.' },
   { id: '4', name: 'Payment Confirmation', channel: 'WhatsApp', subject: 'Thank You', body: 'Thank you for paying ₹{amount} for {student_name}. Your receipt will be shared shortly.' },
-];
-
-const MOCK_HISTORY: ReminderHistory[] = [
-  { id: '1', student: 'Isha Sharma', template: 'Gentle Reminder', channel: 'WhatsApp', sentAt: '2026-06-10 09:00', status: 'DELIVERED' },
-  { id: '2', student: 'Meera Joshi', template: 'Overdue Notice', channel: 'SMS', sentAt: '2026-06-09 14:30', status: 'DELIVERED' },
-  { id: '3', student: 'Karan Verma', template: 'Gentle Reminder', channel: 'WhatsApp', sentAt: '2026-06-08 10:00', status: 'PENDING' },
-  { id: '4', student: 'Isha Sharma', template: 'Final Warning', channel: 'Email', sentAt: '2026-06-07 08:00', status: 'FAILED' },
-  { id: '5', student: 'Sneha Das', template: 'Gentle Reminder', channel: 'WhatsApp', sentAt: '2026-06-05 11:00', status: 'DELIVERED' },
 ];
 
 const CHANNEL_ICON: Record<string, React.ElementType> = {
@@ -93,6 +92,7 @@ const CHANNEL_ICON: Record<string, React.ElementType> = {
 
 const STATUS_BADGE: Record<string, string> = {
   DELIVERED: 'bg-emerald-50 text-emerald-700',
+  SENT: 'bg-emerald-50 text-emerald-700',
   PENDING: 'bg-amber-50 text-amber-700',
   FAILED: 'bg-red-50 text-red-700',
 };
@@ -100,13 +100,68 @@ const STATUS_BADGE: Record<string, string> = {
 export default function RemindersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<ReminderTemplate | null>(null);
+  const [overdue, setOverdue] = useState<OverduePayment[]>([]);
+  const [history, setHistory] = useState<ReminderHistory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const [invRes, remRes] = await Promise.all([
+          fetch('/api/fees/invoices?status=OVERDUE&limit=100'),
+          fetch('/api/fees/reminders'),
+        ]);
+        if (!invRes.ok) throw new Error('Failed to load overdue invoices');
+        const invData = await invRes.json();
+        const remData = remRes.ok ? await remRes.json() : { reminders: [] };
+        const reminders: ApiReminder[] = remData.reminders || [];
+
+        // Count reminders already sent per invoice
+        const countByInvoice: Record<string, number> = {};
+        for (const r of reminders) {
+          countByInvoice[r.invoiceId] = (countByInvoice[r.invoiceId] || 0) + 1;
+        }
+
+        const now = Date.now();
+        const od: OverduePayment[] = (invData.invoices || []).map((inv: ApiInvoice) => ({
+          id: inv.id,
+          student: inv.student ? `${inv.student.firstName} ${inv.student.lastName}` : '—',
+          class: inv.student?.class?.name || '—',
+          amount: inv.netAmount ?? inv.amount,
+          dueDate: inv.dueDate,
+          daysOverdue: Math.max(0, Math.floor((now - new Date(inv.dueDate).getTime()) / 86400000)),
+          remindersSent: countByInvoice[inv.id] || 0,
+        }));
+        setOverdue(od);
+
+        const hist: ReminderHistory[] = reminders.map((r) => ({
+          id: r.id,
+          student: r.invoice?.student ? `${r.invoice.student.firstName} ${r.invoice.student.lastName}` : '—',
+          template: r.type || 'Reminder',
+          channel: r.channel,
+          sentAt: r.sentAt
+            ? new Date(r.sentAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+            : 'Pending',
+          status: r.status,
+        }));
+        setHistory(hist);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load reminders');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredOverdue = useMemo(() => {
-    if (!searchQuery) return MOCK_OVERDUE;
-    return MOCK_OVERDUE.filter((o) => o.student.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [searchQuery]);
+    if (!searchQuery) return overdue;
+    return overdue.filter((o) => o.student.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [overdue, searchQuery]);
 
-  const totalOverdue = MOCK_OVERDUE.reduce((s, o) => s + o.amount, 0);
+  const totalOverdue = overdue.reduce((s, o) => s + o.amount, 0);
 
   return (
     <PageTransition>
@@ -137,7 +192,7 @@ export default function RemindersPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Overdue Payments</p>
-                  <p className="text-lg font-bold text-red-700">{MOCK_OVERDUE.length}</p>
+                  <p className="text-lg font-bold text-red-700">{overdue.length}</p>
                 </div>
               </div>
             </PreOneCard>
@@ -159,7 +214,7 @@ export default function RemindersPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Reminders Sent</p>
-                  <p className="text-lg font-bold text-purple-700">{MOCK_HISTORY.length}</p>
+                  <p className="text-lg font-bold text-purple-700">{history.length}</p>
                 </div>
               </div>
             </PreOneCard>
@@ -195,28 +250,44 @@ export default function RemindersPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredOverdue.map((o) => (
-                        <TableRow key={o.id} className="hover:bg-red-50/30">
-                          <TableCell>
-                            <div>
-                              <p className="text-sm font-medium">{o.student}</p>
-                              <p className="text-xs text-gray-400">{o.class}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm font-medium text-red-700">₹{o.amount.toLocaleString('en-IN')}</TableCell>
-                          <TableCell>
-                            <Badge className={`${o.daysOverdue > 60 ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'} text-[10px]`}>
-                              {o.daysOverdue}d
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-500">{o.remindersSent}</TableCell>
-                          <TableCell>
-                            <Button size="sm" variant="outline" className="h-7 text-xs">
-                              <Send className="w-3 h-3 mr-1" /> Remind
-                            </Button>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-10 text-gray-400">
+                            <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading overdue payments…
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : error ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-10 text-red-500 text-sm">{error}</TableCell>
+                        </TableRow>
+                      ) : filteredOverdue.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-10 text-gray-400 text-sm">No overdue payments 🎉</TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredOverdue.map((o) => (
+                          <TableRow key={o.id} className="hover:bg-red-50/30">
+                            <TableCell>
+                              <div>
+                                <p className="text-sm font-medium">{o.student}</p>
+                                <p className="text-xs text-gray-400">{o.class}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm font-medium text-red-700">₹{o.amount.toLocaleString('en-IN')}</TableCell>
+                            <TableCell>
+                              <Badge className={`${o.daysOverdue > 60 ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'} text-[10px]`}>
+                                {o.daysOverdue}d
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-gray-500">{o.remindersSent}</TableCell>
+                            <TableCell>
+                              <Button size="sm" variant="outline" className="h-7 text-xs">
+                                <Send className="w-3 h-3 mr-1" /> Remind
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -226,7 +297,7 @@ export default function RemindersPage() {
 
           {/* Right Sidebar */}
           <div className="space-y-6">
-            {/* Templates */}
+            {/* Templates (built-in presets) */}
             <StaggerItem>
               <PreOneCard variant="default">
                 <PreOneCardContent>
@@ -238,7 +309,7 @@ export default function RemindersPage() {
                   </div>
                   <ScrollArea className="max-h-48">
                     <div className="space-y-2">
-                      {MOCK_TEMPLATES.map((t) => {
+                      {DEFAULT_TEMPLATES.map((t) => {
                         const Icon = CHANNEL_ICON[t.channel] || Mail;
                         return (
                           <div
@@ -270,23 +341,31 @@ export default function RemindersPage() {
                 <PreOneCardContent>
                   <h3 className="font-semibold text-gray-900 mb-3">Recent History</h3>
                   <ScrollArea className="max-h-48">
-                    <div className="space-y-2">
-                      {MOCK_HISTORY.map((h) => {
-                        const Icon = CHANNEL_ICON[h.channel] || Mail;
-                        return (
-                          <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50">
-                            <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                              <Icon className="w-3.5 h-3.5 text-gray-500" />
+                    {loading ? (
+                      <p className="text-xs text-gray-400 py-6 text-center">
+                        <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" /> Loading…
+                      </p>
+                    ) : history.length === 0 ? (
+                      <p className="text-xs text-gray-400 py-6 text-center">No reminders sent yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {history.map((h) => {
+                          const Icon = CHANNEL_ICON[h.channel] || Mail;
+                          return (
+                            <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50">
+                              <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                <Icon className="w-3.5 h-3.5 text-gray-500" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-900">{h.student}</p>
+                                <p className="text-[10px] text-gray-400">{h.template} • {h.sentAt}</p>
+                              </div>
+                              <Badge className={`${STATUS_BADGE[h.status] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{h.status}</Badge>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-gray-900">{h.student}</p>
-                              <p className="text-[10px] text-gray-400">{h.template} • {h.sentAt}</p>
-                            </div>
-                            <Badge className={`${STATUS_BADGE[h.status]} text-[9px]`}>{h.status}</Badge>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </ScrollArea>
                 </PreOneCardContent>
               </PreOneCard>
