@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
@@ -13,15 +13,10 @@ import {
   Palette,
   Search,
   CalendarDays,
-  Trophy,
-  Star,
-  Music,
-  TreePine,
-  BookOpen,
-  Dumbbell,
   Plus,
   Filter,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -32,35 +27,27 @@ interface Activity {
   type: string;
   date: string;
   time: string;
-  teacher: string;
-  status: 'COMPLETED' | 'UPCOMING' | 'IN_PROGRESS';
-  rating?: number;
+  status: string;
+  className: string;
   notes?: string;
 }
 
-const MOCK_ACTIVITIES: Activity[] = [
-  { id: '1', name: 'Finger Painting Session', type: 'ART', date: '2026-06-12', time: '9:30 AM', teacher: 'Ms. Priya', status: 'COMPLETED', rating: 4, notes: 'Showed great creativity with colors' },
-  { id: '2', name: 'Rhyme Time', type: 'MUSIC', date: '2026-06-11', time: '10:00 AM', teacher: 'Ms. Kavitha', status: 'COMPLETED', rating: 5, notes: 'Participated enthusiastically' },
-  { id: '3', name: 'Outdoor Play', type: 'OUTDOOR', date: '2026-06-13', time: '11:00 AM', teacher: 'Mr. Raj', status: 'UPCOMING' },
-  { id: '4', name: 'Story Circle', type: 'STORYTELLING', date: '2026-06-13', time: '2:00 PM', teacher: 'Ms. Priya', status: 'UPCOMING' },
-  { id: '5', name: 'Dance Practice', type: 'DANCE', date: '2026-06-10', time: '9:00 AM', teacher: 'Ms. Kavitha', status: 'COMPLETED', rating: 3, notes: 'Needs more practice with rhythm' },
-  { id: '6', name: 'Clay Modeling', type: 'CRAFT', date: '2026-06-09', time: '10:30 AM', teacher: 'Ms. Sana', status: 'COMPLETED', rating: 4, notes: 'Made a nice animal figure' },
-  { id: '7', name: 'Yoga & Meditation', type: 'INDOOR', date: '2026-06-14', time: '8:30 AM', teacher: 'Mr. Raj', status: 'UPCOMING' },
-  { id: '8', name: 'Sprint Race', type: 'SPORTS', date: '2026-06-08', time: '11:00 AM', teacher: 'Mr. Raj', status: 'COMPLETED', rating: 5, notes: 'Won the race! Great energy' },
-  { id: '9', name: 'Number Fun', type: 'ACADEMIC', date: '2026-06-07', time: '9:00 AM', teacher: 'Ms. Priya', status: 'COMPLETED', rating: 4 },
-  { id: '10', name: 'Free Play', type: 'OTHER', date: '2026-06-14', time: '3:00 PM', teacher: 'Ms. Sana', status: 'UPCOMING' },
-];
-
-const TYPE_ICON: Record<string, React.ElementType> = {
-  ART: Palette, MUSIC: Music, DANCE: Star, OUTDOOR: TreePine,
-  INDOOR: BookOpen, SPORTS: Dumbbell, STORYTELLING: BookOpen,
-  CRAFT: Palette, ACADEMIC: BookOpen, OTHER: Filter,
-};
+interface ApiActivity {
+  id: string;
+  title: string;
+  type: string;
+  date: string;
+  startTime?: string | null;
+  status: string;
+  description?: string | null;
+  class?: { name: string } | null;
+}
 
 const STATUS_BADGE: Record<string, string> = {
   COMPLETED: 'bg-emerald-50 text-emerald-700',
   UPCOMING: 'bg-blue-50 text-blue-700',
-  IN_PROGRESS: 'bg-amber-50 text-amber-700',
+  ONGOING: 'bg-amber-50 text-amber-700',
+  CANCELLED: 'bg-gray-100 text-gray-500',
 };
 
 export default function StudentActivitiesPage() {
@@ -68,19 +55,58 @@ export default function StudentActivitiesPage() {
   const studentId = params?.id as string;
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!studentId) return;
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Activities are scoped to the student's class
+        const sRes = await fetch(`/api/students/${studentId}`);
+        if (!sRes.ok) throw new Error('Failed to load student');
+        const sData = await sRes.json();
+        const classId: string | undefined = sData.student?.class?.id;
+        if (!classId) {
+          setActivities([]);
+          return;
+        }
+        const aRes = await fetch(`/api/activities?classId=${classId}&limit=100`);
+        if (!aRes.ok) throw new Error('Failed to load activities');
+        const aData = await aRes.json();
+        const apiActivities: ApiActivity[] = aData.activities || [];
+        setActivities(apiActivities.map((a) => ({
+          id: a.id,
+          name: a.title,
+          type: a.type,
+          date: a.date,
+          time: a.startTime || '',
+          status: a.status,
+          className: a.class?.name || '',
+          notes: a.description || undefined,
+        })));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load activities');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [studentId]);
 
   const filteredActivities = useMemo(() => {
-    return MOCK_ACTIVITIES.filter((a) => {
+    return activities.filter((a) => {
       const matchSearch = !searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchType = typeFilter === 'all' || a.type === typeFilter;
       return matchSearch && matchType;
     });
-  }, [searchQuery, typeFilter]);
+  }, [activities, searchQuery, typeFilter]);
 
-  const completed = MOCK_ACTIVITIES.filter((a) => a.status === 'COMPLETED');
-  const avgRating = completed.length > 0
-    ? (completed.reduce((s, a) => s + (a.rating || 0), 0) / completed.length).toFixed(1)
-    : '0';
+  const completed = activities.filter((a) => a.status === 'COMPLETED').length;
+  const upcoming = activities.filter((a) => a.status === 'UPCOMING').length;
+  const ongoing = activities.filter((a) => a.status === 'ONGOING').length;
 
   return (
     <PageTransition>
@@ -93,7 +119,7 @@ export default function StudentActivitiesPage() {
                 <Palette className="w-6 h-6" style={{ color: theme.primary }} />
                 Student Activities
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Student ID: {studentId} — Activity participation</p>
+              <p className="text-sm text-gray-500 mt-1">Activities for this student&apos;s class</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Assign Activity
@@ -106,22 +132,19 @@ export default function StudentActivitiesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Total Activities</p>
-              <p className="text-lg font-bold text-purple-700">{MOCK_ACTIVITIES.length}</p>
+              <p className="text-lg font-bold text-purple-700">{activities.length}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Completed</p>
-              <p className="text-lg font-bold text-emerald-700">{completed.length}</p>
+              <p className="text-lg font-bold text-emerald-700">{completed}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Upcoming</p>
-              <p className="text-lg font-bold text-blue-700">{MOCK_ACTIVITIES.filter((a) => a.status === 'UPCOMING').length}</p>
+              <p className="text-lg font-bold text-blue-700">{upcoming}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-1">
-                <p className="text-xs text-gray-500">Avg Rating</p>
-                <Trophy className="w-3 h-3 text-amber-500" />
-              </div>
-              <p className="text-lg font-bold text-amber-700">{avgRating}/5</p>
+              <p className="text-xs text-gray-500">Ongoing</p>
+              <p className="text-lg font-bold text-amber-700">{ongoing}</p>
             </PreOneCard>
           </div>
         </StaggerItem>
@@ -149,41 +172,42 @@ export default function StudentActivitiesPage() {
           <PreOneCard variant="default">
             <PreOneCardContent>
               <h3 className="font-semibold text-gray-900 mb-4">Participation History</h3>
-              <ScrollArea className="max-h-96">
-                <div className="space-y-3">
-                  {filteredActivities.map((a) => {
-                    const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER;
-                    const Icon = TYPE_ICON[a.type] || Filter;
-                    return (
-                      <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                        <div className={`w-10 h-10 rounded-xl ${typeCfg.bg} flex items-center justify-center shrink-0`}>
-                          <span className="text-lg">{typeCfg.icon}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900">{a.name}</p>
-                            <Badge className={`${STATUS_BADGE[a.status]} text-[9px]`}>{a.status}</Badge>
+              {loading ? (
+                <div className="flex items-center justify-center py-12 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading activities…</div>
+              ) : error ? (
+                <div className="py-12 text-center text-red-500 text-sm">{error}</div>
+              ) : filteredActivities.length === 0 ? (
+                <div className="py-12 text-center text-gray-400 text-sm">No activities found for this student&apos;s class.</div>
+              ) : (
+                <ScrollArea className="max-h-96">
+                  <div className="space-y-3">
+                    {filteredActivities.map((a) => {
+                      const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER || { bg: 'bg-gray-50', icon: '🎯' };
+                      return (
+                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                          <div className={`w-10 h-10 rounded-xl ${typeCfg.bg} flex items-center justify-center shrink-0`}>
+                            <span className="text-lg">{typeCfg.icon}</span>
                           </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                            <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                            <span>{a.time}</span>
-                            <span>{a.teacher}</span>
-                          </div>
-                          {a.rating && (
-                            <div className="flex items-center gap-0.5 mt-1">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <Star key={i} className={`w-3 h-3 ${i < a.rating! ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
-                              ))}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-gray-900">{a.name}</p>
+                              <Badge className={`${STATUS_BADGE[a.status] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{a.status}</Badge>
                             </div>
-                          )}
-                          {a.notes && <p className="text-xs text-gray-400 mt-1">{a.notes}</p>}
+                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                              <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                              {a.time && <span>{a.time}</span>}
+                              {a.className && <span>{a.className}</span>}
+                              <Badge variant="outline" className="text-[9px]">{a.type}</Badge>
+                            </div>
+                            {a.notes && <p className="text-xs text-gray-400 mt-1">{a.notes}</p>}
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 mt-1" />
                         </div>
-                        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 mt-1" />
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )}
             </PreOneCardContent>
           </PreOneCard>
         </StaggerItem>

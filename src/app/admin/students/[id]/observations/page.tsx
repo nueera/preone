@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
@@ -15,7 +15,6 @@ import {
   Plus,
   Clock,
   User,
-  MessageSquare,
   Brain,
   Heart,
   Hand,
@@ -23,42 +22,45 @@ import {
   Sparkles,
   Send,
   X,
+  Loader2,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
 
+// Matches the Prisma ObservationCategory + Priority enums
+const MODEL_CATEGORIES = ['COGNITIVE', 'SOCIAL', 'EMOTIONAL', 'PHYSICAL', 'BEHAVIORAL', 'ACADEMIC'] as const;
+
 interface Observation {
   id: string;
-  category: 'COGNITIVE' | 'SOCIAL' | 'PHYSICAL' | 'EMOTIONAL' | 'LANGUAGE' | 'CREATIVE';
-  title: string;
-  note: string;
+  category: string;
+  content: string;
+  priority: string;
   teacher: string;
   date: string;
-  time: string;
-  severity?: 'POSITIVE' | 'NEUTRAL' | 'CONCERN';
 }
 
-const MOCK_OBSERVATIONS: Observation[] = [
-  { id: '1', category: 'COGNITIVE', title: 'Problem Solving', note: 'Demonstrated excellent problem-solving skills during the puzzle activity. Was able to complete a 12-piece puzzle independently.', teacher: 'Ms. Priya', date: '2026-06-12', time: '10:30 AM', severity: 'POSITIVE' },
-  { id: '2', category: 'SOCIAL', title: 'Group Play', note: 'Showed great cooperation during group play. Helped a younger peer find their shoes.', teacher: 'Mr. Raj', date: '2026-06-11', time: '11:15 AM', severity: 'POSITIVE' },
-  { id: '3', category: 'EMOTIONAL', title: 'Separation Anxiety', note: 'Appeared hesitant during morning drop-off. Took about 20 minutes to settle in. Cried briefly when parent left.', teacher: 'Ms. Kavitha', date: '2026-06-10', time: '8:45 AM', severity: 'CONCERN' },
-  { id: '4', category: 'LANGUAGE', title: 'Vocabulary Growth', note: 'Used 5 new words today during story time. Attempted to form complete sentences.', teacher: 'Ms. Priya', date: '2026-06-09', time: '2:00 PM', severity: 'POSITIVE' },
-  { id: '5', category: 'PHYSICAL', title: 'Fine Motor Skills', note: 'Holding crayon with improved grip. Drawing more controlled circles and lines.', teacher: 'Ms. Sana', date: '2026-06-08', time: '10:00 AM', severity: 'NEUTRAL' },
-  { id: '6', category: 'CREATIVE', title: 'Art Expression', note: 'Created an imaginative drawing of a house with family. Used multiple colors purposefully.', teacher: 'Ms. Sana', date: '2026-06-07', time: '9:30 AM', severity: 'POSITIVE' },
-  { id: '7', category: 'COGNITIVE', title: 'Counting Skills', note: 'Can count objects up to 10 reliably. Struggled with counting beyond 15.', teacher: 'Ms. Priya', date: '2026-06-06', time: '11:00 AM', severity: 'NEUTRAL' },
-  { id: '8', category: 'SOCIAL', title: 'Sharing Behavior', note: 'Reluctant to share toys during free play. Needed teacher intervention twice.', teacher: 'Mr. Raj', date: '2026-06-05', time: '3:00 PM', severity: 'CONCERN' },
-];
+interface ApiObservation {
+  id: string;
+  category: string;
+  content: string;
+  priority: string;
+  createdAt: string;
+  teacher?: { firstName: string; lastName: string } | null;
+}
 
 const CATEGORY_ICON: Record<string, React.ElementType> = {
   COGNITIVE: Brain, SOCIAL: User, PHYSICAL: Hand,
-  EMOTIONAL: Heart, LANGUAGE: BookOpen, CREATIVE: Sparkles,
+  EMOTIONAL: Heart, ACADEMIC: BookOpen, BEHAVIORAL: Sparkles,
 };
 
-const SEVERITY_BADGE: Record<string, string> = {
-  POSITIVE: 'bg-emerald-50 text-emerald-700',
-  NEUTRAL: 'bg-blue-50 text-blue-700',
+const PRIORITY_BADGE: Record<string, string> = {
+  LOW: 'bg-gray-50 text-gray-600',
+  NORMAL: 'bg-blue-50 text-blue-700',
+  HIGH: 'bg-amber-50 text-amber-700',
   CONCERN: 'bg-red-50 text-red-700',
 };
+
+const toTitle = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 export default function StudentObservationsPage() {
   const params = useParams();
@@ -66,6 +68,41 @@ export default function StudentObservationsPage() {
   const [showForm, setShowForm] = useState(false);
   const [newCategory, setNewCategory] = useState<string>('COGNITIVE');
   const [newNote, setNewNote] = useState('');
+  const [observations, setObservations] = useState<Observation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!studentId) return;
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch(`/api/students/${studentId}`);
+        if (!res.ok) throw new Error('Failed to load observations');
+        const data = await res.json();
+        const obs: ApiObservation[] = data.student?.observations || [];
+        setObservations(obs.map((o) => ({
+          id: o.id,
+          category: o.category,
+          content: o.content,
+          priority: o.priority,
+          teacher: o.teacher ? `${o.teacher.firstName} ${o.teacher.lastName}` : 'Staff',
+          date: o.createdAt,
+        })));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load observations');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [studentId]);
+
+  const categoryCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const o of observations) m[o.category] = (m[o.category] || 0) + 1;
+    return m;
+  }, [observations]);
 
   return (
     <PageTransition>
@@ -78,7 +115,7 @@ export default function StudentObservationsPage() {
                 <Eye className="w-6 h-6" style={{ color: theme.primary }} />
                 Student Observations
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Student ID: {studentId} — Teacher observations timeline</p>
+              <p className="text-sm text-gray-500 mt-1">Teacher observations timeline</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md" onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" /> Add Observation
@@ -98,21 +135,20 @@ export default function StudentObservationsPage() {
               </div>
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
-                  {Object.entries(OBSERVATION_COLORS).map(([key, cfg]) => {
+                  {MODEL_CATEGORIES.map((key) => {
                     const Icon = CATEGORY_ICON[key] || Brain;
                     return (
                       <Badge
                         key={key}
                         variant={newCategory === key ? 'default' : 'outline'}
-                        className={`cursor-pointer text-xs ${newCategory !== key ? cfg.text : ''}`}
+                        className="cursor-pointer text-xs"
                         onClick={() => setNewCategory(key)}
                       >
-                        <Icon className="w-3 h-3 mr-1" /> {key}
+                        <Icon className="w-3 h-3 mr-1" /> {toTitle(key)}
                       </Badge>
                     );
                   })}
                 </div>
-                <Input placeholder="Observation title..." />
                 <Textarea placeholder="Describe your observation..." value={newNote} onChange={(e) => setNewNote(e.target.value)} rows={3} />
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -128,14 +164,14 @@ export default function StudentObservationsPage() {
         {/* Category Stats */}
         <StaggerItem>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {Object.entries(OBSERVATION_COLORS).map(([key, cfg]) => {
+            {MODEL_CATEGORIES.map((key) => {
+              const cfg = OBSERVATION_COLORS[key] || OBSERVATION_COLORS.COGNITIVE;
               const Icon = CATEGORY_ICON[key] || Brain;
-              const count = MOCK_OBSERVATIONS.filter((o) => o.category === key).length;
               return (
                 <PreOneCard key={key} variant="strip" className="p-3 text-center">
                   <Icon className={`w-5 h-5 mx-auto ${cfg.text}`} />
-                  <p className="text-[10px] text-gray-500 mt-1 capitalize">{key}</p>
-                  <p className="text-sm font-bold" style={{ color: cfg.hex }}>{count}</p>
+                  <p className="text-[10px] text-gray-500 mt-1 capitalize">{toTitle(key)}</p>
+                  <p className="text-sm font-bold" style={{ color: cfg.hex }}>{categoryCounts[key] || 0}</p>
                 </PreOneCard>
               );
             })}
@@ -147,35 +183,41 @@ export default function StudentObservationsPage() {
           <PreOneCard variant="default">
             <PreOneCardContent>
               <h3 className="font-semibold text-gray-900 mb-4">Observation Timeline</h3>
-              <ScrollArea className="max-h-[500px]">
-                <div className="relative pl-6 border-l-2 border-gray-100 space-y-6">
-                  {MOCK_OBSERVATIONS.map((obs) => {
-                    const cfg = OBSERVATION_COLORS[obs.category] || OBSERVATION_COLORS.COGNITIVE;
-                    const Icon = CATEGORY_ICON[obs.category] || Brain;
-                    return (
-                      <div key={obs.id} className="relative">
-                        <div className={`absolute -left-[31px] w-6 h-6 rounded-full ${cfg.bg} flex items-center justify-center border-2 border-white`}>
-                          <Icon className={`w-3 h-3 ${cfg.text}`} />
-                        </div>
-                        <div className="ml-4 p-3 rounded-xl border hover:shadow-sm transition-shadow">
-                          <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-sm font-medium text-gray-900">{obs.title}</h4>
-                            {obs.severity && (
-                              <Badge className={`${SEVERITY_BADGE[obs.severity]} text-[9px]`}>{obs.severity}</Badge>
-                            )}
+              {loading ? (
+                <div className="flex items-center justify-center py-12 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading observations…</div>
+              ) : error ? (
+                <div className="py-12 text-center text-red-500 text-sm">{error}</div>
+              ) : observations.length === 0 ? (
+                <div className="py-12 text-center text-gray-400 text-sm">No observations recorded for this student yet.</div>
+              ) : (
+                <ScrollArea className="max-h-[500px]">
+                  <div className="relative pl-6 border-l-2 border-gray-100 space-y-6">
+                    {observations.map((obs) => {
+                      const cfg = OBSERVATION_COLORS[obs.category] || OBSERVATION_COLORS.COGNITIVE;
+                      const Icon = CATEGORY_ICON[obs.category] || Brain;
+                      return (
+                        <div key={obs.id} className="relative">
+                          <div className={`absolute -left-[31px] w-6 h-6 rounded-full ${cfg.bg} flex items-center justify-center border-2 border-white`}>
+                            <Icon className={`w-3 h-3 ${cfg.text}`} />
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">{obs.note}</p>
-                          <div className="flex items-center gap-3 text-xs text-gray-400">
-                            <span className="flex items-center gap-1"><User className="w-3 h-3" /> {obs.teacher}</span>
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(obs.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} {obs.time}</span>
-                            <Badge className={`${cfg.bg} ${cfg.text} text-[9px]`}>{obs.category}</Badge>
+                          <div className="ml-4 p-3 rounded-xl border hover:shadow-sm transition-shadow">
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className="text-sm font-medium text-gray-900">{toTitle(obs.category)}</h4>
+                              <Badge className={`${PRIORITY_BADGE[obs.priority] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{obs.priority}</Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{obs.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-gray-400">
+                              <span className="flex items-center gap-1"><User className="w-3 h-3" /> {obs.teacher}</span>
+                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(obs.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                              <Badge className={`${cfg.bg} ${cfg.text} text-[9px]`}>{toTitle(obs.category)}</Badge>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )}
             </PreOneCardContent>
           </PreOneCard>
         </StaggerItem>

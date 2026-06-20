@@ -76,6 +76,22 @@ export async function GET(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
+    // Observation has only a teacherId (no relation) — resolve names in one query
+    const teacherIds = [
+      ...new Set(student.observations.map((o) => o.teacherId).filter((t): t is string => !!t)),
+    ];
+    if (teacherIds.length > 0) {
+      const teachers = await db.teacher.findMany({
+        where: { id: { in: teacherIds } },
+        select: { id: true, firstName: true, lastName: true },
+      });
+      const teacherMap = new Map(teachers.map((t) => [t.id, t]));
+      student.observations = student.observations.map((o) => ({
+        ...o,
+        teacher: o.teacherId ? teacherMap.get(o.teacherId) ?? null : null,
+      })) as typeof student.observations;
+    }
+
     return NextResponse.json({ student });
   } catch (error) {
     console.error('Get student error:', error);
