@@ -1,24 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
 import {
   BarChart3,
   Download,
   TrendingUp,
-  Users,
-  Target,
   Funnel,
-  CalendarDays,
+  Loader2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -31,45 +26,105 @@ import {
 } from 'recharts';
 
 const theme = PORTAL_THEMES.admin;
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const CONVERSION_FUNNEL = [
-  { stage: 'New Leads', count: 156, color: CHART_PALETTE.series[0] },
-  { stage: 'Contacted', count: 128, color: CHART_PALETTE.series[1] },
-  { stage: 'Tour Scheduled', count: 89, color: CHART_PALETTE.series[4] },
-  { stage: 'Tour Completed', count: 72, color: CHART_PALETTE.series[2] },
-  { stage: 'Application', count: 58, color: CHART_PALETTE.series[3] },
-  { stage: 'Enrolled', count: 42, color: CHART_PALETTE.series[5] },
-];
+// Lead stages, in funnel order (LOST is excluded — it's a drop-off, not a stage).
+const STAGE_ORDER = ['NEW', 'CONTACTED', 'QUALIFIED', 'TOUR_SCHEDULED', 'TOUR_COMPLETED', 'APPLICATION', 'ENROLLED'];
+const STAGE_LABEL: Record<string, string> = {
+  NEW: 'New Leads',
+  CONTACTED: 'Contacted',
+  QUALIFIED: 'Qualified',
+  TOUR_SCHEDULED: 'Tour Scheduled',
+  TOUR_COMPLETED: 'Tour Completed',
+  APPLICATION: 'Application',
+  ENROLLED: 'Enrolled',
+};
 
-const SOURCE_DATA = [
-  { source: 'Instagram', leads: 42, converted: 18, rate: 43, revenue: 360000 },
-  { source: 'Walk-in', leads: 28, converted: 16, rate: 57, revenue: 320000 },
-  { source: 'Referral', leads: 35, converted: 15, rate: 43, revenue: 300000 },
-  { source: 'Google', leads: 22, converted: 8, rate: 36, revenue: 160000 },
-  { source: 'Facebook', leads: 18, converted: 6, rate: 33, revenue: 120000 },
-  { source: 'Other', leads: 11, converted: 3, rate: 27, revenue: 60000 },
-];
-
-const MONTHLY_TREND = [
-  { month: 'Jan', leads: 18, enrolled: 5 }, { month: 'Feb', leads: 22, enrolled: 8 },
-  { month: 'Mar', leads: 28, enrolled: 10 }, { month: 'Apr', leads: 32, enrolled: 12 },
-  { month: 'May', leads: 26, enrolled: 9 }, { month: 'Jun', leads: 30, enrolled: 8 },
-];
-
-const SOURCE_PIE = [
-  { name: 'Instagram', value: 42, color: CHART_PALETTE.series[0] },
-  { name: 'Walk-in', value: 28, color: CHART_PALETTE.series[1] },
-  { name: 'Referral', value: 35, color: CHART_PALETTE.series[2] },
-  { name: 'Google', value: 22, color: CHART_PALETTE.series[3] },
-  { name: 'Facebook', value: 18, color: CHART_PALETTE.series[4] },
-  { name: 'Other', value: 11, color: CHART_PALETTE.series[5] },
-];
+interface CrmSummary {
+  totalLeads: number;
+  enrolled: number;
+  conversionRate: string;
+  totalEstimatedRevenue: number;
+  enrolledRevenue: number;
+  byStage: Record<string, { count: number; value: number }>;
+  bySource: Record<string, number>;
+}
+interface CrmRecord {
+  stage: string;
+  createdAt: string;
+}
 
 export default function AdmissionsReportPage() {
-  const totalLeads = SOURCE_DATA.reduce((s, d) => s + d.leads, 0);
-  const totalConverted = SOURCE_DATA.reduce((s, d) => s + d.converted, 0);
-  const convRate = Math.round((totalConverted / totalLeads) * 100);
-  const totalRevenue = SOURCE_DATA.reduce((s, d) => s + d.revenue, 0);
+  const [summary, setSummary] = useState<CrmSummary>({ totalLeads: 0, enrolled: 0, conversionRate: '0', totalEstimatedRevenue: 0, enrolledRevenue: 0, byStage: {}, bySource: {} });
+  const [records, setRecords] = useState<CrmRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/reports/crm');
+        if (!res.ok) throw new Error('Failed to load admissions report');
+        const data = await res.json();
+        setSummary(data.summary || { totalLeads: 0, enrolled: 0, conversionRate: '0', totalEstimatedRevenue: 0, enrolledRevenue: 0, byStage: {}, bySource: {} });
+        setRecords(data.records || []);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load admissions report');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const funnel = useMemo(() => {
+    return STAGE_ORDER
+      .filter((s) => summary.byStage?.[s])
+      .map((s, i) => ({
+        stage: STAGE_LABEL[s] || s,
+        count: summary.byStage[s].count,
+        color: CHART_PALETTE.series[i % CHART_PALETTE.series.length],
+      }));
+  }, [summary]);
+
+  const sourcePie = useMemo(() => {
+    return Object.entries(summary.bySource || {}).map(([name, value], i) => ({
+      name,
+      value,
+      color: CHART_PALETTE.series[i % CHART_PALETTE.series.length],
+    }));
+  }, [summary]);
+
+  const monthlyTrend = useMemo(() => {
+    const now = new Date();
+    const out: { month: string; leads: number; enrolled: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const inMonth = records.filter((r) => {
+        if (!r.createdAt) return false;
+        const cd = new Date(r.createdAt);
+        return cd.getFullYear() === d.getFullYear() && cd.getMonth() === d.getMonth();
+      });
+      out.push({
+        month: MONTHS[d.getMonth()],
+        leads: inMonth.length,
+        enrolled: inMonth.filter((r) => r.stage === 'ENROLLED').length,
+      });
+    }
+    return out;
+  }, [records]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-gray-400">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading admissions report…
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="flex items-center justify-center py-24 text-red-500 text-sm">{error}</div>;
+  }
 
   return (
     <PageTransition>
@@ -92,112 +147,124 @@ export default function AdmissionsReportPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Total Leads</p>
-              <p className="text-xl font-bold text-purple-700">{totalLeads}</p>
+              <p className="text-xl font-bold text-purple-700">{summary.totalLeads}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Enrolled</p>
-              <p className="text-xl font-bold text-emerald-700">{totalConverted}</p>
+              <p className="text-xl font-bold text-emerald-700">{summary.enrolled}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-gray-500">Conversion Rate</p>
-              <p className="text-xl font-bold text-amber-700">{convRate}%</p>
+              <p className="text-xl font-bold text-amber-700">{summary.conversionRate}%</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Revenue</p>
-              <p className="text-xl font-bold text-purple-700">₹{(totalRevenue / 100000).toFixed(1)}L</p>
+              <p className="text-xs text-gray-500">Est. Revenue</p>
+              <p className="text-xl font-bold text-purple-700">₹{(summary.totalEstimatedRevenue / 100000).toFixed(1)}L</p>
             </PreOneCard>
           </div>
         </StaggerItem>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Conversion Funnel */}
+        {summary.totalLeads === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><Funnel className="w-4 h-4" /> Conversion Funnel</h3>
-              </div>
-              <div className="px-6 pb-6">
-                <div className="space-y-2">
-                  {CONVERSION_FUNNEL.map((stage, i) => {
-                    const maxCount = CONVERSION_FUNNEL[0].count;
-                    const width = Math.max((stage.count / maxCount) * 100, 8);
-                    return (
-                      <div key={stage.stage} className="flex items-center gap-3">
-                        <span className="text-xs text-gray-500 w-28">{stage.stage}</span>
-                        <div className="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden">
-                          <div className="h-full rounded-full flex items-center justify-end pr-3 transition-all" style={{ width: `${width}%`, backgroundColor: stage.color }}>
-                            <span className="text-xs font-semibold text-white">{stage.count}</span>
+            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+              No leads yet.
+            </PreOneCard>
+          </StaggerItem>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Conversion Funnel */}
+            <StaggerItem>
+              <PreOneCard variant="default" className="p-0">
+                <div className="p-6 pb-2">
+                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><Funnel className="w-4 h-4" /> Conversion Funnel</h3>
+                </div>
+                <div className="px-6 pb-6">
+                  <div className="space-y-2">
+                    {funnel.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-6 text-center">No pipeline data.</p>
+                    ) : (
+                      funnel.map((stage, i) => {
+                        const maxCount = funnel[0].count || 1;
+                        const width = Math.max((stage.count / maxCount) * 100, 8);
+                        return (
+                          <div key={stage.stage} className="flex items-center gap-3">
+                            <span className="text-xs text-gray-500 w-28">{stage.stage}</span>
+                            <div className="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden">
+                              <div className="h-full rounded-full flex items-center justify-end pr-3 transition-all" style={{ width: `${width}%`, backgroundColor: stage.color }}>
+                                <span className="text-xs font-semibold text-white">{stage.count}</span>
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-400 w-12 text-right">
+                              {i > 0 ? `${Math.round((stage.count / funnel[i - 1].count) * 100)}%` : ''}
+                            </span>
                           </div>
-                        </div>
-                        <span className="text-xs text-gray-400 w-12 text-right">
-                          {i > 0 ? `${Math.round((stage.count / CONVERSION_FUNNEL[i - 1].count) * 100)}%` : ''}
-                        </span>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </PreOneCard>
+            </StaggerItem>
+
+            {/* Source Pie */}
+            <StaggerItem>
+              <PreOneCard variant="default" className="p-0">
+                <div className="p-6 pb-2">
+                  <h3 className="text-base font-semibold text-gray-900">Lead Sources</h3>
+                </div>
+                <div className="px-6 pb-6">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie data={sourcePie} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={3} dataKey="value">
+                        {sourcePie.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                      </Pie>
+                      <RTooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="flex flex-wrap gap-3 justify-center mt-2">
+                    {sourcePie.map((s) => (
+                      <div key={s.name} className="flex items-center gap-1 text-xs">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                        <span className="text-gray-600">{s.name}</span>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </PreOneCard>
-          </StaggerItem>
+              </PreOneCard>
+            </StaggerItem>
 
-          {/* Source Pie */}
-          <StaggerItem>
-            <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900">Lead Sources</h3>
-              </div>
-              <div className="px-6 pb-6">
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie data={SOURCE_PIE} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={3} dataKey="value">
-                      {SOURCE_PIE.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                    </Pie>
-                    <RTooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-wrap gap-3 justify-center mt-2">
-                  {SOURCE_PIE.map((s) => (
-                    <div key={s.name} className="flex items-center gap-1 text-xs">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                      <span className="text-gray-600">{s.name}</span>
-                    </div>
-                  ))}
+            {/* Monthly Trend */}
+            <StaggerItem className="lg:col-span-2">
+              <PreOneCard variant="default" className="p-0">
+                <div className="p-6 pb-2">
+                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trends</h3>
                 </div>
-              </div>
-            </PreOneCard>
-          </StaggerItem>
-
-          {/* Monthly Trend */}
-          <StaggerItem className="lg:col-span-2">
-            <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trends</h3>
-              </div>
-              <div className="px-6 pb-6">
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={MONTHLY_TREND}>
-                    <defs>
-                      <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="gradEnrolled" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                    <RTooltip />
-                    <Area type="monotone" dataKey="leads" stroke={CHART_PALETTE.series[0]} fill="url(#gradLeads)" name="Leads" />
-                    <Area type="monotone" dataKey="enrolled" stroke={CHART_PALETTE.series[2]} fill="url(#gradEnrolled)" name="Enrolled" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </PreOneCard>
-          </StaggerItem>
-        </div>
+                <div className="px-6 pb-6">
+                  <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={monthlyTrend}>
+                      <defs>
+                        <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={CHART_PALETTE.series[0]} stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="gradEnrolled" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={CHART_PALETTE.series[2]} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                      <RTooltip />
+                      <Area type="monotone" dataKey="leads" stroke={CHART_PALETTE.series[0]} fill="url(#gradLeads)" name="Leads" />
+                      <Area type="monotone" dataKey="enrolled" stroke={CHART_PALETTE.series[2]} fill="url(#gradEnrolled)" name="Enrolled" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </PreOneCard>
+            </StaggerItem>
+          </div>
+        )}
       </StaggerContainer>
     </PageTransition>
   );
