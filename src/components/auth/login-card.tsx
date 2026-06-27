@@ -28,7 +28,6 @@ import {
   type ClipboardEvent,
   type FormEvent,
   type KeyboardEvent,
-  type RefObject,
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -98,6 +97,13 @@ export function LoginCard() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
+
+  // ── OTP send state ──
+  // The OTP tab is a two-step flow: user clicks "Send code" → backend
+  // emails (or SMSes) the code → user types it → clicks "Verify & Launch".
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // ── OTP refs (one per box, for auto-advance + backspace nav) ──
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -208,10 +214,77 @@ export function LoginCard() {
     if (tab === 'email') {
       if (!password) next.password = 'Password is required';
     } else {
-      if (otp.join('').length !== 6) next.otp = 'Enter the 6-digit code';
+      if (!otpSent) next.otp = 'Click "Send code" to receive a verification code first';
+      else if (otp.join('').length !== 6) next.otp = 'Enter the 6-digit code';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
+  }
+
+  // ── Resend cooldown ticker (counts down 30 → 0) ──
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  // ── Send OTP to the email/phone the user typed ──
+  async function handleSendOtp() {
+    if (!email.trim()) {
+      setErrors((prev) => ({ ...prev, email: 'Enter your email first' }));
+      emailInputRef.current?.focus();
+      return;
+    }
+    if (otpSending || resendCooldown > 0) return;
+
+    setOtpSending(true);
+    setErrors((prev) => ({ ...prev, otp: undefined }));
+    try {
+      const res = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: email, purpose: 'login' }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to send OTP');
+        return;
+      }
+      setOtpSent(true);
+      setResendCooldown(30);
+      // Dev convenience: surface the code so the tester doesn't need to
+      // check the server console.
+      if (data.devOtpCode) {
+        toast.success(`OTP sent (dev code: ${data.devOtpCode})`, {
+          description: data.deliveredTo ?? undefined,
+        });
+      } else {
+        toast.success('OTP sent', { description: data.deliveredTo ?? undefined });
+      }
+      // Focus the first OTP box so the user can start typing immediately.
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    } catch (err) {
+      console.error('OTP send error:', err);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setOtpSending(false);
+    }
+  }
+
+  // ── Reset OTP-tab state when switching tabs ──
+  function handleTabChange(next: Tab) {
+    if (next === tab) return;
+    setTab(next);
+    if (next !== 'otp') {
+      // Leaving OTP tab — clear OTP state so coming back starts fresh.
+      setOtp(['', '', '', '', '', '']);
+      setOtpSent(false);
+      setResendCooldown(0);
+      setErrors({});
+    } else {
+      // Entering OTP tab — clear password field (not used here) but keep email.
+      setErrors({});
+    }
   }
 
   // ── Submit ──
@@ -232,7 +305,7 @@ export function LoginCard() {
       const body =
         tab === 'email'
           ? { email, password }
-          : { phone: email, code: otp.join(''), purpose: 'login' };
+          : { identifier: email, code: otp.join(''), purpose: 'login' };
 
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -266,9 +339,11 @@ export function LoginCard() {
     setEmail(account.email);
     setPassword(account.password);
     setOtp(['', '', '', '', '', '']);
+    setOtpSent(false);
+    setResendCooldown(0);
     setErrors({});
     // Ensure we're on the email tab (demo accounts use password auth)
-    setTab('email');
+    handleTabChange('email');
     setTimeout(() => {
       // Submit programmatically by calling handleSubmit with a synthetic event.
       // We re-validate inline so the prefilled values are picked up.
@@ -383,7 +458,7 @@ export function LoginCard() {
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => setTab(t)}
+              onClick={() => handleTabChange(t)}
               className="
                 relative flex h-8 flex-1 items-center justify-center gap-1.5
                 rounded-[8px] text-[13px] font-medium
@@ -537,14 +612,44 @@ export function LoginCard() {
           </div>
         ) : (
           <div>
-            <label
-              className="
-                mb-1.5 block text-[14px] font-medium
-                text-[#374151] dark:text-[#C0C0C0]
-              "
-            >
-              Verification Code
-            </label>
+            {/* Label row with Send-code button */}
+            <div className="mb-1.5 flex items-center justify-between">
+              <label
+                className="
+                  block text-[14px] font-medium
+                  text-[#374151] dark:text-[#C0C0C0]
+                "
+              >
+                Verification Code
+              </label>
+              <button
+                type="button"
+                onClick={handleSendOtp}
+                disabled={otpSending || resendCooldown > 0 || isLoading}
+                className="
+                  flex items-center gap-1 text-[13px] font-medium
+                  text-[#7C3AED] hover:underline
+                  dark:text-[#A78BFA]
+                  focus-visible:outline-none focus-visible:ring-2
+                  focus-visible:ring-[#7B2CBF] focus-visible:rounded
+                  disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed
+                "
+              >
+                {otpSending ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Sending…
+                  </>
+                ) : resendCooldown > 0 ? (
+                  `Resend in ${resendCooldown}s`
+                ) : otpSent ? (
+                  'Resend code'
+                ) : (
+                  'Send code'
+                )}
+              </button>
+            </div>
+
             <div
               className={`
                 flex justify-between gap-2
@@ -564,7 +669,7 @@ export function LoginCard() {
                   value={digit}
                   onChange={(e) => handleOtpChange(i, e)}
                   onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                  disabled={isLoading}
+                  disabled={isLoading || !otpSent}
                   aria-label={`OTP digit ${i + 1}`}
                   className={`
                     h-11 w-11 rounded-[8px] border bg-transparent text-center
@@ -585,6 +690,16 @@ export function LoginCard() {
             </div>
             {errors.otp && (
               <p className="mt-1 text-[12px] text-[#EF4444]">{errors.otp}</p>
+            )}
+            {otpSent && !errors.otp && (
+              <p
+                className="
+                  mt-1 text-[12px]
+                  text-[#6B7280] dark:text-[#808080]
+                "
+              >
+                Enter the 6-digit code we sent to your email.
+              </p>
             )}
           </div>
         )}
@@ -655,7 +770,8 @@ export function LoginCard() {
         <button
           type="submit"
           disabled={
-            isLoading || (tab === 'otp' && !otpComplete)
+            isLoading ||
+            (tab === 'otp' && (!otpSent || !otpComplete))
           }
           className="
             btn-launch mt-5 flex h-12 w-full items-center justify-center gap-2
@@ -752,6 +868,3 @@ export function LoginCard() {
     </div>
   );
 }
-
-// Helper ref type (kept for clarity; not strictly required by TS)
-type _InputRef = RefObject<HTMLInputElement | null>;
