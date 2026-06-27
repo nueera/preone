@@ -244,22 +244,18 @@
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
 
-  /* ============================================================
-     LOGIN PAGE — Playful-Space + Glassmorphism Tokens
-     (sampled from the reference design; do not deviate)
-     ============================================================ */
-
-  /* Brand */
+  /* ── Brand accent tokens (login + admin) ── */
   --brand-purple: #7B2CBF;
   --brand-blue: #3A86FF;
   --brand-violet: #8B5CF6;
   --brand-indigo: #6366F1;
 
-  /* Semantic login tokens — LIGHT theme defaults.
-     The .dark override below re-defines them for dark mode.
-     Components use the *unprefixed* names (bg-login-card,
-     text-login-muted, etc.) so they automatically pick up
-     the right value per theme — no `dark:` variants needed. */
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-indigo: var(--brand-indigo);
+
+  /* ── Login page tokens — light defaults, overridden in .dark ── */
   --login-card: rgba(255, 255, 255, 0.55);
   --login-card-border: rgba(255, 255, 255, 0.6);
   --login-input: rgba(255, 255, 255, 0.7);
@@ -277,17 +273,6 @@
   --login-icon: #6366F1;
   --login-icon-muted: #6B7280;
 
-  /* Map login tokens → Tailwind utility classes.
-     Usable as: bg-login-card, text-login-text, border-login-border,
-                bg-login-input, text-login-muted, text-login-subtle,
-                text-login-label, text-login-link, bg-login-divider,
-                border-login-input, ring-login-focus, text-login-error,
-                bg-login-tab-bg, bg-login-tab-active, text-login-icon,
-                text-login-icon-muted, bg-brand-purple, bg-brand-blue */
-  --color-brand-purple: var(--brand-purple);
-  --color-brand-blue: var(--brand-blue);
-  --color-brand-violet: var(--brand-violet);
-  --color-brand-indigo: var(--brand-indigo);
   --color-login-card: var(--login-card);
   --color-login-card-border: var(--login-card-border);
   --color-login-input: var(--login-input);
@@ -480,25 +465,23 @@
   --portal: #A78BFA;
   --portal-foreground: #0F172A;
 
-  /* ── LOGIN tokens — DARK overrides ──
-     Components use the unprefixed names and automatically pick
-     up these values under .dark. No dark: variant needed. */
+  /* ── Login page dark-mode overrides ── */
   --login-card: rgba(20, 20, 36, 0.55);
-  --login-card-border: rgba(255, 255, 255, 0.1);
+  --login-card-border: rgba(255, 255, 255, 0.08);
   --login-input: rgba(42, 42, 58, 0.55);
-  --login-input-border: #3A3A4A;
-  --login-text: #FFFFFF;
-  --login-muted: #B0B0B0;
-  --login-subtle: #808080;
-  --login-label: #C0C0C0;
-  --login-link: #A78BFA;
-  --login-divider: #3A3A4A;
-  --login-focus: #7B2CBF;
-  --login-error: #EF4444;
-  --login-tab-bg: rgba(255, 255, 255, 0.05);
-  --login-tab-active: #7B2CBF;
-  --login-icon: #7B2CBF;
-  --login-icon-muted: #808080;
+  --login-input-border: rgba(255, 255, 255, 0.1);
+  --login-text: #F5F7FA;
+  --login-muted: #9CA3B4;
+  --login-subtle: #6B7280;
+  --login-label: #D1D5DB;
+  --login-link: #818CF8;
+  --login-divider: rgba(255, 255, 255, 0.08);
+  --login-focus: #818CF8;
+  --login-error: #F87171;
+  --login-tab-bg: rgba(255, 255, 255, 0.06);
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #9CA3B4;
 }
 
 .dark [data-portal="teacher"] {
@@ -666,10 +649,10 @@
 }
 
 /* ============================================================
-   LOGIN PAGE — Playful-Space + Glassmorphism Utilities
+   LOGIN PAGE — Glassmorphism + Playful-Space Utilities
    ============================================================ */
 
-/* ── Login primary button: 135deg purple → blue (do not change direction) ── */
+/* ── Login primary button: 135deg purple → blue ── */
 .btn-launch {
   background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
   color: #FFFFFF;
@@ -691,10 +674,7 @@
   opacity: 0.85;
 }
 
-/* ── Glassmorphism card — works in BOTH themes via --login-card token ──
-   Light: frosted white glass (rgba(255,255,255,0.55) + blur24px)
-   Dark:  smokier glass     (rgba(20,20,36,0.55)   + blur24px)
-   Both let the space wallpaper read through while keeping text legible. */
+/* ── Glassmorphism card ── */
 .login-card-glass {
   background: var(--login-card);
   backdrop-filter: blur(24px) saturate(160%);
@@ -712,35 +692,13 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Legacy alias kept for any external references — same as glass */
-.login-card-solid {
-  background: var(--login-card);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid var(--login-card-border);
-  border-radius: 20px;
-  box-shadow:
-    0 20px 60px 0 rgba(91, 33, 182, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-.dark .login-card-solid {
-  box-shadow:
-    0 20px 60px 0 rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-/* ── Login input focus ring — uses --login-focus token (indigo light / purple dark) ── */
+/* ── Login input focus ring ── */
 .login-input-focus:focus-within {
   border-color: var(--login-focus);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
 }
 
-/* ── Login wallpaper overlay — theme-aware ──
-   LIGHT: subtle white-purple wash that keeps the airy pastel
-          wallpaper visible. Adds slight bottom-right darkening
-          for card contrast.
-   DARK:  deeper purple-black gradient on top of dark wallpaper
-          for headline legibility. */
+/* ── Login wallpaper overlay — theme-aware ── */
 .login-wallpaper-overlay {
   background: linear-gradient(
     135deg,
@@ -758,40 +716,30 @@
   );
 }
 
-/* ── Login right-panel background gradients (LEGACY — kept for backward
-   compatibility, no longer applied on the new full-bleed layout). ── */
-.login-panel-dark {
-  background: transparent;
-}
+/* ── Login panel backgrounds (transparent — wallpaper shows through) ── */
+.login-panel-dark,
 .login-panel-light {
   background: transparent;
 }
 
-/* ── Login checkbox checked state: gradient purple → blue ── */
+/* ── Login checkbox checked state ── */
 .login-checkbox-checked {
   background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
   border-color: transparent;
 }
 
-/* ── Login theme transition: smooth color shift on toggle ──
-   Applies a 240ms transition to color-affecting properties so the
-   dark/light toggle crossfades smoothly instead of snapping. */
+/* ── Login theme transition ── */
 .login-theme-transition,
 .login-theme-transition * {
   transition-property: background-color, border-color, color, fill, stroke, box-shadow;
   transition-duration: 240ms;
   transition-timing-function: ease;
 }
-/* Don't transition transforms or opacity (those are for framer-motion). */
 @media (prefers-reduced-motion: reduce) {
   .login-theme-transition,
   .login-theme-transition * {
     transition: none;
   }
-}
-
-/* ── Reduce motion: disable tab indicator slide + button scale ── */
-@media (prefers-reduced-motion: reduce) {
   .btn-launch {
     transition: none;
   }
@@ -801,19 +749,16 @@
 }
 
 /* ============================================================
-   MOBILE LOGIN — additional rules
+   MOBILE LOGIN — additional rules (redesigned login page)
    ============================================================ */
 
-/* ── Disable pull-to-refresh + rubber-band on the login page so the
-   form scroll doesn't trigger browser refresh gestures. ── */
+/* ── Disable pull-to-refresh + rubber-band on the login page ── */
 .login-page-shell {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── iOS auto-zoom fix: input font-size must be >= 16px on < sm
-   or iOS Safari zooms the viewport when the input gets focus. ──
-   We bump the actual input text; labels/placeholders can stay smaller. */
+/* ── iOS auto-zoom fix: input font-size must be >= 16px on < sm ── */
 @media (max-width: 639px) {
   .login-card-glass input[type="text"],
   .login-card-glass input[type="email"],
@@ -824,9 +769,7 @@
   }
 }
 
-/* ── Safe-area-inset utilities for notch / home-indicator clearance ──
-   Use on the outermost login shell so children can pad against the
-   real safe area on iPhone notch / Dynamic Island models. */
+/* ── Safe-area-inset utilities ── */
 .pt-safe { padding-top: env(safe-area-inset-top); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 .pl-safe { padding-left: env(safe-area-inset-left); }
@@ -834,9 +777,7 @@
 .mt-safe { margin-top: env(safe-area-inset-top); }
 .mb-safe { margin-bottom: env(safe-area-inset-bottom); }
 
-/* ── Mobile wallpaper overlay — darker top & bottom vignette
-   for brand-text + footer legibility, clearer middle for the card.
-   Replaces the desktop overlay on < md via responsive classes. ── */
+/* ── Mobile wallpaper overlay — vertical vignette ── */
 .login-wallpaper-overlay-mobile {
   background: linear-gradient(
     180deg,
@@ -857,8 +798,7 @@
   );
 }
 
-/* ── Wrap hover-only effects in (hover: hover) so they don't
-   sticky-apply on touch devices. ── */
+/* ── Wrap hover-only effects in (hover: hover) ── */
 @media (hover: none) {
   .btn-launch:hover:not(:disabled) {
     filter: none;
@@ -866,7 +806,7 @@
   }
 }
 
-/* ── Mobile theme-toggle pill — labelled Light/Dark buttons ── */
+/* ── Mobile theme-toggle pill ── */
 .login-toggle-pill {
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px) saturate(140%);
@@ -888,7 +828,7 @@
   box-shadow: 0 4px 12px rgba(123, 44, 191, 0.35);
 }
 
-/* ── Mobile brand wordmark — gradient indigo→violet in light, white in dark ── */
+/* ── Mobile brand wordmark ── */
 .login-brand-wordmark {
   color: #FFFFFF;
 }
