@@ -30,6 +30,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -402,20 +403,15 @@ export function LoginCard() {
     >
       {/* ── 3.1 Logo + Welcome ── */}
       <div className="text-center">
-        <div className="flex items-center justify-center gap-2">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-full shadow-md"
-            style={{ background: 'linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%)' }}
-          >
-            <span className="text-sm font-bold text-white">O</span>
-          </div>
-          <span
-            className="
-              text-[20px] font-bold text-login-text
-            "
-          >
-            PreOne
-          </span>
+        <div className="flex items-center justify-center">
+          <Image
+            src="/preonelogo.png"
+            alt="PreOne logo"
+            width={72}
+            height={72}
+            priority
+            className="h-[72px] w-[72px] object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+          />
         </div>
 
         <h2
