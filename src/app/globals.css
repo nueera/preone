@@ -800,6 +800,113 @@
   }
 }
 
+/* ============================================================
+   MOBILE LOGIN — additional rules
+   ============================================================ */
+
+/* ── Disable pull-to-refresh + rubber-band on the login page so the
+   form scroll doesn't trigger browser refresh gestures. ── */
+.login-page-shell {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── iOS auto-zoom fix: input font-size must be >= 16px on < sm
+   or iOS Safari zooms the viewport when the input gets focus. ──
+   We bump the actual input text; labels/placeholders can stay smaller. */
+@media (max-width: 639px) {
+  .login-card-glass input[type="text"],
+  .login-card-glass input[type="email"],
+  .login-card-glass input[type="password"],
+  .login-card-glass input[type="tel"],
+  .login-card-glass input:not([type]) {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Safe-area-inset utilities for notch / home-indicator clearance ──
+   Use on the outermost login shell so children can pad against the
+   real safe area on iPhone notch / Dynamic Island models. */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pl-safe { padding-left: env(safe-area-inset-left); }
+.pr-safe { padding-right: env(safe-area-inset-right); }
+.mt-safe { margin-top: env(safe-area-inset-top); }
+.mb-safe { margin-bottom: env(safe-area-inset-bottom); }
+
+/* ── Mobile wallpaper overlay — darker top & bottom vignette
+   for brand-text + footer legibility, clearer middle for the card.
+   Replaces the desktop overlay on < md via responsive classes. ── */
+.login-wallpaper-overlay-mobile {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.55) 0%,
+    rgba(10, 10, 26, 0.15) 35%,
+    rgba(10, 10, 26, 0.35) 70%,
+    rgba(10, 10, 26, 0.7) 100%
+  );
+  transition: background 240ms ease;
+}
+:is(.dark) .login-wallpaper-overlay-mobile {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.65) 0%,
+    rgba(10, 10, 26, 0.25) 35%,
+    rgba(10, 10, 26, 0.45) 70%,
+    rgba(10, 10, 26, 0.8) 100%
+  );
+}
+
+/* ── Wrap hover-only effects in (hover: hover) so they don't
+   sticky-apply on touch devices. ── */
+@media (hover: none) {
+  .btn-launch:hover:not(:disabled) {
+    filter: none;
+    box-shadow: none;
+  }
+}
+
+/* ── Mobile theme-toggle pill — labelled Light/Dark buttons ── */
+.login-toggle-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background-color 240ms ease, border-color 240ms ease;
+}
+:is(.dark) .login-toggle-pill {
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.login-toggle-pill-btn {
+  color: #B0B0B0;
+  transition: color 200ms ease, background 200ms ease;
+}
+.login-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(123, 44, 191, 0.35);
+}
+
+/* ── Mobile brand wordmark — gradient indigo→violet in light, white in dark ── */
+.login-brand-wordmark {
+  color: #FFFFFF;
+}
+:is(.light) .login-brand-wordmark {
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-violet) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Demo-account cell tap target bump on mobile ── */
+@media (max-width: 639px) {
+  .login-demo-cell {
+    min-height: 64px;
+  }
+}
+
 /* ── Floating Action Element ── */
 .floating-shadow {
   box-shadow: 0px 30px 60px rgba(15,23,42,0.10);

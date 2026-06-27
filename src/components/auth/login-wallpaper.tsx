@@ -1,24 +1,30 @@
 'use client';
 
 // ============================================================
-// PreOne — Login Wallpaper (Full-bleed background)
+// PreOne — Login Wallpaper (Full-bleed background, responsive)
+//
 // Renders the supplied PreOne space illustration as a FIXED
-// full-viewport background so it shows through the translucent
-// login card on the right AND the headline overlay on the left.
+// full-viewport background. The asset resolves per-theme:
 //
-// Why full-bleed instead of left-panel-only:
-//   - Source wallpapers are 1536×1024 (3:2). Constrained to a
-//     60%-wide panel, object-cover crops the right side (where
-//     the rocket + blue planet live). Spanning the full viewport
-//     keeps the entire scene visible.
-//   - A transparent glass card needs the wallpaper behind it,
-//     not just on the left side.
+//   - Desktop (≥ md): public/login-wallpaper-{dark,light}.png
+//     (1536×1024, 3:2 — split-screen layout, wider scene)
+//   - Mobile  (< md): public/login-wallpaper-mobile-{dark,light}.png
+//     (853×1844, tall portrait — vertical stack layout)
 //
-// Asset slot:
-//   Replace `public/login-wallpaper-dark.png` and
-//   `public/login-wallpaper-light.png` with the supplied PreOne
-//   space illustrations. The component picks the right one based
-//   on the resolved theme (next-themes).
+// Both variants fill the entire viewport via next/image fill +
+// object-cover. The <picture>-style switching is done with two
+// stacked <Image> elements, one visible per breakpoint, so we
+// don't need a JS resize listener and SSR/CSR markup stays
+// stable. next/image priority is set on both (only one is
+// actually fetched, depending on viewport).
+//
+// Overlay gradients:
+//   - Desktop overlay (.login-wallpaper-overlay): 135deg diagonal
+//     wash tuned for the left/right split-screen composition.
+//   - Mobile overlay  (.login-wallpaper-overlay-mobile): 180deg
+//     vertical vignette — darker top & bottom, clearer middle —
+//     so the brand wordmark and footer remain legible on phones
+//     while the form card area gets visual breathing room.
 // ============================================================
 
 import { useEffect, useState } from 'react';
@@ -29,63 +35,83 @@ export type WallpaperSrc =
   | string
   | { dark?: string; light?: string };
 
-const DEFAULT_WALLPAPER: { dark: string; light: string } = {
+interface WallpaperSet {
+  dark: string;
+  light: string;
+}
+
+const DEFAULT_DESKTOP: WallpaperSet = {
   dark: '/login-wallpaper-dark.png',
   light: '/login-wallpaper-light.png',
 };
 
+const DEFAULT_MOBILE: WallpaperSet = {
+  dark: '/login-wallpaper-mobile-dark.png',
+  light: '/login-wallpaper-mobile-light.png',
+};
+
 interface LoginWallpaperProps {
-  wallpaperSrc?: WallpaperSrc;
+  /** Override the DESKTOP wallpaper asset. */
+  desktop?: WallpaperSrc;
+  /** Override the MOBILE wallpaper asset. */
+  mobile?: WallpaperSrc;
 }
 
-export function LoginWallpaper({ wallpaperSrc }: LoginWallpaperProps) {
+export function LoginWallpaper({ desktop, mobile }: LoginWallpaperProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Resolve the asset URL for the current theme.
-  // Before mount we render the dark wallpaper to keep SSR/CSR markup stable
-  // (default theme is dark in the design reference).
-  const resolveSrc = (): string => {
-    if (!wallpaperSrc) {
+  // Resolve asset URL for the requested theme. Before mount we
+  // default to the dark variant to keep SSR/CSR markup stable.
+  const resolve = (set: WallpaperSet, override?: WallpaperSrc): string => {
+    if (!override) {
       const theme = mounted ? resolvedTheme : 'dark';
-      return theme === 'light'
-        ? DEFAULT_WALLPAPER.light
-        : DEFAULT_WALLPAPER.dark;
+      return theme === 'light' ? set.light : set.dark;
     }
-    if (typeof wallpaperSrc === 'string') return wallpaperSrc;
+    if (typeof override === 'string') return override;
     const theme = mounted ? resolvedTheme : 'dark';
-    if (theme === 'light') {
-      return wallpaperSrc.light ?? DEFAULT_WALLPAPER.light;
-    }
-    return wallpaperSrc.dark ?? DEFAULT_WALLPAPER.dark;
+    if (theme === 'light') return override.light ?? set.light;
+    return override.dark ?? set.dark;
   };
 
-  const src = resolveSrc();
+  const desktopSrc = resolve(DEFAULT_DESKTOP, desktop);
+  const mobileSrc = resolve(DEFAULT_MOBILE, mobile);
 
   return (
     <div
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       aria-hidden="true"
     >
-      {/* Full-bleed wallpaper — covers the entire viewport so it shows
-          through the translucent login card on the right and the
-          headline overlay on the left. object-cover keeps the focal
-          point (children on left) visible with minimal cropping. */}
+      {/* ── Desktop wallpaper (md+) — wide 3:2 scene ── */}
       <Image
-        src={src}
+        src={desktopSrc}
         alt=""
         fill
-        className="object-cover"
+        className="object-cover hidden md:block"
         priority
         sizes="100vw"
       />
 
-      {/* Theme-aware overlay for text legibility —
-          dark: stronger purple-black gradient on top of dark wallpaper
-          light: softer white-purple wash so light wallpaper stays airy */}
+      {/* ── Mobile wallpaper (< md) — tall portrait scene ── */}
+      <Image
+        src={mobileSrc}
+        alt=""
+        fill
+        className="object-cover md:hidden"
+        priority
+        sizes="100vw"
+      />
+
+      {/* ── Desktop overlay (md+) — 135deg diagonal wash ── */}
       <div
-        className="absolute inset-0 login-wallpaper-overlay"
+        className="absolute inset-0 login-wallpaper-overlay hidden md:block"
+        aria-hidden="true"
+      />
+
+      {/* ── Mobile overlay (< md) — 180deg vertical vignette ── */}
+      <div
+        className="absolute inset-0 login-wallpaper-overlay-mobile md:hidden"
         aria-hidden="true"
       />
     </div>

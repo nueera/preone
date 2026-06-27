@@ -18,16 +18,24 @@ export function LoginHeadline() {
       "
       aria-hidden="true"
     >
-      {/* Logo */}
-      <div className="mb-8">
+      {/* Logo + wordmark row */}
+      <div className="mb-8 flex items-center gap-3">
         <Image
           src="/preonelogo.png"
           alt="PreOne logo"
-          width={96}
-          height={96}
+          width={48}
+          height={48}
           priority
-          className="h-[96px] w-[96px] object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          className="h-12 w-12 object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
         />
+        <span
+          className="
+            login-brand-wordmark text-[28px] font-bold tracking-tight
+          "
+          style={{ letterSpacing: '-0.01em' }}
+        >
+          PreOne
+        </span>
       </div>
 
       {/* Headline */}
