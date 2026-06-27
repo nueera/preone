@@ -42,11 +42,15 @@ type ModuleIconConfig = {
 /** Modules that have a custom webp icon in public/icons/admin/ */
 const CUSTOM_ICON_KEYS = new Set([
   'dashboard',
+  'setup',
+  'admission',
   'students',
   'parents',
   'teachers',
+  'classes',
   'operations',
   'fees',
+  'communication',
   'reports',
   'settings',
   'growth-passport',
