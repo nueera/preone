@@ -43,7 +43,7 @@ import {
   Megaphone,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PageHeader } from '@/components/admin/page-header';
+import { ModuleIcon } from '@/components/admin/module-icons';
 import Link from 'next/link';
 
 // ── Mock data (replace with API calls later) ──────────────────
@@ -167,10 +167,10 @@ function CosmicStatCard({
           </p>
         </div>
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-lg"
+          className="flex h-12 w-12 items-center justify-center rounded-xl"
           style={{ background: `${color}18` }}
         >
-          <Icon className="h-5 w-5" style={{ color }} />
+          <Icon className="h-7 w-7" style={{ color }} />
         </div>
       </div>
 
@@ -382,11 +382,20 @@ function RecentActivity() {
 export default function AdminDashboardPage() {
   return (
     <div>
-      <PageHeader
-        iconKey="dashboard"
-        title="Dashboard"
-        subtitle="KPIs, charts and school overview"
-      />
+      {/* ── Page header ── */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <ModuleIcon iconKey="dashboard" size={72} />
+          <div>
+            <h1 className="text-[20px] font-semibold text-[var(--admin-text)]">
+              Dashboard
+            </h1>
+            <p className="mt-1 text-[14px] text-[var(--admin-text-muted)]">
+              KPIs, charts and school overview
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* ── KPI row ── */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">

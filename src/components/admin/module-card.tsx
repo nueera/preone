@@ -64,7 +64,10 @@ export function ModuleCard({ module }: ModuleCardProps) {
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <ModuleIcon iconKey={module.key} size={48} />
+        <ModuleIcon
+          iconKey={module.key}
+          size={['parents'].includes(module.key) ? 144 : ['students', 'ai-center', 'dashboard', 'setup', 'admission', 'classes'].includes(module.key) ? 128 : ['settings', 'fees', 'communication', 'reports', 'growth-passport'].includes(module.key) ? 80 : ['attendance'].includes(module.key) ? 112 : ['operations', 'teachers'].includes(module.key) ? 96 : 56}
+        />
       </motion.span>
 
       {/* ── Label ── */}
