@@ -25,7 +25,7 @@ function EmptyState({ mod }: { mod: ModuleDef }) {
       "
     >
       <div className="mb-4">
-        <ModuleIcon iconKey={mod.key} size={64} />
+        <ModuleIcon iconKey={mod.key} size={80} />
       </div>
       <h3 className="text-[16px] font-semibold text-[var(--admin-text)]">
         {mod.label} — Coming Next

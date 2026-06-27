@@ -65,7 +65,7 @@ export function PageHeader({
       {/* ── Title row ── */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <ModuleIcon iconKey={iconKey} size={40} />
+          <ModuleIcon iconKey={iconKey} size={48} />
           <div>
             <h1 className="text-[24px] font-bold leading-tight text-[var(--admin-text)]">
               {title}

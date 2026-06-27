@@ -7,9 +7,9 @@
 // to a module route.
 //
 // Variants:
-//   - Regular: icon (48px) + label, min-h-[140px]
+//   - Regular: icon (64px) + label, min-h-[160px]
 //   - Hero (daily-milestones): icon + two-line label with tagline,
-//     min-h-[160px], subtle indigo gradient border on hover
+//     min-h-[180px], subtle indigo gradient border on hover
 //   - Badge (communication): red count pill in top-right corner
 //
 // Hover: translate-y -1px + shadow lift + border indigo tint.
@@ -43,7 +43,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
         focus-visible:outline-none focus-visible:ring-2
         focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2
       "
-      style={{ minHeight: isHero ? 160 : 140 }}
+      style={{ minHeight: isHero ? 180 : 160 }}
     >
       {/* ── Notification badge (communication only) ── */}
       {hasBadge && (
@@ -64,7 +64,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <ModuleIcon iconKey={module.key} size={48} />
+        <ModuleIcon iconKey={module.key} size={64} />
       </motion.span>
 
       {/* ── Label ── */}
