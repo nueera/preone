@@ -1,10 +1,10 @@
 // ============================================================
 // PreOne — Module Registry
 //
-// Central definition of all 16 admin portal modules. Each entry
+// Central definition of all 15 admin portal modules. Each entry
 // drives the dashboard card, the module page header, and
-// navigation. The dashboard grid renders all 16 cards including
-// the "Dashboard" self-link.
+// navigation. The Dashboard card links to /admin/dashboard
+// (the KPI + charts page, not the module grid).
 //
 // Only "communication" gets a notification badge (spec §5).
 // Only "daily-milestones" gets a tagline (hero card, spec §5).
@@ -24,8 +24,8 @@ export const MODULES: ModuleDef[] = [
   {
     key: 'dashboard',
     label: 'Dashboard',
-    href: '/admin',
-    subtitle: 'Quick access to all your modules',
+    href: '/admin/dashboard',
+    subtitle: 'KPIs, charts and school overview',
     primaryAction: '',
   },
   {
