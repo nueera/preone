@@ -25,9 +25,22 @@ interface ModuleCardProps {
   module: ModuleDef;
 }
 
+// Per-module icon size overrides (default = 64px)
+const ICON_SIZES: Record<string, number> = {
+  attendance: 112,
+  operations: 96,
+  teachers: 96,
+  settings: 80,
+  fees: 80,
+  communication: 80,
+  reports: 80,
+  'growth-passport': 80,
+};
+
 export function ModuleCard({ module }: ModuleCardProps) {
   const isHero = module.key === 'daily-milestones';
   const hasBadge = module.badge != null && module.badge > 0;
+  const iconSize = ICON_SIZES[module.key] ?? 64;
 
   return (
     <Link
@@ -64,7 +77,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <ModuleIcon iconKey={module.key} size={64} />
+        <ModuleIcon iconKey={module.key} size={iconSize} />
       </motion.span>
 
       {/* ── Label ── */}
