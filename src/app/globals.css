@@ -255,43 +255,55 @@
   --brand-violet: #8B5CF6;
   --brand-indigo: #6366F1;
 
-  /* Dark login */
-  --login-dark-bg-1: #0a0a1a;
-  --login-dark-bg-2: #1a0a2a;
-  --login-dark-card: rgba(30, 30, 46, 0.9);
-  --login-dark-input: #2A2A3A;
-  --login-dark-border: #3A3A4A;
-  --login-dark-text: #FFFFFF;
-  --login-dark-muted: #B0B0B0;
-  --login-dark-subtle: #808080;
+  /* Semantic login tokens — LIGHT theme defaults.
+     The .dark override below re-defines them for dark mode.
+     Components use the *unprefixed* names (bg-login-card,
+     text-login-muted, etc.) so they automatically pick up
+     the right value per theme — no `dark:` variants needed. */
+  --login-card: rgba(255, 255, 255, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.6);
+  --login-input: rgba(255, 255, 255, 0.7);
+  --login-input-border: #E5E7EB;
+  --login-text: #1F2937;
+  --login-muted: #6B7280;
+  --login-subtle: #9CA3AF;
+  --login-label: #374151;
+  --login-link: #7C3AED;
+  --login-divider: #E5E7EB;
+  --login-focus: #6366F1;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.5);
+  --login-tab-active: #6366F1;
+  --login-icon: #6366F1;
+  --login-icon-muted: #6B7280;
 
-  /* Light login */
-  --login-light-bg-1: #E8E0FF;
-  --login-light-bg-2: #D4E6FF;
-  --login-light-card: #FFFFFF;
-  --login-light-input: #FFFFFF;
-  --login-light-border: #E5E7EB;
-  --login-light-text: #1F2937;
-  --login-light-muted: #6B7280;
-  --login-light-subtle: #9CA3AF;
-
-  /* Map login tokens → Tailwind utility classes (bg-login-dark-card, etc.) */
+  /* Map login tokens → Tailwind utility classes.
+     Usable as: bg-login-card, text-login-text, border-login-border,
+                bg-login-input, text-login-muted, text-login-subtle,
+                text-login-label, text-login-link, bg-login-divider,
+                border-login-input, ring-login-focus, text-login-error,
+                bg-login-tab-bg, bg-login-tab-active, text-login-icon,
+                text-login-icon-muted, bg-brand-purple, bg-brand-blue */
   --color-brand-purple: var(--brand-purple);
   --color-brand-blue: var(--brand-blue);
   --color-brand-violet: var(--brand-violet);
   --color-brand-indigo: var(--brand-indigo);
-  --color-login-dark-card: var(--login-dark-card);
-  --color-login-dark-input: var(--login-dark-input);
-  --color-login-dark-border: var(--login-dark-border);
-  --color-login-dark-text: var(--login-dark-text);
-  --color-login-dark-muted: var(--login-dark-muted);
-  --color-login-dark-subtle: var(--login-dark-subtle);
-  --color-login-light-card: var(--login-light-card);
-  --color-login-light-input: var(--login-light-input);
-  --color-login-light-border: var(--login-light-border);
-  --color-login-light-text: var(--login-light-text);
-  --color-login-light-muted: var(--login-light-muted);
-  --color-login-light-subtle: var(--login-light-subtle);
+  --color-login-card: var(--login-card);
+  --color-login-card-border: var(--login-card-border);
+  --color-login-input: var(--login-input);
+  --color-login-input-border: var(--login-input-border);
+  --color-login-text: var(--login-text);
+  --color-login-muted: var(--login-muted);
+  --color-login-subtle: var(--login-subtle);
+  --color-login-label: var(--login-label);
+  --color-login-link: var(--login-link);
+  --color-login-divider: var(--login-divider);
+  --color-login-focus: var(--login-focus);
+  --color-login-error: var(--login-error);
+  --color-login-tab-bg: var(--login-tab-bg);
+  --color-login-tab-active: var(--login-tab-active);
+  --color-login-icon: var(--login-icon);
+  --color-login-icon-muted: var(--login-icon-muted);
 }
 
 /* ============================================================
@@ -467,6 +479,26 @@
 
   --portal: #A78BFA;
   --portal-foreground: #0F172A;
+
+  /* ── LOGIN tokens — DARK overrides ──
+     Components use the unprefixed names and automatically pick
+     up these values under .dark. No dark: variant needed. */
+  --login-card: rgba(20, 20, 36, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.1);
+  --login-input: rgba(42, 42, 58, 0.55);
+  --login-input-border: #3A3A4A;
+  --login-text: #FFFFFF;
+  --login-muted: #B0B0B0;
+  --login-subtle: #808080;
+  --login-label: #C0C0C0;
+  --login-link: #A78BFA;
+  --login-divider: #3A3A4A;
+  --login-focus: #7B2CBF;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.05);
+  --login-tab-active: #7B2CBF;
+  --login-icon: #7B2CBF;
+  --login-icon-muted: #808080;
 }
 
 .dark [data-portal="teacher"] {
@@ -639,7 +671,7 @@
 
 /* ── Login primary button: 135deg purple → blue (do not change direction) ── */
 .btn-launch {
-  background: linear-gradient(135deg, #7B2CBF 0%, #3A86FF 100%);
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -659,30 +691,22 @@
   opacity: 0.85;
 }
 
-/* ── Glassmorphism card — base (LIGHT theme) ──
-   Light theme uses a frosted white glass so the colorful wallpaper
-   still reads through the card. Opacity tuned to keep text contrast
-   AA on bright backgrounds. */
+/* ── Glassmorphism card — works in BOTH themes via --login-card token ──
+   Light: frosted white glass (rgba(255,255,255,0.55) + blur24px)
+   Dark:  smokier glass     (rgba(20,20,36,0.55)   + blur24px)
+   Both let the space wallpaper read through while keeping text legible. */
 .login-card-glass {
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--login-card);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--login-card-border);
   border-radius: 20px;
   box-shadow:
     0 20px 60px 0 rgba(91, 33, 182, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 240ms ease, border-color 240ms ease;
 }
-
-/* ── Glassmorphism card — DARK theme ──
-   Deeper, smokier glass. Opacity 0.55 lets the space wallpaper
-   glow through while keeping white text legible. */
 .dark .login-card-glass {
-  background: rgba(20, 20, 36, 0.55);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
   box-shadow:
     0 20px 60px 0 rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -690,34 +714,25 @@
 
 /* Legacy alias kept for any external references — same as glass */
 .login-card-solid {
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--login-card);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--login-card-border);
   border-radius: 20px;
   box-shadow:
     0 20px 60px 0 rgba(91, 33, 182, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 .dark .login-card-solid {
-  background: rgba(20, 20, 36, 0.55);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
   box-shadow:
     0 20px 60px 0 rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* ── Login input focus rings (purple dark / indigo light) ── */
+/* ── Login input focus ring — uses --login-focus token (indigo light / purple dark) ── */
 .login-input-focus:focus-within {
-  border-color: #7B2CBF;
-  box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.18);
-}
-:root:not(.dark) .login-input-focus:focus-within {
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+  border-color: var(--login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
 }
 
 /* ── Login wallpaper overlay — theme-aware ──
@@ -733,6 +748,7 @@
     rgba(123, 44, 191, 0.08) 50%,
     rgba(10, 10, 26, 0.22) 100%
   );
+  transition: background 240ms ease;
 }
 .dark .login-wallpaper-overlay {
   background: linear-gradient(
@@ -753,8 +769,25 @@
 
 /* ── Login checkbox checked state: gradient purple → blue ── */
 .login-checkbox-checked {
-  background: linear-gradient(135deg, #7B2CBF 0%, #3A86FF 100%);
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
   border-color: transparent;
+}
+
+/* ── Login theme transition: smooth color shift on toggle ──
+   Applies a 240ms transition to color-affecting properties so the
+   dark/light toggle crossfades smoothly instead of snapping. */
+.login-theme-transition,
+.login-theme-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 240ms;
+  transition-timing-function: ease;
+}
+/* Don't transition transforms or opacity (those are for framer-motion). */
+@media (prefers-reduced-motion: reduce) {
+  .login-theme-transition,
+  .login-theme-transition * {
+    transition: none;
+  }
 }
 
 /* ── Reduce motion: disable tab indicator slide + button scale ── */
