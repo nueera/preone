@@ -23,6 +23,7 @@ export default function LoginPage() {
   return (
     <main
       className="
+        login-theme-transition
         relative flex min-h-screen w-full items-center justify-center
         overflow-hidden
       "

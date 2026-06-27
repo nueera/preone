@@ -25,7 +25,7 @@ export function LoginHeadline() {
           "
           style={{
             background:
-              'linear-gradient(135deg, #7B2CBF 0%, #3A86FF 100%)',
+              'linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%)',
           }}
         >
           <span className="text-xl font-bold text-white">O</span>

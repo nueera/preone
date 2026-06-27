@@ -4,6 +4,11 @@
 // PreOne — Login Theme Toggle
 // Animated sun ↔ moon crossfade (280ms) using next-themes.
 // Place in the top-right corner of the login page.
+//
+// Theme-aware colors:
+//   - Sun icon  uses --login-link  (indigo in light, violet in dark)
+//   - Moon icon uses white (always visible on dark wallpaper)
+//   - Button hover/focus uses --login-focus token
 // ============================================================
 
 import { useEffect, useState } from 'react';
@@ -30,10 +35,11 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label="Toggle theme"
       className="
+        login-theme-transition
         relative inline-flex h-10 w-10 items-center justify-center rounded-full
-        text-foreground/80 hover:bg-foreground/10
+        text-login-text hover:bg-login-input
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-        focus-visible:ring-[#7B2CBF] dark:focus-visible:ring-[#7B2CBF]
+        focus-visible:ring-login-focus
         focus-visible:ring-offset-transparent
         transition-colors
       "
@@ -59,7 +65,7 @@ export function ThemeToggle() {
             transition={{ duration: 0.28, ease: 'easeOut' }}
             className="inline-flex"
           >
-            <Sun className="h-5 w-5 text-amber-500" />
+            <Sun className="h-5 w-5 text-login-link" />
           </motion.span>
         )}
       </AnimatePresence>
