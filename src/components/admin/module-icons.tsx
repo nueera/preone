@@ -3,14 +3,14 @@
 //
 // Maps each module key to:
 //   - asset: path under /public for the custom illustrated icon
-//   - fallback: lucide-react icon shown when the asset is missing
+//   - fallback: lucide-react icon shown when no custom asset exists
 //
-// User will drop custom SVGs into public/icons/admin/<key>.svg.
-// Recommended: 96×96 SVG, transparent bg, 1–2 colors, playful
-// preschool aesthetic.
+// Modules with custom webp icons render <Image> directly.
+// Modules without custom assets fall back to lucide-react icons.
 //
-// Until custom assets are available, the fallback lucide icon is
-// rendered at the requested size in --admin-primary (#6366F1).
+// Custom icons: 96×96+ webp, transparent bg, playful preschool aesthetic.
+// Drop new icons into public/icons/admin/<key>.webp and add to the
+// CUSTOM_ICON_KEYS set to activate.
 // ============================================================
 
 import Image from 'next/image';
@@ -39,23 +39,37 @@ type ModuleIconConfig = {
   fallback: LucideIcon;
 };
 
+/** Modules that have a custom webp icon in public/icons/admin/ */
+const CUSTOM_ICON_KEYS = new Set([
+  'dashboard',
+  'students',
+  'parents',
+  'teachers',
+  'operations',
+  'fees',
+  'reports',
+  'settings',
+  'growth-passport',
+  'attendance',
+]);
+
 export const MODULE_ICONS: Record<string, ModuleIconConfig> = {
-  dashboard:          { asset: '/icons/admin/dashboard.svg',        fallback: LayoutDashboard },
-  setup:              { asset: '/icons/admin/setup.svg',            fallback: Settings2 },
-  admission:          { asset: '/icons/admin/admission.svg',        fallback: ClipboardCheck },
-  students:           { asset: '/icons/admin/students.svg',         fallback: Users },
-  parents:            { asset: '/icons/admin/parents.svg',          fallback: UsersRound },
-  teachers:           { asset: '/icons/admin/teachers.svg',         fallback: GraduationCap },
-  classes:            { asset: '/icons/admin/classes.svg',          fallback: Backpack },
-  operations:         { asset: '/icons/admin/operations.svg',       fallback: Cog },
-  fees:               { asset: '/icons/admin/fees.svg',             fallback: Wallet },
-  communication:      { asset: '/icons/admin/communication.svg',    fallback: Mail },
-  reports:            { asset: '/icons/admin/reports.svg',          fallback: BarChart3 },
-  'ai-center':        { asset: '/icons/admin/ai-center.svg',       fallback: Bot },
-  settings:           { asset: '/icons/admin/settings.svg',         fallback: Settings },
-  'growth-passport':  { asset: '/icons/admin/growth-passport.svg',  fallback: Sparkles },
-  attendance:         { asset: '/icons/admin/attendance.svg',       fallback: CalendarCheck },
-  'daily-milestones': { asset: '/icons/admin/daily-milestones.svg', fallback: Castle },
+  dashboard:          { asset: '/icons/admin/dashboard.webp',        fallback: LayoutDashboard },
+  setup:              { asset: '/icons/admin/setup.webp',            fallback: Settings2 },
+  admission:          { asset: '/icons/admin/admission.webp',        fallback: ClipboardCheck },
+  students:           { asset: '/icons/admin/students.webp',         fallback: Users },
+  parents:            { asset: '/icons/admin/parents.webp',          fallback: UsersRound },
+  teachers:           { asset: '/icons/admin/teachers.webp',         fallback: GraduationCap },
+  classes:            { asset: '/icons/admin/classes.webp',          fallback: Backpack },
+  operations:         { asset: '/icons/admin/operations.webp',       fallback: Cog },
+  fees:               { asset: '/icons/admin/fees.webp',             fallback: Wallet },
+  communication:      { asset: '/icons/admin/communication.webp',    fallback: Mail },
+  reports:            { asset: '/icons/admin/reports.webp',          fallback: BarChart3 },
+  'ai-center':        { asset: '/icons/admin/ai-center.webp',       fallback: Bot },
+  settings:           { asset: '/icons/admin/settings.webp',         fallback: Settings },
+  'growth-passport':  { asset: '/icons/admin/growth-passport.webp',  fallback: Sparkles },
+  attendance:         { asset: '/icons/admin/attendance.webp',       fallback: CalendarCheck },
+  'daily-milestones': { asset: '/icons/admin/daily-milestones.webp', fallback: Castle },
 };
 
 interface ModuleIconProps {
@@ -65,19 +79,28 @@ interface ModuleIconProps {
 }
 
 /**
- * Renders a module icon. Tries the custom SVG asset first; falls back
- * to a lucide icon if the asset hasn't been provided yet.
- *
- * Since we can't reliably detect a missing static asset at render time
- * without an extra network request, we render the lucide fallback by
- * default. Once the user drops SVGs into public/icons/admin/, they can
- * switch this component to prefer the <Image> variant.
+ * Renders a module icon. Modules with custom webp assets render
+ * a Next.js <Image>; others fall back to a lucide-react icon.
  */
 export function ModuleIcon({ iconKey, size = 48, className = '' }: ModuleIconProps) {
   const cfg = MODULE_ICONS[iconKey];
   if (!cfg) return null;
 
-  // ── Use lucide fallback until custom assets are available ──
+  // ── Custom webp icon available ──
+  if (CUSTOM_ICON_KEYS.has(iconKey)) {
+    return (
+      <Image
+        src={cfg.asset}
+        alt=""
+        width={size}
+        height={size}
+        className={`object-contain ${className}`}
+        priority={false}
+      />
+    );
+  }
+
+  // ── Lucide fallback for modules without custom icons ──
   const FallbackIcon = cfg.fallback;
   return (
     <FallbackIcon
@@ -86,15 +109,4 @@ export function ModuleIcon({ iconKey, size = 48, className = '' }: ModuleIconPro
       strokeWidth={1.5}
     />
   );
-
-  // ── Uncomment once custom assets are in place ──
-  // return (
-  //   <Image
-  //     src={cfg.asset}
-  //     alt=""
-  //     width={size}
-  //     height={size}
-  //     className={`object-contain ${className}`}
-  //   />
-  // );
 }
