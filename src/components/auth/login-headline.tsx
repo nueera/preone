@@ -1,8 +1,10 @@
 'use client';
 
+import Image from 'next/image';
+
 // ============================================================
 // PreOne — Login Headline (Left overlay)
-// Floating headline + subheadline + logo row that sits on top
+// Floating logo + headline + subheadline that sits on top
 // of the full-bleed wallpaper (lg+ only). On smaller screens it
 // is hidden — the wallpaper still shows through the glass card.
 // ============================================================
@@ -16,26 +18,16 @@ export function LoginHeadline() {
       "
       aria-hidden="true"
     >
-      {/* Logo row */}
-      <div className="mb-8 flex items-center gap-3">
-        <div
-          className="
-            flex h-12 w-12 items-center justify-center rounded-full
-            shadow-lg
-          "
-          style={{
-            background:
-              'linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%)',
-          }}
-        >
-          <span className="text-xl font-bold text-white">O</span>
-        </div>
-        <span
-          className="text-[28px] font-bold tracking-tight text-white"
-          style={{ letterSpacing: '-0.01em' }}
-        >
-          PreOne
-        </span>
+      {/* Logo */}
+      <div className="mb-8">
+        <Image
+          src="/preonelogo.png"
+          alt="PreOne logo"
+          width={96}
+          height={96}
+          priority
+          className="h-[96px] w-[96px] object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+        />
       </div>
 
       {/* Headline */}
