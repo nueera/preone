@@ -1,20 +1,24 @@
 'use client';
 
 // ============================================================
-// PreOne — Login Wallpaper (Left Panel, 60%)
-// Renders the supplied PreOne space illustration as a full-bleed
-// background with a subtle dark gradient overlay for text legibility.
+// PreOne — Login Wallpaper (Full-bleed background)
+// Renders the supplied PreOne space illustration as a FIXED
+// full-viewport background so it shows through the translucent
+// login card on the right AND the headline overlay on the left.
+//
+// Why full-bleed instead of left-panel-only:
+//   - Source wallpapers are 1536×1024 (3:2). Constrained to a
+//     60%-wide panel, object-cover crops the right side (where
+//     the rocket + blue planet live). Spanning the full viewport
+//     keeps the entire scene visible.
+//   - A transparent glass card needs the wallpaper behind it,
+//     not just on the left side.
 //
 // Asset slot:
 //   Replace `public/login-wallpaper-dark.png` and
 //   `public/login-wallpaper-light.png` with the supplied PreOne
 //   space illustrations. The component picks the right one based
 //   on the resolved theme (next-themes).
-//
-// Prop API:
-//   - <LoginWallpaper />                                   → default per-theme asset
-//   - <LoginWallpaper wallpaperSrc="/custom.svg" />        → single asset in both themes (spec §6)
-//   - <LoginWallpaper wallpaperSrc={{ dark, light }} />    → per-theme override
 // ============================================================
 
 import { useEffect, useState } from 'react';
@@ -60,75 +64,30 @@ export function LoginWallpaper({ wallpaperSrc }: LoginWallpaperProps) {
   const src = resolveSrc();
 
   return (
-    <aside
-      className="
-        relative hidden lg:flex lg:w-[60%] xl:w-[60%]
-        flex-col justify-center
-        overflow-hidden
-      "
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       aria-hidden="true"
     >
-      {/* Full-bleed wallpaper */}
+      {/* Full-bleed wallpaper — covers the entire viewport so it shows
+          through the translucent login card on the right and the
+          headline overlay on the left. object-cover keeps the focal
+          point (children on left) visible with minimal cropping. */}
       <Image
         src={src}
         alt=""
         fill
         className="object-cover"
         priority
-        sizes="(min-width: 1024px) 60vw, 0px"
+        sizes="100vw"
       />
 
-      {/* Subtle dark gradient overlay for text legibility */}
+      {/* Theme-aware overlay for text legibility —
+          dark: stronger purple-black gradient on top of dark wallpaper
+          light: softer white-purple wash so light wallpaper stays airy */}
       <div
         className="absolute inset-0 login-wallpaper-overlay"
         aria-hidden="true"
       />
-
-      {/* Centered content — logo row, headline, subheadline */}
-      <div className="relative z-10 flex flex-col justify-center px-16">
-        {/* Logo row */}
-        <div className="mb-8 flex items-center gap-3">
-          <div
-            className="
-              flex h-12 w-12 items-center justify-center rounded-full
-              shadow-lg
-            "
-            style={{
-              background:
-                'linear-gradient(135deg, #7B2CBF 0%, #3A86FF 100%)',
-            }}
-          >
-            <span className="text-xl font-bold text-white">O</span>
-          </div>
-          <span
-            className="text-[28px] font-bold tracking-tight text-white"
-            style={{ letterSpacing: '-0.01em' }}
-          >
-            PreOne
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1
-          className="
-            max-w-[480px] text-white
-            text-[36px] leading-[1.15] font-bold
-          "
-          style={{ letterSpacing: '-0.02em' }}
-        >
-          Welcome to the PreOne Universe
-        </h1>
-
-        {/* Subheadline */}
-        <p
-          className="
-            mt-6 max-w-[460px] text-[18px] leading-[1.6] font-normal
-          "
-          style={{ color: 'rgba(255, 255, 255, 0.8)' }}
-        >
-          Where every child begins their learning journey among the stars.
-        </p>
-      </div>
-    </aside>
+    </div>
   );
 }

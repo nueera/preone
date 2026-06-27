@@ -394,7 +394,7 @@ export function LoginCard() {
         w-[440px] max-w-full
         rounded-[20px]
         p-10 sm:p-8
-        login-card-solid dark:login-card-glass
+        login-card-glass
       "
       role="form"
       aria-label="PreOne login form"
@@ -444,8 +444,8 @@ export function LoginCard() {
         aria-label="Login method"
         className="
           mt-6 flex h-10 w-full items-center gap-1 rounded-[10px]
-          bg-[#F3F4F6] p-1
-          dark:bg-white/[0.04]
+          bg-white/50 p-1
+          dark:bg-white/[0.05]
         "
       >
         {(['email', 'otp'] as const).map((t) => {
@@ -506,8 +506,8 @@ export function LoginCard() {
             className={`
               login-input-focus flex h-11 items-center gap-2.5 rounded-[8px] border
               px-3.5 transition-all
-              bg-white border-[#E5E7EB]
-              dark:bg-[#2A2A3A] dark:border-[#3A3A4A]
+              bg-white/70 border-[#E5E7EB]
+              dark:bg-[#2A2A3A]/55 dark:border-[#3A3A4A]
               ${errors.email ? '!border-[#EF4444]' : ''}
             `}
           >
@@ -560,8 +560,8 @@ export function LoginCard() {
               className={`
                 login-input-focus flex h-11 items-center gap-2.5 rounded-[8px] border
                 px-3.5 transition-all
-                bg-white border-[#E5E7EB]
-                dark:bg-[#2A2A3A] dark:border-[#3A3A4A]
+                bg-white/70 border-[#E5E7EB]
+                dark:bg-[#2A2A3A]/55 dark:border-[#3A3A4A]
                 ${errors.password ? '!border-[#EF4444]' : ''}
               `}
             >
@@ -672,12 +672,12 @@ export function LoginCard() {
                   disabled={isLoading || !otpSent}
                   aria-label={`OTP digit ${i + 1}`}
                   className={`
-                    h-11 w-11 rounded-[8px] border bg-transparent text-center
+                    h-11 w-11 rounded-[8px] border text-center
                     font-mono text-[16px] font-medium
                     text-[#1F2937] dark:text-white
                     transition-all
-                    bg-white border-[#E5E7EB]
-                    dark:bg-[#2A2A3A] dark:border-[#3A3A4A]
+                    bg-white/70 border-[#E5E7EB]
+                    dark:bg-[#2A2A3A]/55 dark:border-[#3A3A4A]
                     focus:border-[#6366F1] focus:outline-none
                     focus:ring-[3px] focus:ring-[#6366F1]/18
                     dark:focus:border-[#7B2CBF]
