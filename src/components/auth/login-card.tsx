@@ -393,17 +393,19 @@ export function LoginCard() {
     <div
       className="
         login-theme-transition
-        w-[440px] max-w-full
-        rounded-[20px]
-        p-10 sm:p-8
         login-card-glass
+        w-full max-w-[440px]
+        rounded-2xl md:rounded-[20px]
+        p-5 md:p-8 md:px-10
       "
       role="form"
       aria-label="PreOne login form"
     >
       {/* ── 3.1 Logo + Welcome ── */}
+      {/* Mobile: skip the in-card logo (brand area already shows it).
+          Desktop (md+): show the logo + welcome heading. */}
       <div className="text-center">
-        <div className="flex items-center justify-center">
+        <div className="hidden md:flex md:items-center md:justify-center">
           <Image
             src="/preonelogo.png"
             alt="PreOne logo"
@@ -416,7 +418,8 @@ export function LoginCard() {
 
         <h2
           className="
-            mt-4 text-[24px] leading-[1.2] font-bold
+            mt-0 md:mt-4
+            text-[22px] md:text-[24px] leading-[1.2] font-bold
             text-login-text
           "
         >
@@ -424,7 +427,7 @@ export function LoginCard() {
         </h2>
         <p
           className="
-            mt-1 text-[14px] leading-[1.5] font-normal
+            mt-1 text-[13px] md:text-[14px] leading-[1.5] font-normal
             text-login-muted
           "
         >
@@ -437,7 +440,7 @@ export function LoginCard() {
         role="tablist"
         aria-label="Login method"
         className="
-          mt-6 flex h-10 w-full items-center gap-1 rounded-[10px]
+          mt-5 md:mt-6 flex h-10 w-full items-center gap-1 rounded-[10px]
           bg-login-tab-bg p-1
         "
       >
@@ -474,7 +477,7 @@ export function LoginCard() {
                   ${isActive ? 'text-white' : ''}
                 `}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-3.5 w-3.5" />
                 {label}
               </span>
             </button>
@@ -483,13 +486,13 @@ export function LoginCard() {
       </div>
 
       {/* ── 3.3 Form ── */}
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="mt-5 space-y-3.5 md:mt-6 md:space-y-4" noValidate>
         {/* Email / Username */}
         <div>
           <label
             htmlFor="login-email"
             className="
-              mb-1.5 block text-[14px] font-medium
+              mb-1.5 block text-[13px] md:text-[14px] font-medium
               text-login-label
             "
           >
@@ -497,14 +500,15 @@ export function LoginCard() {
           </label>
           <div
             className={`
-              login-input-focus flex h-11 items-center gap-2.5 rounded-[8px] border
+              login-input-focus flex h-11 md:h-11 items-center gap-2.5
+              rounded-xl md:rounded-[8px] border
               px-3.5 transition-all
               bg-login-input border-login-input-border
               ${errors.email ? '!border-login-error' : ''}
             `}
           >
             <Mail
-              className="h-4 w-4 shrink-0 text-login-icon"
+              className="h-[18px] w-[18px] shrink-0 text-login-icon"
               aria-hidden="true"
             />
             <input
@@ -541,7 +545,7 @@ export function LoginCard() {
             <label
               htmlFor="login-password"
               className="
-                mb-1.5 block text-[14px] font-medium
+                mb-1.5 block text-[13px] md:text-[14px] font-medium
                 text-login-label
               "
             >
@@ -549,14 +553,15 @@ export function LoginCard() {
             </label>
             <div
               className={`
-                login-input-focus flex h-11 items-center gap-2.5 rounded-[8px] border
+                login-input-focus flex h-11 md:h-11 items-center gap-2.5
+                rounded-xl md:rounded-[8px] border
                 px-3.5 transition-all
                 bg-login-input border-login-input-border
                 ${errors.password ? '!border-login-error' : ''}
               `}
             >
               <Lock
-                className="h-4 w-4 shrink-0 text-login-icon-muted"
+                className="h-[18px] w-[18px] shrink-0 text-login-icon-muted"
                 aria-hidden="true"
               />
               <input
@@ -591,7 +596,7 @@ export function LoginCard() {
                   focus-visible:ring-login-focus focus-visible:rounded
                 "
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
               </button>
             </div>
             {errors.password && (
@@ -604,7 +609,7 @@ export function LoginCard() {
             <div className="mb-1.5 flex items-center justify-between">
               <label
                 className="
-                  block text-[14px] font-medium
+                  block text-[13px] md:text-[14px] font-medium
                   text-login-label
                 "
               >
@@ -652,6 +657,7 @@ export function LoginCard() {
                   }}
                   type="text"
                   inputMode="numeric"
+                  autoComplete="one-time-code"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(i, e)}
@@ -659,7 +665,7 @@ export function LoginCard() {
                   disabled={isLoading || !otpSent}
                   aria-label={`OTP digit ${i + 1}`}
                   className={`
-                    h-11 w-11 rounded-[8px] border text-center
+                    h-11 w-11 rounded-xl md:rounded-[8px] border text-center
                     font-mono text-[16px] font-medium
                     text-login-text
                     transition-all
@@ -727,7 +733,7 @@ export function LoginCard() {
               </span>
               <span
                 className="
-                  text-[13px]
+                  text-[12px] md:text-[13px]
                   text-login-label
                 "
               >
@@ -737,10 +743,11 @@ export function LoginCard() {
             <Link
               href="/forgot-password"
               className="
-                text-[13px] font-medium
+                text-[12px] md:text-[13px] font-medium
                 text-login-link hover:underline
                 focus-visible:outline-none focus-visible:ring-2
                 focus-visible:ring-login-focus focus-visible:rounded
+                py-1.5
               "
             >
               Forgot Password?
@@ -756,8 +763,10 @@ export function LoginCard() {
             (tab === 'otp' && (!otpSent || !otpComplete))
           }
           className="
-            btn-launch mt-5 flex h-12 w-full items-center justify-center gap-2
-            text-[16px] text-white
+            btn-launch mt-4 md:mt-5 flex h-[52px] md:h-12 w-full
+            items-center justify-center gap-2
+            rounded-xl md:rounded-[8px]
+            text-[16px] text-white font-bold
             focus-visible:outline-none focus-visible:ring-2
             focus-visible:ring-login-focus focus-visible:ring-offset-2
             focus-visible:ring-offset-transparent
@@ -778,11 +787,11 @@ export function LoginCard() {
       </form>
 
       {/* ── 3.5 Divider ── */}
-      <div className="mt-5 flex items-center gap-3">
+      <div className="mt-4 md:mt-5 flex items-center gap-3">
         <div className="h-px flex-1 bg-login-divider" />
         <span
           className="
-            text-[12px] uppercase tracking-[0.06em]
+            text-[11px] md:text-[12px] uppercase tracking-[0.06em]
             text-login-subtle
           "
         >
@@ -791,16 +800,19 @@ export function LoginCard() {
         <div className="h-px flex-1 bg-login-divider" />
       </div>
 
-      {/* ── 3.6 Demo accounts — 2×2 grid ── */}
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      {/* ── 3.6 Demo accounts — 2×2 grid (kept on mobile) ── */}
+      <div className="mt-3.5 md:mt-4 grid grid-cols-2 gap-2">
         {DEMO_ACCOUNTS.map(({ role, email: demoEmail, bg, Icon }) => (
           <button
             key={role}
             type="button"
             onClick={() => handleDemoClick({ role, email: demoEmail, password: 'demo123', bg, Icon })}
             disabled={isLoading}
+            title={`Sign in as ${role} — ${demoEmail}`}
             className="
-              flex h-14 items-center gap-3 rounded-[8px] p-3 text-left
+              login-demo-cell
+              flex h-14 items-center gap-2.5 rounded-xl md:rounded-[8px]
+              p-2.5 md:p-3 text-left
               transition-[filter] duration-150
               hover:brightness-110
               focus-visible:outline-none focus-visible:ring-2
@@ -817,15 +829,15 @@ export function LoginCard() {
                 bg-white/15
               "
             >
-              <Icon className="h-[18px] w-[18px] text-white" />
+              <Icon className="h-4 w-4 md:h-[18px] md:w-[18px] text-white" />
             </span>
             <span className="flex min-w-0 flex-col">
-              <span className="text-[13px] font-bold leading-tight text-white">
+              <span className="text-[12px] md:text-[13px] font-bold leading-tight text-white">
                 {role}
               </span>
               <span
                 className="
-                  truncate font-mono text-[11px] font-normal leading-tight
+                  truncate font-mono text-[10px] md:text-[11px] font-normal leading-tight
                   text-white/80
                 "
               >
@@ -836,15 +848,15 @@ export function LoginCard() {
         ))}
       </div>
 
-      {/* ── 3.7 Footer — secure login ── */}
+      {/* ── 3.7 Footer — secure login (inside card on mobile) ── */}
       <div
         className="
-          mt-6 flex items-center justify-center gap-1.5 text-center
-          text-[12px]
+          mt-5 md:mt-6 flex items-center justify-center gap-1.5 text-center
+          text-[11px] md:text-[12px]
           text-login-muted
         "
       >
-        <ShieldCheck className="h-3.5 w-3.5 text-login-link" />
+        <ShieldCheck className="h-3 w-3 md:h-3.5 md:w-3.5 shrink-0 text-login-link" />
         <span>Secure Login • Your data is protected with enterprise-grade security</span>
       </div>
     </div>
