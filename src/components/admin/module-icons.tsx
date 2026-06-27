@@ -55,6 +55,7 @@ const CUSTOM_ICON_KEYS = new Set([
   'settings',
   'growth-passport',
   'attendance',
+  'ai-center',
 ]);
 
 export const MODULE_ICONS: Record<string, ModuleIconConfig> = {
