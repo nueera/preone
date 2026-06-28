@@ -1,11 +1,24 @@
 'use client';
 
+// ============================================================
+// PreOne — Onboarding Entry Page (/admin/onboarding)
+//
+// Landing page for the onboarding wizard.
+// Fetches onboarding status, initializes Zustand store,
+// starts auto-save, and redirects to dashboard if complete.
+//
+// Color rules:
+//   ALL colors use var(--admin-*) CSS variables — no hardcoded
+//   hex or Tailwind color classes in JSX.
+// ============================================================
+
 import { useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { WizardShell } from '@/components/onboarding/wizard-shell';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { motion } from 'framer-motion';
+import { School, ArrowRight } from 'lucide-react';
 
 /** Get auth headers for API calls */
 function getAuthHeaders(): Record<string, string> {
@@ -15,17 +28,6 @@ function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
-/**
- * Onboarding Entry Page
- *
- * This is the main entry point for the onboarding wizard.
- * It:
- * 1. Fetches onboarding status from the API on mount
- * 2. Initializes the Zustand store with the draft data
- * 3. Starts an auto-save interval (every 30s)
- * 4. Redirects to dashboard if onboarding is already complete
- * 5. Renders the WizardShell with step 1 content
- */
 export default function OnboardingPage() {
   const router = useRouter();
   const autoSaveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -55,13 +57,11 @@ export default function OnboardingPage() {
         const data = await res.json();
 
         if (data.onboardingComplete) {
-          // Onboarding already done — redirect to dashboard
           localStorage.setItem('preone_onboarding_complete', 'true');
           router.replace('/admin/dashboard');
           return;
         }
 
-        // Initialize store with fetched data
         initialize({
           ...data.draft,
           currentStep: data.currentStep ?? 1,
@@ -69,14 +69,12 @@ export default function OnboardingPage() {
           onboardingComplete: data.onboardingComplete ?? false,
         });
 
-        // Navigate to the current step
         const step = data.currentStep ?? 1;
         if (step > 1) {
           router.replace(`/admin/onboarding/step/${step}`);
         }
       } catch (error) {
         console.error('Failed to load onboarding status:', error);
-        // Initialize with defaults so the wizard still works
         initialize({});
       }
     };
@@ -107,7 +105,6 @@ export default function OnboardingPage() {
   }, [draft, isDirty, isSaving, setSaving, markSaved]);
 
   useEffect(() => {
-    // Only start auto-save after initial load
     if (isLoading) return;
 
     autoSaveRef.current = setInterval(saveDraft, 30000);
@@ -157,21 +154,37 @@ export default function OnboardingPage() {
   // ── Loading state ──
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--admin-bg)' }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--preone-primary)] to-[var(--preone-primary-light)] flex items-center justify-center text-white font-bold text-2xl shadow-lg mx-auto mb-4">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-sm font-bold shadow-lg mx-auto mb-4"
+            style={{
+              background: 'var(--admin-primary)',
+              color: 'var(--admin-primary-foreground, #FFFFFF)',
+            }}
+          >
             P
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
+          <h2
+            className="text-lg font-semibold mb-2"
+            style={{ color: 'var(--admin-text)' }}
+          >
             Loading your setup wizard...
           </h2>
-          <div className="w-48 h-1.5 rounded-full bg-[var(--bg-tertiary)] mx-auto overflow-hidden">
+          <div
+            className="w-48 h-1.5 rounded-full mx-auto overflow-hidden"
+            style={{ background: 'var(--admin-surface-2)' }}
+          >
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)]"
+              className="h-full rounded-full"
+              style={{ background: 'var(--admin-primary)' }}
               initial={{ width: '0%' }}
               animate={{ width: '60%' }}
               transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
@@ -182,7 +195,7 @@ export default function OnboardingPage() {
     );
   }
 
-  // ── Render WizardShell with Step 1 (School Profile) placeholder ──
+  // ── Render WizardShell with Welcome content ──
   return (
     <WizardShell
       currentStep={draft.currentStep}
@@ -201,11 +214,27 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="text-5xl mb-4 block">🏫</span>
-              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 font-[var(--font-primary)]">
+              {/* Icon */}
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{ background: 'var(--admin-primary-soft)' }}
+              >
+                <School
+                  className="h-8 w-8"
+                  style={{ color: 'var(--admin-primary)' }}
+                />
+              </div>
+
+              <h2
+                className="text-2xl font-bold mb-2"
+                style={{ color: 'var(--admin-text)' }}
+              >
                 Welcome to PreOne!
               </h2>
-              <p className="text-[var(--text-secondary)] max-w-md mx-auto mb-6">
+              <p
+                className="max-w-md mx-auto mb-6"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
                 Let&apos;s set up your school in a few simple steps. We&apos;ll walk you
                 through everything you need to get started.
               </p>
@@ -214,9 +243,14 @@ export default function OnboardingPage() {
                   setCurrentStep(1);
                   router.push('/admin/onboarding/step/1');
                 }}
-                className="px-8 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)] hover:shadow-lg hover:shadow-[var(--preone-primary)]/25 transition-all duration-200 min-h-[44px]"
+                className="px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-200 min-h-[44px] inline-flex items-center gap-2"
+                style={{
+                  background: 'var(--admin-primary)',
+                  color: 'var(--admin-primary-foreground, #FFFFFF)',
+                }}
               >
-                Let&apos;s Begin →
+                Let&apos;s Begin
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </motion.div>
           </div>
