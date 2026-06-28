@@ -6,20 +6,14 @@
 //
 //   variant="compact" (desktop, md+):
 //     Single 40×40 icon button, ghost style.
-//     Animated sun ↔ moon crossfade (280ms).
+//     Animated sun ↔ moon crossfade (spring physics).
 //
 //   variant="labeled" (mobile, < md):
-//     Pill 36px tall (32px on < sm), 4px padding, two labelled
-//     buttons — "Light" (sun) and "Dark" (moon). Active button
-//     gets the brand gradient + white text; inactive is transparent
-//     with #B0B0B0 text. Both buttons always rendered (no
-//     crossfade) so the user sees both options at once.
+//     Pill 36px tall, two labelled buttons — "Light" / "Dark".
+//     Active button gets the brand gradient + white text.
 //
-// Switching between variants is done by the PARENT via Tailwind
-// responsive classes (hidden md:flex / flex md:hidden) — render
-// BOTH variants in the layout and let CSS pick the visible one.
-// This avoids a JS-driven breakpoint listener and keeps SSR/CSR
-// markup stable.
+// Transitions use global --transition-* tokens so timing
+// changes reflect across all modules.
 // ============================================================
 
 import { useEffect, useState } from 'react';
@@ -52,6 +46,7 @@ export function ThemeToggle({ variant = 'compact', className = '' }: ThemeToggle
 
 // ============================================================
 // Compact variant — desktop icon button (40×40)
+// Spring physics for premium icon swap
 // ============================================================
 function CompactToggle({ isDark, onToggle, className }: { isDark: boolean; onToggle: () => void; className: string }) {
   return (
@@ -73,10 +68,10 @@ function CompactToggle({ isDark, onToggle, className }: { isDark: boolean; onTog
         {isDark ? (
           <motion.span
             key="moon"
-            initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
+            initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={{ opacity: 0, rotate: 90, scale: 0.8 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
+            exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25, mass: 0.6 }}
             className="inline-flex"
           >
             <Moon className="h-5 w-5 text-white" />
@@ -84,10 +79,10 @@ function CompactToggle({ isDark, onToggle, className }: { isDark: boolean; onTog
         ) : (
           <motion.span
             key="sun"
-            initial={{ opacity: 0, rotate: 90, scale: 0.8 }}
+            initial={{ opacity: 0, rotate: 90, scale: 0.6 }}
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={{ opacity: 0, rotate: -90, scale: 0.8 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
+            exit={{ opacity: 0, rotate: -90, scale: 0.6 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25, mass: 0.6 }}
             className="inline-flex"
           >
             <Sun className="h-5 w-5 text-login-link" />
@@ -100,12 +95,8 @@ function CompactToggle({ isDark, onToggle, className }: { isDark: boolean; onTog
 
 // ============================================================
 // Labeled variant — mobile pill with two labelled buttons
-// Pill: 36px tall on sm+, 32px tall on < sm (per spec §6)
-// Each button: 28px tall (sm+), padding 0 12px, icon 14px + label 12px
 // ============================================================
 function LabeledToggle({ isDark, onToggle, className }: { isDark: boolean; onToggle: () => void; className: string }) {
-  // Buttons render the active state explicitly (no crossfade) so both
-  // options remain visible — required by spec §4.
   return (
     <div
       role="group"
@@ -113,7 +104,6 @@ function LabeledToggle({ isDark, onToggle, className }: { isDark: boolean; onTog
       className={`
         login-toggle-pill login-theme-transition
         inline-flex h-9 items-center gap-0.5 rounded-full p-1
-        sm:h-9
         ${className}
       `}
     >

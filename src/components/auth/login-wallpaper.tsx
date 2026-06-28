@@ -7,24 +7,13 @@
 // full-viewport background. The asset resolves per-theme:
 //
 //   - Desktop (≥ md): public/login-wallpaper-{dark,light}.png
-//     (1536×1024, 3:2 — split-screen layout, wider scene)
 //   - Mobile  (< md): public/login-wallpaper-mobile-{dark,light}.png
-//     (853×1844, tall portrait — vertical stack layout)
 //
 // Both variants fill the entire viewport via next/image fill +
 // object-cover. The <picture>-style switching is done with two
-// stacked <Image> elements, one visible per breakpoint, so we
-// don't need a JS resize listener and SSR/CSR markup stays
-// stable. next/image priority is set on both (only one is
-// actually fetched, depending on viewport).
+// stacked <Image> elements, one visible per breakpoint.
 //
-// Overlay gradients:
-//   - Desktop overlay (.login-wallpaper-overlay): 135deg diagonal
-//     wash tuned for the left/right split-screen composition.
-//   - Mobile overlay  (.login-wallpaper-overlay-mobile): 180deg
-//     vertical vignette — darker top & bottom, clearer middle —
-//     so the brand wordmark and footer remain legible on phones
-//     while the form card area gets visual breathing room.
+// Uses CSS transition tokens for smooth theme crossfade.
 // ============================================================
 
 import { useEffect, useState } from 'react';
@@ -89,6 +78,7 @@ export function LoginWallpaper({ desktop, mobile }: LoginWallpaperProps) {
         alt=""
         fill
         className="object-cover hidden md:block"
+        style={{ transition: 'opacity var(--transition-theme)' }}
         priority
         sizes="100vw"
       />
@@ -99,6 +89,7 @@ export function LoginWallpaper({ desktop, mobile }: LoginWallpaperProps) {
         alt=""
         fill
         className="object-cover md:hidden"
+        style={{ transition: 'opacity var(--transition-theme)' }}
         priority
         sizes="100vw"
       />

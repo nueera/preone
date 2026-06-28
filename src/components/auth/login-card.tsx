@@ -390,13 +390,16 @@ export function LoginCard() {
   // Render
   // ============================================================
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 24, mass: 0.8, delay: 0.1 }}
       className="
         login-theme-transition
         login-card-glass
         w-full max-w-[440px]
         rounded-2xl md:rounded-[20px]
-        p-5 md:p-8 md:px-10
+        p-4 sm:p-5 md:p-8 md:px-10
       "
       role="form"
       aria-label="PreOne login form"
@@ -412,14 +415,14 @@ export function LoginCard() {
             width={72}
             height={72}
             priority
-            className="h-[72px] w-[72px] object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+            className="h-16 w-16 md:h-[72px] md:w-[72px] object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
           />
         </div>
 
         <h2
           className="
             mt-0 md:mt-4
-            text-[22px] md:text-[24px] leading-[1.2] font-bold
+            text-[20px] sm:text-[22px] md:text-[24px] leading-[1.2] font-bold
             text-login-text
           "
         >
@@ -427,7 +430,7 @@ export function LoginCard() {
         </h2>
         <p
           className="
-            mt-1 text-[13px] md:text-[14px] leading-[1.5] font-normal
+            mt-1 text-[12px] sm:text-[13px] md:text-[14px] leading-[1.5] font-normal
             text-login-muted
           "
         >
@@ -665,7 +668,7 @@ export function LoginCard() {
                   disabled={isLoading || !otpSent}
                   aria-label={`OTP digit ${i + 1}`}
                   className={`
-                    h-11 w-11 rounded-xl md:rounded-[8px] border text-center
+                    h-10 w-10 sm:h-11 sm:w-11 rounded-xl md:rounded-[8px] border text-center
                     font-mono text-[16px] font-medium
                     text-login-text
                     transition-all
@@ -763,10 +766,10 @@ export function LoginCard() {
             (tab === 'otp' && (!otpSent || !otpComplete))
           }
           className="
-            btn-launch mt-4 md:mt-5 flex h-[52px] md:h-12 w-full
+            btn-launch mt-4 md:mt-5 flex h-11 sm:h-[52px] md:h-12 w-full
             items-center justify-center gap-2
             rounded-xl md:rounded-[8px]
-            text-[16px] text-white font-bold
+            text-[14px] sm:text-[16px] text-white font-bold
             focus-visible:outline-none focus-visible:ring-2
             focus-visible:ring-login-focus focus-visible:ring-offset-2
             focus-visible:ring-offset-transparent
@@ -811,8 +814,8 @@ export function LoginCard() {
             title={`Sign in as ${role} — ${demoEmail}`}
             className="
               login-demo-cell
-              flex h-14 items-center gap-2.5 rounded-xl md:rounded-[8px]
-              p-2.5 md:p-3 text-left
+              flex h-12 sm:h-14 items-center gap-2 sm:gap-2.5 rounded-xl md:rounded-[8px]
+              p-2 sm:p-2.5 md:p-3 text-left
               transition-[filter] duration-150
               hover:brightness-110
               focus-visible:outline-none focus-visible:ring-2
@@ -859,6 +862,6 @@ export function LoginCard() {
         <ShieldCheck className="h-3 w-3 md:h-3.5 md:w-3.5 shrink-0 text-login-link" />
         <span>Secure Login • Your data is protected with enterprise-grade security</span>
       </div>
-    </div>
+    </motion.div>
   );
 }

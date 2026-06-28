@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Clock, LogOut, Settings, User } from 'lucide-react';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 
 export function AdminTopbar() {
   const router = useRouter();
@@ -91,7 +92,7 @@ export function AdminTopbar() {
         Welcome back, Nilesh! 👋
       </span>
 
-      {/* ── Right: Time + Date + Avatar ── */}
+      {/* ── Right: Time + Date + Theme Toggle + Avatar ── */}
       <div className="flex items-center gap-3">
         {/* Time pill */}
         <span className="hidden items-center gap-1.5 sm:flex">
@@ -103,6 +104,9 @@ export function AdminTopbar() {
         <span className="hidden text-[13px] text-[var(--admin-text-muted)] md:block">
           {dateStr}
         </span>
+
+        {/* ── Global Theme Toggle ── */}
+        <GlobalThemeToggle variant="pill" />
 
         {/* Avatar + dropdown */}
         <div className="relative">
