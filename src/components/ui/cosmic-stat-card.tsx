@@ -76,7 +76,7 @@ export function CosmicStatCard({
         )}
       />
 
-      {/* Icon / Illustration area — always visible, responsive sizing */}
+      {/* Icon / Illustration area */}
       <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div />
         {imageSrc ? (
@@ -102,14 +102,15 @@ export function CosmicStatCard({
               {icon}
             </span>
           </div>
-        </div>
+        )}
+      </div>
 
-      {/* Value — responsive typography */}
+      {/* Value */}
       <div className="text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">
         {displayOverride ?? displayText}
       </div>
 
-      {/* Label + Trend — responsive */}
+      {/* Label + Trend */}
       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:mt-2">
         <span className="text-xs text-[var(--text-secondary)] sm:text-sm">{label}</span>
         {trend && (
@@ -133,11 +134,11 @@ export function CosmicStatCard({
               {trend.positive ? '+' : ''}{trend.value}%
             </span>
             <span className="text-[10px] sm:text-[11px] text-[var(--text-tertiary)]">vs last month</span>
-          </div>
+          </span>
         )}
       </div>
 
-      {/* Planet decoration — scales down on mobile */}
+      {/* Planet decoration */}
       <div
         className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full opacity-[0.05] sm:-bottom-6 sm:-right-6 sm:h-24 sm:w-24"
         style={{
