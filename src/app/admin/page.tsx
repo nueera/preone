@@ -1,26 +1,28 @@
 'use client';
 
 // ============================================================
-// PreOne — Admin Dashboard (/admin)
+// PreOne — Admin Module Grid (/admin)
 //
-// Pure module grid — 16 cards in a responsive 2/3/4-column grid.
-// No KPIs, no charts, no "recent activity". Just the module grid.
+// Landing page after login — 16 module cards in a responsive
+// 2/3/4-column grid. Clicking "Dashboard" card navigates to
+// /admin/dashboard (the KPI + charts page).
 //
-// Page header: H1 "Dashboard" + subtitle + Refresh ghost button.
+// This is NOT the dashboard — it's the module launcher.
+// The real dashboard lives at /admin/dashboard/page.tsx.
 // ============================================================
 
 import { RefreshCw } from 'lucide-react';
 import { MODULES } from '@/components/admin/modules';
 import { ModuleCard } from '@/components/admin/module-card';
 
-export default function AdminDashboardPage() {
+export default function AdminModuleGridPage() {
   return (
     <div>
       {/* ── Page header ── */}
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-[20px] font-semibold text-[var(--admin-text)]">
-            Dashboard
+            Modules
           </h1>
           <p className="mt-1 text-[14px] text-[var(--admin-text-muted)]">
             Quick access to all your modules
