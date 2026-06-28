@@ -36,6 +36,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import Image from 'next/image';
 import {
   Users,
   GraduationCap,
@@ -62,12 +63,12 @@ import { motion } from 'framer-motion';
 // hardcoded style values — they're data-level chart colors.
 
 const KPI_DATA = [
-  { key: 'students', label: 'Students', value: 348, trend: 12.5, icon: Users, color: 'var(--chart-1)' },
-  { key: 'teachers', label: 'Teachers', value: 24, trend: 4.2, icon: GraduationCap, color: 'var(--admin-success)' },
-  { key: 'revenue', label: 'Revenue', value: 485000, trend: 8.3, prefix: '₹', icon: IndianRupee, color: 'var(--admin-warning)' },
-  { key: 'admissions', label: 'Admissions', value: 42, trend: 18.7, icon: ClipboardCheck, color: 'var(--admin-info)' },
-  { key: 'occupancy', label: 'Occupancy', value: 87, trend: -2.1, suffix: '%', icon: TrendingUp, color: 'var(--admin-error)' },
-  { key: 'attendance', label: 'Attendance', value: 94, trend: 1.4, suffix: '%', icon: CalendarCheck, color: 'var(--chart-2)' },
+  { key: 'students', label: 'Students', value: 348, trend: 12.5, icon: Users, color: 'var(--chart-1)', imageSrc: '/icons/admin/kpi/students.webp' },
+  { key: 'teachers', label: 'Teachers', value: 24, trend: 4.2, icon: GraduationCap, color: 'var(--admin-success)', imageSrc: '/icons/admin/kpi/teachers.webp' },
+  { key: 'revenue', label: 'Revenue', value: 485000, trend: 8.3, prefix: '₹', icon: IndianRupee, color: 'var(--admin-warning)', imageSrc: '/icons/admin/kpi/revenue.webp' },
+  { key: 'admissions', label: 'Admissions', value: 42, trend: 18.7, icon: ClipboardCheck, color: 'var(--admin-info)', imageSrc: '/icons/admin/kpi/admissions.webp' },
+  { key: 'occupancy', label: 'Occupancy', value: 87, trend: -2.1, suffix: '%', icon: TrendingUp, color: 'var(--admin-error)', imageSrc: '/icons/admin/kpi/occupancy.webp' },
+  { key: 'attendance', label: 'Attendance', value: 94, trend: 1.4, suffix: '%', icon: CalendarCheck, color: 'var(--chart-2)', imageSrc: '/icons/admin/kpi/attendance.webp' },
 ] as const;
 
 const REVENUE_DATA_THIS_YEAR = [
@@ -239,6 +240,7 @@ function CosmicStatCard({
   prefix = '',
   suffix = '',
   delay = 0,
+  imageSrc,
 }: {
   label: string;
   value: number;
@@ -248,6 +250,7 @@ function CosmicStatCard({
   prefix?: string;
   suffix?: string;
   delay?: number;
+  imageSrc?: string;
 }) {
   const animated = useAnimatedCounter(value);
 
@@ -311,8 +314,20 @@ function CosmicStatCard({
           </div>
         </div>
 
-        {/* ── Right: illustration slot (desktop only, user adds SVGs later) ── */}
-        <div className="hidden h-16 w-16 shrink-0 md:block" />
+        {/* ── Right: illustration image (or placeholder) ── */}
+        {imageSrc ? (
+          <div className="hidden h-16 w-16 shrink-0 md:block">
+            <Image
+              src={imageSrc}
+              alt={label}
+              width={64}
+              height={64}
+              className="h-16 w-16 object-contain drop-shadow-sm"
+            />
+          </div>
+        ) : (
+          <div className="hidden h-16 w-16 shrink-0 md:block" />
+        )}
       </div>
     </motion.div>
   );
@@ -786,8 +801,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── KPI grid (3×2) ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* ── KPI grid (responsive: 1→2→3→6 columns) ── */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
         {KPI_DATA.map((kpi, idx) => (
           <CosmicStatCard
             key={kpi.key}
@@ -799,6 +814,7 @@ export default function AdminDashboardPage() {
             prefix={'prefix' in kpi ? (kpi as { prefix?: string }).prefix : ''}
             suffix={'suffix' in kpi ? (kpi as { suffix?: string }).suffix : ''}
             delay={idx * 0.06}
+            imageSrc={'imageSrc' in kpi ? (kpi as { imageSrc?: string }).imageSrc : undefined}
           />
         ))}
       </div>
