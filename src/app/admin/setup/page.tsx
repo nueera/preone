@@ -62,6 +62,7 @@ interface SetupModule {
   icon: React.ElementType;
   statusIcon: React.ElementType;
   statusText: string;
+  imageSrc: string;
 }
 
 const SETUP_MODULES: SetupModule[] = [
@@ -73,6 +74,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: Building2,
     statusIcon: Building2,
     statusText: '2 Campuses',
+    imageSrc: '/icons/admin/setup/school.webp',
   },
   {
     key: 'academic-year',
@@ -82,6 +84,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: Calendar,
     statusIcon: Calendar,
     statusText: '2025-26 (Current)',
+    imageSrc: '/icons/admin/setup/academic-year.webp',
   },
   {
     key: 'group',
@@ -91,6 +94,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: Users,
     statusIcon: Users,
     statusText: '5 Groups',
+    imageSrc: '/icons/admin/setup/group.webp',
   },
   {
     key: 'classes',
@@ -100,6 +104,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: GraduationCap,
     statusIcon: GraduationCap,
     statusText: '12 Classes',
+    imageSrc: '/icons/admin/setup/classes.webp',
   },
   {
     key: 'fee-structure',
@@ -109,6 +114,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: IndianRupee,
     statusIcon: IndianRupee,
     statusText: '8 Fee Structures',
+    imageSrc: '/icons/admin/setup/fee-structure.webp',
   },
   {
     key: 'staff',
@@ -118,6 +124,7 @@ const SETUP_MODULES: SetupModule[] = [
     icon: UserCog,
     statusIcon: UserCog,
     statusText: '36 Staff Members',
+    imageSrc: '/icons/admin/setup/staff.webp',
   },
 ];
 
@@ -145,45 +152,44 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
         hover
         className="h-full"
       >
-        <div className="flex min-h-[200px] flex-col justify-between p-6">
-          {/* ── Top row: illustration + icon ── */}
-          <div className="mb-4 flex items-start justify-between">
-            {/* Left: illustration slot or icon fallback */}
-            <div className="relative h-[72px] w-[96px]">
+        <div className="flex min-h-[180px] flex-col justify-between p-5 sm:min-h-[200px] sm:p-6">
+          {/* ── Top row: illustration + icon badge ── */}
+          <div className="mb-3 flex items-start justify-between sm:mb-4">
+            {/* Left: custom illustration (responsive sizing, always visible) */}
+            <div className="relative h-14 w-20 sm:h-[72px] sm:w-[96px]">
               {hasIllustration ? (
                 <Image
-                  src={`/icons/admin/setup-${module.key}.svg`}
+                  src={module.imageSrc}
                   alt=""
-                  width={96}
-                  height={72}
+                  fill
                   className={`
-                    h-[72px] w-[96px] object-contain
+                    object-contain
                     ${reducedMotion ? '' : 'transition-transform duration-200 group-hover:scale-105'}
                   `}
                   onError={() => setHasIllustration(false)}
                 />
               ) : (
                 <div
-                  className="flex h-16 w-16 items-center justify-center rounded-xl"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl sm:h-16 sm:w-16"
                   style={{ background: 'var(--admin-primary-soft)' }}
                 >
-                  <Icon className="h-12 w-12" style={{ color: 'var(--admin-primary)' }} />
+                  <Icon className="h-8 w-8 sm:h-12 sm:w-12" style={{ color: 'var(--admin-primary)' }} />
                 </div>
               )}
             </div>
 
-            {/* Right: circular icon badge (32px) */}
+            {/* Right: circular icon badge */}
             <div
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8"
               style={{ background: 'var(--admin-primary)' }}
             >
-              <Icon className="h-4 w-4" style={{ color: 'var(--admin-primary-foreground, #FFFFFF)' }} />
+              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: 'var(--admin-primary-foreground, #FFFFFF)' }} />
             </div>
           </div>
 
           {/* ── Title ── */}
           <h3
-            className="mb-1 text-[18px] font-bold transition-colors duration-200"
+            className="mb-1 text-[16px] font-bold transition-colors duration-200 sm:text-[18px]"
             style={{ color: 'var(--admin-text)' }}
           >
             <span className="group-hover:text-[var(--admin-primary)]">
@@ -193,7 +199,7 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
 
           {/* ── Description ── */}
           <p
-            className="mb-4 line-clamp-2 text-[13px] font-normal"
+            className="mb-3 line-clamp-2 text-[12px] font-normal sm:mb-4 sm:text-[13px]"
             style={{ color: 'var(--admin-text-muted)' }}
           >
             {module.description}
@@ -201,7 +207,7 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
 
           {/* ── Footer: status badge + arrow ── */}
           <div
-            className="flex items-center justify-between pt-3"
+            className="flex items-center justify-between pt-2.5 sm:pt-3"
             style={{ borderTop: '1px solid var(--admin-border)' }}
           >
             {/* Status badge */}
@@ -210,11 +216,11 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
               aria-label={`Status: ${module.statusText}`}
             >
               <StatusIcon
-                className="h-3.5 w-3.5"
+                className="h-3 w-3 sm:h-3.5 sm:w-3.5"
                 style={{ color: 'var(--admin-primary)' }}
               />
               <span
-                className="text-[12px] font-medium"
+                className="text-[11px] font-medium sm:text-[12px]"
                 style={{ color: 'var(--admin-text-muted)' }}
               >
                 {module.statusText}
@@ -224,15 +230,17 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
             {/* Arrow button */}
             <div
               className={`
-                flex h-8 w-8 items-center justify-center rounded-full
+                flex h-7 w-7 items-center justify-center rounded-full
                 transition-all duration-200
+                sm:h-8 sm:w-8
                 group-hover:bg-[var(--admin-primary-soft)]
               `}
               style={{ background: 'var(--admin-surface-2)' }}
             >
               <ArrowRight
                 className={`
-                  h-4 w-4 transition-transform duration-200
+                  h-3.5 w-3.5 transition-transform duration-200
+                  sm:h-4 sm:w-4
                   ${reducedMotion ? '' : 'group-hover:translate-x-0.5'}
                 `}
                 style={{ color: 'var(--admin-primary)' }}

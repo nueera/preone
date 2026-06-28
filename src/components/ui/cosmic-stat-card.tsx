@@ -13,9 +13,13 @@ import { PreOneCard } from '@/components/ui/preone-card';
  * Uses framer-motion's `useMotionValue` + `useTransform` for smooth
  * number interpolation from 0 → value on mount.
  *
+ * Layout (mobile-first):
+ *   - Mobile: illustration + label + value in a row, trend below
+ *   - Desktop: same row, illustration scales up slightly
+ *
  * Supports two icon modes:
- *   1. Custom illustration image (imageSrc) — shown as a larger illustration
- *   2. Lucide icon fallback — shown in a gradient badge (original behavior)
+ *   1. Custom illustration image (imageSrc) — always visible
+ *   2. Lucide icon fallback — shown in a gradient badge
  */
 
 export interface CosmicStatCardProps {
@@ -27,7 +31,7 @@ export interface CosmicStatCardProps {
   suffix?: string;
   /** Optional custom display value override (e.g. "₹4.8L" for revenue) */
   displayOverride?: string;
-  /** Icon element rendered in top-right (fallback when no imageSrc) */
+  /** Icon element (fallback when no imageSrc) */
   icon: React.ReactNode;
   /** Tailwind bg class for the left color accent stripe (e.g. 'bg-purple-500') */
   color: string;
@@ -96,60 +100,63 @@ export function CosmicStatCard({
         )}
       />
 
-      {/* Icon / Illustration area */}
-      <div className="flex items-start justify-between mb-3">
-        <div />
-        {imageSrc ? (
-          /* Custom illustration image */
-          <div className="relative h-10 w-10 shrink-0">
-            <Image
-              src={imageSrc}
-              alt={label}
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain drop-shadow-sm"
-            />
-          </div>
-        ) : (
-          /* Fallback: lucide icon in gradient badge */
-          <div
-            className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-xl',
-              'bg-gradient-to-br from-[var(--preone-primary-50)] to-[var(--preone-primary-100)]',
-              'dark:from-[rgba(129,140,248,0.12)] dark:to-[rgba(129,140,248,0.06)]',
-              'shadow-sm'
-            )}
-          >
-            <span className="text-[var(--preone-primary)] dark:text-[var(--preone-primary-light)]">
-              {icon}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        {/* ── Left: illustration/icon + label + value ── */}
+        <div className="flex items-center gap-3 min-w-0">
+          {imageSrc ? (
+            /* Custom illustration image — always visible, scales with screen */
+            <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0">
+              <Image
+                src={imageSrc}
+                alt={label}
+                width={48}
+                height={48}
+                className="h-full w-full object-contain drop-shadow-sm"
+              />
+            </div>
+          ) : (
+            /* Fallback: lucide icon in gradient badge */
+            <div
+              className={cn(
+                'flex items-center justify-center w-10 h-10 shrink-0 rounded-xl',
+                'bg-gradient-to-br from-[var(--preone-primary-50)] to-[var(--preone-primary-100)]',
+                'dark:from-[rgba(129,140,248,0.12)] dark:to-[rgba(129,140,248,0.06)]',
+                'shadow-sm'
+              )}
+            >
+              <span className="text-[var(--preone-primary)] dark:text-[var(--preone-primary-light)]">
+                {icon}
+              </span>
+            </div>
+          )}
+          <div className="min-w-0">
+            <span className="text-[11px] sm:text-[12px] font-medium uppercase tracking-wider text-[var(--text-secondary)] truncate block">
+              {label}
+            </span>
+            <span className="text-[20px] sm:text-2xl font-bold tracking-tight text-[var(--text-primary)] block leading-tight mt-0.5">
+              {displayOverride ?? displayText}
             </span>
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Value */}
-      <div className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-        {displayOverride ?? displayText}
-      </div>
-
-      {/* Label + Trend */}
-      <div className="flex items-center gap-2 mt-1">
-        <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+        {/* ── Trend indicator ── */}
         {trend && (
-          <span
-            className={cn(
-              'inline-flex items-center gap-0.5 text-xs font-medium',
-              trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
-            )}
-          >
+          <div className="flex items-center gap-1 sm:shrink-0">
             {trend.positive ? (
-              <TrendingUp className="w-3 h-3" />
+              <TrendingUp className="w-3.5 h-3.5 text-[var(--preone-green)]" />
             ) : (
-              <TrendingDown className="w-3 h-3" />
+              <TrendingDown className="w-3.5 h-3.5 text-[var(--preone-coral)]" />
             )}
-            {trend.positive ? '+' : ''}
-            {trend.value}%
-          </span>
+            <span
+              className={cn(
+                'text-[11px] sm:text-xs font-semibold',
+                trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
+              )}
+            >
+              {trend.positive ? '+' : ''}{trend.value}%
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[var(--text-tertiary)]">vs last month</span>
+          </div>
         )}
       </div>
 

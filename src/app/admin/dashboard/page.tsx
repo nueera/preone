@@ -271,63 +271,63 @@ function CosmicStatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       className="
-        relative min-h-[120px] overflow-hidden rounded-xl border border-[var(--admin-border)]
-        bg-[var(--admin-surface)] p-5
+        relative overflow-hidden rounded-xl border border-[var(--admin-border)]
+        bg-[var(--admin-surface)] p-4 sm:p-5
       "
       aria-label={`${label}: ${value}, ${isUp ? 'up' : 'down'} ${Math.abs(trend)} percent from last month`}
     >
-      <div className="flex items-center justify-between">
-        {/* ── Left: icon + text ── */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
+      {/* ── Mobile: vertical stack with illustration on top ── */}
+      {/* ── Desktop: horizontal row with illustration on right ── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        {/* ── Left: illustration + icon + text ── */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Illustration image — always visible, scales with screen */}
+          {imageSrc && (
+            <div className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 shrink-0">
+              <Image
+                src={imageSrc}
+                alt={label}
+                width={56}
+                height={56}
+                className="h-full w-full object-contain drop-shadow-sm"
+              />
+            </div>
+          )}
+          {/* Fallback lucide icon when no image */}
+          {!imageSrc && (
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
               style={{ background: 'var(--admin-primary-soft)' }}
             >
               <Icon className="h-5 w-5" style={{ color }} />
             </div>
-            <div>
-              <p className="text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)]">
-                {label}
-              </p>
-              <p className="mt-0.5 text-[28px] font-bold leading-none text-[var(--admin-text)]">
-                {formatValue(animated)}
-              </p>
-            </div>
-          </div>
-
-          {/* ── Trend indicator ── */}
-          <div className="mt-3 flex items-center gap-1">
-            {isUp ? (
-              <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
-            ) : (
-              <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
-            )}
-            <span
-              className={`text-[12px] font-semibold ${
-                isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
-              }`}
-            >
-              {isUp ? '+' : ''}{trend}%
-            </span>
-            <span className="text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
+          )}
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)] truncate">
+              {label}
+            </p>
+            <p className="mt-0.5 text-[22px] sm:text-[26px] lg:text-[28px] font-bold leading-none text-[var(--admin-text)]">
+              {formatValue(animated)}
+            </p>
           </div>
         </div>
 
-        {/* ── Right: illustration image (or placeholder) ── */}
-        {imageSrc ? (
-          <div className="hidden h-16 w-16 shrink-0 md:block">
-            <Image
-              src={imageSrc}
-              alt={label}
-              width={64}
-              height={64}
-              className="h-16 w-16 object-contain drop-shadow-sm"
-            />
-          </div>
-        ) : (
-          <div className="hidden h-16 w-16 shrink-0 md:block" />
-        )}
+        {/* ── Trend indicator ── */}
+        <div className="flex items-center gap-1 sm:shrink-0">
+          {isUp ? (
+            <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
+          ) : (
+            <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
+          )}
+          <span
+            className={`text-[11px] sm:text-[12px] font-semibold ${
+              isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
+            }`}
+          >
+            {isUp ? '+' : ''}{trend}%
+          </span>
+          <span className="text-[10px] sm:text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
+        </div>
       </div>
     </motion.div>
   );
