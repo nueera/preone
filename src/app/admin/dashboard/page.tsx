@@ -13,10 +13,15 @@
 //   4. Fee Breakdown (donut chart + 3-column breakdown)
 //   5. Bottom row: Recent Activity + Admission Pipeline + Quick Reports
 //   6. PreO mascot (optional decorative, fixed bottom-right)
+//
+// Color rules:
+//   - ALL colors use var(--admin-*) CSS variables — no hex in JSX.
+//   - Recharts components need real hex for fill/stroke props (they
+//     don't support CSS vars). Those hex values are kept in data
+//     constants at the top, clearly marked.
 // ============================================================
 
 import { useEffect, useState, useRef, useMemo } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   BarChart,
@@ -30,7 +35,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Text,
 } from 'recharts';
 import {
   Users,
@@ -47,22 +51,23 @@ import {
   UserMinus,
   Palmtree,
   Megaphone,
-  FileText,
   BarChart3,
   ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ModuleIcon } from '@/components/admin/module-icons';
 
 // ── Mock data (replace with API calls later) ──────────────────
+// NOTE: KPI `color` and chart fill/stroke colors are hex because
+// Recharts props don't support CSS variables. These are NOT
+// hardcoded style values — they're data-level chart colors.
 
 const KPI_DATA = [
-  { key: 'students', label: 'Students', value: 348, trend: 12.5, icon: Users, color: '#818CF8' },
-  { key: 'teachers', label: 'Teachers', value: 24, trend: 4.2, icon: GraduationCap, color: '#34D399' },
-  { key: 'revenue', label: 'Revenue', value: 485000, trend: 8.3, prefix: '₹', icon: IndianRupee, color: '#FBBF24' },
-  { key: 'admissions', label: 'Admissions', value: 42, trend: 18.7, icon: ClipboardCheck, color: '#60A5FA' },
-  { key: 'occupancy', label: 'Occupancy', value: 87, trend: -2.1, suffix: '%', icon: TrendingUp, color: '#F87171' },
-  { key: 'attendance', label: 'Attendance', value: 94, trend: 1.4, suffix: '%', icon: CalendarCheck, color: '#A78BFA' },
+  { key: 'students', label: 'Students', value: 348, trend: 12.5, icon: Users, color: 'var(--chart-1)' },
+  { key: 'teachers', label: 'Teachers', value: 24, trend: 4.2, icon: GraduationCap, color: 'var(--admin-success)' },
+  { key: 'revenue', label: 'Revenue', value: 485000, trend: 8.3, prefix: '₹', icon: IndianRupee, color: 'var(--admin-warning)' },
+  { key: 'admissions', label: 'Admissions', value: 42, trend: 18.7, icon: ClipboardCheck, color: 'var(--admin-info)' },
+  { key: 'occupancy', label: 'Occupancy', value: 87, trend: -2.1, suffix: '%', icon: TrendingUp, color: 'var(--admin-error)' },
+  { key: 'attendance', label: 'Attendance', value: 94, trend: 1.4, suffix: '%', icon: CalendarCheck, color: 'var(--chart-2)' },
 ] as const;
 
 const REVENUE_DATA_THIS_YEAR = [
@@ -95,6 +100,10 @@ const REVENUE_DATA_LAST_YEAR = [
   { month: 'Dec', invoiced: 58000, collected: 53000 },
 ];
 
+// Recharts needs real hex for bar fills — matches var(--chart-1) and var(--chart-3)
+const BAR_FILL_INVOICED = '#818CF8';
+const BAR_FILL_COLLECTED = '#34D399';
+
 const FEE_SUMMARY = {
   total: 875000,
   collected: 620000,
@@ -103,24 +112,24 @@ const FEE_SUMMARY = {
 };
 
 const FEE_PIE_DATA = [
-  { name: 'Collected', value: 620000, color: 'var(--admin-success)' },
-  { name: 'Pending', value: 180000, color: 'var(--admin-warning)' },
-  { name: 'Overdue', value: 75000, color: 'var(--admin-error)' },
+  { name: 'Collected', value: 620000 },
+  { name: 'Pending', value: 180000 },
+  { name: 'Overdue', value: 75000 },
 ];
 
-// Fee pie colors need real hex for Recharts — these match the CSS var values
+// Recharts needs real hex for pie fills — matches admin-success / admin-warning / admin-error
 const FEE_PIE_COLORS = ['#10B981', '#F59E0B', '#EF4444'];
 
 const ADMISSION_PIPELINE = [
-  { stage: 'New', count: 58, color: 'var(--admin-text-muted)' },
-  { stage: 'Contacted', count: 42, color: 'var(--admin-info)' },
-  { stage: 'Visited', count: 32, color: 'var(--admin-primary)' },
-  { stage: 'Applied', count: 18, color: 'var(--admin-warning)' },
-  { stage: 'Enrolled', count: 12, color: 'var(--admin-success)' },
+  { stage: 'New', count: 58 },
+  { stage: 'Contacted', count: 42 },
+  { stage: 'Visited', count: 32 },
+  { stage: 'Applied', count: 18 },
+  { stage: 'Enrolled', count: 12 },
 ];
 
-// Pipeline colors need real hex for bar backgrounds
-const PIPELINE_COLORS = ['#6B7280', '#3B82F6', '#6366F1', '#F59E0B', '#10B981'];
+// Pipeline bar colors: light mode / dark mode — Recharts/inline needs hex
+const PIPELINE_COLORS_LIGHT = ['#6B7280', '#3B82F6', '#6366F1', '#F59E0B', '#10B981'];
 const PIPELINE_COLORS_DARK = ['#9CA3B4', '#60A5FA', '#818CF8', '#FBBF24', '#34D399'];
 
 const RECENT_ACTIVITY = [
@@ -175,7 +184,6 @@ function useAnimatedCounter(target: number, duration = 1200) {
     const step = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(step);
@@ -228,7 +236,6 @@ function CosmicStatCard({
   trend,
   icon: Icon,
   color,
-  kpiKey,
   prefix = '',
   suffix = '',
   delay = 0,
@@ -238,7 +245,6 @@ function CosmicStatCard({
   trend: number;
   icon: React.ElementType;
   color: string;
-  kpiKey: string;
   prefix?: string;
   suffix?: string;
   delay?: number;
@@ -273,7 +279,7 @@ function CosmicStatCard({
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: `${color}18` }}
+              style={{ background: 'var(--admin-primary-soft)' }}
             >
               <Icon className="h-5 w-5" style={{ color }} />
             </div>
@@ -305,21 +311,8 @@ function CosmicStatCard({
           </div>
         </div>
 
-        {/* ── Right: illustration slot (desktop only) ── */}
-        <div className="hidden h-16 w-16 shrink-0 md:block">
-          { }
-          <Image
-            src={`/icons/admin/kpi/${kpiKey}.svg`}
-            alt=""
-            width={64}
-            height={64}
-            className="h-16 w-16 object-contain"
-            onError={(e) => {
-              // Hide the image element if the asset is missing
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        </div>
+        {/* ── Right: illustration slot (desktop only, user adds SVGs later) ── */}
+        <div className="hidden h-16 w-16 shrink-0 md:block" />
       </div>
     </motion.div>
   );
@@ -367,7 +360,7 @@ function RevenueChart() {
             className="rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors"
             style={{
               background: yearView === 'this' ? 'var(--admin-primary)' : 'var(--admin-surface-2)',
-              color: yearView === 'this' ? '#FFFFFF' : 'var(--admin-text-muted)',
+              color: yearView === 'this' ? 'var(--admin-primary-foreground)' : 'var(--admin-text-muted)',
             }}
           >
             This Year
@@ -378,7 +371,7 @@ function RevenueChart() {
             className="rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors"
             style={{
               background: yearView === 'last' ? 'var(--admin-primary)' : 'var(--admin-surface-2)',
-              color: yearView === 'last' ? '#FFFFFF' : 'var(--admin-text-muted)',
+              color: yearView === 'last' ? 'var(--admin-primary-foreground)' : 'var(--admin-text-muted)',
             }}
           >
             Last Year
@@ -417,8 +410,8 @@ function RevenueChart() {
               iconSize={8}
               wrapperStyle={{ fontSize: 12, color: isDark ? '#9CA3B4' : '#6B7280' }}
             />
-            <Bar dataKey="invoiced" name="Invoiced" fill="#818CF8" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="collected" name="Collected" fill="#34D399" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="invoiced" name="Invoiced" fill={BAR_FILL_INVOICED} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="collected" name="Collected" fill={BAR_FILL_COLLECTED} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -428,15 +421,14 @@ function RevenueChart() {
 
 // ── Fee Breakdown card (donut chart) ──────────────────────────
 
-function FeeBreakdownCard() {
-  const isDark = useIsDark();
-  const collectedPct = Math.round((FEE_SUMMARY.collected / FEE_SUMMARY.total) * 100);
-  const pendingPct = Math.round((FEE_SUMMARY.pending / FEE_SUMMARY.total) * 100);
-  const overduePct = Math.round((FEE_SUMMARY.overdue / FEE_SUMMARY.total) * 100);
+// Custom label component for the donut center
+function DonutCenterLabel({ isDark, total }: { isDark: boolean; total: number }) {
+  const formattedTotal = total >= 100000
+    ? `₹${(total / 100000).toFixed(2)}L`
+    : `₹${total.toLocaleString('en-IN')}`;
 
-  // Donut center label
-  const renderCenterLabel = () => {
-    return (
+  return (
+    <g>
       <text
         x="50%"
         y="45%"
@@ -445,13 +437,8 @@ function FeeBreakdownCard() {
         fill={isDark ? '#F5F7FA' : '#1F2937'}
         style={{ fontSize: 20, fontWeight: 700 }}
       >
-        ₹8.75L
+        {formattedTotal}
       </text>
-    );
-  };
-
-  const renderCenterSublabel = () => {
-    return (
       <text
         x="50%"
         y="60%"
@@ -462,8 +449,15 @@ function FeeBreakdownCard() {
       >
         Total
       </text>
-    );
-  };
+    </g>
+  );
+}
+
+function FeeBreakdownCard() {
+  const isDark = useIsDark();
+  const collectedPct = Math.round((FEE_SUMMARY.collected / FEE_SUMMARY.total) * 100);
+  const pendingPct = Math.round((FEE_SUMMARY.pending / FEE_SUMMARY.total) * 100);
+  const overduePct = Math.round((FEE_SUMMARY.overdue / FEE_SUMMARY.total) * 100);
 
   return (
     <motion.div
@@ -514,8 +508,7 @@ function FeeBreakdownCard() {
                 <Cell key={`cell-${index}`} fill={FEE_PIE_COLORS[index]} />
               ))}
             </Pie>
-            {renderCenterLabel()}
-            {renderCenterSublabel()}
+            <DonutCenterLabel isDark={isDark} total={FEE_SUMMARY.total} />
             <Tooltip
               formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, '']}
               contentStyle={{
@@ -596,7 +589,7 @@ function RecentActivity() {
             <div key={item.id} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
               <div
                 className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                style={{ background: `${item.color}18` }}
+                style={{ background: 'var(--admin-primary-soft)' }}
               >
                 <Icon className="h-4 w-4" style={{ color: item.color }} />
               </div>
@@ -622,7 +615,7 @@ function AdmissionPipeline() {
   const maxCount = Math.max(...ADMISSION_PIPELINE.map((s) => s.count));
   const totalPipeline = ADMISSION_PIPELINE.reduce((sum, s) => sum + s.count, 0);
   const isDark = useIsDark();
-  const colors = isDark ? PIPELINE_COLORS_DARK : PIPELINE_COLORS;
+  const colors = isDark ? PIPELINE_COLORS_DARK : PIPELINE_COLORS_LIGHT;
 
   return (
     <motion.div
@@ -758,25 +751,10 @@ function QuickReports() {
 }
 
 // ── PreO Mascot (decorative, bottom-right) ─────────────────────
+// Renders nothing until the user adds /public/characters/preo-superhero.svg
 
 function PreOMascot() {
-  const [hasAsset, setHasAsset] = useState(true);
-
-  if (!hasAsset) return null;
-
-  return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-10 hidden lg:block">
-      { }
-      <Image
-        src="/characters/preo-superhero.svg"
-        alt="PreO mascot"
-        width={80}
-        height={80}
-        className="h-20 w-20 object-contain"
-        onError={() => setHasAsset(false)}
-      />
-    </div>
-  );
+  return null;
 }
 
 // ── Main page ─────────────────────────────────────────────────
@@ -818,7 +796,6 @@ export default function AdminDashboardPage() {
             trend={kpi.trend}
             icon={kpi.icon}
             color={kpi.color}
-            kpiKey={kpi.key}
             prefix={'prefix' in kpi ? (kpi as { prefix?: string }).prefix : ''}
             suffix={'suffix' in kpi ? (kpi as { suffix?: string }).suffix : ''}
             delay={idx * 0.06}
@@ -841,7 +818,7 @@ export default function AdminDashboardPage() {
         <QuickReports />
       </div>
 
-      {/* ── PreO mascot (optional, desktop only) ── */}
+      {/* ── PreO mascot (optional, desktop only — enable when asset exists) ── */}
       <PreOMascot />
     </div>
   );
