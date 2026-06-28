@@ -78,12 +78,12 @@ const SUBJECT_PACKS = [
 ] as const;
 
 const INPUT_CLASS =
-  'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all';
+  'w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all';
 
 const SMALL_INPUT_CLASS =
-  'px-3 py-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all text-sm';
+  'px-3 py-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all text-sm';
 
-const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--text-primary)]';
+const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--admin-text)]';
 
 function generateId(): string {
   return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -142,7 +142,7 @@ function SubjectRow({
       animate="visible"
       exit="exit"
       layout
-      className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-secondary)]"
+      className="flex items-center gap-3 p-3 rounded-xl bg-[var(--admin-surface)]"
     >
       {/* Color Dot */}
       <div
@@ -326,14 +326,14 @@ export function SubjectsStep() {
       {/* ── Step Header ── */}
       <motion.div variants={itemVariants} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-yellow-50 flex items-center justify-center text-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: 'var(--admin-primary-soft)' }}>
             ✏️
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)] font-[var(--font-primary)]">
+            <h2 className="text-xl font-bold text-[var(--admin-text)] font-[var(--font-primary)]">
               Subjects
             </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Configure subjects and assign them to classes
             </p>
           </div>
@@ -344,10 +344,10 @@ export function SubjectsStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">📦</span> Subject Packs
             </h3>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Start with a preset pack or create custom subjects
             </p>
 
@@ -362,20 +362,20 @@ export function SubjectsStep() {
                     className={cn(
                       'flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left min-h-[44px]',
                       isSelected
-                        ? 'border-[var(--preone-primary)] bg-[var(--preone-primary-50)] shadow-lg shadow-[var(--preone-primary)]/10'
-                        : 'border-[var(--border-default)] bg-[var(--bg-primary)] hover:border-[var(--preone-primary)]/40'
+                        ? 'border-[var(--admin-primary)] bg-[var(--admin-primary-soft)] shadow-lg shadow-[var(--admin-primary)]/10'
+                        : 'border-[var(--admin-border)] bg-[var(--admin-bg)] hover:border-[var(--admin-primary)]/40'
                     )}
                   >
                     <span className="text-2xl mb-2">{pack.icon}</span>
                     <span
                       className={cn(
                         'text-sm font-semibold',
-                        isSelected ? 'text-[var(--preone-primary)]' : 'text-[var(--text-primary)]'
+                        isSelected ? 'text-[var(--admin-primary)]' : 'text-[var(--admin-text)]'
                       )}
                     >
                       {pack.label}
                     </span>
-                    <span className="text-xs text-[var(--text-muted)] mt-1">
+                    <span className="text-xs text-[var(--admin-text-subtle)] mt-1">
                       {pack.description}
                     </span>
                   </button>
@@ -392,9 +392,9 @@ export function SubjectsStep() {
           <PreOneCardContent>
             <motion.div variants={itemVariants} className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
                   <span className="text-lg">🌐</span> All Classes
-                  <span className="text-xs font-normal text-[var(--text-muted)] bg-[var(--bg-tertiary)] px-2 py-0.5 rounded-lg">
+                  <span className="text-xs font-normal text-[var(--admin-text-subtle)] bg-[var(--admin-surface-2)] px-2 py-0.5 rounded-lg">
                     {globalSubjects.length} subject{globalSubjects.length !== 1 ? 's' : ''}
                   </span>
                 </h3>
@@ -416,7 +416,7 @@ export function SubjectsStep() {
               <button
                 type="button"
                 onClick={() => handleAddSubject()}
-                className="w-full py-2.5 rounded-xl border border-dashed border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--preone-primary)] hover:text-[var(--preone-primary)] transition-all text-sm font-medium min-h-[40px]"
+                className="w-full py-2.5 rounded-xl border border-dashed border-[var(--admin-border)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)] transition-all text-sm font-medium min-h-[40px]"
               >
                 + Add Subject
               </button>
@@ -444,10 +444,10 @@ export function SubjectsStep() {
                         {classInfo.section}
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-[var(--text-primary)]">
+                        <h4 className="text-sm font-semibold text-[var(--admin-text)]">
                           {classInfo.name} - Section {classInfo.section}
                         </h4>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-xs text-[var(--admin-text-subtle)]">
                           {classSubjects.length} subject{classSubjects.length !== 1 ? 's' : ''} assigned
                         </p>
                       </div>
@@ -474,7 +474,7 @@ export function SubjectsStep() {
                   <button
                     type="button"
                     onClick={() => handleAddSubjectForClass(classInfo.id)}
-                    className="w-full py-2.5 rounded-xl border border-dashed border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--preone-primary)] hover:text-[var(--preone-primary)] transition-all text-sm font-medium min-h-[40px]"
+                    className="w-full py-2.5 rounded-xl border border-dashed border-[var(--admin-border)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)] transition-all text-sm font-medium min-h-[40px]"
                   >
                     + Add Subject for {classInfo.name} - {classInfo.section}
                   </button>
@@ -490,13 +490,13 @@ export function SubjectsStep() {
         <motion.div variants={itemVariants}>
           <div className="text-center py-8">
             <span className="text-4xl block mb-3">✏️</span>
-            <p className="text-sm text-[var(--text-muted)] mb-4">
+            <p className="text-sm text-[var(--admin-text-subtle)] mb-4">
               Select a subject pack above or add subjects manually
             </p>
             <button
               type="button"
               onClick={() => handleSelectPack('custom')}
-              className="px-6 py-2.5 rounded-xl bg-[var(--preone-primary)] text-white text-sm font-medium hover:shadow-md transition-all min-h-[44px]"
+              className="px-6 py-2.5 rounded-xl bg-[var(--admin-primary)] text-white text-sm font-medium hover:shadow-md transition-all min-h-[44px]"
             >
               Start Adding Subjects
             </button>
@@ -512,10 +512,10 @@ export function SubjectsStep() {
               <div className="flex items-center gap-3">
                 <span className="text-2xl">📊</span>
                 <div>
-                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                  <p className="text-sm font-semibold text-[var(--admin-text)]">
                     {subjects.filter((s) => s.name.trim()).length} subjects configured
                   </p>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-[var(--admin-text-subtle)]">
                     {subjects.filter((s) => s.type === 'academic' && s.name.trim()).length} academic •{' '}
                     {subjects.filter((s) => s.type === 'co-curricular' && s.name.trim()).length} co-curricular •{' '}
                     {subjects.filter((s) => s.type === 'extra-curricular' && s.name.trim()).length} extra-curricular
