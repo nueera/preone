@@ -32,7 +32,7 @@ import { LoginWallpaper } from '@/components/auth/login-wallpaper';
 import { LoginHeadline } from '@/components/auth/login-headline';
 import { LoginBrandArea } from '@/components/auth/login-brand-area';
 import { LoginCard } from '@/components/auth/login-card';
-import { ThemeToggle } from '@/components/auth/theme-toggle';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 
 // ── Stagger container: children animate in sequence ──
 const staggerContainer = {
@@ -91,8 +91,8 @@ export default function LoginPage() {
       <LoginWallpaper />
 
       {/* ── Theme toggle ──
-          Mobile (labeled pill): top-right of the brand area.
-          Desktop (compact icon): top-right of the right panel. */}
+          Same GlobalThemeToggle used across all portals.
+          Mobile: pill variant. Desktop: icon variant. */}
       <motion.div
         variants={scaleIn}
         initial="hidden"
@@ -104,11 +104,11 @@ export default function LoginPage() {
       >
         {/* Mobile — labelled pill */}
         <div className="md:hidden">
-          <ThemeToggle variant="labeled" />
+          <GlobalThemeToggle variant="pill" />
         </div>
         {/* Desktop — compact icon */}
         <div className="hidden md:block">
-          <ThemeToggle variant="compact" />
+          <GlobalThemeToggle variant="icon" />
         </div>
       </motion.div>
 
