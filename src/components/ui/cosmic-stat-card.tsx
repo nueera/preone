@@ -7,38 +7,18 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PreOneCard } from '@/components/ui/preone-card';
 
-/**
- * CosmicStatCard — Animated stat card with count-up number animation.
- *
- * Uses framer-motion's `useMotionValue` + `useTransform` for smooth
- * number interpolation from 0 → value on mount.
- *
- * Supports two icon modes:
- *   1. Custom illustration image (imageSrc) — shown as a larger illustration
- *   2. Lucide icon fallback — shown in a gradient badge (original behavior)
- */
-
 export interface CosmicStatCardProps {
-  /** Stat label */
   label: string;
-  /** Numeric value to display and animate to */
   value: number;
-  /** Optional prefix/suffix like '₹' or '%' */
   suffix?: string;
-  /** Optional custom display value override (e.g. "₹4.8L" for revenue) */
   displayOverride?: string;
-  /** Icon element rendered in top-right (fallback when no imageSrc) */
   icon: React.ReactNode;
-  /** Tailwind bg class for the left color accent stripe (e.g. 'bg-purple-500') */
   color: string;
-  /** Optional custom illustration image src — replaces the icon badge */
   imageSrc?: string;
-  /** Trend indicator */
   trend?: {
     value: number;
     positive: boolean;
   };
-  /** Additional CSS classes */
   className?: string;
 }
 
@@ -96,25 +76,23 @@ export function CosmicStatCard({
         )}
       />
 
-      {/* Icon / Illustration area */}
-      <div className="flex items-start justify-between mb-3">
+      {/* Icon / Illustration area — always visible, responsive sizing */}
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div />
         {imageSrc ? (
-          /* Custom illustration image */
-          <div className="relative h-10 w-10 shrink-0">
+          <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
             <Image
               src={imageSrc}
               alt={label}
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain drop-shadow-sm"
+              width={64}
+              height={64}
+              className="h-10 w-10 object-contain drop-shadow-sm sm:h-12 sm:w-12 lg:h-14 lg:w-14"
             />
           </div>
         ) : (
-          /* Fallback: lucide icon in gradient badge */
           <div
             className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-xl',
+              'flex items-center justify-center w-10 h-10 rounded-xl sm:w-12 sm:h-12',
               'bg-gradient-to-br from-[var(--preone-primary-50)] to-[var(--preone-primary-100)]',
               'dark:from-[rgba(129,140,248,0.12)] dark:to-[rgba(129,140,248,0.06)]',
               'shadow-sm'
@@ -127,25 +105,25 @@ export function CosmicStatCard({
         )}
       </div>
 
-      {/* Value */}
-      <div className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+      {/* Value — responsive typography */}
+      <div className="text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">
         {displayOverride ?? displayText}
       </div>
 
-      {/* Label + Trend */}
-      <div className="flex items-center gap-2 mt-1">
-        <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+      {/* Label + Trend — responsive */}
+      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:mt-2">
+        <span className="text-xs text-[var(--text-secondary)] sm:text-sm">{label}</span>
         {trend && (
           <span
             className={cn(
-              'inline-flex items-center gap-0.5 text-xs font-medium',
+              'inline-flex items-center gap-0.5 text-[10px] font-medium sm:text-xs',
               trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
             )}
           >
             {trend.positive ? (
-              <TrendingUp className="w-3 h-3" />
+              <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             ) : (
-              <TrendingDown className="w-3 h-3" />
+              <TrendingDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             )}
             {trend.positive ? '+' : ''}
             {trend.value}%
@@ -153,9 +131,9 @@ export function CosmicStatCard({
         )}
       </div>
 
-      {/* Planet decoration (bottom-right, 5% opacity) */}
+      {/* Planet decoration — scales down on mobile */}
       <div
-        className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-[0.05]"
+        className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full opacity-[0.05] sm:-bottom-6 sm:-right-6 sm:h-24 sm:w-24"
         style={{
           background:
             'radial-gradient(circle, var(--preone-primary) 0%, transparent 70%)',

@@ -271,63 +271,57 @@ function CosmicStatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       className="
-        relative min-h-[120px] overflow-hidden rounded-xl border border-[var(--admin-border)]
-        bg-[var(--admin-surface)] p-5
+        relative overflow-hidden rounded-xl border border-[var(--admin-border)]
+        bg-[var(--admin-surface)] p-4 sm:p-5
       "
       aria-label={`${label}: ${value}, ${isUp ? 'up' : 'down'} ${Math.abs(trend)} percent from last month`}
     >
-      <div className="flex items-center justify-between">
-        {/* ── Left: icon + text ── */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
-            >
-              <Icon className="h-5 w-5" style={{ color }} />
-            </div>
-            <div>
-              <p className="text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)]">
-                {label}
-              </p>
-              <p className="mt-0.5 text-[28px] font-bold leading-none text-[var(--admin-text)]">
-                {formatValue(animated)}
-              </p>
-            </div>
+      {/* ── Top row: icon + value + illustration ── */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: 'var(--admin-primary-soft)' }}
+          >
+            <Icon className="h-5 w-5" style={{ color }} />
           </div>
-
-          {/* ── Trend indicator ── */}
-          <div className="mt-3 flex items-center gap-1">
-            {isUp ? (
-              <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
-            ) : (
-              <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
-            )}
-            <span
-              className={`text-[12px] font-semibold ${
-                isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
-              }`}
-            >
-              {isUp ? '+' : ''}{trend}%
-            </span>
-            <span className="text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)] sm:text-[12px]">
+              {label}
+            </p>
+            <p className="mt-0.5 text-[22px] font-bold leading-none text-[var(--admin-text)] sm:text-[26px] lg:text-[28px]">
+              {formatValue(animated)}
+            </p>
           </div>
         </div>
 
-        {/* ── Right: illustration image (or placeholder) ── */}
+        {/* ── Illustration — always visible, responsive size ── */}
         {imageSrc ? (
-          <div className="hidden h-16 w-16 shrink-0 md:block">
-            <Image
-              src={imageSrc}
-              alt={label}
-              width={64}
-              height={64}
-              className="h-16 w-16 object-contain drop-shadow-sm"
-            />
-          </div>
+          <Image
+            src={imageSrc}
+            alt={label}
+            width={64}
+            height={64}
+            className="h-10 w-10 shrink-0 object-contain drop-shadow-sm sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+          />
+        ) : null}
+      </div>
+
+      {/* ── Trend indicator ── */}
+      <div className="mt-2 flex items-center gap-1 sm:mt-3">
+        {isUp ? (
+          <TrendingUp className="h-3 w-3 text-[var(--admin-success)] sm:h-3.5 sm:w-3.5" />
         ) : (
-          <div className="hidden h-16 w-16 shrink-0 md:block" />
+          <TrendingDown className="h-3 w-3 text-[var(--admin-error)] sm:h-3.5 sm:w-3.5" />
         )}
+        <span
+          className={`text-[10px] font-semibold sm:text-[12px] ${
+            isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
+          }`}
+        >
+          {isUp ? '+' : ''}{trend}%
+        </span>
+        <span className="text-[10px] text-[var(--admin-text-subtle)] sm:text-[11px]">vs last month</span>
       </div>
     </motion.div>
   );
@@ -801,8 +795,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── KPI grid (responsive: 1→2→3→6 columns) ── */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+      {/* ── KPI grid (responsive: 1→2→3→6 columns, mobile-first) ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
         {KPI_DATA.map((kpi, idx) => (
           <CosmicStatCard
             key={kpi.key}
