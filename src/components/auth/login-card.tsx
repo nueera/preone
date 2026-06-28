@@ -489,7 +489,7 @@ export function LoginCard() {
       </div>
 
       {/* ── 3.3 Form ── */}
-      <form onSubmit={handleSubmit} className="mt-5 space-y-3.5 md:mt-6 md:space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="mt-5 space-y-3.5 md:mt-6 md:space-y-4" noValidate suppressHydrationWarning>
         {/* Email / Username */}
         <div>
           <label
@@ -529,6 +529,7 @@ export function LoginCard() {
               disabled={isLoading}
               aria-invalid={!!errors.email}
               aria-label="Email or username"
+              suppressHydrationWarning
               className="
                 h-full w-full bg-transparent text-[14px] text-login-text
                 placeholder:text-login-subtle
@@ -581,6 +582,7 @@ export function LoginCard() {
                 disabled={isLoading}
                 aria-invalid={!!errors.password}
                 aria-label="Password"
+                suppressHydrationWarning
                 className="
                   h-full w-full bg-transparent text-[14px] text-login-text
                   placeholder:text-login-subtle
@@ -593,6 +595,7 @@ export function LoginCard() {
                 onClick={() => setShowPassword((s) => !s)}
                 tabIndex={-1}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                suppressHydrationWarning
                 className="
                   text-login-icon-muted transition-opacity hover:opacity-80
                   focus-visible:outline-none focus-visible:ring-2
@@ -765,6 +768,7 @@ export function LoginCard() {
             isLoading ||
             (tab === 'otp' && (!otpSent || !otpComplete))
           }
+          suppressHydrationWarning
           className="
             btn-launch mt-4 md:mt-5 flex h-11 sm:h-[52px] md:h-12 w-full
             items-center justify-center gap-2
@@ -812,6 +816,7 @@ export function LoginCard() {
             onClick={() => handleDemoClick({ role, email: demoEmail, password: 'demo123', bg, Icon })}
             disabled={isLoading}
             title={`Sign in as ${role} — ${demoEmail}`}
+            suppressHydrationWarning
             className="
               login-demo-cell
               flex h-12 sm:h-14 items-center gap-2 sm:gap-2.5 rounded-xl md:rounded-[8px]
