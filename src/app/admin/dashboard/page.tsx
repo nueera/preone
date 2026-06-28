@@ -276,58 +276,52 @@ function CosmicStatCard({
       "
       aria-label={`${label}: ${value}, ${isUp ? 'up' : 'down'} ${Math.abs(trend)} percent from last month`}
     >
-      {/* ── Mobile: vertical stack with illustration on top ── */}
-      {/* ── Desktop: horizontal row with illustration on right ── */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        {/* ── Left: illustration + icon + text ── */}
+      {/* ── Top row: icon + value + illustration ── */}
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          {/* Illustration image — always visible, scales with screen */}
-          {imageSrc && (
-            <div className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 shrink-0">
-              <Image
-                src={imageSrc}
-                alt={label}
-                width={56}
-                height={56}
-                className="h-full w-full object-contain drop-shadow-sm"
-              />
-            </div>
-          )}
-          {/* Fallback lucide icon when no image */}
-          {!imageSrc && (
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
-            >
-              <Icon className="h-5 w-5" style={{ color }} />
-            </div>
-          )}
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: 'var(--admin-primary-soft)' }}
+          >
+            <Icon className="h-5 w-5" style={{ color }} />
+          </div>
           <div className="min-w-0">
-            <p className="text-[11px] sm:text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)] truncate">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)] sm:text-[12px]">
               {label}
             </p>
-            <p className="mt-0.5 text-[22px] sm:text-[26px] lg:text-[28px] font-bold leading-none text-[var(--admin-text)]">
+            <p className="mt-0.5 text-[22px] font-bold leading-none text-[var(--admin-text)] sm:text-[26px] lg:text-[28px]">
               {formatValue(animated)}
             </p>
           </div>
         </div>
 
-        {/* ── Trend indicator ── */}
-        <div className="flex items-center gap-1 sm:shrink-0">
-          {isUp ? (
-            <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
-          ) : (
-            <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
-          )}
-          <span
-            className={`text-[11px] sm:text-[12px] font-semibold ${
-              isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
-            }`}
-          >
-            {isUp ? '+' : ''}{trend}%
-          </span>
-          <span className="text-[10px] sm:text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
-        </div>
+        {/* ── Illustration — always visible, responsive size ── */}
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={label}
+            width={64}
+            height={64}
+            className="h-10 w-10 shrink-0 object-contain drop-shadow-sm sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+          />
+        ) : null}
+      </div>
+
+      {/* ── Trend indicator ── */}
+      <div className="mt-2 flex items-center gap-1 sm:mt-3">
+        {isUp ? (
+          <TrendingUp className="h-3 w-3 text-[var(--admin-success)] sm:h-3.5 sm:w-3.5" />
+        ) : (
+          <TrendingDown className="h-3 w-3 text-[var(--admin-error)] sm:h-3.5 sm:w-3.5" />
+        )}
+        <span
+          className={`text-[10px] font-semibold sm:text-[12px] ${
+            isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
+          }`}
+        >
+          {isUp ? '+' : ''}{trend}%
+        </span>
+        <span className="text-[10px] text-[var(--admin-text-subtle)] sm:text-[11px]">vs last month</span>
       </div>
     </motion.div>
   );
@@ -801,8 +795,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── KPI grid (responsive: 1→2→3→6 columns) ── */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+      {/* ── KPI grid (responsive: 1→2→3→6 columns, mobile-first) ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
         {KPI_DATA.map((kpi, idx) => (
           <CosmicStatCard
             key={kpi.key}
