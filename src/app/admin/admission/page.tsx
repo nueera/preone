@@ -1,7 +1,9 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { AdmissionPage } from '@/components/admin/module-stubs';
-
-export default function Page() {
-  return <AdmissionPage />;
+/**
+ * /admin/admission → redirect to /admin/admissions
+ * The admission module lives at /admin/admissions (plural).
+ */
+export default function AdmissionRedirectPage() {
+  redirect('/admin/admissions');
 }

@@ -38,7 +38,7 @@ export const MODULES: ModuleDef[] = [
   {
     key: 'admission',
     label: 'Admission',
-    href: '/admin/admission',
+    href: '/admin/admissions',
     subtitle: 'Manage admissions pipeline and enquiries',
     primaryAction: '+ New Enquiry',
   },
