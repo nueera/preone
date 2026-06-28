@@ -3,19 +3,21 @@
 // ============================================================
 // PreOne — Admin Dashboard (/admin/dashboard)
 //
-// Real dashboard with KPIs, charts, and activity feed.
-// Reached by clicking the "Dashboard" card in the module grid
-// at /admin.
+// Enhanced dashboard with KPIs, charts, activity feed,
+// admission pipeline, quick reports, and dynamic welcome.
 //
 // Sections:
-//   1. PageHeader (dashboard icon + title)
-//   2. 6 CosmicStatCard KPIs (animated counters + trend)
-//   3. Revenue chart (Recharts BarChart — invoiced vs collected)
-//   4. Fee summary card (progress bar + breakdown)
-//   5. Recent Activity feed (last 8 events)
+//   1. Welcome section (dynamic greeting + date pill)
+//   2. 6 CosmicStatCard KPIs (3×2 grid, horizontal layout, illustration slots)
+//   3. Revenue Overview (12 months + year toggle)
+//   4. Fee Breakdown (donut chart + 3-column breakdown)
+//   5. Bottom row: Recent Activity + Admission Pipeline + Quick Reports
+//   6. PreO mascot (optional decorative, fixed bottom-right)
 // ============================================================
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   BarChart,
   Bar,
@@ -25,6 +27,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  PieChart,
+  Pie,
+  Cell,
+  Text,
 } from 'recharts';
 import {
   Users,
@@ -41,10 +47,12 @@ import {
   UserMinus,
   Palmtree,
   Megaphone,
+  FileText,
+  BarChart3,
+  ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ModuleIcon } from '@/components/admin/module-icons';
-import Link from 'next/link';
 
 // ── Mock data (replace with API calls later) ──────────────────
 
@@ -57,21 +65,63 @@ const KPI_DATA = [
   { key: 'attendance', label: 'Attendance', value: 94, trend: 1.4, suffix: '%', icon: CalendarCheck, color: '#A78BFA' },
 ] as const;
 
-const REVENUE_DATA = [
+const REVENUE_DATA_THIS_YEAR = [
   { month: 'Jan', invoiced: 42000, collected: 38000 },
   { month: 'Feb', invoiced: 45000, collected: 41000 },
   { month: 'Mar', invoiced: 48000, collected: 44000 },
   { month: 'Apr', invoiced: 44000, collected: 39000 },
   { month: 'May', invoiced: 50000, collected: 47000 },
   { month: 'Jun', invoiced: 52000, collected: 48000 },
+  { month: 'Jul', invoiced: 48000, collected: 45000 },
+  { month: 'Aug', invoiced: 55000, collected: 51000 },
+  { month: 'Sep', invoiced: 58000, collected: 53000 },
+  { month: 'Oct', invoiced: 60000, collected: 55000 },
+  { month: 'Nov', invoiced: 62000, collected: 57000 },
+  { month: 'Dec', invoiced: 65000, collected: 60000 },
+];
+
+const REVENUE_DATA_LAST_YEAR = [
+  { month: 'Jan', invoiced: 38000, collected: 34000 },
+  { month: 'Feb', invoiced: 40000, collected: 36000 },
+  { month: 'Mar', invoiced: 42000, collected: 38000 },
+  { month: 'Apr', invoiced: 39000, collected: 35000 },
+  { month: 'May', invoiced: 44000, collected: 40000 },
+  { month: 'Jun', invoiced: 46000, collected: 42000 },
+  { month: 'Jul', invoiced: 43000, collected: 39000 },
+  { month: 'Aug', invoiced: 48000, collected: 44000 },
+  { month: 'Sep', invoiced: 51000, collected: 47000 },
+  { month: 'Oct', invoiced: 53000, collected: 48000 },
+  { month: 'Nov', invoiced: 55000, collected: 50000 },
+  { month: 'Dec', invoiced: 58000, collected: 53000 },
 ];
 
 const FEE_SUMMARY = {
-  total: 485000,
-  collected: 352000,
-  pending: 98000,
-  overdue: 35000,
+  total: 875000,
+  collected: 620000,
+  pending: 180000,
+  overdue: 75000,
 };
+
+const FEE_PIE_DATA = [
+  { name: 'Collected', value: 620000, color: 'var(--admin-success)' },
+  { name: 'Pending', value: 180000, color: 'var(--admin-warning)' },
+  { name: 'Overdue', value: 75000, color: 'var(--admin-error)' },
+];
+
+// Fee pie colors need real hex for Recharts — these match the CSS var values
+const FEE_PIE_COLORS = ['#10B981', '#F59E0B', '#EF4444'];
+
+const ADMISSION_PIPELINE = [
+  { stage: 'New', count: 58, color: 'var(--admin-text-muted)' },
+  { stage: 'Contacted', count: 42, color: 'var(--admin-info)' },
+  { stage: 'Visited', count: 32, color: 'var(--admin-primary)' },
+  { stage: 'Applied', count: 18, color: 'var(--admin-warning)' },
+  { stage: 'Enrolled', count: 12, color: 'var(--admin-success)' },
+];
+
+// Pipeline colors need real hex for bar backgrounds
+const PIPELINE_COLORS = ['#6B7280', '#3B82F6', '#6366F1', '#F59E0B', '#10B981'];
+const PIPELINE_COLORS_DARK = ['#9CA3B4', '#60A5FA', '#818CF8', '#FBBF24', '#34D399'];
 
 const RECENT_ACTIVITY = [
   { id: 1, type: 'admission', text: 'New admission enquiry from Priya Sharma', time: '2 min ago', icon: UserPlus, color: 'var(--admin-info)' },
@@ -80,17 +130,44 @@ const RECENT_ACTIVITY = [
   { id: 4, type: 'absence', text: 'Aarav Singh marked absent (Class 2A)', time: '2 hrs ago', icon: UserMinus, color: 'var(--admin-error)' },
   { id: 5, type: 'leave', text: 'Teacher Anjali requested leave (Jun 28–29)', time: '3 hrs ago', icon: Palmtree, color: 'var(--admin-warning)' },
   { id: 6, type: 'announcement', text: 'Annual Day announcement published', time: '5 hrs ago', icon: Megaphone, color: 'var(--admin-accent)' },
-  { id: 7, type: 'payment', text: 'Payment of ₹8,000 received from Sunil Das', time: '6 hrs ago', icon: CreditCard, color: 'var(--admin-success)' },
-  { id: 8, type: 'admission', text: 'Admission confirmed for Vihaan Reddy (KG)', time: 'Yesterday', icon: UserPlus, color: 'var(--admin-info)' },
 ] as const;
+
+const QUICK_REPORTS = [
+  { label: 'Fee Collection Report', href: '/admin/reports?tab=fees', icon: IndianRupee },
+  { label: 'Attendance Summary', href: '/admin/reports?tab=attendance', icon: ClipboardCheck },
+  { label: 'Admission Pipeline Report', href: '/admin/reports?tab=admissions', icon: UserPlus },
+  { label: 'Monthly Revenue Report', href: '/admin/reports?tab=revenue', icon: BarChart3 },
+] as const;
+
+// ── Reduced-motion detection ──────────────────────────────────
+
+function usePrefersReducedMotion() {
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReduced;
+}
 
 // ── Animated counter hook ─────────────────────────────────────
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
   const ref = useRef(false);
+  const prefersReduced = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (prefersReduced) {
+      setCount(target);
+      return;
+    }
+
     if (ref.current) return;
     ref.current = true;
 
@@ -104,9 +181,43 @@ function useAnimatedCounter(target: number, duration = 1200) {
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
-  }, [target, duration]);
+  }, [target, duration, prefersReduced]);
 
   return count;
+}
+
+// ── Dark mode detection for chart colors ──────────────────────
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains('dark'));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
+// ── Greeting helper ───────────────────────────────────────────
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
+function getDatePill(): string {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 // ── CosmicStatCard ─────────────────────────────────────────────
@@ -117,16 +228,20 @@ function CosmicStatCard({
   trend,
   icon: Icon,
   color,
+  kpiKey,
   prefix = '',
   suffix = '',
+  delay = 0,
 }: {
   label: string;
   value: number;
   trend: number;
   icon: React.ElementType;
   color: string;
+  kpiKey: string;
   prefix?: string;
   suffix?: string;
+  delay?: number;
 }) {
   const animated = useAnimatedCounter(value);
 
@@ -145,50 +260,66 @@ function CosmicStatCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       className="
-        relative overflow-hidden rounded-xl border border-[var(--admin-border)]
+        relative min-h-[120px] overflow-hidden rounded-xl border border-[var(--admin-border)]
         bg-[var(--admin-surface)] p-5
       "
+      aria-label={`${label}: ${value}, ${isUp ? 'up' : 'down'} ${Math.abs(trend)} percent from last month`}
     >
-      {/* ── Decorative glow ── */}
-      <div
-        className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-10 blur-2xl"
-        style={{ background: color }}
-      />
+      <div className="flex items-center justify-between">
+        {/* ── Left: icon + text ── */}
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+              style={{ background: `${color}18` }}
+            >
+              <Icon className="h-5 w-5" style={{ color }} />
+            </div>
+            <div>
+              <p className="text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)]">
+                {label}
+              </p>
+              <p className="mt-0.5 text-[28px] font-bold leading-none text-[var(--admin-text)]">
+                {formatValue(animated)}
+              </p>
+            </div>
+          </div>
 
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[12px] font-medium uppercase tracking-wider text-[var(--admin-text-muted)]">
-            {label}
-          </p>
-          <p className="mt-2 text-[28px] font-bold leading-none text-[var(--admin-text)]">
-            {formatValue(animated)}
-          </p>
+          {/* ── Trend indicator ── */}
+          <div className="mt-3 flex items-center gap-1">
+            {isUp ? (
+              <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
+            ) : (
+              <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
+            )}
+            <span
+              className={`text-[12px] font-semibold ${
+                isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
+              }`}
+            >
+              {isUp ? '+' : ''}{trend}%
+            </span>
+            <span className="text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
+          </div>
         </div>
-        <div
-          className="flex h-12 w-12 items-center justify-center rounded-xl"
-          style={{ background: `${color}18` }}
-        >
-          <Icon className="h-7 w-7" style={{ color }} />
-        </div>
-      </div>
 
-      {/* ── Trend indicator ── */}
-      <div className="mt-3 flex items-center gap-1">
-        {isUp ? (
-          <TrendingUp className="h-3.5 w-3.5 text-[var(--admin-success)]" />
-        ) : (
-          <TrendingDown className="h-3.5 w-3.5 text-[var(--admin-error)]" />
-        )}
-        <span
-          className={`text-[12px] font-semibold ${
-            isUp ? 'text-[var(--admin-success)]' : 'text-[var(--admin-error)]'
-          }`}
-        >
-          {isUp ? '+' : ''}{trend}%
-        </span>
-        <span className="text-[11px] text-[var(--admin-text-subtle)]">vs last month</span>
+        {/* ── Right: illustration slot (desktop only) ── */}
+        <div className="hidden h-16 w-16 shrink-0 md:block">
+          { }
+          <Image
+            src={`/icons/admin/kpi/${kpiKey}.svg`}
+            alt=""
+            width={64}
+            height={64}
+            className="h-16 w-16 object-contain"
+            onError={(e) => {
+              // Hide the image element if the asset is missing
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        </div>
       </div>
     </motion.div>
   );
@@ -197,6 +328,17 @@ function CosmicStatCard({
 // ── Revenue chart (Recharts) ──────────────────────────────────
 
 function RevenueChart() {
+  const [yearView, setYearView] = useState<'this' | 'last'>('this');
+  const isDark = useIsDark();
+
+  const data = yearView === 'this' ? REVENUE_DATA_THIS_YEAR : REVENUE_DATA_LAST_YEAR;
+
+  const formatY = (v: number) => {
+    if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
+    if (v >= 1000) return `₹${(v / 1000).toFixed(0)}K`;
+    return `₹${v}`;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -207,38 +349,73 @@ function RevenueChart() {
         bg-[var(--admin-surface)] p-5
       "
     >
-      <h3 className="mb-4 text-[15px] font-semibold text-[var(--admin-text)]">
-        Revenue Overview
-      </h3>
+      {/* ── Header row ── */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
+            Revenue Overview
+          </h3>
+          <p className="mt-0.5 text-[12px] text-[var(--admin-text-muted)]">
+            Monthly invoiced vs collected
+          </p>
+        </div>
+        {/* ── Year toggle ── */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setYearView('this')}
+            className="rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors"
+            style={{
+              background: yearView === 'this' ? 'var(--admin-primary)' : 'var(--admin-surface-2)',
+              color: yearView === 'this' ? '#FFFFFF' : 'var(--admin-text-muted)',
+            }}
+          >
+            This Year
+          </button>
+          <button
+            type="button"
+            onClick={() => setYearView('last')}
+            className="rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors"
+            style={{
+              background: yearView === 'last' ? 'var(--admin-primary)' : 'var(--admin-surface-2)',
+              color: yearView === 'last' ? '#FFFFFF' : 'var(--admin-text-muted)',
+            }}
+          >
+            Last Year
+          </button>
+        </div>
+      </div>
+
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={REVENUE_DATA} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
+          <BarChart data={data} barGap={4}>
+            <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#232B3D' : '#E5E7EB'} />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 12, fill: 'var(--admin-text-muted)' }}
-              axisLine={{ stroke: 'var(--admin-border)' }}
+              tick={{ fontSize: 12, fill: isDark ? '#9CA3B4' : '#6B7280' }}
+              axisLine={{ stroke: isDark ? '#232B3D' : '#E5E7EB' }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: 'var(--admin-text-muted)' }}
+              tick={{ fontSize: 12, fill: isDark ? '#9CA3B4' : '#6B7280' }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}K`}
+              tickFormatter={formatY}
             />
             <Tooltip
               contentStyle={{
-                background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border)',
+                background: isDark ? '#131826' : '#FFFFFF',
+                border: `1px solid ${isDark ? '#232B3D' : '#E5E7EB'}`,
                 borderRadius: 8,
                 fontSize: 13,
+                color: isDark ? '#F5F7FA' : '#1F2937',
               }}
               formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, '']}
             />
             <Legend
               iconType="circle"
               iconSize={8}
-              wrapperStyle={{ fontSize: 12, color: 'var(--admin-text-muted)' }}
+              wrapperStyle={{ fontSize: 12, color: isDark ? '#9CA3B4' : '#6B7280' }}
             />
             <Bar dataKey="invoiced" name="Invoiced" fill="#818CF8" radius={[4, 4, 0, 0]} />
             <Bar dataKey="collected" name="Collected" fill="#34D399" radius={[4, 4, 0, 0]} />
@@ -249,12 +426,44 @@ function RevenueChart() {
   );
 }
 
-// ── Fee Summary card ──────────────────────────────────────────
+// ── Fee Breakdown card (donut chart) ──────────────────────────
 
-function FeeSummaryCard() {
+function FeeBreakdownCard() {
+  const isDark = useIsDark();
   const collectedPct = Math.round((FEE_SUMMARY.collected / FEE_SUMMARY.total) * 100);
   const pendingPct = Math.round((FEE_SUMMARY.pending / FEE_SUMMARY.total) * 100);
   const overduePct = Math.round((FEE_SUMMARY.overdue / FEE_SUMMARY.total) * 100);
+
+  // Donut center label
+  const renderCenterLabel = () => {
+    return (
+      <text
+        x="50%"
+        y="45%"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={isDark ? '#F5F7FA' : '#1F2937'}
+        style={{ fontSize: 20, fontWeight: 700 }}
+      >
+        ₹8.75L
+      </text>
+    );
+  };
+
+  const renderCenterSublabel = () => {
+    return (
+      <text
+        x="50%"
+        y="60%"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={isDark ? '#9CA3B4' : '#6B7280'}
+        style={{ fontSize: 12 }}
+      >
+        Total
+      </text>
+    );
+  };
 
   return (
     <motion.div
@@ -265,11 +474,17 @@ function FeeSummaryCard() {
         rounded-xl border border-[var(--admin-border)]
         bg-[var(--admin-surface)] p-5
       "
+      aria-label={`Fee breakdown: ${collectedPct}% collected, ${pendingPct}% pending, ${overduePct}% overdue`}
     >
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
-          Fee Summary
-        </h3>
+        <div>
+          <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
+            Fee Breakdown
+          </h3>
+          <p className="mt-0.5 text-[12px] text-[var(--admin-text-muted)]">
+            Current fee collection status
+          </p>
+        </div>
         <Link
           href="/admin/fees"
           className="
@@ -281,27 +496,38 @@ function FeeSummaryCard() {
         </Link>
       </div>
 
-      <p className="text-[24px] font-bold text-[var(--admin-text)]">
-        ₹{(FEE_SUMMARY.total / 100000).toFixed(1)}L
-        <span className="ml-2 text-[13px] font-normal text-[var(--admin-text-muted)]">total</span>
-      </p>
-
-      {/* ── Progress bar ── */}
-      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-[var(--admin-border)]">
-        <div className="flex h-full">
-          <div
-            className="rounded-l-full bg-[var(--admin-success)]"
-            style={{ width: `${collectedPct}%` }}
-          />
-          <div
-            className="bg-[var(--admin-warning)]"
-            style={{ width: `${pendingPct}%` }}
-          />
-          <div
-            className="rounded-r-full bg-[var(--admin-error)]"
-            style={{ width: `${overduePct}%` }}
-          />
-        </div>
+      {/* ── Donut chart ── */}
+      <div className="h-[200px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={FEE_PIE_DATA}
+              cx="50%"
+              cy="50%"
+              innerRadius="55%"
+              outerRadius="80%"
+              paddingAngle={2}
+              dataKey="value"
+              stroke="none"
+            >
+              {FEE_PIE_DATA.map((_entry, index) => (
+                <Cell key={`cell-${index}`} fill={FEE_PIE_COLORS[index]} />
+              ))}
+            </Pie>
+            {renderCenterLabel()}
+            {renderCenterSublabel()}
+            <Tooltip
+              formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, '']}
+              contentStyle={{
+                background: isDark ? '#131826' : '#FFFFFF',
+                border: `1px solid ${isDark ? '#232B3D' : '#E5E7EB'}`,
+                borderRadius: 8,
+                fontSize: 13,
+                color: isDark ? '#F5F7FA' : '#1F2937',
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
 
       {/* ── Breakdown ── */}
@@ -344,10 +570,23 @@ function RecentActivity() {
       "
     >
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
-          Recent Activity
-        </h3>
-        <span className="text-[12px] text-[var(--admin-text-muted)]">Last 24 hours</span>
+        <div>
+          <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
+            Recent Activity
+          </h3>
+          <p className="mt-0.5 text-[12px] text-[var(--admin-text-muted)]">
+            Latest actions and events
+          </p>
+        </div>
+        <Link
+          href="/admin/dashboard"
+          className="
+            inline-flex items-center gap-1 text-[12px] font-medium
+            text-[var(--admin-primary)] transition-colors hover:underline
+          "
+        >
+          View All <ArrowRight className="h-3 w-3" />
+        </Link>
       </div>
 
       <div className="divide-y divide-[var(--admin-border)]">
@@ -377,29 +616,201 @@ function RecentActivity() {
   );
 }
 
+// ── Admission Pipeline ─────────────────────────────────────────
+
+function AdmissionPipeline() {
+  const maxCount = Math.max(...ADMISSION_PIPELINE.map((s) => s.count));
+  const totalPipeline = ADMISSION_PIPELINE.reduce((sum, s) => sum + s.count, 0);
+  const isDark = useIsDark();
+  const colors = isDark ? PIPELINE_COLORS_DARK : PIPELINE_COLORS;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.5, ease: 'easeOut' }}
+      className="
+        rounded-xl border border-[var(--admin-border)]
+        bg-[var(--admin-surface)] p-5
+      "
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
+            Admission Pipeline
+          </h3>
+          <p className="mt-0.5 text-[12px] text-[var(--admin-text-muted)]">
+            Lead conversion funnel
+          </p>
+        </div>
+        <Link
+          href="/admin/admission"
+          className="
+            inline-flex items-center gap-1 text-[12px] font-medium
+            text-[var(--admin-primary)] transition-colors hover:underline
+          "
+        >
+          View Details <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <div className="space-y-3">
+        {ADMISSION_PIPELINE.map((stage, idx) => {
+          const pct = Math.round((stage.count / maxCount) * 100);
+          return (
+            <div
+              key={stage.stage}
+              role="meter"
+              aria-valuenow={stage.count}
+              aria-valuemin={0}
+              aria-valuemax={maxCount}
+              aria-label={`${stage.stage}: ${stage.count} leads`}
+              className="flex items-center gap-3"
+            >
+              <div className="w-[72px] shrink-0">
+                <span className="text-[13px] font-semibold text-[var(--admin-text)]">
+                  {stage.stage}
+                </span>
+                <span className="ml-1.5 text-[13px] font-mono text-[var(--admin-text-muted)]">
+                  {stage.count}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--admin-surface-2)]">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${pct}%`,
+                      backgroundColor: colors[idx],
+                      transitionDuration: '500ms',
+                    }}
+                  />
+                </div>
+              </div>
+              <span className="w-10 text-right text-[12px] text-[var(--admin-text-subtle)]">
+                {pct}%
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 border-t border-[var(--admin-border)] pt-3">
+        <p className="text-[14px] font-bold text-[var(--admin-text)]">
+          Total Pipeline: <span className="font-mono">{totalPipeline}</span>
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Quick Reports ──────────────────────────────────────────────
+
+function QuickReports() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
+      className="
+        rounded-xl border border-[var(--admin-border)]
+        bg-[var(--admin-surface)] p-5
+      "
+    >
+      <div className="mb-4">
+        <h3 className="text-[15px] font-semibold text-[var(--admin-text)]">
+          Quick Reports
+        </h3>
+        <p className="mt-0.5 text-[12px] text-[var(--admin-text-muted)]">
+          Jump to frequently used reports
+        </p>
+      </div>
+
+      <div className="space-y-1">
+        {QUICK_REPORTS.map((report) => {
+          const Icon = report.icon;
+          return (
+            <Link
+              key={report.label}
+              href={report.href}
+              className="
+                flex items-center gap-3 rounded-lg px-3 py-2.5
+                text-[14px] font-medium text-[var(--admin-text)]
+                transition-colors
+                hover:bg-[var(--admin-surface-2)]
+              "
+              style={{ transitionDuration: '150ms' }}
+            >
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                style={{ background: 'var(--admin-primary-soft)' }}
+              >
+                <Icon className="h-5 w-5 text-[var(--admin-primary)]" />
+              </div>
+              <span className="flex-1">{report.label}</span>
+              <ChevronRight className="h-4 w-4 text-[var(--admin-text-subtle)]" />
+            </Link>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── PreO Mascot (decorative, bottom-right) ─────────────────────
+
+function PreOMascot() {
+  const [hasAsset, setHasAsset] = useState(true);
+
+  if (!hasAsset) return null;
+
+  return (
+    <div className="pointer-events-none fixed bottom-6 right-6 z-10 hidden lg:block">
+      { }
+      <Image
+        src="/characters/preo-superhero.svg"
+        alt="PreO mascot"
+        width={80}
+        height={80}
+        className="h-20 w-20 object-contain"
+        onError={() => setHasAsset(false)}
+      />
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────
 
 export default function AdminDashboardPage() {
+  const greeting = useMemo(() => getGreeting(), []);
+  const datePill = useMemo(() => getDatePill(), []);
+
   return (
     <div>
-      {/* ── Page header ── */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <ModuleIcon iconKey="dashboard" size={72} />
-          <div>
-            <h1 className="text-[20px] font-semibold text-[var(--admin-text)]">
-              Dashboard
-            </h1>
-            <p className="mt-1 text-[14px] text-[var(--admin-text-muted)]">
-              KPIs, charts and school overview
-            </p>
-          </div>
+      {/* ── Welcome section ── */}
+      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-[24px] font-semibold text-[var(--admin-text)]">
+            {greeting}, Admin! 👋
+          </h1>
+          <p className="mt-1 text-[14px] text-[var(--admin-text-muted)]">
+            Here&apos;s your preschool overview at a glance.
+          </p>
+        </div>
+        <div
+          className="
+            hidden shrink-0 items-center rounded-lg border
+            border-[var(--admin-border)] bg-[var(--admin-surface)]
+            px-3 py-1.5 sm:inline-flex
+          "
+        >
+          <span className="text-[13px] text-[var(--admin-text-muted)]">{datePill}</span>
         </div>
       </div>
 
-      {/* ── KPI row ── */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        {KPI_DATA.map((kpi) => (
+      {/* ── KPI grid (3×2) ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {KPI_DATA.map((kpi, idx) => (
           <CosmicStatCard
             key={kpi.key}
             label={kpi.label}
@@ -407,24 +818,31 @@ export default function AdminDashboardPage() {
             trend={kpi.trend}
             icon={kpi.icon}
             color={kpi.color}
+            kpiKey={kpi.key}
             prefix={'prefix' in kpi ? (kpi as { prefix?: string }).prefix : ''}
             suffix={'suffix' in kpi ? (kpi as { suffix?: string }).suffix : ''}
+            delay={idx * 0.06}
           />
         ))}
       </div>
 
-      {/* ── Charts + Fee summary row ── */}
+      {/* ── Charts + Fee breakdown row ── */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <RevenueChart />
         </div>
-        <FeeSummaryCard />
+        <FeeBreakdownCard />
       </div>
 
-      {/* ── Recent Activity ── */}
-      <div className="mt-6">
+      {/* ── Bottom row: Activity + Pipeline + Quick Reports ── */}
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <RecentActivity />
+        <AdmissionPipeline />
+        <QuickReports />
       </div>
+
+      {/* ── PreO mascot (optional, desktop only) ── */}
+      <PreOMascot />
     </div>
   );
 }
