@@ -102,8 +102,7 @@ export function CosmicStatCard({
               {icon}
             </span>
           </div>
-        )}
-      </div>
+        </div>
 
       {/* Value — responsive typography */}
       <div className="text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">
@@ -125,9 +124,16 @@ export function CosmicStatCard({
             ) : (
               <TrendingDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             )}
-            {trend.positive ? '+' : ''}
-            {trend.value}%
-          </span>
+            <span
+              className={cn(
+                'text-[11px] sm:text-xs font-semibold',
+                trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
+              )}
+            >
+              {trend.positive ? '+' : ''}{trend.value}%
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[var(--text-tertiary)]">vs last month</span>
+          </div>
         )}
       </div>
 
