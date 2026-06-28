@@ -13,12 +13,17 @@
 // Color rules:
 //   ALL colors use var(--admin-*) CSS variables — no hardcoded
 //   hex or Tailwind color classes in JSX.
+//
+// Accessibility:
+//   - aria-labels on all interactive elements
+//   - focus-visible ring on card links
+//   - prefers-reduced-motion: disables transforms, keeps opacity
 // ============================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PageTransition } from '@/components/ui/page-transition';
+import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard } from '@/components/ui/preone-card';
 import {
   Building2,
@@ -30,6 +35,22 @@ import {
   ArrowRight,
   Settings,
 } from 'lucide-react';
+
+// ── prefers-reduced-motion hook ───────────────────────────────
+
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return reduced;
+}
 
 // ── Mock data (replace with API calls later) ──────────────────
 
@@ -104,6 +125,7 @@ const SETUP_MODULES: SetupModule[] = [
 
 function SetupModuleCard({ module }: { module: SetupModule }) {
   const [hasIllustration, setHasIllustration] = useState(true);
+  const reducedMotion = usePrefersReducedMotion();
   const Icon = module.icon;
   const StatusIcon = module.statusIcon;
 
@@ -111,7 +133,12 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
     <Link
       href={module.href}
       aria-label={`${module.title} — ${module.statusText}`}
-      className="group block"
+      className={`
+        group block
+        focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2
+        rounded-3xl
+      `}
     >
       <PreOneCard
         variant="default"
@@ -129,7 +156,10 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
                   alt=""
                   width={96}
                   height={72}
-                  className="h-[72px] w-[96px] object-contain"
+                  className={`
+                    h-[72px] w-[96px] object-contain
+                    ${reducedMotion ? '' : 'transition-transform duration-200 group-hover:scale-105'}
+                  `}
                   onError={() => setHasIllustration(false)}
                 />
               ) : (
@@ -142,7 +172,7 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
               )}
             </div>
 
-            {/* Right: circular icon badge */}
+            {/* Right: circular icon badge (32px) */}
             <div
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
               style={{ background: 'var(--admin-primary)' }}
@@ -193,13 +223,18 @@ function SetupModuleCard({ module }: { module: SetupModule }) {
 
             {/* Arrow button */}
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200"
-              style={{
-                background: 'var(--admin-surface-2)',
-              }}
+              className={`
+                flex h-8 w-8 items-center justify-center rounded-full
+                transition-all duration-200
+                group-hover:bg-[var(--admin-primary-soft)]
+              `}
+              style={{ background: 'var(--admin-surface-2)' }}
             >
               <ArrowRight
-                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                className={`
+                  h-4 w-4 transition-transform duration-200
+                  ${reducedMotion ? '' : 'group-hover:translate-x-0.5'}
+                `}
                 style={{ color: 'var(--admin-primary)' }}
                 aria-hidden="true"
               />
@@ -230,10 +265,10 @@ function SpeechBubble() {
           className="text-[13px] font-medium"
           style={{ color: 'var(--admin-text)' }}
         >
-          Let&apos;s set everything up the right way! 🚀
+          Let&apos;s set everything up the right way!
         </p>
       </div>
-      {/* Tail */}
+      {/* Tail (outer border) */}
       <div
         className="absolute -bottom-2 right-6 h-0 w-0"
         style={{
@@ -242,6 +277,7 @@ function SpeechBubble() {
           borderTop: '8px solid var(--admin-border)',
         }}
       />
+      {/* Tail (inner fill) */}
       <div
         className="absolute -bottom-[7px] right-[25px] h-0 w-0"
         style={{
@@ -285,7 +321,7 @@ export default function SetupLandingPage() {
         {/* ── Page header ── */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-start gap-4">
-            {/* Icon slot */}
+            {/* Gear icon */}
             <div
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
               style={{ background: 'var(--admin-primary-soft)' }}
@@ -293,6 +329,7 @@ export default function SetupLandingPage() {
               <Settings
                 className="h-7 w-7"
                 style={{ color: 'var(--admin-primary)' }}
+                aria-hidden="true"
               />
             </div>
 
@@ -317,12 +354,14 @@ export default function SetupLandingPage() {
           <PreOCharacter />
         </div>
 
-        {/* ── Module card grid ── */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* ── Module card grid with stagger entrance ── */}
+        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {SETUP_MODULES.map((mod) => (
-            <SetupModuleCard key={mod.key} module={mod} />
+            <StaggerItem key={mod.key}>
+              <SetupModuleCard module={mod} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </PageTransition>
   );
