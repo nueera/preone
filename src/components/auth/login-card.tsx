@@ -51,7 +51,7 @@ import {
 
 // ── Role-based redirect mapping ──
 const ROLE_DASHBOARD: Record<string, string> = {
-  ADMIN: '/admin/dashboard',
+  ADMIN: '/admin',
   TASK_MASTER: '/admin/crm',
   TEACHER: '/teacher/dashboard',
   PARENT: '/parent/dashboard',
