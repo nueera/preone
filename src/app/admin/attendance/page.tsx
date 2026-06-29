@@ -1,7 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { AttendancePage } from '@/components/admin/module-stubs';
-
-export default function Page() {
-  return <AttendancePage />;
+export default function AttendanceRedirectPage() {
+  redirect('/admin/operations/attendance');
 }
