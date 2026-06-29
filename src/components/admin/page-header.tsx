@@ -11,17 +11,16 @@
 //   ┌──────────────────────────────────────────────┐
 //   │ ← Back to Dashboard                           │
 //   │                                                │
-//   │ [icon 40px]  Module Title     [+ Action Btn]  │
-//   │              Subtitle text                     │
+//   │ [icon 36-48px]  Module Title     [+ Action]   │
+//   │                 Subtitle text                  │
 //   └──────────────────────────────────────────────┘
 //
 // Back link: always goes to /admin.
-// Primary action: indigo button, hidden on < sm (moves to ⋯ menu
-// on mobile — the menu is the consuming page's responsibility).
+// Primary action: full label on sm+, icon-only on mobile.
 // ============================================================
 
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { ModuleIcon } from '@/components/admin/module-icons';
 
 interface PageHeaderProps {
@@ -63,11 +62,11 @@ export function PageHeader({
       </Link>
 
       {/* ── Title row ── */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <ModuleIcon iconKey={iconKey} size={48} />
-          <div>
-            <h1 className="text-[24px] font-bold leading-tight text-[var(--admin-text)]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <ModuleIcon iconKey={iconKey} size={36} smSize={48} />
+          <div className="min-w-0">
+            <h1 className="page-heading font-bold leading-tight text-[var(--admin-text)]">
               {title}
             </h1>
             <p className="mt-0.5 text-[14px] text-[var(--admin-text-muted)]">
@@ -76,21 +75,22 @@ export function PageHeader({
           </div>
         </div>
 
-        {/* ── Primary action (hidden < sm) ── */}
+        {/* ── Primary action (icon-only on mobile, full label on sm+) ── */}
         {primaryAction && (
           <button
             type="button"
             onClick={onPrimaryAction}
             className="
-              hidden h-9 items-center rounded-md px-4
+              flex h-9 items-center justify-center rounded-md px-3 sm:px-4
               bg-[var(--admin-primary)] text-[13px] font-semibold text-white
               transition-colors hover:bg-[var(--admin-primary-hover)]
               focus-visible:outline-none focus-visible:ring-2
               focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2
-              sm:inline-flex
+              flex-shrink-0
             "
           >
-            {primaryAction}
+            <Plus className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">{primaryAction}</span>
           </button>
         )}
       </div>

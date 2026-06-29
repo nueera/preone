@@ -25,22 +25,23 @@ interface ModuleCardProps {
   module: ModuleDef;
 }
 
-// Per-module icon size overrides (default = 64px)
-const ICON_SIZES: Record<string, number> = {
-  attendance: 112,
-  operations: 96,
-  teachers: 96,
-  settings: 80,
-  fees: 80,
-  communication: 80,
-  reports: 80,
-  'growth-passport': 80,
+// Per-module icon size overrides — [mobile, desktop]
+const ICON_SIZES: Record<string, [number, number]> = {
+  attendance: [64, 112],
+  operations: [56, 96],
+  teachers: [56, 96],
+  settings: [48, 80],
+  fees: [48, 80],
+  communication: [48, 80],
+  reports: [48, 80],
+  'growth-passport': [48, 80],
 };
+const DEFAULT_ICON_SIZE: [number, number] = [40, 64];
 
 export function ModuleCard({ module }: ModuleCardProps) {
   const isHero = module.key === 'daily-milestones';
   const hasBadge = module.badge != null && module.badge > 0;
-  const iconSize = ICON_SIZES[module.key] ?? 64;
+  const [mobileSize, desktopSize] = ICON_SIZES[module.key] ?? DEFAULT_ICON_SIZE;
 
   return (
     <Link
@@ -49,14 +50,14 @@ export function ModuleCard({ module }: ModuleCardProps) {
       className="
         group relative flex flex-col items-center justify-center
         rounded-xl border border-[var(--admin-border)]
-        bg-[var(--admin-surface)] p-6 text-center
+        bg-[var(--admin-surface)] p-4 sm:p-6 text-center
         transition-all duration-200
         hover:-translate-y-1 hover:border-[var(--admin-primary)]/30
         hover:shadow-[var(--admin-shadow-card-hover)]
         focus-visible:outline-none focus-visible:ring-2
         focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2
       "
-      style={{ minHeight: isHero ? 180 : 160 }}
+      style={{ minHeight: isHero ? 160 : 140 }}
     >
       {/* ── Notification badge (communication only) ── */}
       {hasBadge && (
@@ -73,11 +74,11 @@ export function ModuleCard({ module }: ModuleCardProps) {
 
       {/* ── Icon ── */}
       <motion.span
-        className="mb-4 flex items-center justify-center"
+        className="mb-3 sm:mb-4 flex items-center justify-center"
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <ModuleIcon iconKey={module.key} size={iconSize} />
+        <ModuleIcon iconKey={module.key} size={mobileSize} smSize={desktopSize} />
       </motion.span>
 
       {/* ── Label ── */}

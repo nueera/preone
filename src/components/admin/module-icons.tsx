@@ -80,16 +80,22 @@ export const MODULE_ICONS: Record<string, ModuleIconConfig> = {
 interface ModuleIconProps {
   iconKey: string;
   size?: number;
+  /** Optional larger size on sm+ screens for responsive icons */
+  smSize?: number;
   className?: string;
 }
 
 /**
  * Renders a module icon. Modules with custom webp assets render
  * a Next.js <Image>; others fall back to a lucide-react icon.
+ * Supports responsive sizing via `size` (mobile) + `smSize` (desktop).
  */
-export function ModuleIcon({ iconKey, size = 48, className = '' }: ModuleIconProps) {
+export function ModuleIcon({ iconKey, size = 36, smSize, className = '' }: ModuleIconProps) {
   const cfg = MODULE_ICONS[iconKey];
   if (!cfg) return null;
+
+  // Use smSize if provided for larger screens
+  const desktopSize = smSize ?? size;
 
   // ── Custom webp icon available ──
   if (CUSTOM_ICON_KEYS.has(iconKey)) {
@@ -97,9 +103,9 @@ export function ModuleIcon({ iconKey, size = 48, className = '' }: ModuleIconPro
       <Image
         src={cfg.asset}
         alt=""
-        width={size}
-        height={size}
-        className={`object-contain ${className}`}
+        width={desktopSize}
+        height={desktopSize}
+        className={`object-contain w-[${size}px] h-[${size}px] sm:w-[${desktopSize}px] sm:h-[${desktopSize}px] ${className}`}
         priority={false}
       />
     );
@@ -109,8 +115,8 @@ export function ModuleIcon({ iconKey, size = 48, className = '' }: ModuleIconPro
   const FallbackIcon = cfg.fallback;
   return (
     <FallbackIcon
-      size={size}
-      className={`text-[var(--admin-primary)] ${className}`}
+      size={desktopSize}
+      className={`text-[var(--admin-primary)] w-[${size}px] h-[${size}px] sm:w-[${desktopSize}px] sm:h-[${desktopSize}px] ${className}`}
       strokeWidth={1.5}
     />
   );

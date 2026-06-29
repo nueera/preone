@@ -230,7 +230,7 @@ export function AdminLayoutClient({
 
       {/* ── Scrollable content area ── */}
       <main
-        className="flex-1 overflow-y-auto bg-[var(--admin-bg)] p-6 md:p-8"
+        className="flex-1 overflow-y-auto bg-[var(--admin-bg)] p-4 sm:p-6 md:p-8"
       >
         <div className="mx-auto max-w-[1440px]">
           <AnimatePresence mode="wait">

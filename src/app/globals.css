@@ -1057,6 +1057,52 @@
    RESPONSIVE UTILITIES — PreOne
    ============================================================ */
 
+/* ── Global Responsive: Cards ── */
+[data-slot="preone-card"] {
+  /* Cards always adapt padding on mobile */
+}
+@media (max-width: 639px) {
+  [data-slot="preone-card"] {
+    border-radius: 16px !important;
+  }
+  [data-slot="preone-card-content"] {
+    padding: 16px !important;
+  }
+}
+
+/* ── Global Responsive: Module Cards (dashboard grid) ── */
+@media (max-width: 639px) {
+  .module-card-icon {
+    transform: scale(0.7);
+    transform-origin: center;
+  }
+}
+
+/* ── Global Responsive: Page Headings ── */
+.page-heading {
+  font-size: 22px;
+}
+@media (min-width: 640px) {
+  .page-heading {
+    font-size: 28px;
+  }
+}
+
+/* ── Global Responsive: Section Headings ── */
+.section-heading {
+  font-size: 18px;
+}
+@media (min-width: 640px) {
+  .section-heading {
+    font-size: 20px;
+  }
+}
+
+/* ── Global Responsive: Illustration Areas ── */
+.illustration-area {
+  /* Always show illustrations on mobile, but compact */
+}
+
 /* ── Mobile-first touch targets (min 44px for accessibility) ── */
 @media (max-width: 767px) {
   /* Ensure buttons have adequate touch targets on mobile */
@@ -1082,11 +1128,6 @@
   .input-mobile-full {
     width: 100%;
   }
-
-  /* Reduce heading sizes on mobile */
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1.125rem; }
 
   /* Prevent horizontal overflow */
   .overflow-container {

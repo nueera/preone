@@ -164,40 +164,40 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
         style={{ backgroundColor: `var(${module.accentSoftVar}, ${module.accentSoftHex})` }}
       >
         {/* Top accent circle with icon */}
-        <div className="pt-6 pb-2 flex flex-col items-center">
+        <div className="pt-4 sm:pt-6 pb-2 flex flex-col items-center">
           <div
-            className="h-12 w-12 rounded-full flex items-center justify-center shadow-sm"
+            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center shadow-sm"
             style={{
               backgroundColor: 'white',
               color: `var(${module.accentVar}, ${module.accentHex})`,
             }}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         </div>
 
         {/* Stat number */}
-        <div className="flex flex-col items-center px-4 pb-2">
+        <div className="flex flex-col items-center px-3 sm:px-4 pb-2">
           <span
-            className="text-3xl font-bold leading-tight"
+            className="text-2xl sm:text-3xl font-bold leading-tight"
             style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
           >
             {statValue}
           </span>
-          <span className="text-xs font-medium text-gray-600 mt-0.5">
+          <span className="text-[11px] sm:text-xs font-medium text-gray-600 mt-0.5">
             {module.statLabel}
           </span>
         </div>
 
-        {/* Illustration area — takes remaining space */}
+        {/* Illustration area — always visible, compact on mobile */}
         <div className="flex-1 w-full relative flex items-end justify-center overflow-hidden">
-          <div className="relative w-[85%] h-full max-h-[180px]">
+          <div className="relative w-[80%] sm:w-[85%] h-full max-h-[140px] sm:max-h-[180px]">
             <Image
               src={module.imageSrc}
               alt={module.title}
               fill
               className="object-contain object-bottom"
-              sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 20vw"
+              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
@@ -207,20 +207,20 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
         </div>
 
         {/* Bottom: title + description + arrow */}
-        <div className="w-full px-4 pt-3 pb-4 flex items-center justify-between">
+        <div className="w-full px-3 sm:px-4 pt-2 sm:pt-3 pb-3 sm:pb-4 flex items-center justify-between">
           <div className="min-w-0">
             <h3
-              className="font-semibold text-sm"
+              className="font-semibold text-[13px] sm:text-sm"
               style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
             >
               {module.title}
             </h3>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-snug truncate">
+            <p className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 leading-snug truncate">
               {module.description}
             </p>
           </div>
           <ChevronRight
-            className="h-4 w-4 flex-shrink-0 text-gray-400 group-hover:translate-x-0.5 transition-transform"
+            className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-gray-400 group-hover:translate-x-0.5 transition-transform"
             style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
           />
         </div>
@@ -271,12 +271,12 @@ export default function CrmDashboardPage() {
     <PageTransition>
       <div className="space-y-6">
         {/* ── Page Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="page-heading font-bold text-gray-900 flex items-center gap-2">
               <span className="text-portal-600">Admission CRM</span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-[13px] sm:text-sm text-gray-500 mt-1">
               Track leads, manage follow-ups, and grow enrollments
             </p>
           </div>
@@ -291,20 +291,20 @@ export default function CrmDashboardPage() {
               className="gap-1.5"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
             <Button
               onClick={() => setAddLeadOpen(true)}
               className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
             >
               <Plus className="h-4 w-4" />
-              Add Lead
+              <span className="hidden sm:inline">Add Lead</span>
             </Button>
           </div>
         </div>
 
         {/* ── CRM Module Cards Grid ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {CRM_MODULES.map((mod) => (
             <CrmModuleCard key={mod.key} module={mod} stats={loading ? null : stats} />
           ))}

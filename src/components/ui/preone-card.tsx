@@ -62,7 +62,7 @@ export function PreOneCardContent({
   return (
     <div
       data-slot="preone-card-content"
-      className={cn('p-6', className)}
+      className={cn('p-4 sm:p-6', className)}
       {...props}
     >
       {children}
