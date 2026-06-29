@@ -126,23 +126,23 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
 
   return (
     <PreOneCard variant="default" hover className="overflow-hidden">
-      <div className="flex flex-row min-h-[280px] sm:min-h-[300px]">
-        {/* Left: Text content — 60% */}
-        <div className="flex-1 p-5 flex flex-col">
+      <div className="flex flex-col sm:flex-row min-h-[280px] sm:min-h-[300px]">
+        {/* Left: Text content */}
+        <div className="flex-1 p-4 sm:p-5 flex flex-col">
           {/* Circular icon badge */}
           <div
-            className="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
+            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center flex-shrink-0"
             style={{
               backgroundColor: `var(${module.accentSoftVar}, ${module.accentSoftHex})`,
               color: `var(${module.accentVar}, ${module.accentHex})`,
             }}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
 
           {/* Title */}
           <h3
-            className="mt-3 text-[20px] font-semibold leading-tight"
+            className="mt-2 sm:mt-3 text-[18px] sm:text-[20px] font-semibold leading-tight"
             style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
           >
             {module.title}
@@ -150,14 +150,14 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
 
           {/* Description */}
           <p
-            className="mt-1 text-[14px] leading-snug"
+            className="mt-1 text-[13px] sm:text-[14px] leading-snug"
             style={{ color: 'var(--admin-text-muted, #6B7280)' }}
           >
             {module.description}
           </p>
 
           {/* Sub-items */}
-          <div className="mt-auto pt-4 space-y-0.5">
+          <div className="mt-auto pt-3 sm:pt-4 space-y-0.5">
             {module.subItems.map((sub) => {
               const SubIcon = sub.icon;
               return (
@@ -177,7 +177,7 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
                 >
                   <SubIcon className="h-4 w-4 flex-shrink-0" />
                   <span
-                    className="text-[14px] font-medium flex-1"
+                    className="text-[13px] sm:text-[14px] font-medium flex-1"
                     style={{ color: 'var(--admin-text, #111827)' }}
                   >
                     {sub.label}
@@ -189,9 +189,9 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
           </div>
         </div>
 
-        {/* Right: Illustration — 40% */}
+        {/* Right: Illustration — always visible, compact on mobile */}
         <div
-          className="hidden sm:flex w-[40%] relative items-center justify-center overflow-hidden"
+          className="relative flex sm:w-[40%] h-32 sm:h-auto items-center justify-center overflow-hidden rounded-b-2xl sm:rounded-b-none sm:rounded-r-2xl"
           style={{ backgroundColor: `var(${module.accentSoftVar}, ${module.accentSoftHex})` }}
         >
           <Image
@@ -199,7 +199,7 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
             alt={module.title}
             fill
             className="object-contain object-center p-3 transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 1024px) 40vw, 20vw"
+            sizes="(max-width: 640px) 100vw, 40vw"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
@@ -207,7 +207,7 @@ function OpsModuleCard({ module }: { module: OpsModule }) {
           />
           {/* Fallback icon when image fails to load */}
           <Icon
-            className="absolute inset-0 m-auto h-20 w-20 opacity-30 pointer-events-none"
+            className="absolute inset-0 m-auto h-16 w-16 sm:h-20 sm:w-20 opacity-30 pointer-events-none"
             style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
           />
         </div>
@@ -225,17 +225,17 @@ export default function OperationsPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div
-              className="h-10 w-10 rounded-xl flex items-center justify-center"
+              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center"
               style={{
                 backgroundColor: 'var(--admin-primary-soft, #F5F3FF)',
                 color: 'var(--admin-primary, #7C3AED)',
               }}
             >
-              <Wrench className="h-5 w-5" />
+              <Wrench className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
             </div>
             <div>
               <h1
-                className="text-[28px] font-bold leading-tight"
+                className="page-heading font-bold leading-tight"
                 style={{ color: 'var(--admin-text, #111827)' }}
               >
                 Operations
@@ -243,7 +243,7 @@ export default function OperationsPage() {
             </div>
           </div>
           <p
-            className="text-[14px] mt-1"
+            className="text-[13px] sm:text-[14px] mt-1"
             style={{ color: 'var(--admin-text-muted, #6B7280)' }}
           >
             Manage daily operations and activities seamlessly
@@ -251,7 +251,7 @@ export default function OperationsPage() {
         </div>
 
         {/* ── Module Cards Grid ── */}
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {OPS_MODULES.map((mod) => (
             <StaggerItem key={mod.key}>
               <OpsModuleCard module={mod} />

@@ -388,7 +388,7 @@ function RevenueChart() {
         </div>
       </div>
 
-      <div className="h-[280px]">
+      <div className="h-[200px] sm:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} barGap={4}>
             <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#232B3D' : '#E5E7EB'} />
@@ -533,7 +533,7 @@ function FeeBreakdownCard() {
       </div>
 
       {/* ── Breakdown ── */}
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { label: 'Collected', value: FEE_SUMMARY.collected, pct: collectedPct, color: 'var(--admin-success)', soft: 'var(--admin-success-soft)' },
           { label: 'Pending', value: FEE_SUMMARY.pending, pct: pendingPct, color: 'var(--admin-warning)', soft: 'var(--admin-warning-soft)' },

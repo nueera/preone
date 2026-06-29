@@ -60,14 +60,14 @@ export function AdminTopbar() {
       role="banner"
       className="
         sticky top-0 z-40 flex h-12 w-full items-center justify-between
-        border-b border-[var(--admin-border)] bg-[var(--admin-surface)] px-6
+        border-b border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 sm:px-6
       "
     >
       {/* ── Left: Brand ── */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         <div
           className="
-            flex h-7 w-7 items-center justify-center rounded-full
+            flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full
           "
           style={{
             background: 'linear-gradient(135deg, var(--admin-primary) 0%, #8B5CF6 100%)',
@@ -81,9 +81,9 @@ export function AdminTopbar() {
             className="rounded-full object-contain"
           />
         </div>
-        <span className="flex items-baseline gap-1 whitespace-nowrap text-[16px] leading-none">
-          <span className="font-bold text-[var(--admin-primary)]">PreOne</span>
-          <span className="font-medium text-[var(--admin-text-muted)]">Preschool ERP</span>
+        <span className="flex items-baseline gap-1 text-[14px] sm:text-[16px] leading-none min-w-0">
+          <span className="font-bold text-[var(--admin-primary)] truncate">PreOne</span>
+          <span className="font-medium text-[var(--admin-text-muted)] hidden sm:inline">Preschool ERP</span>
         </span>
       </div>
 
@@ -93,11 +93,11 @@ export function AdminTopbar() {
       </span>
 
       {/* ── Right: Time + Date + Theme Toggle + Avatar ── */}
-      <div className="flex items-center gap-3">
-        {/* Time pill */}
-        <span className="hidden items-center gap-1.5 sm:flex">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Time — always visible */}
+        <span className="flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5 text-[var(--admin-text-muted)]" />
-          <span className="font-mono text-[13px] text-[var(--admin-text)]">{timeStr}</span>
+          <span className="font-mono text-[12px] sm:text-[13px] text-[var(--admin-text)]">{timeStr}</span>
         </span>
 
         {/* Date pill (hidden < md) */}
