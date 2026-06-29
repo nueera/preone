@@ -119,10 +119,10 @@ export function DailyUpdatesStep() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h2 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-primary)' }}>
+        <h2 className="text-2xl font-bold text-[var(--admin-text)]" style={{ fontFamily: 'var(--font-primary)' }}>
           📱 Daily Updates
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-sm text-[var(--admin-text-muted)] mt-1">
           Choose what information to share with parents throughout the day
         </p>
       </motion.div>
@@ -130,8 +130,8 @@ export function DailyUpdatesStep() {
       {/* What to share with parents */}
       <PreOneCard variant="default">
         <PreOneCardContent>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            <Bell className="w-5 h-5 text-[var(--preone-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+            <Bell className="w-5 h-5 text-[var(--admin-primary)]" />
             What to share with parents
           </h3>
 
@@ -145,8 +145,8 @@ export function DailyUpdatesStep() {
                   className={cn(
                     'flex items-center gap-3 p-3 rounded-xl transition-all',
                     isEnabled
-                      ? 'bg-[var(--preone-primary-50)] border border-[var(--preone-primary)]/20'
-                      : 'bg-[var(--bg-secondary)] border border-transparent hover:border-[var(--border-default)]'
+                      ? 'bg-[var(--admin-primary-soft)] border border-[var(--admin-primary)]/20'
+                      : 'bg-[var(--admin-surface)] border border-transparent hover:border-[var(--admin-border)]'
                   )}
                 >
                   {/* Icon */}
@@ -158,11 +158,11 @@ export function DailyUpdatesStep() {
                   <div className="flex-1 min-w-0">
                     <p className={cn(
                       'text-sm font-medium',
-                      isEnabled ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+                      isEnabled ? 'text-[var(--admin-text)]' : 'text-[var(--admin-text-muted)]'
                     )}>
                       {category.label}
                     </p>
-                    <p className="text-xs text-[var(--text-muted)]">{category.description}</p>
+                    <p className="text-xs text-[var(--admin-text-subtle)]">{category.description}</p>
                   </div>
 
                   {/* Toggle Switch */}
@@ -175,8 +175,8 @@ export function DailyUpdatesStep() {
                     className={cn(
                       'relative w-11 h-6 rounded-full transition-all duration-200 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center',
                       isEnabled
-                        ? 'bg-[var(--preone-primary)]'
-                        : 'bg-[var(--border-default)]'
+                        ? 'bg-[var(--admin-primary)]'
+                        : 'bg-[var(--admin-border)]'
                     )}
                   >
                     <span
@@ -196,8 +196,8 @@ export function DailyUpdatesStep() {
       {/* When to send */}
       <PreOneCard variant="default">
         <PreOneCardContent>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-[var(--preone-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-[var(--admin-primary)]" />
             When to send
           </h3>
 
@@ -213,8 +213,8 @@ export function DailyUpdatesStep() {
                   className={cn(
                     'w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left',
                     isSelected
-                      ? 'bg-[var(--preone-primary-50)] border-2 border-[var(--preone-primary)]'
-                      : 'bg-[var(--bg-secondary)] border-2 border-transparent hover:border-[var(--border-default)]'
+                      ? 'bg-[var(--admin-primary-soft)] border-2 border-[var(--admin-primary)]'
+                      : 'bg-[var(--admin-surface)] border-2 border-transparent hover:border-[var(--admin-border)]'
                   )}
                 >
                   {/* Radio indicator */}
@@ -222,12 +222,12 @@ export function DailyUpdatesStep() {
                     className={cn(
                       'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all',
                       isSelected
-                        ? 'border-[var(--preone-primary)]'
-                        : 'border-[var(--border-default)]'
+                        ? 'border-[var(--admin-primary)]'
+                        : 'border-[var(--admin-border)]'
                     )}
                   >
                     {isSelected && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--preone-primary)]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--admin-primary)]" />
                     )}
                   </div>
 
@@ -240,11 +240,11 @@ export function DailyUpdatesStep() {
                   <div className="flex-1">
                     <p className={cn(
                       'text-sm font-medium',
-                      isSelected ? 'text-[var(--preone-primary)]' : 'text-[var(--text-primary)]'
+                      isSelected ? 'text-[var(--admin-primary)]' : 'text-[var(--admin-text)]'
                     )}>
                       {option.label}
                     </p>
-                    <p className="text-xs text-[var(--text-muted)]">{option.description}</p>
+                    <p className="text-xs text-[var(--admin-text-subtle)]">{option.description}</p>
                   </div>
                 </button>
               );
@@ -259,12 +259,12 @@ export function DailyUpdatesStep() {
               exit={{ opacity: 0, height: 0 }}
               className="mt-3 flex items-center gap-3"
             >
-              <label className="text-sm font-medium text-[var(--text-primary)]">Send at:</label>
+              <label className="text-sm font-medium text-[var(--admin-text)]">Send at:</label>
               <input
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="px-4 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="px-4 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </motion.div>
           )}
@@ -274,8 +274,8 @@ export function DailyUpdatesStep() {
       {/* Notify parents via */}
       <PreOneCard variant="default">
         <PreOneCardContent>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            <Send className="w-5 h-5 text-[var(--preone-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+            <Send className="w-5 h-5 text-[var(--admin-primary)]" />
             Notify parents via
           </h3>
 
@@ -291,8 +291,8 @@ export function DailyUpdatesStep() {
                   className={cn(
                     'flex items-center gap-2 px-4 py-3 rounded-xl transition-all text-sm font-medium min-h-[44px]',
                     isSelected
-                      ? 'bg-[var(--preone-primary)] text-white shadow-md shadow-[var(--preone-primary)]/25'
-                      : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--preone-primary)]/50'
+                      ? 'bg-[var(--admin-primary)] text-white shadow-md shadow-[var(--admin-primary)]/25'
+                      : 'bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:border-[var(--admin-primary)]/50'
                   )}
                 >
                   <span className="text-lg" role="img" aria-hidden="true">
@@ -305,7 +305,7 @@ export function DailyUpdatesStep() {
           </div>
 
           {channels.size === 0 && (
-            <p className="mt-2 text-xs text-amber-500">
+            <p className="mt-2 text-xs" style={{ color: 'var(--admin-warning)' }}>
               Please select at least one notification channel
             </p>
           )}
@@ -317,7 +317,7 @@ export function DailyUpdatesStep() {
         <button
           type="button"
           onClick={handleContinue}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--preone-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--admin-primary)] to-[var(--admin-primary)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--admin-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
         >
           Continue →
         </button>

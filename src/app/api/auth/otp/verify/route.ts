@@ -2,27 +2,59 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { generateToken } from '@/lib/auth';
 
+// ============================================================
+// POST /api/auth/otp/verify
+// Verifies a 6-digit OTP against the stored record and, for
+// `purpose: "login"`, returns a JWT token + user object identical
+// to the password login flow.
+//
+// Request body (any of these shapes — backward compatible):
+//   { identifier: "user@example.com" | "+91...", code: "123456" }  ← preferred
+//   { email: "user@example.com", code: "123456" }                  ← alias
+//   { phone: "+91...", code: "123456" }                            ← alias
+//   { purpose?: "login" | "verify_email" | "reset_password" }      (default "login")
+//
+// The `identifier` is auto-detected: if it contains "@", it's treated
+// as an email; otherwise as a phone.
+// ============================================================
+
+function looksLikeEmail(value: string): boolean {
+  return value.includes('@');
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { phone, code, purpose = 'login' } = body;
+    const { phone, email, code, purpose = 'login' } = body;
 
-    if (!phone || !code) {
+    // Accept `identifier` (preferred) OR `email` OR `phone` (backward compat)
+    const identifier: string | undefined = body.identifier ?? email ?? phone;
+
+    if (!identifier || !code) {
       return NextResponse.json(
-        { error: 'Phone number and OTP code are required' },
+        { error: 'Email/phone and OTP code are required' },
         { status: 400 }
       );
     }
 
-    // Find user by phone
+    const normalized = identifier.trim();
+    const isEmail = looksLikeEmail(normalized);
+
+    // Find user by email OR phone
     const user = await db.user.findFirst({
-      where: { phone },
+      where: isEmail
+        ? { email: normalized.toLowerCase() }
+        : { phone: normalized },
       include: { branch: true },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: 'No account found with this phone number' },
+        {
+          error: isEmail
+            ? 'No account found with this email'
+            : 'No account found with this phone number',
+        },
         { status: 404 }
       );
     }
@@ -84,11 +116,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (purpose === 'verify_email' || purpose === 'reset_password') {
-      await db.user.update({
-        where: { id: user.id },
-        data: { isVerified: true },
-      });
-
+      // The OTP itself being marked as used (above) is the verification
+      // signal. The User model has no `isVerified` field, so we don't
+      // persist anything additional here — callers (e.g. forgot-password
+      // flow) rely on the OTP record's `isUsed: true` state instead.
       return NextResponse.json({
         message: 'OTP verified successfully',
         verified: true,

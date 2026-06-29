@@ -243,6 +243,59 @@
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
+
+  /* ── Brand accent tokens (login + admin) ── */
+  --brand-purple: #7B2CBF;
+  --brand-blue: #3A86FF;
+  --brand-violet: #8B5CF6;
+  --brand-indigo: #6366F1;
+
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-indigo: var(--brand-indigo);
+
+  /* ── Global transition tokens (used by login + all modules) ── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 240ms ease;
+  --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-theme: 300ms ease;
+
+  /* ── Login page tokens — light defaults, overridden in .dark ── */
+  --login-card: rgba(255, 255, 255, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.6);
+  --login-input: rgba(255, 255, 255, 0.7);
+  --login-input-border: #E5E7EB;
+  --login-text: #1F2937;
+  --login-muted: #6B7280;
+  --login-subtle: #9CA3AF;
+  --login-label: #374151;
+  --login-link: #7C3AED;
+  --login-divider: #E5E7EB;
+  --login-focus: #6366F1;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.5);
+  --login-tab-active: #6366F1;
+  --login-icon: #6366F1;
+  --login-icon-muted: #6B7280;
+
+  --color-login-card: var(--login-card);
+  --color-login-card-border: var(--login-card-border);
+  --color-login-input: var(--login-input);
+  --color-login-input-border: var(--login-input-border);
+  --color-login-text: var(--login-text);
+  --color-login-muted: var(--login-muted);
+  --color-login-subtle: var(--login-subtle);
+  --color-login-label: var(--login-label);
+  --color-login-link: var(--login-link);
+  --color-login-divider: var(--login-divider);
+  --color-login-focus: var(--login-focus);
+  --color-login-error: var(--login-error);
+  --color-login-tab-bg: var(--login-tab-bg);
+  --color-login-tab-active: var(--login-tab-active);
+  --color-login-icon: var(--login-icon);
+  --color-login-icon-muted: var(--login-icon-muted);
 }
 
 /* ============================================================
@@ -418,6 +471,24 @@
 
   --portal: #A78BFA;
   --portal-foreground: #0F172A;
+
+  /* ── Login page dark-mode overrides ── */
+  --login-card: rgba(20, 20, 36, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.08);
+  --login-input: rgba(42, 42, 58, 0.55);
+  --login-input-border: rgba(255, 255, 255, 0.1);
+  --login-text: #F5F7FA;
+  --login-muted: #9CA3B4;
+  --login-subtle: #6B7280;
+  --login-label: #D1D5DB;
+  --login-link: #818CF8;
+  --login-divider: rgba(255, 255, 255, 0.08);
+  --login-focus: #818CF8;
+  --login-error: #F87171;
+  --login-tab-bg: rgba(255, 255, 255, 0.06);
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #9CA3B4;
 }
 
 .dark [data-portal="teacher"] {
@@ -525,7 +596,7 @@
   padding: 24px;
   border: 1px solid #E2E8F0;
   box-shadow: 0px 8px 24px rgba(15,23,42,0.06);
-  transition: all 300ms ease;
+  transition: all var(--transition-smooth);
 }
 
 .card-preone:hover {
@@ -539,7 +610,7 @@
   color: white;
   border-radius: 16px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
   border: none;
   cursor: pointer;
 }
@@ -560,7 +631,7 @@
   color: white;
   border-radius: 16px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
   border: none;
   cursor: pointer;
 }
@@ -577,11 +648,264 @@
 
 /* ── Button: Ghost Hover ── */
 .btn-ghost-preone {
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
 }
 
 .btn-ghost-preone:hover {
   background: #F1F5F9;
+}
+
+/* ============================================================
+   LOGIN PAGE — Glassmorphism + Playful-Space Utilities
+   ============================================================ */
+
+/* ── Login primary button: 135deg purple → blue ── */
+.btn-launch {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--transition-fast), box-shadow var(--transition-normal), transform var(--transition-fast);
+}
+.btn-launch:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(123, 44, 191, 0.35);
+}
+.btn-launch:active:not(:disabled) {
+  transform: scale(0.99);
+}
+.btn-launch:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* ── Glassmorphism card ── */
+.login-card-glass {
+  background: var(--login-card);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--login-card-border);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px 0 rgba(91, 33, 182, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme), box-shadow var(--transition-smooth);
+}
+.dark .login-card-glass {
+  box-shadow:
+    0 20px 60px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── Login input focus ring ── */
+.login-input-focus:focus-within {
+  border-color: var(--login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
+}
+
+/* ── Login wallpaper overlay — theme-aware ── */
+.login-wallpaper-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(123, 44, 191, 0.08) 50%,
+    rgba(10, 10, 26, 0.22) 100%
+  );
+  transition: background var(--transition-theme);
+}
+.dark .login-wallpaper-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 26, 0.55) 0%,
+    rgba(123, 44, 191, 0.35) 100%
+  );
+}
+
+/* ── Login panel backgrounds (transparent — wallpaper shows through) ── */
+.login-panel-dark,
+.login-panel-light {
+  background: transparent;
+}
+
+/* ── Login checkbox checked state ── */
+.login-checkbox-checked {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  border-color: transparent;
+}
+
+/* ── Login theme transition — uses global transition tokens ── */
+.login-theme-transition,
+.login-theme-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: var(--transition-theme);
+  transition-timing-function: ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-theme-transition,
+  .login-theme-transition * {
+    transition: none;
+  }
+  .btn-launch {
+    transition: none;
+  }
+  .btn-launch:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   MOBILE LOGIN — additional rules (redesigned login page)
+   ============================================================ */
+
+/* ── Login page shell: exact viewport height, no scrollbars on desktop ── */
+.login-page-shell {
+  height: 100vh;
+  height: 100dvh; /* dynamic viewport height — accounts for mobile browser chrome */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  overflow: hidden; /* desktop: no scrollbars — wallpaper fills exactly */
+}
+
+/* ── Mobile: allow vertical scroll when keyboard opens ── */
+@media (max-width: 767px) {
+  .login-page-shell {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+/* ── iOS auto-zoom fix: input font-size must be >= 16px on < sm ── */
+@media (max-width: 639px) {
+  .login-card-glass input[type="text"],
+  .login-card-glass input[type="email"],
+  .login-card-glass input[type="password"],
+  .login-card-glass input[type="tel"],
+  .login-card-glass input:not([type]) {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Safe-area-inset utilities ── */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pl-safe { padding-left: env(safe-area-inset-left); }
+.pr-safe { padding-right: env(safe-area-inset-right); }
+.mt-safe { margin-top: env(safe-area-inset-top); }
+.mb-safe { margin-bottom: env(safe-area-inset-bottom); }
+
+/* ── Mobile wallpaper overlay — vertical vignette ── */
+.login-wallpaper-overlay-mobile {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.55) 0%,
+    rgba(10, 10, 26, 0.15) 35%,
+    rgba(10, 10, 26, 0.35) 70%,
+    rgba(10, 10, 26, 0.7) 100%
+  );
+  transition: background var(--transition-theme);
+}
+:is(.dark) .login-wallpaper-overlay-mobile {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.65) 0%,
+    rgba(10, 10, 26, 0.25) 35%,
+    rgba(10, 10, 26, 0.45) 70%,
+    rgba(10, 10, 26, 0.8) 100%
+  );
+}
+
+/* ── Wrap hover-only effects in (hover: hover) ── */
+@media (hover: none) {
+  .btn-launch:hover:not(:disabled) {
+    filter: none;
+    box-shadow: none;
+  }
+}
+
+/* ── Mobile theme-toggle pill ── */
+.login-toggle-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+:is(.dark) .login-toggle-pill {
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.login-toggle-pill-btn {
+  color: #B0B0B0;
+  transition: color var(--transition-fast), background var(--transition-normal);
+}
+.login-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(123, 44, 191, 0.35);
+}
+
+/* ── Mobile brand wordmark ── */
+.login-brand-wordmark {
+  color: #FFFFFF;
+}
+:is(.light) .login-brand-wordmark {
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-violet) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Demo-account cell tap target bump on mobile ── */
+@media (max-width: 639px) {
+  .login-demo-cell {
+    min-height: 56px;
+  }
+}
+
+/* ============================================================
+   GLOBAL THEME TOGGLE PILL — works in ALL portals
+   Same visual style as the login labeled toggle, but uses
+   semantic color tokens instead of login-specific ones.
+   ============================================================ */
+
+.theme-toggle-pill {
+  background: rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+.dark .theme-toggle-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-pill-btn {
+  color: var(--muted-foreground);
+  transition: color var(--transition-fast), background var(--transition-normal);
+}
+.theme-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(123, 44, 191, 0.3);
+}
+.theme-toggle-pill-btn[data-active="true"]:is(.dark *) {
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-violet) 100%);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* ── Login card: shrink gracefully on very small viewports ── */
+@media (max-height: 680px) and (max-width: 767px) {
+  .login-card-glass {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+  .login-card-glass .btn-launch {
+    height: 44px !important;
+  }
 }
 
 /* ── Floating Action Element ── */
@@ -711,7 +1035,7 @@
 
 /* ── Table Row Hover ── */
 .table-row-preone {
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
 }
 .table-row-preone:hover {
   background: #F8FAFC;
@@ -781,7 +1105,7 @@
 
 /* ── Prevent layout shift when sidebar opens/closes ── */
 .sidebar-transition {
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width var(--transition-smooth);
 }
 
 /* ── Mobile sheet overlay adjustments ── */
@@ -903,7 +1227,7 @@
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-smooth);
 }
 
 .preone-card:hover {
@@ -987,7 +1311,7 @@
   font-weight: 600;
   font-size: 14px;
   font-family: var(--font-primary);
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   border: none;
   cursor: pointer;
@@ -1012,7 +1336,7 @@
   font-size: 14px;
   font-family: var(--font-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
 
 .preone-btn-secondary:hover {
@@ -1030,7 +1354,7 @@
   color: var(--text-tertiary);
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
 
 .preone-btn-icon:hover {
@@ -1180,7 +1504,7 @@ body, p, span, div {
   font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   cursor: pointer;
 }
 

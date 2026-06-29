@@ -1,20 +1,46 @@
 'use client';
 
+// ============================================================
+// PreOne — Onboarding Wizard Shell
+//
+// Full-page wizard layout with:
+//   - Sticky header: PreOne logo + title + save indicator + step nav + progress bar
+//   - Scrollable content area (children)
+//   - Sticky footer: Back / Step indicator / Next buttons
+//
+// Color rules:
+//   ALL colors use var(--admin-*) CSS variables — no hardcoded
+//   hex or Tailwind color classes in JSX.
+// ============================================================
+
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import {
+  School,
+  Building2,
+  BookOpen,
+  PenTool,
+  Users,
+  GraduationCap,
+  Smartphone,
+  Rocket,
+  Check,
+} from 'lucide-react';
 import { PreOneCard } from '@/components/ui/preone-card';
 import { OnboardingProgressBar } from '@/components/onboarding/progress-bar';
 
+// ── Step definitions with lucide icons ──
+
 const STEPS = [
-  { number: 1, label: 'School', icon: '🏫' },
-  { number: 2, label: 'Branch', icon: '🏢' },
-  { number: 3, label: 'Classes', icon: '📚' },
-  { number: 4, label: 'Subjects', icon: '✏️' },
-  { number: 5, label: 'Teachers', icon: '👩‍🏫' },
-  { number: 6, label: 'Students', icon: '👨‍🎓' },
-  { number: 7, label: 'Updates', icon: '📱' },
-  { number: 8, label: 'Launch', icon: '🚀' },
+  { number: 1, label: 'School', Icon: School },
+  { number: 2, label: 'Branch', Icon: Building2 },
+  { number: 3, label: 'Classes', Icon: BookOpen },
+  { number: 4, label: 'Subjects', Icon: PenTool },
+  { number: 5, label: 'Teachers', Icon: Users },
+  { number: 6, label: 'Students', Icon: GraduationCap },
+  { number: 7, label: 'Updates', Icon: Smartphone },
+  { number: 8, label: 'Launch', Icon: Rocket },
 ];
 
 interface WizardShellProps {
@@ -60,7 +86,6 @@ export function WizardShell({
 
   const handleNext = () => {
     if (currentStep === 8) {
-      // Launch handled by step 8 component
       onNext?.();
       return;
     }
@@ -85,36 +110,66 @@ export function WizardShell({
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: 'var(--admin-bg)' }}
+    >
       {/* ── Top Header ── */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-[var(--border-default)] px-4 py-4 safe-top">
+      <header
+        className="sticky top-0 z-50 backdrop-blur-xl px-4 py-4 safe-top"
+        style={{
+          background: 'color-mix(in srgb, var(--admin-surface) 80%, transparent)',
+          borderBottom: '1px solid var(--admin-border)',
+        }}
+      >
         <div className="max-w-4xl mx-auto">
           {/* Logo + Title */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--preone-primary)] to-[var(--preone-primary-light)] flex items-center justify-center text-white font-bold text-lg shadow-md">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-md"
+                style={{
+                  background: 'var(--admin-primary)',
+                  color: 'var(--admin-primary-foreground, #FFFFFF)',
+                }}
+              >
                 P
               </div>
               <div>
-                <h1 className="text-lg font-bold text-[var(--text-primary)] font-[var(--font-primary)]">
+                <h1
+                  className="text-lg font-bold"
+                  style={{ color: 'var(--admin-text)' }}
+                >
                   PreOne School Setup
                 </h1>
-                <p className="text-xs text-[var(--text-secondary)]">
+                <p
+                  className="text-xs"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
                   Let&apos;s get your school ready!
                 </p>
               </div>
             </div>
 
             {/* Save indicator */}
-            <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+            <div
+              className="flex items-center gap-2 text-xs"
+              style={{ color: 'var(--admin-text-muted)' }}
+            >
               {isSaving ? (
                 <>
-                  <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <div
+                    className="w-2 h-2 rounded-full animate-pulse"
+                    style={{ background: 'var(--admin-warning)' }}
+                  />
                   <span>Saving...</span>
                 </>
               ) : (
                 <>
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div
+                    className="w-2 h-2 rounded-full animate-pulse"
+                    style={{ background: 'var(--admin-success)' }}
+                  />
                   <span>
                     {lastSaved
                       ? `Saved ${formatLastSaved(lastSaved)}`
@@ -145,29 +200,36 @@ export function WizardShell({
                   aria-label={`Step ${step.number}: ${step.label}${isCompleted ? ' (completed)' : ''}`}
                   className={cn(
                     'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-200',
-                    isCurrent &&
-                      'bg-[var(--preone-primary)] text-white shadow-md shadow-[var(--preone-primary)]/25',
-                    isCompleted &&
-                      !isCurrent &&
-                      'bg-[var(--preone-primary-50)] text-[var(--preone-primary)] dark:bg-[var(--preone-primary)]/20 dark:text-[var(--preone-primary-light)]',
-                    !isCurrent &&
-                      !isCompleted &&
-                      'text-[var(--text-muted)]',
-                    isClickable &&
-                      !isCurrent &&
-                      'cursor-pointer hover:bg-[var(--bg-secondary)]',
+                    isCurrent && 'shadow-md',
+                    isClickable && !isCurrent && 'cursor-pointer',
                     !isClickable && 'cursor-not-allowed opacity-50'
                   )}
+                  style={{
+                    background: isCurrent
+                      ? 'var(--admin-primary)'
+                      : isCompleted
+                        ? 'var(--admin-primary-soft)'
+                        : 'transparent',
+                    color: isCurrent
+                      ? 'var(--admin-primary-foreground, #FFFFFF)'
+                      : isCompleted
+                        ? 'var(--admin-primary)'
+                        : 'var(--admin-text-muted)',
+                    boxShadow: isCurrent
+                      ? '0 4px 6px rgba(0,0,0,0.15)'
+                      : undefined,
+                  }}
                 >
-                  <span className="text-sm" role="img" aria-hidden="true">
-                    {step.icon}
-                  </span>
-                  <span className="hidden sm:inline">{step.label}</span>
-                  {isCompleted && !isCurrent && (
-                    <span className="text-emerald-500 ml-0.5" aria-hidden="true">
-                      ✓
-                    </span>
+                  {isCompleted && !isCurrent ? (
+                    <Check
+                      className="h-3.5 w-3.5"
+                      style={{ color: 'var(--admin-success)' }}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <step.Icon className="h-3.5 w-3.5" aria-hidden="true" />
                   )}
+                  <span className="hidden sm:inline">{step.label}</span>
                 </button>
               );
             })}
@@ -201,18 +263,31 @@ export function WizardShell({
       </main>
 
       {/* ── Bottom Navigation ── */}
-      <footer className="sticky bottom-0 bg-white/80 dark:bg-[#0a0a1a]/80 backdrop-blur-xl border-t border-[var(--border-default)] px-4 py-3 safe-bottom">
+      <footer
+        className="sticky bottom-0 backdrop-blur-xl px-4 py-3 safe-bottom"
+        style={{
+          background: 'color-mix(in srgb, var(--admin-surface) 80%, transparent)',
+          borderTop: '1px solid var(--admin-border)',
+        }}
+      >
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
             aria-label="Go to previous step"
-            className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px]"
+            style={{
+              color: 'var(--admin-text-muted)',
+            }}
           >
-            ← Back
+            &larr; Back
           </button>
 
-          <span className="text-sm text-[var(--text-muted)]" aria-live="polite">
+          <span
+            className="text-sm"
+            style={{ color: 'var(--admin-text-subtle)' }}
+            aria-live="polite"
+          >
             Step {currentStep} of 8
           </span>
 
@@ -223,14 +298,17 @@ export function WizardShell({
               currentStep === 8 ? 'Launch your school' : 'Go to next step'
             }
             className={cn(
-              'px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-all duration-200 min-h-[44px]',
-              currentStep === 8
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25'
-                : 'bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)] hover:shadow-lg hover:shadow-[var(--preone-primary)]/25',
+              'px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px]',
               isNextDisabled && 'opacity-50 cursor-not-allowed'
             )}
+            style={{
+              background: currentStep === 8
+                ? 'var(--admin-success)'
+                : 'var(--admin-primary)',
+              color: 'var(--admin-primary-foreground, #FFFFFF)',
+            }}
           >
-            {currentStep === 8 ? 'Launch! 🚀' : 'Next →'}
+            {currentStep === 8 ? 'Launch!' : 'Next \u2192'}
           </button>
         </div>
       </footer>
