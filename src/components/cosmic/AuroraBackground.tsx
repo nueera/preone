@@ -4,9 +4,12 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * AuroraBackground — Living Universe ambient background
+ * AuroraBackground — "Midnight Garden" ambient background
  * Renders animated gradient blobs that float gently behind content.
  * Wraps the entire portal layout for immersive feel.
+ * 
+ * Light mode: Soft pastel blobs (sky, pink, emerald)
+ * Dark mode: Vibrant glowing blobs (violet, cyan, emerald, rose)
  */
 export function AuroraBackground({
   children,
@@ -19,9 +22,9 @@ export function AuroraBackground({
   intensity?: 'subtle' | 'medium' | 'vibrant';
 }) {
   const opacityMap = {
-    subtle: 'opacity-30',
-    medium: 'opacity-50',
-    vibrant: 'opacity-70',
+    subtle: 'opacity-20 dark:opacity-30',
+    medium: 'opacity-35 dark:opacity-50',
+    vibrant: 'opacity-50 dark:opacity-70',
   };
 
   return (
@@ -34,23 +37,23 @@ export function AuroraBackground({
         )}
         aria-hidden="true"
       >
-        {/* Blob 1 — Top-left sky */}
+        {/* Blob 1 — Top-left: Sky/Violet */}
         <div
-          className="absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-sky-300 via-blue-200 to-purple-200 blur-3xl"
+          className="absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full blur-3xl bg-gradient-to-br from-sky-300 via-blue-200 to-purple-200 dark:from-violet-500/40 dark:via-indigo-400/30 dark:to-purple-500/20"
           style={{
             animation: 'aurora-float-1 20s ease-in-out infinite',
           }}
         />
-        {/* Blob 2 — Bottom-right pink */}
+        {/* Blob 2 — Bottom-right: Pink/Rose */}
         <div
-          className="absolute -right-32 -bottom-32 h-[400px] w-[400px] rounded-full bg-gradient-to-tl from-pink-300 via-rose-200 to-orange-200 blur-3xl"
+          className="absolute -right-32 -bottom-32 h-[400px] w-[400px] rounded-full blur-3xl bg-gradient-to-tl from-pink-300 via-rose-200 to-orange-200 dark:from-rose-500/30 dark:via-pink-400/25 dark:to-amber-500/15"
           style={{
             animation: 'aurora-float-2 25s ease-in-out infinite',
           }}
         />
-        {/* Blob 3 — Center emerald */}
+        {/* Blob 3 — Center: Emerald/Teal */}
         <div
-          className="absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-emerald-200 via-teal-200 to-sky-200 blur-3xl"
+          className="absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl bg-gradient-to-br from-emerald-200 via-teal-200 to-sky-200 dark:from-emerald-500/25 dark:via-teal-400/20 dark:to-cyan-500/15"
           style={{
             animation: 'aurora-float-3 18s ease-in-out infinite',
           }}
