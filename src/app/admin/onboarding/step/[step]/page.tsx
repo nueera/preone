@@ -1,5 +1,16 @@
 'use client';
 
+// ============================================================
+// PreOne — Onboarding Step Page (/admin/onboarding/step/[step])
+//
+// Dynamic step page that renders the appropriate step component
+// wrapped in WizardShell.
+//
+// Color rules:
+//   ALL colors use var(--admin-*) CSS variables — no hardcoded
+//   hex or Tailwind color classes in JSX.
+// ============================================================
+
 import { useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -7,6 +18,16 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { WizardShell } from '@/components/onboarding/wizard-shell';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
+import {
+  School,
+  Building2,
+  BookOpen,
+  PenTool,
+  Users,
+  GraduationCap,
+  Smartphone,
+  Rocket,
+} from 'lucide-react';
 import { SchoolProfileStep } from '@/components/onboarding/steps/school-profile-step';
 import { BranchSetupStep } from '@/components/onboarding/steps/branch-setup-step';
 import { AcademicYearStep } from '@/components/onboarding/steps/academic-year-step';
@@ -25,82 +46,65 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 /**
- * Step metadata for placeholder rendering
- * Each step component will be created in separate files later
+ * Step metadata for placeholder rendering.
+ * Uses lucide icons instead of emojis.
+ * Colors use var(--admin-*) exclusively.
  */
 const STEP_META: Record<
   number,
   {
     label: string;
-    icon: string;
+    Icon: React.ElementType;
     description: string;
-    color: string;
-    bgGradient: string;
   }
 > = {
   1: {
     label: 'School Profile',
-    icon: '🏫',
+    Icon: School,
     description:
       'Tell us about your school — name, logo, contact details, and the board you follow.',
-    color: 'text-violet-600',
-    bgGradient: 'from-violet-50 to-purple-50',
   },
   2: {
     label: 'Branch Setup',
-    icon: '🏢',
+    Icon: Building2,
     description:
       'Add your school branches — campuses, locations, and branch-specific settings.',
-    color: 'text-sky-600',
-    bgGradient: 'from-sky-50 to-blue-50',
   },
   3: {
     label: 'Academic Year & Classes',
-    icon: '📚',
+    Icon: BookOpen,
     description:
       'Define the academic year, create classes, and set up sections for each branch.',
-    color: 'text-emerald-600',
-    bgGradient: 'from-emerald-50 to-green-50',
   },
   4: {
     label: 'Subjects',
-    icon: '✏️',
+    Icon: PenTool,
     description:
       'Configure the subjects taught at your school and assign them to classes.',
-    color: 'text-amber-600',
-    bgGradient: 'from-amber-50 to-yellow-50',
   },
   5: {
     label: 'Teachers',
-    icon: '👩‍🏫',
+    Icon: Users,
     description:
       'Add teachers, assign subjects and classes, and set up their profiles.',
-    color: 'text-pink-600',
-    bgGradient: 'from-pink-50 to-rose-50',
   },
   6: {
     label: 'Students',
-    icon: '👨‍🎓',
+    Icon: GraduationCap,
     description:
       'Enroll students, assign them to classes, and add parent contact information.',
-    color: 'text-indigo-600',
-    bgGradient: 'from-indigo-50 to-blue-50',
   },
   7: {
     label: 'Daily Updates',
-    icon: '📱',
+    Icon: Smartphone,
     description:
       'Configure daily update categories, notification preferences, and parent communication settings.',
-    color: 'text-teal-600',
-    bgGradient: 'from-teal-50 to-cyan-50',
   },
   8: {
     label: 'Review & Launch',
-    icon: '🚀',
+    Icon: Rocket,
     description:
       'Review all your settings and launch your school on PreOne!',
-    color: 'text-emerald-600',
-    bgGradient: 'from-emerald-50 to-teal-50',
   },
 };
 
@@ -111,6 +115,7 @@ const STEP_META: Record<
 function StepPlaceholder({ step }: { step: number }) {
   const meta = STEP_META[step];
   if (!meta) return null;
+  const { Icon } = meta;
 
   return (
     <PreOneCard variant="default">
@@ -119,40 +124,45 @@ function StepPlaceholder({ step }: { step: number }) {
           {/* Step header */}
           <div className="flex items-center gap-3 mb-6">
             <div
-              className={cn(
-                'w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shadow-sm',
-                meta.bgGradient
-              )}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm"
+              style={{ background: 'var(--admin-primary-soft)' }}
             >
-              {meta.icon}
+              <Icon
+                className="h-6 w-6"
+                style={{ color: 'var(--admin-primary)' }}
+              />
             </div>
             <div>
               <h2
-                className={cn(
-                  'text-xl font-bold font-[var(--font-primary)]',
-                  meta.color
-                )}
+                className="text-xl font-bold"
+                style={{ color: 'var(--admin-text)' }}
               >
                 Step {step}: {meta.label}
               </h2>
-              <p className="text-sm text-[var(--text-secondary)]">
+              <p
+                className="text-sm"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
                 This step is coming soon
               </p>
             </div>
           </div>
 
           {/* Description */}
-          <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
+          <p
+            className="mb-6 leading-relaxed"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
             {meta.description}
           </p>
 
           {/* Visual placeholder */}
           <div
-            className={cn(
-              'rounded-2xl bg-gradient-to-br p-8 border border-dashed',
-              meta.bgGradient,
-              'border-current/10'
-            )}
+            className="rounded-2xl p-8 border border-dashed"
+            style={{
+              background: 'var(--admin-primary-soft)',
+              borderColor: 'var(--admin-border)',
+            }}
           >
             <motion.div
               className="flex flex-col items-center justify-center gap-4"
@@ -160,9 +170,16 @@ function StepPlaceholder({ step }: { step: number }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <span className="text-6xl">{meta.icon}</span>
-              <p className="text-sm text-[var(--text-tertiary)] text-center max-w-sm">
-                The <strong>{meta.label}</strong> form will be available here.
+              <Icon
+                className="h-12 w-12"
+                style={{ color: 'var(--admin-primary)' }}
+                aria-hidden="true"
+              />
+              <p
+                className="text-sm text-center max-w-sm"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              >
+                The <strong style={{ color: 'var(--admin-text)' }}>{meta.label}</strong> form will be available here.
                 <br />
                 You can still navigate through other steps.
               </p>
@@ -201,13 +218,11 @@ export default function OnboardingStepPage() {
 
   // ── Validate step and sync store ──
   useEffect(() => {
-    // If step is invalid, redirect to step 1
     if (isNaN(step) || step < 1 || step > 8) {
       router.replace('/admin/onboarding/step/1');
       return;
     }
 
-    // If store hasn't been initialized yet, fetch status
     if (isLoading) {
       const fetchStatus = async () => {
         try {
@@ -237,7 +252,6 @@ export default function OnboardingStepPage() {
 
       fetchStatus();
     } else {
-      // Store is initialized, just update current step
       setCurrentStep(step);
     }
   }, [step, isLoading, initialize, setCurrentStep, router]);
@@ -294,21 +308,37 @@ export default function OnboardingStepPage() {
   // ── Loading state ──
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--admin-bg)' }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--preone-primary)] to-[var(--preone-primary-light)] flex items-center justify-center text-white font-bold text-2xl shadow-lg mx-auto mb-4">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-sm font-bold shadow-lg mx-auto mb-4"
+            style={{
+              background: 'var(--admin-primary)',
+              color: 'var(--admin-primary-foreground, #FFFFFF)',
+            }}
+          >
             P
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
+          <h2
+            className="text-lg font-semibold mb-2"
+            style={{ color: 'var(--admin-text)' }}
+          >
             Loading Step {step}...
           </h2>
-          <div className="w-48 h-1.5 rounded-full bg-[var(--bg-tertiary)] mx-auto overflow-hidden">
+          <div
+            className="w-48 h-1.5 rounded-full mx-auto overflow-hidden"
+            style={{ background: 'var(--admin-surface-2)' }}
+          >
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)]"
+              className="h-full rounded-full"
+              style={{ background: 'var(--admin-primary)' }}
               initial={{ width: '0%' }}
               animate={{ width: '60%' }}
               transition={{
@@ -324,14 +354,7 @@ export default function OnboardingStepPage() {
   }
 
   // ── Render step component ──
-  // Step components will be imported here as they are created.
-  // For now, all steps render the StepPlaceholder.
-  // Example: when Step 1 component exists:
-  //   case 1: return <SchoolProfileStep />;
   const renderStepContent = () => {
-    // All steps use placeholder for now — individual step components
-    // will be created in separate files and imported here.
-    // Pattern: import { SchoolProfileStep } from '@/components/onboarding/steps/school-profile-step';
     switch (step) {
       case 1:
         return <SchoolProfileStep />;
