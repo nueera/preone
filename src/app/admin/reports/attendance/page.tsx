@@ -112,7 +112,7 @@ export default function AttendanceReportPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]">
         <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading attendance report…
       </div>
     );
@@ -127,11 +127,11 @@ export default function AttendanceReportPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <CheckCircle2 className="w-6 h-6" style={{ color: theme.primary }} />
                 Attendance Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Overall rates, class-wise breakdown, and trend (last 6 months)</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Overall rates, class-wise breakdown, and trend (last 6 months)</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -142,7 +142,7 @@ export default function AttendanceReportPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {overallRates.map((r) => (
               <PreOneCard key={r.label} variant="strip" className="p-4">
-                <p className="text-xs text-gray-500">{r.label}</p>
+                <p className="text-xs text-[var(--admin-text-muted)]">{r.label}</p>
                 <p className={`text-xl font-bold ${r.color}`}>{r.raw ? r.value : `${r.value}%`}</p>
                 {!r.raw && <Progress value={r.value} className="h-1.5 mt-2" />}
               </PreOneCard>
@@ -152,7 +152,7 @@ export default function AttendanceReportPage() {
 
         {summary.total === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+            <PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">
               No attendance recorded in the last 6 months.
             </PreOneCard>
           </StaggerItem>
@@ -162,7 +162,7 @@ export default function AttendanceReportPage() {
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trend</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trend</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>
@@ -182,7 +182,7 @@ export default function AttendanceReportPage() {
             {/* Class-Wise */}
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
-                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Class-wise Attendance</h3></div>
+                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Class-wise Attendance</h3></div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={classWise}>
@@ -203,13 +203,13 @@ export default function AttendanceReportPage() {
             <StaggerItem className="lg:col-span-2">
               <PreOneCard variant="default">
                 <PreOneCardContent>
-                  <h3 className="font-semibold text-gray-900 mb-4">Student Attendance Breakdown (last 6 months)</h3>
+                  <h3 className="font-semibold text-[var(--admin-text)] mb-4">Student Attendance Breakdown (last 6 months)</h3>
                   <div className="flex gap-1 h-4 rounded-full overflow-hidden">
                     <div className="bg-emerald-400 rounded-l-full" style={{ width: `${pct(summary.present, summary.total)}%` }} />
                     <div className="bg-amber-400" style={{ width: `${pct(summary.late, summary.total)}%` }} />
                     <div className="bg-red-400 rounded-r-full" style={{ width: `${pct(summary.absent, summary.total)}%` }} />
                   </div>
-                  <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                  <div className="flex gap-4 mt-2 text-xs text-[var(--admin-text-muted)]">
                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Present {pct(summary.present, summary.total)}%</span>
                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-400" /> Late {pct(summary.late, summary.total)}%</span>
                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-400" /> Absent {pct(summary.absent, summary.total)}%</span>

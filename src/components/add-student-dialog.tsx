@@ -341,7 +341,7 @@ export function AddStudentDialog({ open, onOpenChange, onStudentCreated }: AddSt
                     'flex items-center justify-center h-8 w-8 rounded-full text-sm font-semibold transition-colors',
                     step >= s.id
                       ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-400'
+                      : 'bg-muted text-muted-foreground'
                   )}
                 >
                   {s.id}
@@ -350,7 +350,7 @@ export function AddStudentDialog({ open, onOpenChange, onStudentCreated }: AddSt
                   <div
                     className={cn(
                       'flex-1 h-1 rounded-full transition-colors',
-                      step > s.id ? 'bg-purple-600' : 'bg-gray-100'
+                      step > s.id ? 'bg-purple-600' : 'bg-muted'
                     )}
                   />
                 )}

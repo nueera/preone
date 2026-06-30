@@ -69,7 +69,7 @@ const KYC_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
     icon: <Clock className="h-3 w-3" />,
   },
   'Not Submitted': {
-    bg: 'bg-gray-50 text-gray-600 border-gray-200',
+    bg: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
     icon: <AlertCircle className="h-3 w-3" />,
   },
 };
@@ -164,7 +164,7 @@ export default function ParentsListPage() {
         {/* ── Top Bar ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
               Parents
             </h1>
             <p className="text-sm text-muted-foreground">Manage parent records and KYC verification</p>
@@ -202,7 +202,7 @@ export default function ParentsListPage() {
             label="Not Submitted"
             value={notSubmittedCount}
             icon={<AlertCircle className="h-5 w-5" />}
-            color="bg-gray-400"
+            color="bg-[var(--admin-text-subtle)]"
           />
         </div>
 
@@ -342,7 +342,7 @@ export default function ParentsListPage() {
                           </Avatar>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-gray-900 dark:text-gray-100">
+                          <div className="font-medium text-[var(--admin-text)]">
                             {parent.firstName} {parent.lastName}
                           </div>
                           <div className="text-xs text-muted-foreground flex items-center gap-1">

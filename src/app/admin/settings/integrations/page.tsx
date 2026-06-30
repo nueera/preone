@@ -44,7 +44,7 @@ const MOCK_INTEGRATIONS: Integration[] = [
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: React.ElementType }> = {
   CONNECTED: { color: 'text-emerald-700', bg: 'bg-emerald-50', icon: CheckCircle2 },
-  DISCONNECTED: { color: 'text-gray-700', bg: 'bg-gray-50', icon: XCircle },
+  DISCONNECTED: { color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]', icon: XCircle },
   ERROR: { color: 'text-red-700', bg: 'bg-red-50', icon: AlertTriangle },
 };
 
@@ -62,11 +62,11 @@ export default function IntegrationsSettingsPage() {
         <StaggerItem>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Plug className="w-6 h-6" style={{ color: theme.primary }} />
                 Integrations
               </h1>
-              <p className="text-sm text-gray-500 mt-1">API keys, webhooks, and connected services</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">API keys, webhooks, and connected services</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Save className="w-4 h-4 mr-2" /> Save All
@@ -89,8 +89,8 @@ export default function IntegrationsSettingsPage() {
                         <Icon className="w-6 h-6 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{integration.name}</h3>
-                        <p className="text-xs text-gray-500">{integration.description}</p>
+                        <h3 className="font-semibold text-[var(--admin-text)]">{integration.name}</h3>
+                        <p className="text-xs text-[var(--admin-text-muted)]">{integration.description}</p>
                       </div>
                     </div>
                     <Badge className={`${statusCfg.bg} ${statusCfg.color} text-[10px]`}>
@@ -102,7 +102,7 @@ export default function IntegrationsSettingsPage() {
                     {/* API Key */}
                     {integration.apiKey && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block flex items-center gap-1">
+                        <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block flex items-center gap-1">
                           <Key className="w-3 h-3" /> API Key
                         </label>
                         <div className="flex gap-2">
@@ -121,7 +121,7 @@ export default function IntegrationsSettingsPage() {
                     {/* Webhook URL */}
                     {integration.webhookUrl && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block flex items-center gap-1">
+                        <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block flex items-center gap-1">
                           <Webhook className="w-3 h-3" /> Webhook URL
                         </label>
                         <Input value={integration.webhookUrl} readOnly className="font-mono text-sm" />
@@ -130,7 +130,7 @@ export default function IntegrationsSettingsPage() {
 
                     {/* Actions */}
                     <div className="flex items-center justify-between pt-2 border-t">
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[var(--admin-text-subtle)]">
                         {integration.lastSync && <span>Last sync: {integration.lastSync}</span>}
                       </div>
                       <div className="flex gap-2">

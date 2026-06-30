@@ -63,7 +63,7 @@ const CATEGORY_COLOR: Record<string, { bg: string; text: string }> = {
   'Fee Reminder': { bg: 'bg-amber-50', text: 'text-amber-700' },
   'Attendance': { bg: 'bg-blue-50', text: 'text-blue-700' },
   'Event': { bg: 'bg-purple-50', text: 'text-purple-700' },
-  'General': { bg: 'bg-gray-50', text: 'text-gray-700' },
+  'General': { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]' },
 };
 
 export default function TemplatesPage() {
@@ -85,11 +85,11 @@ export default function TemplatesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <FileText className="w-6 h-6" style={{ color: theme.primary }} />
                 Message Templates
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Manage reusable message templates</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage reusable message templates</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Add Template
@@ -101,7 +101,7 @@ export default function TemplatesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input placeholder="Search templates..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
             <div className="flex gap-1.5">
@@ -122,7 +122,7 @@ export default function TemplatesPage() {
           <StaggerItem className="lg:col-span-2">
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-4">Templates ({filtered.length})</h3>
+                <h3 className="font-semibold text-[var(--admin-text)] mb-4">Templates ({filtered.length})</h3>
                 <ScrollArea className="max-h-[500px]">
                   <div className="space-y-3">
                     {filtered.map((t) => {
@@ -135,7 +135,7 @@ export default function TemplatesPage() {
                               <div className={`w-7 h-7 rounded-lg ${catCfg.bg} flex items-center justify-center`}>
                                 <CatIcon className={`w-3.5 h-3.5 ${catCfg.text}`} />
                               </div>
-                              <h4 className="text-sm font-medium text-gray-900">{t.name}</h4>
+                              <h4 className="text-sm font-medium text-[var(--admin-text)]">{t.name}</h4>
                               {t.isDefault && <Badge variant="outline" className="text-[9px]">Default</Badge>}
                             </div>
                             <div className="flex items-center gap-1">
@@ -146,14 +146,14 @@ export default function TemplatesPage() {
                               <Button variant="ghost" size="sm" className="h-7 text-xs text-red-600"><Trash2 className="w-3 h-3" /></Button>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 line-clamp-2 mb-2">{t.body}</p>
+                          <p className="text-xs text-[var(--admin-text-muted)] line-clamp-2 mb-2">{t.body}</p>
                           <div className="flex items-center justify-between">
                             <div className="flex gap-1">
                               {t.variables.map((v) => (
                                 <Badge key={v} className="bg-sky-50 text-sky-700 text-[9px]">{'{'}{v}{'}'}</Badge>
                               ))}
                             </div>
-                            <div className="flex items-center gap-3 text-[10px] text-gray-400">
+                            <div className="flex items-center gap-3 text-[10px] text-[var(--admin-text-subtle)]">
                               <span>{t.channel}</span>
                               <span>{t.usageCount} uses</span>
                             </div>
@@ -171,7 +171,7 @@ export default function TemplatesPage() {
           <StaggerItem>
             <PreOneCard variant="default" className="sticky top-6">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-3">Preview</h3>
+                <h3 className="font-semibold text-[var(--admin-text)] mb-3">Preview</h3>
                 {previewTemplate ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
@@ -179,17 +179,17 @@ export default function TemplatesPage() {
                       <Badge variant="outline" className="text-[10px]">{previewTemplate.channel}</Badge>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Subject</p>
-                      <p className="text-sm font-medium text-gray-900">{previewTemplate.subject}</p>
+                      <p className="text-xs text-[var(--admin-text-subtle)] mb-1">Subject</p>
+                      <p className="text-sm font-medium text-[var(--admin-text)]">{previewTemplate.subject}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Body</p>
-                      <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap">
+                      <p className="text-xs text-[var(--admin-text-subtle)] mb-1">Body</p>
+                      <div className="p-3 bg-[var(--admin-surface-2)] rounded-lg text-sm text-[var(--admin-text-muted)] whitespace-pre-wrap">
                         {previewTemplate.body}
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Variables</p>
+                      <p className="text-xs text-[var(--admin-text-subtle)] mb-1">Variables</p>
                       <div className="flex flex-wrap gap-1">
                         {previewTemplate.variables.map((v) => (
                           <Badge key={v} className="bg-sky-50 text-sky-700 text-[10px]">{'{'}{v}{'}'}</Badge>
@@ -199,7 +199,7 @@ export default function TemplatesPage() {
                     <Button variant="outline" size="sm" className="w-full"><Copy className="w-3 h-3 mr-1" /> Copy Template</Button>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-gray-400">
+                  <div className="text-center py-12 text-[var(--admin-text-subtle)]">
                     <Eye className="w-8 h-8 mx-auto mb-2" />
                     <p className="text-sm">Click the eye icon on a template to preview</p>
                   </div>

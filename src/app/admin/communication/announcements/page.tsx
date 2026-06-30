@@ -67,12 +67,12 @@ function StatCard({
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
+            <p className="text-[11px] font-medium text-[var(--admin-text-muted)] uppercase tracking-wider">
               {title}
             </p>
-            <p className="text-xl font-bold text-gray-900">{value}</p>
+            <p className="text-xl font-bold text-[var(--admin-text)]">{value}</p>
             {subtitle && (
-              <p className="text-[10px] text-gray-400">{subtitle}</p>
+              <p className="text-[10px] text-[var(--admin-text-subtle)]">{subtitle}</p>
             )}
           </div>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60">
@@ -194,11 +194,11 @@ export default function AdminAnnouncementsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <Megaphone className="h-6 w-6 text-portal-600" />
             Announcements
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">
             Create and manage announcements across your school
           </p>
         </div>
@@ -253,7 +253,7 @@ export default function AdminAnnouncementsPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-gray-100 rounded-xl">
+        <TabsList className="bg-[var(--admin-surface-2)] rounded-xl">
           <TabsTrigger value="all" className="rounded-lg text-xs">
             All
           </TabsTrigger>
@@ -272,7 +272,7 @@ export default function AdminAnnouncementsPage() {
           {/* Search + Filters */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="relative flex-1 w-full sm:w-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
               <Input
                 placeholder="Search announcements..."
                 value={searchQuery}
@@ -293,7 +293,7 @@ export default function AdminAnnouncementsPage() {
 
           {/* Expanded Filters */}
           {showFilters && (
-            <div className="flex items-center gap-3 flex-wrap p-3 bg-white rounded-xl border">
+            <div className="flex items-center gap-3 flex-wrap p-3 bg-[var(--admin-surface)] rounded-xl border">
               <Select
                 value={typeFilter}
                 onValueChange={(v) => setTypeFilter(v === 'ALL' ? '' : v)}
@@ -353,11 +353,11 @@ export default function AdminAnnouncementsPage() {
           ) : displayAnnouncements.length === 0 ? (
             <Card className="rounded-2xl border-0 shadow-sm">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-                <Megaphone className="h-12 w-12 text-gray-200" />
-                <p className="text-sm font-medium text-gray-500">
+                <Megaphone className="h-12 w-12 text-[var(--admin-text-subtle)]" />
+                <p className="text-sm font-medium text-[var(--admin-text-muted)]">
                   No announcements found
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-[var(--admin-text-subtle)]">
                   Click &quot;Create Announcement&quot; to get started
                 </p>
               </CardContent>

@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 
 // ── Badge Configs ──
 const TYPE_BADGES: Record<string, { label: string; bg: string; color: string }> = {
-  GENERAL: { label: 'General', bg: 'bg-gray-100', color: 'text-gray-700' },
+  GENERAL: { label: 'General', bg: 'bg-muted', color: 'text-muted-foreground' },
   EVENT: { label: 'Event', bg: 'bg-amber-100', color: 'text-amber-700' },
   HOLIDAY: { label: 'Holiday', bg: 'bg-purple-100', color: 'text-purple-700' },
   FEE_REMINDER: { label: 'Fee', bg: 'bg-yellow-100', color: 'text-yellow-700' },
@@ -95,11 +95,11 @@ export default function ParentAnnouncementsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Megaphone className="h-6 w-6 text-portal-600" />
             Announcements
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Stay updated with school announcements
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function ParentAnnouncementsPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search announcements..."
           value={searchQuery}
@@ -146,11 +146,11 @@ export default function ParentAnnouncementsPage() {
       ) : displayAnnouncements.length === 0 ? (
         <Card className="rounded-2xl border-0 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-            <Inbox className="h-12 w-12 text-gray-200" />
-            <p className="text-sm font-medium text-gray-500">
+            <Inbox className="h-12 w-12 text-muted-foreground" />
+            <p className="text-sm font-medium text-muted-foreground">
               No announcements yet
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Announcements from the school will appear here
             </p>
           </CardContent>
@@ -187,7 +187,7 @@ export default function ParentAnnouncementsPage() {
                       <h3
                         className={cn(
                           'text-sm font-semibold leading-snug',
-                          !announcement.isRead ? 'text-gray-900' : 'text-gray-700'
+                          !announcement.isRead ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         {announcement.title}
@@ -232,7 +232,7 @@ export default function ParentAnnouncementsPage() {
                   )}
 
                   {/* Content */}
-                  <div className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  <div className="mt-3 text-sm text-muted-foreground leading-relaxed">
                     <p className="whitespace-pre-line">
                       {isExpanded
                         ? announcement.content
@@ -268,7 +268,7 @@ export default function ParentAnnouncementsPage() {
                   )}
 
                   {/* Footer */}
-                  <div className="mt-3 flex items-center gap-1.5 text-[11px] text-gray-500">
+                  <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <Clock className="h-3 w-3" />
                     <span>
                       {announcement.publishedAt

@@ -87,7 +87,7 @@ const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   UPCOMING: { label: 'Upcoming', color: 'text-blue-600', bg: 'bg-blue-50' },
   ONGOING: { label: 'Ongoing', color: 'text-green-600', bg: 'bg-green-50' },
-  COMPLETED: { label: 'Completed', color: 'text-gray-600', bg: 'bg-gray-50' },
+  COMPLETED: { label: 'Completed', color: 'text-muted-foreground', bg: 'bg-muted' },
   CANCELLED: { label: 'Cancelled', color: 'text-red-600', bg: 'bg-red-50' },
 };
 
@@ -247,7 +247,7 @@ export function ActivityDetailDialog({ open, onOpenChange, activity, onActivityC
                     <CheckCircle2 className="h-3 w-3 mr-1" />Published
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-xs text-gray-400">Draft</Badge>
+                  <Badge variant="outline" className="text-xs text-muted-foreground">Draft</Badge>
                 )}
               </div>
             </div>
@@ -329,22 +329,22 @@ export function ActivityDetailDialog({ open, onOpenChange, activity, onActivityC
             {/* Info rows */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600">{format(new Date(activity.date), 'dd MMMM yyyy')}</span>
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{format(new Date(activity.date), 'dd MMMM yyyy')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">
                   {activity.startTime && activity.endTime ? `${activity.startTime} - ${activity.endTime}` : 'Time not set'}
                 </span>
               </div>
               {activity.location && (
                 <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{activity.location}</span>
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{activity.location}</span>
                 </div>
               )}
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 Class: {activity.class?.name || 'All Classes'}
               </div>
             </div>
@@ -353,26 +353,26 @@ export function ActivityDetailDialog({ open, onOpenChange, activity, onActivityC
 
             {activity.description && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-1">Description</h4>
-                <p className="text-sm text-gray-600 leading-relaxed">{activity.description}</p>
+                <h4 className="text-sm font-semibold text-muted-foreground mb-1">Description</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">{activity.description}</p>
               </div>
             )}
 
             {activity.learningOutcomes && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                <h4 className="text-sm font-semibold text-muted-foreground mb-1 flex items-center gap-1">
                   <BookOpen className="h-4 w-4" /> Learning Outcomes
                 </h4>
-                <p className="text-sm text-gray-600 leading-relaxed">{activity.learningOutcomes}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{activity.learningOutcomes}</p>
               </div>
             )}
 
             {activity.materials && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                <h4 className="text-sm font-semibold text-muted-foreground mb-1 flex items-center gap-1">
                   <Package className="h-4 w-4" /> Materials Needed
                 </h4>
-                <p className="text-sm text-gray-600 leading-relaxed">{activity.materials}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{activity.materials}</p>
               </div>
             )}
 
@@ -399,7 +399,7 @@ export function ActivityDetailDialog({ open, onOpenChange, activity, onActivityC
             </div>
 
             {activity.publishedAt && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Published on {format(new Date(activity.publishedAt), 'dd MMM yyyy, hh:mm a')}
               </p>
             )}

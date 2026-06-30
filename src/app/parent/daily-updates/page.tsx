@@ -64,7 +64,7 @@ const MOOD_COLOR: Record<string, string> = {
   HAPPY: MOOD_COLORS.HAPPY?.text ?? 'text-emerald-600', SAD: MOOD_COLORS.SAD?.text ?? 'text-red-600',
   TIRED: 'text-amber-600', EXCITED: MOOD_COLORS.EXCITED?.text ?? 'text-purple-600',
   CALM: MOOD_COLORS.CALM?.text ?? 'text-blue-600', FUSSY: 'text-orange-600',
-  NEUTRAL: 'text-gray-600',
+  NEUTRAL: 'text-muted-foreground',
 };
 
 const MEAL_STATUS_ICON: Record<string, string> = {
@@ -79,7 +79,7 @@ const MEAL_STATUS_COLOR: Record<string, string> = {
   EATEN: MEAL_COLORS.EATEN ? `${MEAL_COLORS.EATEN.bg} ${MEAL_COLORS.EATEN.text} border-emerald-200` : 'bg-emerald-100 text-emerald-700 border-emerald-200',
   PARTIAL: MEAL_COLORS.PARTIAL ? `${MEAL_COLORS.PARTIAL.bg} ${MEAL_COLORS.PARTIAL.text} border-amber-200` : 'bg-amber-100 text-amber-700 border-amber-200',
   SKIPPED: 'bg-red-100 text-red-700 border-red-200',
-  NOT_PROVIDED: 'bg-gray-100 text-gray-500 border-gray-200',
+  NOT_PROVIDED: 'bg-muted text-muted-foreground border-border',
 };
 
 const SLEEP_QUALITY_ICON: Record<string, string> = { GOOD: '🟢', FAIR: '🟡', POOR: '🔴' };
@@ -169,7 +169,7 @@ function WaterGlasses({ count }: { count: number }) {
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-sm transition-colors ${
                   i < c
                     ? 'bg-sky-100 text-sky-600 border border-sky-300'
-                    : 'bg-gray-100 text-gray-300 border border-gray-200'
+                    : 'bg-muted text-muted-foreground border border-border'
                 }`}
               >
                 💧
@@ -193,9 +193,9 @@ function SleepBar({ quality }: { quality: string | null }) {
   if (!quality) return <p className="text-xs text-muted-foreground">Not recorded</p>;
   return (
     <div className="space-y-1">
-      <div className="h-2.5 w-full rounded-full bg-gray-100 overflow-hidden">
+      <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all ${SLEEP_QUALITY_BAR[quality] ?? 'bg-gray-300'}`}
+          className={`h-full rounded-full transition-all ${SLEEP_QUALITY_BAR[quality] ?? 'bg-muted-foreground/20'}`}
           style={{ width: `${SLEEP_QUALITY_PCT[quality] ?? 0}%` }}
         />
       </div>
@@ -212,7 +212,7 @@ function SleepBar({ quality }: { quality: string | null }) {
 
 function MealBadge({ status }: { status: string | null }) {
   if (!status || status === 'NOT_PROVIDED')
-    return <Badge className="bg-gray-100 text-gray-500 border-gray-200 text-[10px]">— Not Provided</Badge>;
+    return <Badge className="bg-muted text-muted-foreground border-border text-[10px]">— Not Provided</Badge>;
   return (
     <Badge className={`${MEAL_STATUS_COLOR[status] ?? ''} text-[10px] border`}>
       {MEAL_STATUS_ICON[status]} {MEAL_STATUS_LABEL[status]}
@@ -447,7 +447,7 @@ function PreviousUpdatesList({ updates, onSelectDate }: {
               <div
                 key={u.id}
                 className={`rounded-2xl border transition-all cursor-pointer ${
-                  isExpanded ? 'border-sky-200 bg-sky-50/30' : 'border-gray-100 hover:border-gray-200'
+                  isExpanded ? 'border-sky-200 bg-sky-50/30' : 'border-border hover:border-border'
                 }`}
                 onClick={() => setExpandedId(isExpanded ? null : u.id)}
               >
@@ -486,27 +486,27 @@ function PreviousUpdatesList({ updates, onSelectDate }: {
                   <div className="px-4 pb-4 space-y-3">
                     <Separator />
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                      <div className="bg-muted rounded-xl p-2.5 text-center">
                         <p className="text-[10px] text-muted-foreground">Breakfast</p>
                         <p className="text-xs font-medium mt-0.5">
                           {u.breakfast ? `${MEAL_STATUS_ICON[u.breakfast]} ${MEAL_STATUS_LABEL[u.breakfast]}` : '—'}
                         </p>
                         {u.breakfastMenu && <p className="text-[10px] text-muted-foreground">{u.breakfastMenu}</p>}
                       </div>
-                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                      <div className="bg-muted rounded-xl p-2.5 text-center">
                         <p className="text-[10px] text-muted-foreground">Lunch</p>
                         <p className="text-xs font-medium mt-0.5">
                           {u.lunch ? `${MEAL_STATUS_ICON[u.lunch]} ${MEAL_STATUS_LABEL[u.lunch]}` : '—'}
                         </p>
                         {u.lunchMenu && <p className="text-[10px] text-muted-foreground">{u.lunchMenu}</p>}
                       </div>
-                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                      <div className="bg-muted rounded-xl p-2.5 text-center">
                         <p className="text-[10px] text-muted-foreground">Sleep</p>
                         <p className="text-xs font-medium mt-0.5">
                           {u.sleepQuality ? `${SLEEP_QUALITY_ICON[u.sleepQuality]} ${SLEEP_QUALITY_LABEL[u.sleepQuality]}` : '—'}
                         </p>
                       </div>
-                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                      <div className="bg-muted rounded-xl p-2.5 text-center">
                         <p className="text-[10px] text-muted-foreground">Water</p>
                         <p className="text-xs font-medium mt-0.5">💧 {u.waterGlasses}/{MAX_WATER}</p>
                       </div>
@@ -744,7 +744,7 @@ function ChildComparison({ childIds, childNames, selectedDate }: {
             </thead>
             <tbody className="text-xs">
               {['Breakfast', 'Lunch', 'Mood (AM)', 'Mood (PM)'].map((row) => (
-                <tr key={row} className="border-b border-gray-50">
+                <tr key={row} className="border-b border-border">
                   <td className="py-2 pr-4 font-medium text-muted-foreground">{row}</td>
                   {childIds.map((id) => (
                     <td key={id} className="text-center py-2">
@@ -880,7 +880,7 @@ function DailyUpdatesContent() {
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Tab Switcher */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-0.5">
+          <div className="flex items-center bg-muted rounded-xl p-0.5">
             <button
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 activeTab === 'daily' ? 'bg-white text-sky-700 shadow-sm' : 'text-muted-foreground hover:text-foreground'

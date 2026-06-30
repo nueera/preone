@@ -348,8 +348,8 @@ export default function AttendancePage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Attendance</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Attendance</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={() => fetchAttendance(selectedDate)}
           className="bg-portal-600 hover:bg-portal-700 rounded-xl"
@@ -369,7 +369,7 @@ export default function AttendancePage() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="daily" className="space-y-4">
-        <TabsList className="bg-gray-100 p-1 rounded-xl h-auto">
+        <TabsList className="bg-muted p-1 rounded-xl h-auto">
           <TabsTrigger value="daily" className="rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Calendar className="h-4 w-4 mr-1.5" /> Daily Attendance
           </TabsTrigger>
@@ -388,8 +388,8 @@ export default function AttendancePage() {
                 <CardContent className="p-4">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <h1 className="text-xl font-bold text-gray-900">Mark Attendance</h1>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <h1 className="text-xl font-bold text-foreground">Mark Attendance</h1>
+                      <p className="text-sm text-muted-foreground mt-0.5">
                         {data.class.name} | {data.class.program} | {data.stats.total} Students
                       </p>
                     </div>
@@ -437,7 +437,7 @@ export default function AttendancePage() {
                   )}
 
                   {isFuture && (
-                    <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-500 flex items-center gap-2">
+                    <div className="mt-3 p-3 bg-muted border border-border rounded-xl text-sm text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       Cannot mark attendance for future dates
                     </div>
@@ -465,7 +465,7 @@ export default function AttendancePage() {
                     <XCircle className="h-3.5 w-3.5 mr-1" /> Clear All
                   </Button>
                   <div className="flex-1" />
-                  <span className="text-sm text-gray-500">{formatDateDisplay(selectedDate)}</span>
+                  <span className="text-sm text-muted-foreground">{formatDateDisplay(selectedDate)}</span>
                   <Button
                     size="sm"
               className="bg-portal-600 hover:bg-portal-700 rounded-xl text-white"
@@ -495,8 +495,8 @@ export default function AttendancePage() {
                   })}
 
                   {data.records.length === 0 && (
-                    <div className="py-12 text-center text-gray-500">
-                      <Users className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                    <div className="py-12 text-center text-muted-foreground">
+                      <Users className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
                       <p className="font-medium">No Students Found</p>
                       <p className="text-sm">Add students to your class to mark attendance.</p>
                     </div>
@@ -510,7 +510,7 @@ export default function AttendancePage() {
               {/* Today's Summary */}
               <Card className="border-0 shadow-md">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-gray-900">
+                  <CardTitle className="text-sm font-semibold text-foreground">
                     {isToday ? "Today's Summary" : `Summary — ${formatDateShort(selectedDate)}`}
                   </CardTitle>
                 </CardHeader>
@@ -533,19 +533,19 @@ export default function AttendancePage() {
                     value={liveStats.absent}
                     color="red"
                   />
-                  <div className="border-t border-gray-100 pt-3">
+                  <div className="border-t border-border pt-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Attendance Rate</span>
+                      <span className="text-muted-foreground">Attendance Rate</span>
                       <span className="font-bold text-lg text-portal-600">{liveStats.rate}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2 mt-1 overflow-hidden">
+                    <div className="w-full bg-muted rounded-full h-2 mt-1 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-portal-500 transition-all duration-500"
                         style={{ width: `${liveStats.rate}%` }}
                       />
                     </div>
                   </div>
-                  <div className="text-xs text-gray-400 text-right">
+                  <div className="text-xs text-muted-foreground text-right">
                     Total: {liveStats.total} students
                   </div>
                 </CardContent>
@@ -565,7 +565,7 @@ export default function AttendancePage() {
                       {data.records
                         .filter((r) => selections.get(r.studentId) === 'ABSENT')
                         .map((r) => (
-                          <li key={r.studentId} className="text-xs text-gray-600">
+                          <li key={r.studentId} className="text-xs text-muted-foreground">
                             {r.firstName} {r.lastName} (Roll: {r.rollNumber || '-'})
                           </li>
                         ))}
@@ -587,7 +587,7 @@ export default function AttendancePage() {
               {/* Quick date navigation */}
               <Card className="border-0 shadow-md">
                 <CardContent className="p-4">
-                  <p className="text-xs font-medium text-gray-500 mb-2">Quick Navigation</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Quick Navigation</p>
                   <div className="grid grid-cols-3 gap-1">
                     {Array.from({ length: 7 }).map((_, i) => {
                       const d = new Date();
@@ -601,7 +601,7 @@ export default function AttendancePage() {
                           className={`px-2 py-1.5 rounded-lg text-xs text-center transition-colors ${
                             isCurrent
                               ? 'bg-portal-600 text-white font-medium'
-                              : 'text-gray-600 hover:bg-gray-100'
+                              : 'text-muted-foreground hover:bg-muted'
                           }`}
                         >
                           {i === 0 ? 'Today' : d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' })}
@@ -646,8 +646,8 @@ export default function AttendancePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{s.firstName} {s.lastName}</p>
-                  <p className="text-xs text-gray-500">Roll: {s.rollNumber || '-'}</p>
+                  <p className="text-sm font-medium text-foreground">{s.firstName} {s.lastName}</p>
+                  <p className="text-xs text-muted-foreground">Roll: {s.rollNumber || '-'}</p>
                 </div>
               </div>
             ))}
@@ -693,7 +693,7 @@ function StudentRow({
   ];
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50/50 transition-colors">
+    <div className="flex items-center gap-4 px-4 py-3 hover:bg-muted/50 transition-colors">
       {/* Avatar + Info */}
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <Avatar className="h-9 w-9 shrink-0">
@@ -706,10 +706,10 @@ function StudentRow({
           )}
         </Avatar>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
+          <p className="text-sm font-medium text-foreground truncate">
             {student.firstName} {student.lastName}
           </p>
-          <p className="text-xs text-gray-500">Roll: {student.rollNumber || '-'}</p>
+          <p className="text-xs text-muted-foreground">Roll: {student.rollNumber || '-'}</p>
         </div>
       </div>
 
@@ -758,7 +758,7 @@ function StatRow({ icon, label, value, color }: { icon: React.ReactNode; label: 
     <div className={`flex items-center justify-between p-2.5 ${bgColor} rounded-xl`}>
       <div className="flex items-center gap-2">
         {icon}
-        <span className="text-sm text-gray-600">{label}</span>
+        <span className="text-sm text-muted-foreground">{label}</span>
       </div>
       <span className={`text-lg font-bold ${textColor}`}>{value}</span>
     </div>
@@ -810,19 +810,19 @@ function MonthlyView({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-foreground">
                 {new Date(currentYear, currentMonth).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
               </h2>
-              <p className="text-sm text-gray-500">{data.className} | {data.studentCount} Students</p>
+              <p className="text-sm text-muted-foreground">{data.className} | {data.studentCount} Students</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <p className="text-2xl font-bold text-portal-600">{data.monthlyRate}%</p>
-                <p className="text-xs text-gray-500">Monthly Rate</p>
+                <p className="text-xs text-muted-foreground">Monthly Rate</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-blue-600">{data.workingDays}</p>
-                <p className="text-xs text-gray-500">Working Days</p>
+                <p className="text-xs text-muted-foreground">Working Days</p>
               </div>
             </div>
           </div>
@@ -835,7 +835,7 @@ function MonthlyView({
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-1 text-center mb-2">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-              <div key={d} className="text-xs font-medium text-gray-500 py-1">
+              <div key={d} className="text-xs font-medium text-muted-foreground py-1">
                 {d}
               </div>
             ))}
@@ -859,7 +859,7 @@ function MonthlyView({
               const isWeekend = new Date(currentYear, currentMonth, day).getDay() === 0;
 
               // Determine cell color
-              let cellBg = 'bg-white hover:bg-gray-50';
+              let cellBg = 'bg-white hover:bg-muted';
               let dotColor = '';
               if (ds) {
                 const absentRate = totalStudents > 0 ? ds.absent / totalStudents : 0;
@@ -879,7 +879,7 @@ function MonthlyView({
                     transition-all duration-200 border
                     ${isSelected ? 'ring-2 ring-portal-500 ring-offset-1 border-portal-200' : 'border-transparent'}
                     ${isToday ? 'font-bold' : ''}
-                    ${isFuture ? 'text-gray-300 cursor-default' : isWeekend ? 'text-gray-400 cursor-default' : 'cursor-pointer'}
+                    ${isFuture ? 'text-muted-foreground cursor-default' : isWeekend ? 'text-muted-foreground cursor-default' : 'cursor-pointer'}
                     ${cellBg}
                   `}
                 >
@@ -887,11 +887,11 @@ function MonthlyView({
                   {ds && !isFuture && (
                     <div className="flex items-center gap-0.5 mt-0.5">
                       <div className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
-                      <span className="text-[9px] text-gray-500">{ds.rate}%</span>
+                      <span className="text-[9px] text-muted-foreground">{ds.rate}%</span>
                     </div>
                   )}
                   {isWeekend && !isFuture && (
-                    <span className="text-[9px] text-gray-400 mt-0.5">Off</span>
+                    <span className="text-[9px] text-muted-foreground mt-0.5">Off</span>
                   )}
                 </button>
               );
@@ -899,7 +899,7 @@ function MonthlyView({
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> All Present
             </div>

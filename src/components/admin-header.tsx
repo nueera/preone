@@ -125,7 +125,7 @@ export function AdminHeader() {
   const roleTheme = isTaskMaster ? ROLE_THEMES.taskmaster : ROLE_THEMES.admin;
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
       {/* ── Role badge ── */}
       {isSuperAdmin && (
         <span

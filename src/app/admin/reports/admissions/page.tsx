@@ -117,7 +117,7 @@ export default function AdmissionsReportPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]">
         <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading admissions report…
       </div>
     );
@@ -132,11 +132,11 @@ export default function AdmissionsReportPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <BarChart3 className="w-6 h-6" style={{ color: theme.primary }} />
                 Admission Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Conversion funnel, source analysis, and trends</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Conversion funnel, source analysis, and trends</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -146,19 +146,19 @@ export default function AdmissionsReportPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Total Leads</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Total Leads</p>
               <p className="text-xl font-bold text-purple-700">{summary.totalLeads}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Enrolled</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Enrolled</p>
               <p className="text-xl font-bold text-emerald-700">{summary.enrolled}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Conversion Rate</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Conversion Rate</p>
               <p className="text-xl font-bold text-amber-700">{summary.conversionRate}%</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Est. Revenue</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Est. Revenue</p>
               <p className="text-xl font-bold text-purple-700">₹{(summary.totalEstimatedRevenue / 100000).toFixed(1)}L</p>
             </PreOneCard>
           </div>
@@ -166,7 +166,7 @@ export default function AdmissionsReportPage() {
 
         {summary.totalLeads === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+            <PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">
               No leads yet.
             </PreOneCard>
           </StaggerItem>
@@ -176,25 +176,25 @@ export default function AdmissionsReportPage() {
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><Funnel className="w-4 h-4" /> Conversion Funnel</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><Funnel className="w-4 h-4" /> Conversion Funnel</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <div className="space-y-2">
                     {funnel.length === 0 ? (
-                      <p className="text-sm text-gray-400 py-6 text-center">No pipeline data.</p>
+                      <p className="text-sm text-[var(--admin-text-subtle)] py-6 text-center">No pipeline data.</p>
                     ) : (
                       funnel.map((stage, i) => {
                         const maxCount = funnel[0].count || 1;
                         const width = Math.max((stage.count / maxCount) * 100, 8);
                         return (
                           <div key={stage.stage} className="flex items-center gap-3">
-                            <span className="text-xs text-gray-500 w-28">{stage.stage}</span>
-                            <div className="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden">
+                            <span className="text-xs text-[var(--admin-text-muted)] w-28">{stage.stage}</span>
+                            <div className="flex-1 bg-[var(--admin-surface-2)] rounded-full h-8 overflow-hidden">
                               <div className="h-full rounded-full flex items-center justify-end pr-3 transition-all" style={{ width: `${width}%`, backgroundColor: stage.color }}>
                                 <span className="text-xs font-semibold text-white">{stage.count}</span>
                               </div>
                             </div>
-                            <span className="text-xs text-gray-400 w-12 text-right">
+                            <span className="text-xs text-[var(--admin-text-subtle)] w-12 text-right">
                               {i > 0 ? `${Math.round((stage.count / funnel[i - 1].count) * 100)}%` : ''}
                             </span>
                           </div>
@@ -210,7 +210,7 @@ export default function AdmissionsReportPage() {
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900">Lead Sources</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)]">Lead Sources</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={220}>
@@ -225,7 +225,7 @@ export default function AdmissionsReportPage() {
                     {sourcePie.map((s) => (
                       <div key={s.name} className="flex items-center gap-1 text-xs">
                         <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                        <span className="text-gray-600">{s.name}</span>
+                        <span className="text-[var(--admin-text-muted)]">{s.name}</span>
                       </div>
                     ))}
                   </div>
@@ -237,7 +237,7 @@ export default function AdmissionsReportPage() {
             <StaggerItem className="lg:col-span-2">
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trends</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Trends</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>

@@ -216,11 +216,11 @@ export default function AcademicYearPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Calendar className="h-6 w-6 text-violet-600" />
               Academic Year Configuration
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Set up academic years, terms/semesters, and holiday calendars
             </p>
           </div>
@@ -267,10 +267,10 @@ export default function AcademicYearPage() {
                     <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                       Current: {activeYear.name}
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[var(--admin-text-muted)]">
                       {formatDate(activeYear.startDate)} —{' '}
                       {formatDate(activeYear.endDate)}
                     </p>
@@ -378,7 +378,7 @@ export default function AcademicYearPage() {
         {/* All Academic Years Table */}
         <PreOneCard variant="default">
           <div className="p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">
+            <h3 className="font-semibold text-[var(--admin-text)] mb-4">
               All Academic Years
             </h3>
             <div className="overflow-hidden rounded-xl border">
@@ -398,10 +398,10 @@ export default function AcademicYearPage() {
                   {years.map((y) => (
                     <TableRow key={y.id} className="hover:bg-violet-50/30">
                       <TableCell className="font-medium">{y.name}</TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
                         {formatDate(y.startDate)}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
                         {formatDate(y.endDate)}
                       </TableCell>
                       <TableCell>
@@ -420,7 +420,7 @@ export default function AcademicYearPage() {
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                               : y.status === 'upcoming'
                               ? 'bg-sky-50 text-sky-700 border-sky-200'
-                              : 'bg-gray-100 text-gray-600 border-gray-200'
+                              : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                           )}
                         >
                           {y.status === 'active' && (

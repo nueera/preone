@@ -83,11 +83,11 @@ interface CrmTask {
 const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
   HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
   MEDIUM: { label: 'Medium', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200' },
+  LOW: { label: 'Low', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]', border: 'border-[var(--admin-border)]' },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  TODO: { label: 'To Do', icon: <Circle className="h-4 w-4 text-gray-400" />, color: 'text-gray-500' },
+  TODO: { label: 'To Do', icon: <Circle className="h-4 w-4 text-[var(--admin-text-subtle)]" />, color: 'text-[var(--admin-text-muted)]' },
   IN_PROGRESS: { label: 'In Progress', icon: <Clock className="h-4 w-4 text-blue-500" />, color: 'text-blue-500' },
   DONE: { label: 'Done', icon: <CheckCircle2 className="h-4 w-4 text-green-500" />, color: 'text-green-500' },
 };
@@ -464,7 +464,7 @@ export default function CrmTasksPage() {
 
   // Board view columns
   const boardColumns = [
-    { key: 'TODO', label: 'To Do', icon: <Circle className="h-4 w-4 text-gray-400" />, color: '#9ca3af' },
+    { key: 'TODO', label: 'To Do', icon: <Circle className="h-4 w-4 text-[var(--admin-text-subtle)]" />, color: '#9ca3af' },
     { key: 'IN_PROGRESS', label: 'In Progress', icon: <Clock className="h-4 w-4 text-blue-500" />, color: '#3b82f6' },
     { key: 'DONE', label: 'Done', icon: <CheckCircle2 className="h-4 w-4 text-green-500" />, color: '#10b981' },
   ];
@@ -481,11 +481,11 @@ export default function CrmTasksPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <CheckSquare className="h-6 w-6 text-portal-600" />
               CRM Tasks
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Manage your CRM tasks and to-dos</p>
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage your CRM tasks and to-dos</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -506,20 +506,20 @@ export default function CrmTasksPage() {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-gray-400">{todoCount}</p>
-          <p className="text-xs text-gray-500">To Do</p>
+          <p className="text-2xl font-bold text-[var(--admin-text-subtle)]">{todoCount}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">To Do</p>
         </Card>
         <Card className="p-3 text-center">
           <p className="text-2xl font-bold text-blue-500">{inProgressCount}</p>
-          <p className="text-xs text-gray-500">In Progress</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">In Progress</p>
         </Card>
         <Card className="p-3 text-center">
           <p className="text-2xl font-bold text-green-500">{doneCount}</p>
-          <p className="text-xs text-gray-500">Done</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">Done</p>
         </Card>
         <Card className="p-3 text-center">
           <p className="text-2xl font-bold text-red-500">{overdueCount}</p>
-          <p className="text-xs text-gray-500">Overdue</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">Overdue</p>
         </Card>
       </div>
 
@@ -574,15 +574,15 @@ export default function CrmTasksPage() {
 
       {/* Task Content */}
       {loading ? (
-        <div className="flex items-center justify-center h-48 text-gray-400">
+        <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
           <RefreshCw className="h-5 w-5 animate-spin mr-2" />
           Loading tasks...
         </div>
       ) : tasks.length === 0 ? (
         <Card className="p-8 text-center">
-          <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">No tasks yet</p>
-          <p className="text-sm text-gray-400 mt-1">Add your first CRM task to get started</p>
+          <CheckSquare className="h-12 w-12 text-[var(--admin-text-subtle)] mx-auto mb-3" />
+          <p className="text-[var(--admin-text-muted)] font-medium">No tasks yet</p>
+          <p className="text-sm text-[var(--admin-text-subtle)] mt-1">Add your first CRM task to get started</p>
           <Button
             onClick={() => setAddTaskOpen(true)}
             className="mt-4 gap-1 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
@@ -601,13 +601,13 @@ export default function CrmTasksPage() {
                 {/* Column Header */}
                 <div className="flex items-center gap-2 p-3 rounded-t-xl" style={{ backgroundColor: col.color + '15' }}>
                   {col.icon}
-                  <span className="font-semibold text-sm text-gray-800">{col.label}</span>
-                  <span className="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full ml-auto">
+                  <span className="font-semibold text-sm text-[var(--admin-text)]">{col.label}</span>
+                  <span className="bg-[var(--admin-border)] text-[var(--admin-text-muted)] text-xs font-bold px-2 py-0.5 rounded-full ml-auto">
                     {colTasks.length}
                   </span>
                 </div>
                 {/* Cards */}
-                <div className="flex flex-col gap-2 p-2 bg-gray-50/50 rounded-b-xl min-h-[200px] border border-t-0 border-gray-100">
+                <div className="flex flex-col gap-2 p-2 bg-[var(--admin-surface-2)]/50 rounded-b-xl min-h-[200px] border border-t-0 border-[var(--admin-border)]">
                   {colTasks.map((task) => {
                     const priorityCfg = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.MEDIUM;
                     const isOverdue = task.status !== 'DONE' && task.dueDate && isPast(new Date(task.dueDate)) && !isToday(new Date(task.dueDate));
@@ -626,7 +626,7 @@ export default function CrmTasksPage() {
                           <div className="flex items-start justify-between gap-2">
                             <p className={cn(
                               'text-sm font-medium leading-tight',
-                              task.status === 'DONE' && 'line-through text-gray-400',
+                              task.status === 'DONE' && 'line-through text-[var(--admin-text-subtle)]',
                             )}>
                               {task.title}
                             </p>
@@ -639,12 +639,12 @@ export default function CrmTasksPage() {
                           </div>
 
                           {task.description && (
-                            <p className="text-xs text-gray-500 line-clamp-2">{task.description}</p>
+                            <p className="text-xs text-[var(--admin-text-muted)] line-clamp-2">{task.description}</p>
                           )}
 
                           {/* Lead link */}
                           {task.lead && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="flex items-center gap-1 text-xs text-[var(--admin-text-muted)]">
                               <LinkIcon className="h-3 w-3" />
                               <span>{task.lead.parentName}</span>
                               {task.lead.stage && (
@@ -665,7 +665,7 @@ export default function CrmTasksPage() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {task.assignee && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <div className="flex items-center gap-1 text-xs text-[var(--admin-text-muted)]">
                                   <UserCircle className="h-3 w-3" />
                                   {task.assignee.name}
                                 </div>
@@ -674,7 +674,7 @@ export default function CrmTasksPage() {
                             {task.dueDate && (
                               <span className={cn(
                                 'text-[11px] flex items-center gap-1',
-                                isOverdue ? 'text-red-600 font-medium' : 'text-gray-400',
+                                isOverdue ? 'text-red-600 font-medium' : 'text-[var(--admin-text-subtle)]',
                               )}>
                                 <Calendar className="h-3 w-3" />
                                 {isToday(new Date(task.dueDate)) ? 'Today' : format(new Date(task.dueDate), 'dd MMM')}
@@ -683,7 +683,7 @@ export default function CrmTasksPage() {
                           </div>
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-1 pt-1 border-t border-gray-100">
+                          <div className="flex items-center gap-1 pt-1 border-t border-[var(--admin-border)]">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -695,7 +695,7 @@ export default function CrmTasksPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 w-6 p-0 text-gray-400 hover:text-red-500 ml-auto"
+                              className="h-6 w-6 p-0 text-[var(--admin-text-subtle)] hover:text-red-500 ml-auto"
                               onClick={() => deleteTask(task.id)}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -706,7 +706,7 @@ export default function CrmTasksPage() {
                     );
                   })}
                   {colTasks.length === 0 && (
-                    <div className="flex items-center justify-center h-24 text-xs text-gray-400">
+                    <div className="flex items-center justify-center h-24 text-xs text-[var(--admin-text-subtle)]">
                       No tasks
                     </div>
                   )}
@@ -741,19 +741,19 @@ export default function CrmTasksPage() {
                   <div className="flex-1 min-w-0">
                     <p className={cn(
                       'text-sm font-medium',
-                      task.status === 'DONE' && 'line-through text-gray-400',
+                      task.status === 'DONE' && 'line-through text-[var(--admin-text-subtle)]',
                     )}>
                       {task.title}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       {task.lead && (
-                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <span className="text-xs text-[var(--admin-text-muted)] flex items-center gap-1">
                           <LinkIcon className="h-3 w-3" />
                           {task.lead.parentName}
                         </span>
                       )}
                       {task.assignee && (
-                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <span className="text-xs text-[var(--admin-text-muted)] flex items-center gap-1">
                           <UserCircle className="h-3 w-3" />
                           {task.assignee.name}
                         </span>
@@ -761,7 +761,7 @@ export default function CrmTasksPage() {
                       {task.dueDate && (
                         <span className={cn(
                           'text-xs flex items-center gap-1',
-                          isOverdue ? 'text-red-600 font-medium' : 'text-gray-400',
+                          isOverdue ? 'text-red-600 font-medium' : 'text-[var(--admin-text-subtle)]',
                         )}>
                           <Calendar className="h-3 w-3" />
                           {format(new Date(task.dueDate), 'dd MMM')}
@@ -778,7 +778,7 @@ export default function CrmTasksPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                    className="h-7 w-7 p-0 text-[var(--admin-text-subtle)] hover:text-red-500"
                     onClick={() => deleteTask(task.id)}
                   >
                     <Trash2 className="h-3.5 w-3.5" />

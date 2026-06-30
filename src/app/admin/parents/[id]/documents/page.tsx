@@ -73,7 +73,7 @@ const STATUS_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
   Verified: { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <ShieldCheck className="h-3.5 w-3.5" /> },
   Pending: { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock className="h-3.5 w-3.5" /> },
   Rejected: { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle className="h-3.5 w-3.5" /> },
-  'Not Submitted': { bg: 'bg-gray-50 text-gray-600 border-gray-200', icon: <AlertCircle className="h-3.5 w-3.5" /> },
+  'Not Submitted': { bg: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]', icon: <AlertCircle className="h-3.5 w-3.5" /> },
 };
 
 const FILETYPE_COLORS: Record<string, string> = {
@@ -116,7 +116,7 @@ export default function ParentDocumentsPage() {
         {/* ── Header ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
               Documents
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -190,7 +190,7 @@ export default function ParentDocumentsPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{doc.name}</p>
+                          <p className="text-sm font-medium text-[var(--admin-text)]">{doc.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {doc.fileType} · By {doc.uploadedBy}
                           </p>

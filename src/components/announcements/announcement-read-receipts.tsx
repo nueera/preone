@@ -90,7 +90,7 @@ export function AnnouncementReadReceipts({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -101,7 +101,7 @@ export function AnnouncementReadReceipts({
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-700">
+            <span className="text-xs font-medium text-muted-foreground">
               Read Rate
             </span>
             <span className="text-xs font-semibold text-portal-600">
@@ -129,7 +129,7 @@ export function AnnouncementReadReceipts({
           <ScrollArea className="max-h-48">
             <div className="space-y-1.5">
               {readBy.length === 0 ? (
-                <p className="text-[11px] text-gray-400 py-2">No reads yet</p>
+                <p className="text-[11px] text-muted-foreground py-2">No reads yet</p>
               ) : (
                 readBy.map((r) => (
                   <div
@@ -142,11 +142,11 @@ export function AnnouncementReadReceipts({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-gray-800 truncate">
+                      <p className="text-[11px] font-medium text-foreground truncate">
                         {r.name}
                       </p>
                       {r.readAt && (
-                        <p className="text-[9px] text-gray-400">
+                        <p className="text-[9px] text-muted-foreground">
                           {format(new Date(r.readAt), 'dd MMM, h:mm a')}
                         </p>
                       )}
@@ -169,7 +169,7 @@ export function AnnouncementReadReceipts({
           <ScrollArea className="max-h-48">
             <div className="space-y-1.5">
               {notReadBy.length === 0 ? (
-                <p className="text-[11px] text-gray-400 py-2">All caught up!</p>
+                <p className="text-[11px] text-muted-foreground py-2">All caught up!</p>
               ) : (
                 notReadBy.map((r) => (
                   <div
@@ -181,7 +181,7 @@ export function AnnouncementReadReceipts({
                         {getInitials(r.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <p className="text-[11px] font-medium text-gray-800 truncate">
+                    <p className="text-[11px] font-medium text-foreground truncate">
                       {r.name}
                     </p>
                   </div>

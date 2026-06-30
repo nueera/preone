@@ -81,7 +81,7 @@ function FollowUpTypeIcon({ type }: { type: string }) {
     case 'WhatsApp': return <MessageSquare className="h-4 w-4 text-green-500" />;
     case 'Email': return <Mail className="h-4 w-4 text-orange-500" />;
     case 'Visit': return <Eye className="h-4 w-4 text-purple-500" />;
-    default: return <FileText className="h-4 w-4 text-gray-500" />;
+    default: return <FileText className="h-4 w-4 text-[var(--admin-text-muted)]" />;
   }
 }
 
@@ -208,11 +208,11 @@ export default function CrmFollowupsPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Phone className="h-6 w-6 text-portal-600" />
               Follow-ups
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Track upcoming follow-ups and never miss a callback</p>
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">Track upcoming follow-ups and never miss a callback</p>
           </div>
         </div>
         <Button
@@ -235,7 +235,7 @@ export default function CrmFollowupsPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-amber-600">{todayCount}</p>
-              <p className="text-xs text-gray-500">Due Today</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Due Today</p>
             </div>
           </div>
         </Card>
@@ -246,7 +246,7 @@ export default function CrmFollowupsPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-blue-600">{pendingCount}</p>
-              <p className="text-xs text-gray-500">Pending</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Pending</p>
             </div>
           </div>
         </Card>
@@ -257,7 +257,7 @@ export default function CrmFollowupsPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-              <p className="text-xs text-gray-500">Overdue</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Overdue</p>
             </div>
           </div>
         </Card>
@@ -268,7 +268,7 @@ export default function CrmFollowupsPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-green-600">{completedCount}</p>
-              <p className="text-xs text-gray-500">Completed</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Completed</p>
             </div>
           </div>
         </Card>
@@ -309,20 +309,20 @@ export default function CrmFollowupsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main: Follow-up List */}
         <div className="lg:col-span-2 space-y-3">
-          <h3 className="text-sm font-semibold text-gray-700">
+          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">
             {filter === 'all' ? 'All Follow-ups' : filter === 'pending' ? 'Pending Follow-ups' : filter === 'overdue' ? 'Overdue Follow-ups' : 'Completed Follow-ups'}
           </h3>
 
           {loading ? (
-            <div className="flex items-center justify-center h-48 text-gray-400">
+            <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading...
             </div>
           ) : followUps.length === 0 ? (
             <Card className="p-8 text-center">
-              <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium">No follow-ups found</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <Calendar className="h-12 w-12 text-[var(--admin-text-subtle)] mx-auto mb-3" />
+              <p className="text-[var(--admin-text-muted)] font-medium">No follow-ups found</p>
+              <p className="text-sm text-[var(--admin-text-subtle)] mt-1">
                 {filter === 'completed' ? 'No completed follow-ups yet' : 'Add follow-up dates to leads to see them here'}
               </p>
             </Card>
@@ -359,7 +359,7 @@ export default function CrmFollowupsPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className={cn('font-medium', isCompleted && 'line-through text-gray-400')}>
+                          <p className={cn('font-medium', isCompleted && 'line-through text-[var(--admin-text-subtle)]')}>
                             {fu.lead?.parentName || 'Unknown'}
                           </p>
                           <span
@@ -370,10 +370,10 @@ export default function CrmFollowupsPage() {
                             {stageCfg.label}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-[var(--admin-text-muted)]">
                           Child: {fu.lead?.childName || 'N/A'} &middot; {fu.type}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                        <p className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed">
                           &quot;{fu.notes}&quot;
                         </p>
                         {fu.outcome && isCompleted && (
@@ -382,7 +382,7 @@ export default function CrmFollowupsPage() {
                           </p>
                         )}
                         {fu.createdBy && (
-                          <p className="text-[11px] text-gray-400 mt-1">— {fu.createdBy}</p>
+                          <p className="text-[11px] text-[var(--admin-text-subtle)] mt-1">— {fu.createdBy}</p>
                         )}
                       </div>
                     </div>
@@ -393,11 +393,11 @@ export default function CrmFollowupsPage() {
                         isOverdue && 'text-red-600',
                         isTodayFU && 'text-amber-600',
                         isCompleted && 'text-green-600',
-                        !isOverdue && !isTodayFU && !isCompleted && isFuture(fuDate) && 'text-gray-600',
+                        !isOverdue && !isTodayFU && !isCompleted && isFuture(fuDate) && 'text-[var(--admin-text-muted)]',
                       )}>
                         {isTodayFU ? 'Today' : isTomorrow(fuDate) ? 'Tomorrow' : format(fuDate, 'dd MMM yyyy')}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[var(--admin-text-subtle)]">
                         {format(fuDate, 'hh:mm a')}
                       </div>
 
@@ -444,11 +444,11 @@ export default function CrmFollowupsPage() {
 
         {/* Sidebar: Upcoming Follow-ups */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-700">Upcoming Follow-ups</h3>
+          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Upcoming Follow-ups</h3>
           {upcomingLeads.length === 0 ? (
             <Card className="p-6 text-center">
-              <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-xs text-gray-400">No upcoming follow-ups</p>
+              <Calendar className="h-8 w-8 text-[var(--admin-text-subtle)] mx-auto mb-2" />
+              <p className="text-xs text-[var(--admin-text-subtle)]">No upcoming follow-ups</p>
             </Card>
           ) : (
             upcomingLeads.slice(0, 15).map((lead) => {
@@ -468,17 +468,17 @@ export default function CrmFollowupsPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{lead.parentName}</p>
-                      <p className="text-xs text-gray-500 truncate">{lead.childName}</p>
+                      <p className="text-sm font-medium text-[var(--admin-text)] truncate">{lead.parentName}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)] truncate">{lead.childName}</p>
                     </div>
                     <div className="text-right shrink-0 ml-2">
                       <p className={cn(
                         'text-xs font-medium',
-                        isOverdue ? 'text-red-600' : isToday(followUpDate) ? 'text-amber-600' : 'text-gray-600',
+                        isOverdue ? 'text-red-600' : isToday(followUpDate) ? 'text-amber-600' : 'text-[var(--admin-text-muted)]',
                       )}>
                         {isToday(followUpDate) ? 'Today' : isTomorrow(followUpDate) ? 'Tomorrow' : format(followUpDate, 'dd MMM')}
                       </p>
-                      <p className="text-[10px] text-gray-400">{format(followUpDate, 'hh:mm a')}</p>
+                      <p className="text-[10px] text-[var(--admin-text-subtle)]">{format(followUpDate, 'hh:mm a')}</p>
                     </div>
                   </div>
                   <div className="mt-1">

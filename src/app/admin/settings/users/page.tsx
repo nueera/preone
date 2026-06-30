@@ -53,7 +53,7 @@ const ROLE_COLORS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700',
-  INACTIVE: 'bg-gray-50 text-gray-700',
+  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
 };
 
 const ROLE_FILTERS = ['all', 'ADMIN', 'TASK_MASTER', 'TEACHER', 'PARENT'];
@@ -133,11 +133,11 @@ export default function UsersSettingsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Users className="w-6 h-6" style={{ color: theme.primary }} />
                 User Management
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Manage users, roles, and access</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage users, roles, and access</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <UserPlus className="w-4 h-4 mr-2" /> Add User
@@ -148,10 +148,10 @@ export default function UsersSettingsPage() {
         {/* Stats */}
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-gray-500">Total Users</p><p className="text-lg font-bold text-purple-700">{stats.total}</p></PreOneCard>
-            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-gray-500">Active</p><p className="text-lg font-bold text-emerald-700">{stats.active}</p></PreOneCard>
-            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-gray-500">Teachers</p><p className="text-lg font-bold text-blue-700">{stats.teachers}</p></PreOneCard>
-            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-gray-500">Admins</p><p className="text-lg font-bold text-red-700">{stats.admins}</p></PreOneCard>
+            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-[var(--admin-text-muted)]">Total Users</p><p className="text-lg font-bold text-purple-700">{stats.total}</p></PreOneCard>
+            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-[var(--admin-text-muted)]">Active</p><p className="text-lg font-bold text-emerald-700">{stats.active}</p></PreOneCard>
+            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-[var(--admin-text-muted)]">Teachers</p><p className="text-lg font-bold text-blue-700">{stats.teachers}</p></PreOneCard>
+            <PreOneCard variant="strip" className="p-4"><p className="text-xs text-[var(--admin-text-muted)]">Admins</p><p className="text-lg font-bold text-red-700">{stats.admins}</p></PreOneCard>
           </div>
         </StaggerItem>
 
@@ -159,7 +159,7 @@ export default function UsersSettingsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input placeholder="Search users..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -177,11 +177,11 @@ export default function UsersSettingsPage() {
           <PreOneCard variant="default">
             <div className="overflow-hidden">
               {loading ? (
-                <div className="flex items-center justify-center py-12 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading users…</div>
+                <div className="flex items-center justify-center py-12 text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading users…</div>
               ) : error ? (
                 <div className="py-12 text-center text-red-500 text-sm">{error}</div>
               ) : filtered.length === 0 ? (
-                <div className="py-12 text-center text-gray-400 text-sm">No users found.</div>
+                <div className="py-12 text-center text-[var(--admin-text-subtle)] text-sm">No users found.</div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -203,10 +203,10 @@ export default function UsersSettingsPage() {
                             <span className="text-sm font-medium">{u.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-500">{u.email}</TableCell>
-                        <TableCell><Badge className={`${ROLE_COLORS[u.role] || 'bg-gray-50 text-gray-600'} text-[10px]`}>{u.role}</Badge></TableCell>
+                        <TableCell className="text-sm text-[var(--admin-text-muted)]">{u.email}</TableCell>
+                        <TableCell><Badge className={`${ROLE_COLORS[u.role] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[10px]`}>{u.role}</Badge></TableCell>
                         <TableCell><Badge className={`${STATUS_COLORS[u.status]} text-[10px]`}>{u.status}</Badge></TableCell>
-                        <TableCell className="text-sm text-gray-400">{u.lastLogin}</TableCell>
+                        <TableCell className="text-sm text-[var(--admin-text-subtle)]">{u.lastLogin}</TableCell>
                         <TableCell>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="sm" className="h-7 text-xs"><Key className="w-3 h-3 mr-1" /> Reset</Button>

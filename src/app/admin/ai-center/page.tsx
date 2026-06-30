@@ -53,11 +53,11 @@ export default function AICenterPage() {
       <StaggerContainer className="space-y-6">
         <StaggerItem>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Sparkles className="w-6 h-6" style={{ color: theme.primary }} />
               AI Center
             </h1>
-            <p className="text-sm text-gray-500 mt-1">AI-powered insights, analysis, and recommendations</p>
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">AI-powered insights, analysis, and recommendations</p>
           </div>
         </StaggerItem>
 
@@ -74,12 +74,12 @@ export default function AICenterPage() {
                         <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
                           <Icon className="w-5 h-5 text-purple-600" />
                         </div>
-                        <h3 className="font-semibold text-gray-900">{card.title}</h3>
+                        <h3 className="font-semibold text-[var(--admin-text)]">{card.title}</h3>
                       </div>
                       <Badge className={`${card.badgeColor} text-[10px]`}>{card.badge}</Badge>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">{card.description}</p>
-                    <div className="flex items-center gap-4 pt-2 border-t text-xs text-gray-400">
+                    <p className="text-xs text-[var(--admin-text-muted)] mb-3">{card.description}</p>
+                    <div className="flex items-center gap-4 pt-2 border-t text-xs text-[var(--admin-text-subtle)]">
                       {card.stats.map((s, i) => (
                         <span key={i}>{i > 0 && '• '}{s}</span>
                       ))}
@@ -99,7 +99,7 @@ export default function AICenterPage() {
           <PreOneCard variant="default">
             <PreOneCardContent>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="font-semibold text-[var(--admin-text)] flex items-center gap-2">
                   <Brain className="w-4 h-4 text-purple-500" /> Recent AI Observations
                 </h3>
                 <Button variant="outline" size="sm" className="h-7 text-xs">View All</Button>
@@ -111,17 +111,17 @@ export default function AICenterPage() {
                     const TypeIcon = typeCfg.icon;
                     const priCfg = PRIORITY_COLORS[obs.priority];
                     return (
-                      <div key={obs.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                      <div key={obs.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--admin-surface-2)] transition-colors">
                         <div className={`w-8 h-8 rounded-lg ${obs.type === 'ALERT' ? 'bg-red-50' : obs.type === 'RECOMMENDATION' ? 'bg-amber-50' : 'bg-blue-50'} flex items-center justify-center shrink-0`}>
                           <TypeIcon className={`w-4 h-4 ${typeCfg.color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{obs.title}</p>
-                          <p className="text-xs text-gray-400">{obs.student} • {obs.category}</p>
+                          <p className="text-sm font-medium text-[var(--admin-text)] truncate">{obs.title}</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)]">{obs.student} • {obs.category}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <Badge className={`${priCfg.bg} ${priCfg.text} text-[9px]`}>{obs.priority}</Badge>
-                          <span className="text-[10px] text-gray-400">{obs.time}</span>
+                          <span className="text-[10px] text-[var(--admin-text-subtle)]">{obs.time}</span>
                         </div>
                       </div>
                     );
@@ -136,7 +136,7 @@ export default function AICenterPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--admin-text)] mb-3 flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-500" /> Quick Actions
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -151,7 +151,7 @@ export default function AICenterPage() {
                     <Button key={action.label} variant="outline" className="h-auto p-3 flex flex-col items-center gap-2 text-center">
                       <Icon className="w-5 h-5 text-purple-500" />
                       <span className="text-xs font-medium">{action.label}</span>
-                      <span className="text-[10px] text-gray-400">{action.desc}</span>
+                      <span className="text-[10px] text-[var(--admin-text-subtle)]">{action.desc}</span>
                     </Button>
                   );
                 })}

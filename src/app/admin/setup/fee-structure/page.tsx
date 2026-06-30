@@ -195,11 +195,11 @@ export default function FeeStructureSetupPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <IndianRupee className="h-6 w-6 text-violet-600" />
               Fee Structure Setup
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Define fee types, amounts, frequency, and applicable classes
             </p>
           </div>
@@ -322,7 +322,7 @@ export default function FeeStructureSetupPage() {
         {/* Fee Breakdown Summary */}
         <PreOneCard variant="default">
           <div className="p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">
+            <h3 className="font-semibold text-[var(--admin-text)] mb-4">
               Fee Breakdown Summary
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -331,20 +331,20 @@ export default function FeeStructureSetupPage() {
                 .map((fee) => (
                   <div
                     key={fee.id}
-                    className="rounded-xl border bg-white p-4 hover:shadow-sm transition-shadow"
+                    className="rounded-xl border bg-[var(--admin-surface)] p-4 hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <div className="h-8 w-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600">
                         {fee.icon}
                       </div>
-                      <span className="text-sm font-medium text-gray-900 truncate">
+                      <span className="text-sm font-medium text-[var(--admin-text)] truncate">
                         {fee.name}
                       </span>
                     </div>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-[var(--admin-text)]">
                       ₹{fee.amount.toLocaleString('en-IN')}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
                       {frequencyLabels[fee.frequency]}
                     </p>
                   </div>
@@ -356,7 +356,7 @@ export default function FeeStructureSetupPage() {
         {/* Detailed Fee Table */}
         <PreOneCard variant="default">
           <div className="p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">
+            <h3 className="font-semibold text-[var(--admin-text)] mb-4">
               All Fee Types
             </h3>
             <div className="overflow-hidden rounded-xl border">
@@ -381,7 +381,7 @@ export default function FeeStructureSetupPage() {
                           </div>
                           <div>
                             <p className="font-medium text-sm">{fee.name}</p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-[var(--admin-text-subtle)]">
                               {fee.description}
                             </p>
                           </div>

@@ -81,11 +81,11 @@ export default function GrowthAnalysisPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <TrendingUp className="w-6 h-6" style={{ color: theme.primary }} />
                 Growth Analysis
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Developmental milestone tracking and early intervention alerts</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Developmental milestone tracking and early intervention alerts</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -101,7 +101,7 @@ export default function GrowthAnalysisPage() {
                 <PreOneCard key={m.category} variant="strip" className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Icon className="w-4 h-4" style={{ color: growthCfg.hex }} />
-                    <span className="text-sm font-medium text-gray-700">{m.category}</span>
+                    <span className="text-sm font-medium text-[var(--admin-text-muted)]">{m.category}</span>
                     {m.alert > 0 && <Badge className="bg-red-50 text-red-700 text-[9px]">{m.alert} alerts</Badge>}
                   </div>
                   <div className="space-y-1.5">
@@ -110,7 +110,7 @@ export default function GrowthAnalysisPage() {
                       <span className="font-medium">{m.onTrack}%</span>
                     </div>
                     <Progress value={m.onTrack} className="h-1.5" />
-                    <div className="flex gap-2 text-[10px] text-gray-400">
+                    <div className="flex gap-2 text-[10px] text-[var(--admin-text-subtle)]">
                       <span className="text-amber-600">{m.behind}% behind</span>
                       <span className="text-blue-600">{m.ahead}% ahead</span>
                     </div>
@@ -125,7 +125,7 @@ export default function GrowthAnalysisPage() {
           {/* Class Comparison */}
           <StaggerItem>
             <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Class Comparison</h3></div>
+              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Class Comparison</h3></div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={CLASS_COMPARISON}>
@@ -146,7 +146,7 @@ export default function GrowthAnalysisPage() {
           <StaggerItem>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-500" /> Early Intervention Alerts
                 </h3>
                 <ScrollArea className="max-h-64">
@@ -156,11 +156,11 @@ export default function GrowthAnalysisPage() {
                       return (
                         <div key={alert.id} className="p-3 rounded-xl border-l-4 border-l-red-400 bg-red-50/30 hover:bg-red-50/50 transition-colors">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-sm font-medium text-gray-900">{alert.title}</h4>
+                            <h4 className="text-sm font-medium text-[var(--admin-text)]">{alert.title}</h4>
                             <Badge className={`${SEVERITY_BADGE[alert.severity]} text-[9px]`}>{alert.severity}</Badge>
                           </div>
-                          <p className="text-xs text-gray-500">{alert.student}</p>
-                          <p className="text-xs text-gray-600 mt-1">{alert.description}</p>
+                          <p className="text-xs text-[var(--admin-text-muted)]">{alert.student}</p>
+                          <p className="text-xs text-[var(--admin-text-muted)] mt-1">{alert.description}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <Badge className={`${catCfg.bg} ${catCfg.text} text-[9px]`}>{alert.category}</Badge>
                             <Button variant="ghost" size="sm" className="h-5 text-[10px]">

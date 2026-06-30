@@ -402,11 +402,11 @@ function DailyUpdatesContent() {
     if (status === 'Eaten') return <span className="text-emerald-500" title="Eaten">🟢</span>;
     if (status === 'Partial') return <span className="text-amber-500" title="Partial">🟡</span>;
     if (status === 'Not Eaten') return <span className="text-red-500" title="Not Eaten">🔴</span>;
-    return <span className="text-gray-300" title="Not recorded">⬜</span>;
+    return <span className="text-muted-foreground" title="Not recorded">⬜</span>;
   };
 
   const getMoodEmoji = (mood: MoodType | null) => {
-    if (!mood) return <span className="text-gray-300">⬜</span>;
+    if (!mood) return <span className="text-muted-foreground">⬜</span>;
     return <span title={mood}>{MOOD_CONFIG[mood].emoji}</span>;
   };
 
@@ -430,8 +430,8 @@ function DailyUpdatesContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Daily Updates</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Daily Updates</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={() => fetchData(selectedDate)}
           className="bg-portal-600 hover:bg-portal-700 rounded-xl text-white"
@@ -451,11 +451,11 @@ function DailyUpdatesContent() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Sun className="h-5 w-5 text-amber-500" />
                 Daily Updates
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {data.className} | {data.summary.total} Students
               </p>
             </div>
@@ -493,16 +493,16 @@ function DailyUpdatesContent() {
               </Badge>
 
               {/* View toggle */}
-              <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+              <div className="flex items-center border border-border rounded-xl overflow-hidden">
                 <button
                   onClick={() => setViewMode('detail')}
-                  className={`p-1.5 transition-colors ${viewMode === 'detail' ? 'bg-portal-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`p-1.5 transition-colors ${viewMode === 'detail' ? 'bg-portal-600 text-white' : 'text-muted-foreground hover:bg-muted'}`}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => { setViewMode('list'); setSelectedStudentId(null); }}
-                  className={`p-1.5 transition-colors ${viewMode === 'list' ? 'bg-portal-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`p-1.5 transition-colors ${viewMode === 'list' ? 'bg-portal-600 text-white' : 'text-muted-foreground hover:bg-muted'}`}
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -518,7 +518,7 @@ function DailyUpdatesContent() {
             <span className="flex items-center gap-1 text-amber-600">
               <FileEdit className="h-3.5 w-3.5" /> {data.summary.draft} Draft
             </span>
-            <span className="flex items-center gap-1 text-gray-400">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <ClipboardList className="h-3.5 w-3.5" /> {data.summary.notStarted} Not Started
             </span>
             {data.summary.draft > 0 && (
@@ -543,7 +543,7 @@ function DailyUpdatesContent() {
           <div className="lg:col-span-1 space-y-4">
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-900">
+                <CardTitle className="text-sm font-semibold text-foreground">
                   Students ({data.updates.length})
                 </CardTitle>
               </CardHeader>
@@ -557,8 +557,8 @@ function DailyUpdatesContent() {
                   />
                 ))}
                 {data.updates.length === 0 && (
-                  <div className="py-8 text-center text-gray-500">
-                    <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                  <div className="py-8 text-center text-muted-foreground">
+                    <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm">No students found</p>
                   </div>
                 )}
@@ -593,8 +593,8 @@ function DailyUpdatesContent() {
                           )}
                         </Avatar>
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">{currentUpdate?.studentName}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm font-semibold text-foreground">{currentUpdate?.studentName}</p>
+                          <p className="text-xs text-muted-foreground">
                             Roll: {currentUpdate?.rollNumber || '-'} | {formatDateDisplay(selectedDate)}
                           </p>
                         </div>
@@ -611,7 +611,7 @@ function DailyUpdatesContent() {
                           </Badge>
                         )}
                         {currentUpdate?.status === 'NOT_STARTED' && (
-                          <Badge variant="outline" className="text-gray-500 text-xs rounded-xl">
+                          <Badge variant="outline" className="text-muted-foreground text-xs rounded-xl">
                             ⬜ Not Started
                           </Badge>
                         )}
@@ -623,7 +623,7 @@ function DailyUpdatesContent() {
                 {/* Section 1: Food Tracking */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Coffee className="h-4 w-4 text-orange-500" />
                       Food Tracking
                     </CardTitle>
@@ -662,7 +662,7 @@ function DailyUpdatesContent() {
                 {/* Section 2: Sleep Tracking */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Moon className="h-4 w-4 text-indigo-500" />
                       Sleep
                     </CardTitle>
@@ -670,7 +670,7 @@ function DailyUpdatesContent() {
                   <CardContent className="space-y-4">
                     <div className="flex flex-wrap items-end gap-4">
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-500">Start Time</label>
+                        <label className="text-xs font-medium text-muted-foreground">Start Time</label>
                         <Input
                           type="time"
                           value={formData.sleepStart}
@@ -679,7 +679,7 @@ function DailyUpdatesContent() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-500">End Time</label>
+                        <label className="text-xs font-medium text-muted-foreground">End Time</label>
                         <Input
                           type="time"
                           value={formData.sleepEnd}
@@ -696,7 +696,7 @@ function DailyUpdatesContent() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-medium text-gray-500">Quality</label>
+                      <label className="text-xs font-medium text-muted-foreground">Quality</label>
                       <div className="flex items-center gap-2">
                         {(['Good', 'Fair', 'Poor'] as SleepQuality[]).map((q) => {
                           const colors = SLEEP_COLORS[q];
@@ -725,7 +725,7 @@ function DailyUpdatesContent() {
                 {/* Section 3: Mood Tracking */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Smile className="h-4 w-4 text-pink-500" />
                       Mood
                     </CardTitle>
@@ -734,7 +734,7 @@ function DailyUpdatesContent() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Morning Mood */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-500">😊 Morning Mood</label>
+                        <label className="text-xs font-medium text-muted-foreground">😊 Morning Mood</label>
                         <div className="flex flex-wrap gap-1.5">
                           {MOOD_OPTIONS.map((mood) => {
                             const config = MOOD_CONFIG[mood];
@@ -748,7 +748,7 @@ function DailyUpdatesContent() {
                                   transition-all border
                                   ${isActive
                                     ? `${config.bg} ${config.border} ring-1 ring-offset-1 ring-current ${config.color}`
-                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                                    : 'bg-muted text-muted-foreground border-border hover:bg-muted'
                                   }
                                 `}
                               >
@@ -761,7 +761,7 @@ function DailyUpdatesContent() {
                       </div>
                       {/* Afternoon Mood */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-500">😊 Afternoon Mood</label>
+                        <label className="text-xs font-medium text-muted-foreground">😊 Afternoon Mood</label>
                         <div className="flex flex-wrap gap-1.5">
                           {MOOD_OPTIONS.map((mood) => {
                             const config = MOOD_CONFIG[mood];
@@ -775,7 +775,7 @@ function DailyUpdatesContent() {
                                   transition-all border
                                   ${isActive
                                     ? `${config.bg} ${config.border} ring-1 ring-offset-1 ring-current ${config.color}`
-                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                                    : 'bg-muted text-muted-foreground border-border hover:bg-muted'
                                   }
                                 `}
                               >
@@ -793,14 +793,14 @@ function DailyUpdatesContent() {
                 {/* Section 4: Potty/Diaper */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Baby className="h-4 w-4 text-sky-500" />
                       Potty / Diaper
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-500">Count</label>
+                      <label className="text-xs font-medium text-muted-foreground">Count</label>
                       <div className="flex items-center gap-1.5">
                         {[0, 1, 2, 3, 4, 5].map((count) => {
                           const isActive = formData.pottyCount === count;
@@ -824,7 +824,7 @@ function DailyUpdatesContent() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-500">Type</label>
+                      <label className="text-xs font-medium text-muted-foreground">Type</label>
                       <div className="flex items-center gap-2">
                         {(['Dry', 'Wet', 'Soiled'] as PottyType[]).map((t) => {
                           const colors = POTTY_TYPE_COLORS[t];
@@ -853,7 +853,7 @@ function DailyUpdatesContent() {
                 {/* Section 5: Water Intake */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Droplets className="h-4 w-4 text-blue-500" />
                       Water Intake
                     </CardTitle>
@@ -873,7 +873,7 @@ function DailyUpdatesContent() {
                                 ? 'bg-blue-600 text-white border-transparent shadow-sm'
                                 : isFilled
                                   ? 'bg-blue-100 text-blue-700 border-blue-300'
-                                  : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-blue-50'
+                                  : 'bg-muted text-muted-foreground border-border hover:bg-blue-50'
                               }
                             `}
                           >
@@ -889,7 +889,7 @@ function DailyUpdatesContent() {
                           💧
                         </span>
                       ))}
-                      <span className="ml-2 text-sm text-gray-600 font-medium">
+                      <span className="ml-2 text-sm text-muted-foreground font-medium">
                         {formData.waterGlasses} / 8 glasses
                       </span>
                     </div>
@@ -899,7 +899,7 @@ function DailyUpdatesContent() {
                 {/* Section 6: Highlights & Notes */}
                 <Card className="border-0 shadow-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Highlighter className="h-4 w-4 text-amber-500" />
                       Daily Highlights
                     </CardTitle>
@@ -915,8 +915,8 @@ function DailyUpdatesContent() {
                 </Card>
 
                 {/* ── Sticky Action Bar ── */}
-                <div className="sticky bottom-0 z-10 bg-white/80 backdrop-blur-sm border-t border-gray-200 -mx-6 px-6 py-3 flex items-center justify-between gap-3 rounded-b-xl">
-                  <div className="text-xs text-gray-500">
+                <div className="sticky bottom-0 z-10 bg-white/80 backdrop-blur-sm border-t border-border -mx-6 px-6 py-3 flex items-center justify-between gap-3 rounded-b-xl">
+                  <div className="text-xs text-muted-foreground">
                     {currentUpdate?.status === 'PUBLISHED' && 'Published update — edits will be saved'}
                     {currentUpdate?.status === 'DRAFT' && 'Draft — not visible to parents yet'}
                     {currentUpdate?.status === 'NOT_STARTED' && 'New update'}
@@ -968,8 +968,8 @@ function DailyUpdatesContent() {
               <Card className="border-0 shadow-md">
                 <CardContent className="py-16 text-center">
                   <Sun className="h-12 w-12 text-amber-300 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Select a Student</h3>
-                  <p className="text-sm text-gray-500">Choose a student from the list to fill their daily update</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">Select a Student</h3>
+                  <p className="text-sm text-muted-foreground">Choose a student from the list to fill their daily update</p>
                 </CardContent>
               </Card>
             )}
@@ -984,15 +984,15 @@ function DailyUpdatesContent() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/50">
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs">Student</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">🍳 Food</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">😴 Sleep</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">😊 Mood</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">🚽 Potty</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">💧 Water</th>
-                    <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">Status</th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-500 text-xs">Actions</th>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground text-xs">Student</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">🍳 Food</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">😴 Sleep</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">😊 Mood</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">🚽 Potty</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">💧 Water</th>
+                    <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">Status</th>
+                    <th className="text-right py-3 px-4 font-medium text-muted-foreground text-xs">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1004,7 +1004,7 @@ function DailyUpdatesContent() {
                     return (
                       <tr
                         key={update.studentId}
-                        className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                        className="border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => {
                           setSelectedStudentId(update.studentId);
                           setViewMode('detail');
@@ -1022,8 +1022,8 @@ function DailyUpdatesContent() {
                               )}
                             </Avatar>
                             <div>
-                              <p className="text-sm font-medium text-gray-900">{update.studentName}</p>
-                              <p className="text-[10px] text-gray-400">Roll: {update.rollNumber || '-'}</p>
+                              <p className="text-sm font-medium text-foreground">{update.studentName}</p>
+                              <p className="text-[10px] text-muted-foreground">Roll: {update.rollNumber || '-'}</p>
                             </div>
                           </div>
                         </td>
@@ -1034,8 +1034,8 @@ function DailyUpdatesContent() {
                             {getFoodIcon(update.snacks)}
                           </div>
                         </td>
-                        <td className="py-3 px-2 text-center text-xs text-gray-600">
-                          {sleepDuration || <span className="text-gray-300">-</span>}
+                        <td className="py-3 px-2 text-center text-xs text-muted-foreground">
+                          {sleepDuration || <span className="text-muted-foreground">-</span>}
                         </td>
                         <td className="py-3 px-2 text-center">
                           <div className="flex items-center justify-center gap-1">
@@ -1045,16 +1045,16 @@ function DailyUpdatesContent() {
                         </td>
                         <td className="py-3 px-2 text-center text-xs">
                           {update.pottyCount > 0 ? (
-                            <span className="text-gray-700">{update.pottyCount}</span>
+                            <span className="text-muted-foreground">{update.pottyCount}</span>
                           ) : (
-                            <span className="text-gray-300">-</span>
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </td>
                         <td className="py-3 px-2 text-center text-xs">
                           {update.waterGlasses > 0 ? (
                             <span className="text-blue-600 font-medium">{update.waterGlasses}💧</span>
                           ) : (
-                            <span className="text-gray-300">-</span>
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </td>
                         <td className="py-3 px-2 text-center">
@@ -1069,7 +1069,7 @@ function DailyUpdatesContent() {
                             </Badge>
                           )}
                           {update.status === 'NOT_STARTED' && (
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 rounded-md text-gray-400">
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 rounded-md text-muted-foreground">
                               ⬜
                             </Badge>
                           )}
@@ -1089,8 +1089,8 @@ function DailyUpdatesContent() {
                   })}
                   {data.updates.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center text-gray-500">
-                        <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                      <td colSpan={8} className="py-12 text-center text-muted-foreground">
+                        <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                         <p className="font-medium">No Students Found</p>
                       </td>
                     </tr>
@@ -1143,7 +1143,7 @@ function StudentCard({
         w-full flex items-center gap-3 p-2.5 rounded-xl transition-all text-left
         ${isSelected
           ? 'bg-portal-50 border border-portal-200 shadow-sm'
-          : 'hover:bg-gray-50 border border-transparent'
+          : 'hover:bg-muted border border-transparent'
         }
       `}
     >
@@ -1157,10 +1157,10 @@ function StudentCard({
         )}
       </Avatar>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium truncate ${isSelected ? 'text-portal-900' : 'text-gray-900'}`}>
+        <p className={`text-sm font-medium truncate ${isSelected ? 'text-portal-900' : 'text-foreground'}`}>
           {update.studentName}
         </p>
-        <p className="text-[10px] text-gray-400">Roll: {update.rollNumber || '-'}</p>
+        <p className="text-[10px] text-muted-foreground">Roll: {update.rollNumber || '-'}</p>
       </div>
       <div className="shrink-0">
         {update.status === 'PUBLISHED' && (
@@ -1198,7 +1198,7 @@ function MealRow({
   return (
     <div className="space-y-2">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <span className="text-sm font-medium text-gray-700 w-28 shrink-0">{label}</span>
+        <span className="text-sm font-medium text-muted-foreground w-28 shrink-0">{label}</span>
         <div className="flex items-center gap-1.5">
           {mealStatuses.map((s) => {
             const colors = MEAL_COLORS[s];

@@ -66,11 +66,11 @@ export default function SchoolSetupPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Building2 className="h-6 w-6 text-violet-600" />
               School Profile Setup
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Configure your school&apos;s basic information, logo, and contact details
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function SchoolSetupPage() {
                   <div className="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center">
                     <Building2 className="h-4 w-4 text-violet-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                     Basic Information
                   </h2>
                 </div>
@@ -150,7 +150,7 @@ export default function SchoolSetupPage() {
                   <div className="h-8 w-8 rounded-lg bg-emerald-100 flex items-center justify-center">
                     <MapPin className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                     Address Details
                   </h2>
                 </div>
@@ -158,7 +158,7 @@ export default function SchoolSetupPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="address">Street Address</Label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-[var(--admin-text-subtle)]" />
                     <Textarea
                       id="address"
                       value={form.address}
@@ -210,7 +210,7 @@ export default function SchoolSetupPage() {
                   <div className="h-8 w-8 rounded-lg bg-sky-100 flex items-center justify-center">
                     <Phone className="h-4 w-4 text-sky-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                     Contact Details
                   </h2>
                 </div>
@@ -219,7 +219,7 @@ export default function SchoolSetupPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="phone">Phone Number</Label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
                       <Input
                         id="phone"
                         value={form.phone}
@@ -232,7 +232,7 @@ export default function SchoolSetupPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="email">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
                       <Input
                         id="email"
                         value={form.email}
@@ -248,7 +248,7 @@ export default function SchoolSetupPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="website">Website</Label>
                   <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
                     <Input
                       id="website"
                       value={form.website}
@@ -267,33 +267,33 @@ export default function SchoolSetupPage() {
             {/* Logo Upload Card */}
             <PreOneCard variant="default">
               <div className="p-6">
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] mb-4">
                   School Logo
                 </h3>
                 <div
-                  className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-violet-300 hover:bg-violet-50/30 transition-all cursor-pointer"
+                  className="border-2 border-dashed border-[var(--admin-border)] rounded-xl p-6 text-center hover:border-violet-300 hover:bg-violet-50/30 transition-all cursor-pointer"
                   onClick={handleLogoUpload}
                 >
                   {logoPreview ? (
                     <div className="space-y-3">
-                      <div className="w-20 h-20 rounded-2xl bg-white shadow-sm mx-auto overflow-hidden border">
+                      <div className="w-20 h-20 rounded-2xl bg-[var(--admin-surface)] shadow-sm mx-auto overflow-hidden border">
                         <img
                           src={logoPreview}
                           alt="School logo"
                           className="w-full h-full object-contain p-1"
                         />
                       </div>
-                      <p className="text-xs text-gray-500">Click to change</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">Click to change</p>
                     </div>
                   ) : (
                     <>
-                      <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                        <ImageIcon className="h-8 w-8 text-gray-400" />
+                      <div className="w-16 h-16 rounded-2xl bg-[var(--admin-surface-2)] flex items-center justify-center mx-auto mb-3">
+                        <ImageIcon className="h-8 w-8 text-[var(--admin-text-subtle)]" />
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">
+                      <p className="text-sm text-[var(--admin-text-muted)] font-medium">
                         Click to upload logo
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-[var(--admin-text-subtle)] mt-1">
                         PNG, JPG up to 2MB
                       </p>
                     </>
@@ -316,7 +316,7 @@ export default function SchoolSetupPage() {
             {/* Setup Progress Card */}
             <PreOneCard variant="default">
               <div className="p-6">
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] mb-4">
                   Setup Progress
                 </h3>
                 <div className="space-y-3">
@@ -332,14 +332,14 @@ export default function SchoolSetupPage() {
                     <div key={step.label} className="flex items-center gap-2.5">
                       <CheckCircle2
                         className={`h-4 w-4 flex-shrink-0 ${
-                          step.done ? 'text-emerald-500' : 'text-gray-300'
+                          step.done ? 'text-emerald-500' : 'text-[var(--admin-text-subtle)]'
                         }`}
                       />
                       <span
                         className={`text-sm ${
                           step.done
-                            ? 'text-gray-900 font-medium'
-                            : 'text-gray-500'
+                            ? 'text-[var(--admin-text)] font-medium'
+                            : 'text-[var(--admin-text-muted)]'
                         }`}
                       >
                         {step.label}
@@ -349,10 +349,10 @@ export default function SchoolSetupPage() {
                 </div>
                 <Separator className="my-4" />
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--admin-text-muted)]">
                     3 of 7 sections completed
                   </p>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                  <div className="w-full h-1.5 bg-[var(--admin-surface-2)] rounded-full mt-2 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-400"
                       style={{ width: '43%' }}
@@ -365,10 +365,10 @@ export default function SchoolSetupPage() {
             {/* Quick Info Card */}
             <PreOneCard variant="cosmic">
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                <h3 className="text-sm font-semibold text-[var(--admin-text)] mb-2">
                   Need Help?
                 </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-[var(--admin-text-muted)] leading-relaxed">
                   Your school information is used across all PreOne modules —
                   from fee receipts to parent communications. Make sure it&apos;s
                   accurate!

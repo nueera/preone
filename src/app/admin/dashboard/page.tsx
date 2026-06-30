@@ -487,8 +487,8 @@ function ActivityFeed({
             <div className="space-y-1 pr-2">
               {activities.map((a, idx) => {
                 const Icon = ACTIVITY_ICONS[a.type] || Megaphone;
-                const color = ACTIVITY_COLORS[a.type] || 'text-gray-500 dark:text-gray-400';
-                const bg = ACTIVITY_BG[a.type] || 'bg-gray-50 dark:bg-gray-800/40';
+                const color = ACTIVITY_COLORS[a.type] || 'text-[var(--admin-text-muted)]';
+                const bg = ACTIVITY_BG[a.type] || 'bg-[var(--admin-surface-2)]';
 
                 return (
                   <div

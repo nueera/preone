@@ -57,7 +57,7 @@ const KYC_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
     icon: <Clock className="h-3.5 w-3.5" />,
   },
   'Not Submitted': {
-    bg: 'bg-gray-50 text-gray-600 border-gray-200',
+    bg: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
     icon: <AlertCircle className="h-3.5 w-3.5" />,
   },
 };
@@ -163,7 +163,7 @@ export default function ParentDetailPage() {
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
                     {parent.firstName} {parent.lastName}
                   </h1>
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium border ${RELATION_COLORS[parent.relation]}`}>
@@ -359,7 +359,7 @@ export default function ParentDetailPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100">{child.name}</h4>
+                          <h4 className="font-semibold text-[var(--admin-text)]">{child.name}</h4>
                           <p className="text-sm text-muted-foreground">{child.className} — Roll #{child.rollNo}</p>
                         </div>
                       </div>
@@ -418,7 +418,7 @@ export default function ParentDetailPage() {
                         <p className="text-sm font-medium">{msg.subject}</p>
                         <p className="text-xs text-muted-foreground">{msg.date} · {msg.type}</p>
                       </div>
-                      <Badge className={msg.status === 'Read' ? 'bg-emerald-50 text-emerald-700 text-[10px]' : 'bg-gray-50 text-gray-500 text-[10px]'}>
+                      <Badge className={msg.status === 'Read' ? 'bg-emerald-50 text-emerald-700 text-[10px]' : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] text-[10px]'}>
                         {msg.status}
                       </Badge>
                     </div>
@@ -456,7 +456,7 @@ export default function ParentDetailPage() {
                         <p className="text-sm font-medium">{doc.name}</p>
                         <p className="text-xs text-muted-foreground">{doc.type}</p>
                       </div>
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium border ${KYC_STYLES[doc.status as keyof typeof KYC_STYLES]?.bg || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium border ${KYC_STYLES[doc.status as keyof typeof KYC_STYLES]?.bg || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'}`}>
                         {KYC_STYLES[doc.status as keyof typeof KYC_STYLES]?.icon}
                         {doc.status}
                       </span>

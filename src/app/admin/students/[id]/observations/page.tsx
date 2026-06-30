@@ -54,7 +54,7 @@ const CATEGORY_ICON: Record<string, React.ElementType> = {
 };
 
 const PRIORITY_BADGE: Record<string, string> = {
-  LOW: 'bg-gray-50 text-gray-600',
+  LOW: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
   NORMAL: 'bg-blue-50 text-blue-700',
   HIGH: 'bg-amber-50 text-amber-700',
   CONCERN: 'bg-red-50 text-red-700',
@@ -111,11 +111,11 @@ export default function StudentObservationsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Eye className="w-6 h-6" style={{ color: theme.primary }} />
                 Student Observations
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Teacher observations timeline</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Teacher observations timeline</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md" onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" /> Add Observation
@@ -128,7 +128,7 @@ export default function StudentObservationsPage() {
           <StaggerItem>
             <PreOneCard variant="emotional" className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">New Observation</h3>
+                <h3 className="font-semibold text-[var(--admin-text)]">New Observation</h3>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowForm(false)}>
                   <X className="w-4 h-4" />
                 </Button>
@@ -170,7 +170,7 @@ export default function StudentObservationsPage() {
               return (
                 <PreOneCard key={key} variant="strip" className="p-3 text-center">
                   <Icon className={`w-5 h-5 mx-auto ${cfg.text}`} />
-                  <p className="text-[10px] text-gray-500 mt-1 capitalize">{toTitle(key)}</p>
+                  <p className="text-[10px] text-[var(--admin-text-muted)] mt-1 capitalize">{toTitle(key)}</p>
                   <p className="text-sm font-bold" style={{ color: cfg.hex }}>{categoryCounts[key] || 0}</p>
                 </PreOneCard>
               );
@@ -182,16 +182,16 @@ export default function StudentObservationsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Observation Timeline</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Observation Timeline</h3>
               {loading ? (
-                <div className="flex items-center justify-center py-12 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading observations…</div>
+                <div className="flex items-center justify-center py-12 text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading observations…</div>
               ) : error ? (
                 <div className="py-12 text-center text-red-500 text-sm">{error}</div>
               ) : observations.length === 0 ? (
-                <div className="py-12 text-center text-gray-400 text-sm">No observations recorded for this student yet.</div>
+                <div className="py-12 text-center text-[var(--admin-text-subtle)] text-sm">No observations recorded for this student yet.</div>
               ) : (
                 <ScrollArea className="max-h-[500px]">
-                  <div className="relative pl-6 border-l-2 border-gray-100 space-y-6">
+                  <div className="relative pl-6 border-l-2 border-[var(--admin-border)] space-y-6">
                     {observations.map((obs) => {
                       const cfg = OBSERVATION_COLORS[obs.category] || OBSERVATION_COLORS.COGNITIVE;
                       const Icon = CATEGORY_ICON[obs.category] || Brain;
@@ -202,11 +202,11 @@ export default function StudentObservationsPage() {
                           </div>
                           <div className="ml-4 p-3 rounded-xl border hover:shadow-sm transition-shadow">
                             <div className="flex items-center justify-between mb-1">
-                              <h4 className="text-sm font-medium text-gray-900">{toTitle(obs.category)}</h4>
-                              <Badge className={`${PRIORITY_BADGE[obs.priority] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{obs.priority}</Badge>
+                              <h4 className="text-sm font-medium text-[var(--admin-text)]">{toTitle(obs.category)}</h4>
+                              <Badge className={`${PRIORITY_BADGE[obs.priority] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{obs.priority}</Badge>
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">{obs.content}</p>
-                            <div className="flex items-center gap-3 text-xs text-gray-400">
+                            <p className="text-sm text-[var(--admin-text-muted)] mb-2">{obs.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
                               <span className="flex items-center gap-1"><User className="w-3 h-3" /> {obs.teacher}</span>
                               <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(obs.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                               <Badge className={`${cfg.bg} ${cfg.text} text-[9px]`}>{toTitle(obs.category)}</Badge>

@@ -247,8 +247,8 @@ export default function NewLeadPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">New Lead</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Create a new CRM lead entry</p>
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">New Lead</h1>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">Create a new CRM lead entry</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -282,8 +282,8 @@ export default function NewLeadPage() {
                   <UserCircle className="h-5 w-5 text-violet-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Parent Information</h2>
-                  <p className="text-xs text-gray-500">Contact details of the parent or guardian</p>
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">Parent Information</h2>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Contact details of the parent or guardian</p>
                 </div>
               </div>
 
@@ -348,8 +348,8 @@ export default function NewLeadPage() {
                   <Baby className="h-5 w-5 text-amber-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Child Information</h2>
-                  <p className="text-xs text-gray-500">Details about the child and program preferences</p>
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">Child Information</h2>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Details about the child and program preferences</p>
                 </div>
               </div>
 
@@ -393,7 +393,7 @@ export default function NewLeadPage() {
                         'rounded-full px-4 py-2 text-sm font-medium border transition-all duration-150',
                         form.programInterest.includes(program)
                           ? cn(theme.selectedClass, 'border-violet-300 shadow-sm')
-                          : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300 hover:text-gray-500'
+                          : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)] hover:text-[var(--admin-text-muted)]'
                       )}
                     >
                       {program}
@@ -414,8 +414,8 @@ export default function NewLeadPage() {
                   <Tag className="h-5 w-5 text-sky-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Lead Details</h2>
-                  <p className="text-xs text-gray-500">Source, priority, and assignment information</p>
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">Lead Details</h2>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Source, priority, and assignment information</p>
                 </div>
               </div>
 
@@ -493,8 +493,8 @@ export default function NewLeadPage() {
                   <StickyNote className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Notes & Follow-up</h2>
-                  <p className="text-xs text-gray-500">Additional notes and next follow-up scheduling</p>
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">Notes & Follow-up</h2>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Additional notes and next follow-up scheduling</p>
                 </div>
               </div>
 
@@ -542,7 +542,7 @@ export default function NewLeadPage() {
           {/* ── Footer Actions ── */}
           <AnimatedCard delay={0.25} hover={false}>
             <div className="p-4 flex items-center justify-between">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[var(--admin-text-subtle)]">
                 Fields marked with <span className="text-red-500">*</span> are required
               </p>
               <div className="flex items-center gap-3">

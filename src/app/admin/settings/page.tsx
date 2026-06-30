@@ -213,7 +213,7 @@ function PasswordInput({ value, onChange, placeholder }: {
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]"
       >
         {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>
@@ -904,13 +904,13 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <Label>School Logo</Label>
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 rounded-xl border-2 border-dashed border-gray-300">
+              <Avatar className="h-16 w-16 rounded-xl border-2 border-dashed border-[var(--admin-border)]">
                 {schoolForm.logo ? (
                   <AvatarFallback className="rounded-xl bg-portal-100 text-portal-600 text-xl font-bold">
                     {(schoolForm.name || 'S').charAt(0)}
                   </AvatarFallback>
                 ) : (
-                  <AvatarFallback className="rounded-xl bg-gray-100 text-gray-400">
+                  <AvatarFallback className="rounded-xl bg-[var(--admin-surface-2)] text-[var(--admin-text-subtle)]">
                     <Upload className="h-5 w-5" />
                   </AvatarFallback>
                 )}
@@ -1124,7 +1124,7 @@ export default function SettingsPage() {
                     <TableCell>
                       <Badge variant="outline" className={branch.isActive
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-gray-50 text-gray-500 border-gray-200'
+                        : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                       }>
                         {branch.isActive ? 'Active' : 'Inactive'}
                       </Badge>
@@ -1502,7 +1502,7 @@ export default function SettingsPage() {
               The new password has been generated. Please share it securely.
             </DialogDescription>
           </DialogHeader>
-          <div className="p-4 bg-gray-50 rounded-xl border">
+          <div className="p-4 bg-[var(--admin-surface-2)] rounded-xl border">
             <p className="text-xs text-muted-foreground mb-1">New Password</p>
             <p className="text-lg font-mono font-bold tracking-wider text-portal-700">{resetPwdResult}</p>
           </div>
@@ -1810,7 +1810,7 @@ export default function SettingsPage() {
                       <TableCell>
                         <Badge variant="outline" className={vehicle.isActive
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-gray-50 text-gray-500 border-gray-200'
+                          : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                         }>
                           {vehicle.isActive ? 'Active' : 'Inactive'}
                         </Badge>
@@ -1982,7 +1982,7 @@ export default function SettingsPage() {
   const renderTransport = () => (
     <div className="space-y-4">
       <Tabs value={transportSubTab} onValueChange={setTransportSubTab}>
-        <TabsList className="bg-gray-100">
+        <TabsList className="bg-[var(--admin-surface-2)]">
           <TabsTrigger value="routes" className="gap-1.5">
             <Route className="h-3.5 w-3.5" /> Routes
           </TabsTrigger>
@@ -2034,7 +2034,7 @@ export default function SettingsPage() {
       <div className="space-y-6">
         {/* Channel Configuration */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Channel Configuration</h3>
+          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider mb-4">Channel Configuration</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* SMS Card */}
             <ChannelCard icon={Smartphone} title="SMS" color="bg-portal-500">
@@ -2191,7 +2191,7 @@ export default function SettingsPage() {
 
         {/* Auto-notifications Matrix */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Auto-Notification Rules</h3>
+          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider mb-4">Auto-Notification Rules</h3>
           <Card className="rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -2289,8 +2289,8 @@ export default function SettingsPage() {
           <Building2 className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-sm text-gray-500">Manage school profile, branches, users, transport, and notifications</p>
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">Settings</h1>
+          <p className="text-sm text-[var(--admin-text-muted)]">Manage school profile, branches, users, transport, and notifications</p>
         </div>
       </div>
 
@@ -2300,20 +2300,20 @@ export default function SettingsPage() {
 
       {/* Main Tabs */}
       <Tabs defaultValue="school" className="space-y-4">
-        <TabsList className="bg-gray-100 p-1 rounded-xl">
-          <TabsTrigger value="school" className="gap-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+        <TabsList className="bg-[var(--admin-surface-2)] p-1 rounded-xl">
+          <TabsTrigger value="school" className="gap-1.5 rounded-lg data-[state=active]:bg-[var(--admin-surface)] data-[state=active]:shadow-sm">
             <Building2 className="h-3.5 w-3.5" /> School Profile
           </TabsTrigger>
-          <TabsTrigger value="branches" className="gap-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsTrigger value="branches" className="gap-1.5 rounded-lg data-[state=active]:bg-[var(--admin-surface)] data-[state=active]:shadow-sm">
             <Building2 className="h-3.5 w-3.5" /> Branches
           </TabsTrigger>
-          <TabsTrigger value="users" className="gap-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsTrigger value="users" className="gap-1.5 rounded-lg data-[state=active]:bg-[var(--admin-surface)] data-[state=active]:shadow-sm">
             <Users className="h-3.5 w-3.5" /> Users
           </TabsTrigger>
-          <TabsTrigger value="transport" className="gap-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsTrigger value="transport" className="gap-1.5 rounded-lg data-[state=active]:bg-[var(--admin-surface)] data-[state=active]:shadow-sm">
             <Bus className="h-3.5 w-3.5" /> Transport
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsTrigger value="notifications" className="gap-1.5 rounded-lg data-[state=active]:bg-[var(--admin-surface)] data-[state=active]:shadow-sm">
             <Bell className="h-3.5 w-3.5" /> Notifications
           </TabsTrigger>
         </TabsList>

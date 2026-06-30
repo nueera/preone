@@ -138,11 +138,11 @@ export default function CommunicationHubPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-portal-600" />
             Communication Hub
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">
             Manage all your school communication channels from one place
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function CommunicationHubPage() {
               <MessageSquare className="h-5 w-5 text-violet-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Unread Chats</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Unread Chats</p>
               <p className="text-xl font-bold text-violet-700">{chatUnread}</p>
             </div>
           </CardContent>
@@ -173,7 +173,7 @@ export default function CommunicationHubPage() {
               <Megaphone className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Announcements</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Announcements</p>
               <p className="text-xl font-bold text-amber-700">{totalAnnouncements}</p>
             </div>
           </CardContent>
@@ -184,7 +184,7 @@ export default function CommunicationHubPage() {
               <Users className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">WhatsApp</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">WhatsApp</p>
               <p className="text-xl font-bold text-emerald-700">
                 {whatsappConnected ? 'Active' : 'Off'}
               </p>
@@ -197,7 +197,7 @@ export default function CommunicationHubPage() {
               <FileText className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Templates</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Templates</p>
               <p className="text-xl font-bold text-purple-700">{templateCount}</p>
             </div>
           </CardContent>
@@ -232,7 +232,7 @@ export default function CommunicationHubPage() {
           const Icon = card.icon;
           return (
             <Link key={card.id} href={card.href} className="group block">
-              <Card className={`h-full bg-gradient-to-br ${card.gradient} border-gray-200/60 transition-all duration-300 group-hover:shadow-lg group-hover:border-purple-200 group-hover:scale-[1.01]`}>
+              <Card className={`h-full bg-gradient-to-br ${card.gradient} border-[var(--admin-border)]/60 transition-all duration-300 group-hover:shadow-lg group-hover:border-purple-200 group-hover:scale-[1.01]`}>
                 <CardContent className="p-6">
                   {/* Card Header */}
                   <div className="flex items-start justify-between mb-4">
@@ -241,8 +241,8 @@ export default function CommunicationHubPage() {
                         <Icon className={`h-6 w-6 ${card.iconColor}`} />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{card.description}</p>
+                        <h3 className="text-lg font-semibold text-[var(--admin-text)]">{card.title}</h3>
+                        <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">{card.description}</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -251,14 +251,14 @@ export default function CommunicationHubPage() {
                           {card.badge.label}
                         </Badge>
                       )}
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-purple-600 transition-all duration-300 group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4 text-[var(--admin-text-subtle)] group-hover:text-purple-600 transition-all duration-300 group-hover:translate-x-1" />
                     </div>
                   </div>
 
                   {/* Count Display */}
-                  <div className="mb-4 p-3 rounded-lg bg-white/60 border border-gray-100">
+                  <div className="mb-4 p-3 rounded-lg bg-white/60 border border-[var(--admin-border)]">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                      <span className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider font-medium">
                         {card.countLabel}
                       </span>
                       <span className={`text-2xl font-bold ${card.iconColor}`}>
@@ -272,7 +272,7 @@ export default function CommunicationHubPage() {
                     {card.features.map((feature) => (
                       <span
                         key={feature}
-                        className="inline-flex items-center gap-1 text-[11px] text-gray-500 bg-white/80 border border-gray-100 rounded-full px-2.5 py-1"
+                        className="inline-flex items-center gap-1 text-[11px] text-[var(--admin-text-muted)] bg-white/80 border border-[var(--admin-border)] rounded-full px-2.5 py-1"
                       >
                         {feature}
                       </span>

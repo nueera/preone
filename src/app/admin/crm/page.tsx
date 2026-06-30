@@ -100,10 +100,10 @@ function StatCardSkeleton() {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gray-100 animate-pulse" />
+        <div className="h-10 w-10 rounded-xl bg-[var(--admin-surface-2)] animate-pulse" />
         <div className="space-y-2 flex-1">
-          <div className="h-6 w-16 bg-gray-100 rounded animate-pulse" />
-          <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+          <div className="h-6 w-16 bg-[var(--admin-surface-2)] rounded animate-pulse" />
+          <div className="h-3 w-24 bg-[var(--admin-surface-2)] rounded animate-pulse" />
         </div>
       </div>
     </Card>
@@ -113,7 +113,7 @@ function StatCardSkeleton() {
 function PipelineBarSkeleton() {
   return (
     <Card className="p-4">
-      <div className="h-8 w-full bg-gray-100 rounded-full animate-pulse" />
+      <div className="h-8 w-full bg-[var(--admin-surface-2)] rounded-full animate-pulse" />
     </Card>
   );
 }
@@ -123,7 +123,7 @@ function RecentLeadsSkeleton() {
     <Card className="p-4">
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-12 bg-gray-50 rounded-lg animate-pulse" />
+          <div key={i} className="h-12 bg-[var(--admin-surface-2)] rounded-lg animate-pulse" />
         ))}
       </div>
     </Card>
@@ -219,10 +219,10 @@ export default function CrmDashboardPage() {
         {/* ── Page Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-portal-600">Admission CRM</span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Track leads, manage follow-ups, and grow enrollments
             </p>
           </div>
@@ -294,10 +294,10 @@ export default function CrmDashboardPage() {
                       <Users className="h-5 w-5 text-violet-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-2xl font-bold text-gray-900 leading-tight">
+                      <p className="text-2xl font-bold font-heading text-[var(--admin-text)] leading-tight">
                         {stats?.totalLeads ?? 0}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Total Leads</p>
+                      <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Total Leads</p>
                     </div>
                   </div>
                 </div>
@@ -314,7 +314,7 @@ export default function CrmDashboardPage() {
                       <p className="text-2xl font-bold text-blue-600 leading-tight">
                         {stats?.newThisWeek ?? 0}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">New This Week</p>
+                      <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">New This Week</p>
                     </div>
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export default function CrmDashboardPage() {
                       <p className="text-2xl font-bold text-amber-600 leading-tight">
                         {stats?.followUpsToday ?? 0}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Follow-ups Today</p>
+                      <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Follow-ups Today</p>
                     </div>
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function CrmDashboardPage() {
                       <p className="text-2xl font-bold text-emerald-600 leading-tight">
                         {stats?.conversionRate ?? 0}%
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">Conversion Rate</p>
+                      <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Conversion Rate</p>
                     </div>
                   </div>
                 </div>
@@ -367,7 +367,7 @@ export default function CrmDashboardPage() {
               <AnimatedCard delay={0.25}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900">
+                    <CardTitle className="text-base font-semibold text-[var(--admin-text)]">
                       Pipeline Overview
                     </CardTitle>
                     <Link href="/admin/crm/pipeline">
@@ -380,13 +380,13 @@ export default function CrmDashboardPage() {
                 </CardHeader>
                 <CardContent className="pt-0">
                   {totalPipelineLeads === 0 ? (
-                    <div className="py-8 text-center text-sm text-gray-400">
+                    <div className="py-8 text-center text-sm text-[var(--admin-text-subtle)]">
                       No leads in the pipeline yet
                     </div>
                   ) : (
                     <>
                       {/* Horizontal stacked bar */}
-                      <div className="flex h-10 rounded-full overflow-hidden shadow-inner bg-gray-100">
+                      <div className="flex h-10 rounded-full overflow-hidden shadow-inner bg-[var(--admin-surface-2)]">
                         {pipelineData.map((segment) => {
                           if (segment.count === 0) return null;
                           const width = (segment.count / totalPipelineLeads) * 100;
@@ -422,10 +422,10 @@ export default function CrmDashboardPage() {
                               className="h-2.5 w-2.5 rounded-full flex-shrink-0"
                               style={{ backgroundColor: segment.config.color }}
                             />
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-[var(--admin-text-muted)]">
                               {segment.config.label}
                             </span>
-                            <span className="text-xs font-medium text-gray-900">
+                            <span className="text-xs font-medium text-[var(--admin-text)]">
                               {segment.count}
                             </span>
                           </div>
@@ -443,7 +443,7 @@ export default function CrmDashboardPage() {
             {loading ? (
               <AnimatedCard delay={0.3}>
                 <Card className="p-4">
-                  <div className="h-28 bg-gray-50 rounded-lg animate-pulse" />
+                  <div className="h-28 bg-[var(--admin-surface-2)] rounded-lg animate-pulse" />
                 </Card>
               </AnimatedCard>
             ) : (
@@ -468,8 +468,8 @@ export default function CrmDashboardPage() {
                   </div>
                   <div className="px-5 py-3 border-t border-emerald-100">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Active pipeline value</span>
-                      <span className="font-semibold text-gray-700">
+                      <span className="text-[var(--admin-text-muted)]">Active pipeline value</span>
+                      <span className="font-semibold text-[var(--admin-text-muted)]">
                         {formatCurrency(
                           (stats?.leadsByStage ?? [])
                             .filter(s => !['ENROLLED', 'LOST'].includes(s.stage))
@@ -496,7 +496,7 @@ export default function CrmDashboardPage() {
               <AnimatedCard delay={0.35}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900">
+                    <CardTitle className="text-base font-semibold text-[var(--admin-text)]">
                       Recent Leads
                     </CardTitle>
                     <Link href="/admin/crm/leads">
@@ -509,7 +509,7 @@ export default function CrmDashboardPage() {
                 </CardHeader>
                 <CardContent className="pt-0">
                   {!stats?.recentLeads || stats.recentLeads.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-gray-400">
+                    <div className="py-8 text-center text-sm text-[var(--admin-text-subtle)]">
                       No leads yet. Click &quot;Add Lead&quot; to create your first lead.
                     </div>
                   ) : (
@@ -520,7 +520,7 @@ export default function CrmDashboardPage() {
                           <Link
                             key={lead.id}
                             href={`/admin/crm/leads/${lead.id}`}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--admin-surface-2)] transition-colors group"
                           >
                             {/* Avatar */}
                             <div
@@ -536,20 +536,20 @@ export default function CrmDashboardPage() {
                             {/* Lead info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-gray-900 truncate">
+                                <span className="text-sm font-medium text-[var(--admin-text)] truncate">
                                   {lead.parentName}
                                 </span>
-                                <span className="text-xs text-gray-400 flex items-center gap-1 flex-shrink-0">
+                                <span className="text-xs text-[var(--admin-text-subtle)] flex items-center gap-1 flex-shrink-0">
                                   <Baby className="h-3 w-3" />
                                   {lead.childName}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-[var(--admin-text-muted)]">
                                   {SOURCE_LABELS[lead.source] || lead.source}
                                 </span>
                                 {lead.nextFollowUp && (
-                                  <span className="text-xs text-gray-400 flex items-center gap-0.5">
+                                  <span className="text-xs text-[var(--admin-text-subtle)] flex items-center gap-0.5">
                                     <Clock className="h-2.5 w-2.5" />
                                     {new Date(lead.nextFollowUp).toLocaleDateString('en-IN', {
                                       day: 'numeric',
@@ -573,7 +573,7 @@ export default function CrmDashboardPage() {
                             </Badge>
 
                             {/* Arrow */}
-                            <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                            <ChevronRight className="h-4 w-4 text-[var(--admin-text-subtle)] group-hover:text-[var(--admin-text-muted)] transition-colors flex-shrink-0" />
                           </Link>
                         );
                       })}
@@ -589,7 +589,7 @@ export default function CrmDashboardPage() {
             {/* Quick Action Buttons */}
             <AnimatedCard delay={0.4}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold text-gray-900">
+                <CardTitle className="text-base font-semibold text-[var(--admin-text)]">
                   Quick Actions
                 </CardTitle>
               </CardHeader>
@@ -629,7 +629,7 @@ export default function CrmDashboardPage() {
               <AnimatedCard delay={0.45}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900">
+                    <CardTitle className="text-base font-semibold text-[var(--admin-text)]">
                       Tasks
                     </CardTitle>
                     <Link href="/admin/crm/tasks">
@@ -643,7 +643,7 @@ export default function CrmDashboardPage() {
                 <CardContent className="pt-0">
                   <div className="space-y-2.5">
                     {/* Task progress bar */}
-                    <div className="flex h-2.5 rounded-full overflow-hidden bg-gray-100">
+                    <div className="flex h-2.5 rounded-full overflow-hidden bg-[var(--admin-surface-2)]">
                       {stats.tasks.done > 0 && (
                         <div
                           className="bg-emerald-500 transition-all duration-500"
@@ -668,18 +668,18 @@ export default function CrmDashboardPage() {
                     <div className="grid grid-cols-2 gap-2">
                       <div className="flex items-center gap-2 text-xs">
                         <div className="h-2 w-2 rounded-full bg-amber-400" />
-                        <span className="text-gray-500">To Do</span>
-                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.todo}</span>
+                        <span className="text-[var(--admin-text-muted)]">To Do</span>
+                        <span className="font-medium text-[var(--admin-text)] ml-auto">{stats.tasks.todo}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs">
                         <div className="h-2 w-2 rounded-full bg-blue-500" />
-                        <span className="text-gray-500">In Progress</span>
-                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.inProgress}</span>
+                        <span className="text-[var(--admin-text-muted)]">In Progress</span>
+                        <span className="font-medium text-[var(--admin-text)] ml-auto">{stats.tasks.inProgress}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs">
                         <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                        <span className="text-gray-500">Done</span>
-                        <span className="font-medium text-gray-900 ml-auto">{stats.tasks.done}</span>
+                        <span className="text-[var(--admin-text-muted)]">Done</span>
+                        <span className="font-medium text-[var(--admin-text)] ml-auto">{stats.tasks.done}</span>
                       </div>
                       {stats.tasks.overdue > 0 && (
                         <div className="flex items-center gap-2 text-xs">
@@ -702,7 +702,7 @@ export default function CrmDashboardPage() {
             <div className="p-6 text-center">
               <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
               <p className="text-sm text-red-600 font-medium">Failed to load dashboard data</p>
-              <p className="text-xs text-gray-500 mt-1">{error}</p>
+              <p className="text-xs text-[var(--admin-text-muted)] mt-1">{error}</p>
               <Button
                 variant="outline"
                 size="sm"

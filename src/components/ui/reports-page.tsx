@@ -223,7 +223,7 @@ function FilterModal({
                 </div>
               )}
             </div>
-            <div className="flex gap-2 px-5 py-4 border-t bg-gray-50">
+            <div className="flex gap-2 px-5 py-4 border-t bg-muted">
               <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
               <Button className="flex-1 bg-purple-600 hover:bg-purple-700" onClick={handleApply}>Apply Filters</Button>
             </div>
@@ -433,7 +433,7 @@ export function ReportsPage() {
         {/* ── Report Data View ── */}
         {activeReport && loading && (
           <div className="flex items-center justify-center py-16">
-            <div className="h-6 w-6 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin" />
+            <div className="h-6 w-6 border-2 border-border border-t-purple-600 rounded-full animate-spin" />
           </div>
         )}
 
@@ -515,9 +515,9 @@ export function ReportsPage() {
                     </thead>
                     <tbody>
                       {reportData.records.slice(0, 50).map((record, idx) => (
-                        <tr key={idx} className={cn('border-b last:border-b-0', idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50')}>
+                        <tr key={idx} className={cn('border-b last:border-b-0', idx % 2 === 0 ? 'bg-white' : 'bg-muted/50')}>
                           {Object.values(record).map((value, i) => (
-                            <td key={i} className="px-3 py-2 text-xs whitespace-nowrap text-gray-700">
+                            <td key={i} className="px-3 py-2 text-xs whitespace-nowrap text-muted-foreground">
                               {String(value ?? '-')}
                             </td>
                           ))}
@@ -527,7 +527,7 @@ export function ReportsPage() {
                   </table>
                 </div>
                 {reportData.records.length > 50 && (
-                  <div className="px-4 py-2 text-xs text-muted-foreground border-t bg-gray-50">
+                  <div className="px-4 py-2 text-xs text-muted-foreground border-t bg-muted">
                     Showing 50 of {reportData.records.length} records. Export to see all.
                   </div>
                 )}

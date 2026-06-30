@@ -64,11 +64,11 @@ export default function AdmissionInsightsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <BarChart3 className="w-6 h-6" style={{ color: theme.primary }} />
                 Admission Insights
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Lead scoring, conversion predictions, and source ROI</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Lead scoring, conversion predictions, and source ROI</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -78,19 +78,19 @@ export default function AdmissionInsightsPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Active Leads</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Active Leads</p>
               <p className="text-xl font-bold text-purple-700">156</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Avg Lead Score</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Avg Lead Score</p>
               <p className="text-xl font-bold text-amber-700">76</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Predicted Jul</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Predicted Jul</p>
               <p className="text-xl font-bold text-emerald-700">8</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Best Source</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Best Source</p>
               <p className="text-xl font-bold text-purple-700">Referral</p>
             </PreOneCard>
           </div>
@@ -101,21 +101,21 @@ export default function AdmissionInsightsPage() {
           <StaggerItem>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Target className="w-4 h-4 text-purple-500" /> AI Lead Scoring</h3>
+                <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><Target className="w-4 h-4 text-purple-500" /> AI Lead Scoring</h3>
                 <ScrollArea className="max-h-64">
                   <div className="space-y-3">
                     {LEAD_SCORING.map((lead) => (
-                      <div key={lead.name} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50">
+                      <div key={lead.name} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--admin-surface-2)]">
                         <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
                           <Star className={`w-4 h-4 ${lead.score >= 80 ? 'text-emerald-600' : lead.score >= 60 ? 'text-amber-600' : 'text-red-600'}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">{lead.name}</p>
-                          <p className="text-xs text-gray-400">{lead.stage} • {lead.source}</p>
+                          <p className="text-sm font-medium text-[var(--admin-text)]">{lead.name}</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)]">{lead.stage} • {lead.source}</p>
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm font-bold" style={{ color: theme.primary }}>{lead.score}</p>
-                          <p className="text-[10px] text-gray-400">{lead.probability}</p>
+                          <p className="text-[10px] text-[var(--admin-text-subtle)]">{lead.probability}</p>
                         </div>
                       </div>
                     ))}
@@ -129,21 +129,21 @@ export default function AdmissionInsightsPage() {
           <StaggerItem>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><IndianRupee className="w-4 h-4 text-emerald-500" /> Source ROI Analysis</h3>
+                <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><IndianRupee className="w-4 h-4 text-emerald-500" /> Source ROI Analysis</h3>
                 <div className="space-y-3">
                   {SOURCE_ROI.map((s) => (
                     <div key={s.source} className="p-3 rounded-xl border">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-900">{s.source}</span>
+                        <span className="text-sm font-medium text-[var(--admin-text)]">{s.source}</span>
                         <div className="flex items-center gap-2">
                           {s.roi > 0 && <Badge className="bg-emerald-50 text-emerald-700 text-[9px]">ROI: {s.roi}x</Badge>}
                           <Badge variant="outline" className="text-[9px]">CPL: ₹{s.costPerLead}</Badge>
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div><span className="text-gray-400">Spend</span><p className="font-medium">{s.spend > 0 ? `₹${(s.spend / 1000).toFixed(0)}K` : 'Free'}</p></div>
-                        <div><span className="text-gray-400">Leads</span><p className="font-medium">{s.leads}</p></div>
-                        <div><span className="text-gray-400">Converted</span><p className="font-medium text-emerald-700">{s.converted}</p></div>
+                        <div><span className="text-[var(--admin-text-subtle)]">Spend</span><p className="font-medium">{s.spend > 0 ? `₹${(s.spend / 1000).toFixed(0)}K` : 'Free'}</p></div>
+                        <div><span className="text-[var(--admin-text-subtle)]">Leads</span><p className="font-medium">{s.leads}</p></div>
+                        <div><span className="text-[var(--admin-text-subtle)]">Converted</span><p className="font-medium text-emerald-700">{s.converted}</p></div>
                       </div>
                     </div>
                   ))}
@@ -156,8 +156,8 @@ export default function AdmissionInsightsPage() {
           <StaggerItem className="lg:col-span-2">
             <PreOneCard variant="default" className="p-0">
               <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Conversion Predictions</h3>
-                <p className="text-sm text-gray-500 mt-0.5">AI-predicted enrollments vs actual</p>
+                <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Conversion Predictions</h3>
+                <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">AI-predicted enrollments vs actual</p>
               </div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={250}>

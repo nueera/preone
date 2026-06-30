@@ -132,11 +132,11 @@ export default function SetupLandingPage() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Rocket className="h-6 w-6 text-violet-600" />
               Setup & Onboarding
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Complete these steps to get your school up and running on PreOne
             </p>
           </div>
@@ -156,10 +156,10 @@ export default function SetupLandingPage() {
           <div className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                   Overall Setup Progress
                 </h2>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">
                   You&apos;re almost there! Complete the remaining steps to unlock all features.
                 </p>
               </div>
@@ -170,7 +170,7 @@ export default function SetupLandingPage() {
               </div>
             </div>
             <Progress value={overallProgress} className="h-3" />
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+            <div className="flex items-center justify-between mt-3 text-xs text-[var(--admin-text-muted)]">
               <span>{completedCount} sections complete</span>
               <span>
                 {SETUP_STEPS.length - completedCount} remaining
@@ -211,7 +211,7 @@ export default function SetupLandingPage() {
                       <Circle
                         className={cn(
                           'h-5 w-5 flex-shrink-0',
-                          step.progress > 0 ? 'text-amber-400' : 'text-gray-300'
+                          step.progress > 0 ? 'text-amber-400' : 'text-[var(--admin-text-subtle)]'
                         )}
                       />
                     )}
@@ -219,10 +219,10 @@ export default function SetupLandingPage() {
 
                   {/* Title & Description */}
                   <div>
-                    <h3 className="font-semibold text-sm text-gray-900 group-hover:text-violet-700 transition-colors">
+                    <h3 className="font-semibold text-sm text-[var(--admin-text)] group-hover:text-violet-700 transition-colors">
                       {step.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed line-clamp-2">
                       {step.description}
                     </p>
                   </div>
@@ -231,12 +231,12 @@ export default function SetupLandingPage() {
                   {!step.completed && (
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Progress</span>
-                        <span className="font-medium text-gray-700">
+                        <span className="text-[var(--admin-text-muted)]">Progress</span>
+                        <span className="font-medium text-[var(--admin-text-muted)]">
                           {step.progress}%
                         </span>
                       </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[var(--admin-surface-2)] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-400 transition-all duration-500"
                           style={{ width: `${step.progress}%` }}
@@ -272,10 +272,10 @@ export default function SetupLandingPage() {
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-[var(--admin-text)]">
                   Quick Setup Tips
                 </h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-gray-600">
+                <ul className="mt-2 space-y-1.5 text-sm text-[var(--admin-text-muted)]">
                   <li className="flex items-start gap-2">
                     <span className="text-violet-500 mt-0.5">•</span>
                     Start with School Profile and Branches — these are required before other steps
