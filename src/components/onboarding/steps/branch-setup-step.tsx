@@ -37,9 +37,9 @@ const DAYS_OF_WEEK = [
 const DEFAULT_WORKING_DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
 
 const INPUT_CLASS =
-  'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all';
+  'w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all';
 
-const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--text-primary)]';
+const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--admin-text)]';
 
 function generateId(): string {
   return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -123,7 +123,7 @@ function BranchCard({
                   'w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold',
                   branch.isPrimary
                     ? 'bg-white/20 text-white'
-                    : 'bg-[var(--preone-primary-50)] text-[var(--preone-primary)]'
+                    : 'bg-[var(--admin-primary-soft)] text-[var(--admin-primary)]'
                 )}
               >
                 {index + 1}
@@ -132,7 +132,7 @@ function BranchCard({
                 <h3
                   className={cn(
                     'text-base font-semibold font-[var(--font-primary)]',
-                    branch.isPrimary ? 'text-white' : 'text-[var(--text-primary)]'
+                    branch.isPrimary ? 'text-white' : 'text-[var(--admin-text)]'
                   )}
                 >
                   {branch.isPrimary ? '⭐ Head Office' : `Campus ${index + 1}`}
@@ -140,7 +140,7 @@ function BranchCard({
                 <p
                   className={cn(
                     'text-xs',
-                    branch.isPrimary ? 'text-white/70' : 'text-[var(--text-muted)]'
+                    branch.isPrimary ? 'text-white/70' : 'text-[var(--admin-text-subtle)]'
                   )}
                 >
                   Code: {branch.code}
@@ -154,7 +154,7 @@ function BranchCard({
                 <button
                   type="button"
                   onClick={() => onSetPrimary(branch.id)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--preone-primary-50)] hover:text-[var(--preone-primary)] transition-all min-h-[36px]"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:bg-[var(--admin-primary-soft)] hover:text-[var(--admin-primary)] transition-all min-h-[36px]"
                 >
                   Set as Head Office
                 </button>
@@ -309,9 +309,9 @@ function BranchCard({
                     className={cn(
                       'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all min-h-[40px]',
                       isActive
-                        ? 'bg-[var(--preone-primary)] text-white shadow-md shadow-[var(--preone-primary)]/25'
+                        ? 'bg-[var(--admin-primary)] text-white shadow-md shadow-[var(--admin-primary)]/25'
                         : cn(
-                            'bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:bg-[var(--bg-secondary)]',
+                            'bg-[var(--admin-surface-2)] text-[var(--admin-text-subtle)] hover:bg-[var(--admin-surface)]',
                             branch.isPrimary && 'bg-white/10 text-white/60 hover:bg-white/20'
                           )
                     )}
@@ -447,14 +447,14 @@ export function BranchSetupStep() {
       {/* ── Step Header ── */}
       <motion.div variants={itemVariants} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 flex items-center justify-center text-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: 'var(--admin-primary-soft)' }}>
             🏢
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)] font-[var(--font-primary)]">
+            <h2 className="text-xl font-bold text-[var(--admin-text)] font-[var(--font-primary)]">
               Branch / Campus Setup
             </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Add your school branches, campuses, and their settings
             </p>
           </div>
@@ -467,22 +467,22 @@ export function BranchSetupStep() {
           <PreOneCardContent>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                <h3 className="text-sm font-semibold text-[var(--admin-text)]">
                   How many campuses do you have?
                 </h3>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                <p className="text-xs text-[var(--admin-text-subtle)] mt-0.5">
                   You can add more later
                 </p>
               </div>
-              <div className="flex items-center bg-[var(--bg-tertiary)] rounded-xl p-1">
+              <div className="flex items-center bg-[var(--admin-surface-2)] rounded-xl p-1">
                 <button
                   type="button"
                   onClick={() => handleCampusModeToggle(false)}
                   className={cn(
                     'px-4 py-2 rounded-lg text-xs font-medium transition-all min-h-[40px]',
                     !isMultiCampus
-                      ? 'bg-[var(--preone-primary)] text-white shadow-sm'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                      ? 'bg-[var(--admin-primary)] text-white shadow-sm'
+                      : 'text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]'
                   )}
                 >
                   Single Campus
@@ -493,8 +493,8 @@ export function BranchSetupStep() {
                   className={cn(
                     'px-4 py-2 rounded-lg text-xs font-medium transition-all min-h-[40px]',
                     isMultiCampus
-                      ? 'bg-[var(--preone-primary)] text-white shadow-sm'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                      ? 'bg-[var(--admin-primary)] text-white shadow-sm'
+                      : 'text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]'
                   )}
                 >
                   Multi-Campus
@@ -535,7 +535,7 @@ export function BranchSetupStep() {
           <button
             type="button"
             onClick={handleAddCampus}
-            className="w-full py-4 rounded-2xl border-2 border-dashed border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--preone-primary)] hover:text-[var(--preone-primary)] hover:bg-[var(--preone-primary-50)] transition-all flex items-center justify-center gap-2 min-h-[44px]"
+            className="w-full py-4 rounded-2xl border-2 border-dashed border-[var(--admin-border)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] transition-all flex items-center justify-center gap-2 min-h-[44px]"
           >
             <span className="text-lg">+</span>
             <span className="text-sm font-medium">Add Another Campus</span>

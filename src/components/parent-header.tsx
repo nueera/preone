@@ -6,6 +6,7 @@ import {
   User, Settings, LogOut, ChevronDown,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -117,7 +118,7 @@ export function ParentHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Child badge, Notifications, User Menu ── */}
+      {/* ── Right: Child badge, Theme Toggle, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Selected Child Badge */}
         {selectedChild && (
@@ -137,6 +138,9 @@ export function ParentHeader() {
             <span>{selectedChild.className || 'No class'}</span>
           </Badge>
         )}
+
+        {/* ── Global Theme Toggle ── */}
+        <GlobalThemeToggle variant="pill" />
 
         {/* Notification Bell */}
         <NotificationBell />

@@ -143,6 +143,7 @@ const TASK_MASTER_ALLOWED_PREFIXES = [
 
 const LEGACY_REDIRECTS: Record<string, string> = {
   '/admin/crm': '/admin/admissions',
+  '/admin/admission': '/admin/admissions',
   '/admin/chat': '/admin/communication/chat',
   '/admin/announcements': '/admin/communication/announcements',
   '/admin/notifications': '/admin/communication/notifications',
