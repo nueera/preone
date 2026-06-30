@@ -495,116 +495,130 @@
 }
 
 /* ============================================================
-   DARK MODE — Unified Overrides
-   All soft colors use solid hex for consistent dark rendering.
+   DARK MODE — "Midnight Garden" Theme
+   
+   Philosophy: Positive, vibrant, beautiful — NOT gloomy.
+   - Deep indigo/navy backgrounds with subtle color warmth
+   - Surfaces have luminous quality (not flat black/gray)
+   - Vibrant glowing accents that feel alive
+   - Status colors that pop with optimism
+   - Every surface tells a story — subtle gradients, gentle glow
+   
+   Color DNA:
+   - Base: Deep indigo (#1A1A3E) with violet undertones
+   - Surface 1: Soft violet-navy (#222244) — cards float above
+   - Surface 2: Warm slate-indigo (#2A2A4A) — nested elements
+   - Borders: Visible but gentle — indigo-tinted lines
+   - Text: Warm whites and soft lavenders — never stark white
+   - Accents: Vivid violet, sky, emerald, amber — full spectrum
    ============================================================ */
 .dark {
   /* ── Semantic Colors (shadcn compat) ── */
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
-  --primary: #A78BFA;
-  --primary-foreground: #0F172A;
-  --secondary: #1E293B;
-  --secondary-foreground: #F8FAFC;
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
+  --background: #13132B;
+  --foreground: #E8E8F0;
+  --card: #1E1E3F;
+  --card-foreground: #EAEAF5;
+  --popover: #1E1E3F;
+  --popover-foreground: #EAEAF5;
+  --primary: #8B5CF6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #252548;
+  --secondary-foreground: #C4B5FD;
+  --muted: #252548;
+  --muted-foreground: #A3A3C2;
   --accent: #38BDF8;
-  --accent-foreground: #0F172A;
-  --destructive: #FCA5A5;
-  --border: rgba(255,255,255,0.1);
-  --input: rgba(255,255,255,0.15);
-  --ring: #A78BFA;
-  --chart-1: #A78BFA;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FB7185;
+  --border: #33335A;
+  --input: #33335A;
+  --ring: #8B5CF6;
+  --chart-1: #8B5CF6;
   --chart-2: #38BDF8;
-  --chart-3: #4ADE80;
-  --chart-4: #FDE047;
+  --chart-3: #34D399;
+  --chart-4: #FBBF24;
   --chart-5: #F472B6;
-  --sidebar: #1E1B4B;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #A78BFA;
-  --sidebar-primary-foreground: #0F172A;
-  --sidebar-accent: rgba(255,255,255,0.08);
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: rgba(255,255,255,0.08);
-  --sidebar-ring: #A78BFA;
-  --portal: #A78BFA;
-  --portal-foreground: #0F172A;
+  --sidebar: #1A1A3E;
+  --sidebar-foreground: #E8E8F0;
+  --sidebar-primary: #8B5CF6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2D2D55;
+  --sidebar-accent-foreground: #E8E8F0;
+  --sidebar-border: #33335A;
+  --sidebar-ring: #8B5CF6;
+  --portal: #8B5CF6;
+  --portal-foreground: #FFFFFF;
 
   /* ── PreOne Brand Tokens (dark mode) ── */
-  --preone-primary: #6c5ce7;
-  --preone-primary-light: #a29bfe;
-  --preone-blue: #00d2d3;
-  --preone-orange: #fdcb6e;
-  --preone-pink: #ff7675;
-  --preone-green: #55efc4;
+  --preone-primary: #818CF8;
+  --preone-primary-light: #A5B4FC;
+  --preone-blue: #22D3EE;
+  --preone-orange: #FCD34D;
+  --preone-pink: #FB7185;
+  --preone-green: #6EE7B7;
 
-  /* ── Semantic Surface Tokens (dark mode) ── */
-  --bg-primary: #0a0a1a;
-  --bg-secondary: #121234;
-  --bg-tertiary: #1a1a3a;
-  --bg-glass: rgba(18, 18, 52, 0.7);
-  --text-primary: #FFFFFF;
-  --text-secondary: #b2bec3;
-  --text-tertiary: #636e72;
-  --text-muted: #4a5568;
-  --border-default: #2d2d4a;
-  --border-light: #1a1a3a;
+  /* ── Semantic Surface Tokens (dark mode — Midnight Garden) ── */
+  --bg-primary: #1A1A3E;
+  --bg-secondary: #222244;
+  --bg-tertiary: #2A2A4A;
+  --bg-glass: rgba(30, 30, 63, 0.8);
+  --text-primary: #F0F0FF;
+  --text-secondary: #C4C4E0;
+  --text-tertiary: #8888AA;
+  --text-muted: #666688;
+  --border-default: #33335A;
+  --border-light: #2A2A4A;
 
-  /* ── Shadow Tokens (dark mode) ── */
-  --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.25);
+  /* ── Shadow Tokens (dark mode — glowing, not dark) ── */
+  --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.2);
 
   /* ── Glass Effects (dark mode) ── */
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-border: rgba(139, 92, 246, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.05);
   --glass-blur: 20px;
 
   /* ── Login Page Tokens (dark mode) ── */
-  --login-card: rgba(20, 20, 36, 0.55);
-  --login-card-border: rgba(255, 255, 255, 0.08);
-  --login-input: rgba(42, 42, 58, 0.55);
-  --login-input-border: rgba(255, 255, 255, 0.1);
-  --login-text: #F5F7FA;
-  --login-muted: #9CA3B4;
-  --login-subtle: #6B7280;
-  --login-label: #D1D5DB;
+  --login-card: rgba(26, 26, 62, 0.65);
+  --login-card-border: rgba(139, 92, 246, 0.15);
+  --login-input: rgba(34, 34, 68, 0.6);
+  --login-input-border: #33335A;
+  --login-text: #F0F0FF;
+  --login-muted: #A3A3C2;
+  --login-subtle: #8888AA;
+  --login-label: #C4C4E0;
   --login-link: #818CF8;
-  --login-divider: rgba(255, 255, 255, 0.08);
-  --login-focus: #818CF8;
-  --login-error: #F87171;
-  --login-tab-bg: rgba(255, 255, 255, 0.06);
+  --login-divider: #33335A;
+  --login-focus: #8B5CF6;
+  --login-error: #FB7185;
+  --login-tab-bg: #252548;
   --login-tab-active: #818CF8;
   --login-icon: #818CF8;
-  --login-icon-muted: #9CA3B4;
+  --login-icon-muted: #A3A3C2;
 }
 
 .dark [data-portal="admin"] {
-  --admin-bg: #0B0F1A;
-  --admin-surface: #131826;
-  --admin-surface-2: #1A2030;
-  --admin-border: #232B3D;
-  --admin-border-strong: #2D3A4F;
-  --admin-text: #F5F7FA;
-  --admin-text-muted: #9CA3B4;
-  --admin-text-subtle: #6B7280;
+  --admin-bg: #13132B;
+  --admin-surface: #1E1E3F;
+  --admin-surface-2: #262650;
+  --admin-border: #33335A;
+  --admin-border-strong: #44446E;
+  --admin-text: #F0F0FF;
+  --admin-text-muted: #A3A3C2;
+  --admin-text-subtle: #8888AA;
   --admin-primary: #818CF8;
-  --admin-primary-soft: #312E81;
+  --admin-primary-soft: #2E2B5E;
   --admin-primary-hover: #6366F1;
   --admin-success: #34D399;
-  --admin-success-soft: #064E3B;
+  --admin-success-soft: #0D3D2E;
   --admin-warning: #FBBF24;
-  --admin-warning-soft: #78350F;
+  --admin-warning-soft: #3D3010;
   --admin-info: #60A5FA;
-  --admin-info-soft: #1E3A5F;
-  --admin-danger: #F87171;
-  --admin-danger-soft: #7F1D1D;
+  --admin-info-soft: #1A3050;
+  --admin-danger: #FB7185;
+  --admin-danger-soft: #3D1525;
   --admin-accent: #FB923C;
-  --admin-accent-soft: #7C2D12;
-  --admin-error: #F87171;
-  --admin-error-soft: #7F1D1D;
+  --admin-accent-soft: #3D2510;
+  --admin-error: #FB7185;
+  --admin-error-soft: #3D1525;
 }
 
 .dark [data-portal="teacher"] {
@@ -736,6 +750,7 @@
 /* ── Button: Ghost Hover ── */
 .btn-ghost-preone { transition: all var(--transition-normal); }
 .btn-ghost-preone:hover { background: #F1F5F9; }
+.dark .btn-ghost-preone:hover { background: rgba(139, 92, 246, 0.10); }
 
 /* ============================================================
    LOGIN PAGE — Glassmorphism + Playful-Space Utilities
@@ -923,6 +938,15 @@
 .stat-card-indigo { background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border: 1px solid #C7D2FE; }
 .stat-card-portal { background: linear-gradient(135deg, var(--portal-50) 0%, var(--portal-100) 100%); border: 1px solid var(--portal-200); }
 
+/* ── Stat Card Gradient Backgrounds (Dark Mode — Midnight Garden) ── */
+.dark .stat-card-violet { background: linear-gradient(135deg, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.04) 100%); border-color: rgba(139, 92, 246, 0.20); }
+.dark .stat-card-sky { background: linear-gradient(135deg, rgba(56, 189, 248, 0.10) 0%, rgba(56, 189, 248, 0.04) 100%); border-color: rgba(56, 189, 248, 0.20); }
+.dark .stat-card-emerald { background: linear-gradient(135deg, rgba(52, 211, 153, 0.10) 0%, rgba(52, 211, 153, 0.04) 100%); border-color: rgba(52, 211, 153, 0.20); }
+.dark .stat-card-rose { background: linear-gradient(135deg, rgba(251, 113, 133, 0.10) 0%, rgba(251, 113, 133, 0.04) 100%); border-color: rgba(251, 113, 133, 0.20); }
+.dark .stat-card-amber { background: linear-gradient(135deg, rgba(251, 191, 36, 0.10) 0%, rgba(251, 191, 36, 0.04) 100%); border-color: rgba(251, 191, 36, 0.20); }
+.dark .stat-card-indigo { background: linear-gradient(135deg, rgba(129, 140, 248, 0.10) 0%, rgba(129, 140, 248, 0.04) 100%); border-color: rgba(129, 140, 248, 0.20); }
+.dark .stat-card-portal { background: linear-gradient(135deg, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.04) 100%); border-color: rgba(139, 92, 246, 0.20); }
+
 /* ── Space-themed Decorative Elements ── */
 .space-dots {
   background-image: radial-gradient(circle, rgba(124,58,237,0.08) 1px, transparent 1px);
@@ -944,6 +968,12 @@
 .badge-pending { background: #FEF3C7; color: #92400E; border-radius: 12px; }
 .badge-paid { background: #D1FAE5; color: #065F46; border-radius: 12px; }
 
+/* ── Status Badges (Dark Mode — Midnight Garden) ── */
+.dark .badge-present { background: rgba(52, 211, 153, 0.15); color: #6EE7B7; }
+.dark .badge-absent { background: rgba(251, 113, 133, 0.15); color: #FCA5A5; }
+.dark .badge-pending { background: rgba(251, 191, 36, 0.15); color: #FDE68A; }
+.dark .badge-paid { background: rgba(52, 211, 153, 0.15); color: #6EE7B7; }
+
 /* ── Animations ── */
 @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 .animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
@@ -959,14 +989,19 @@
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #44446E; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #5555AA; }
 
 /* ── Table Row Hover ── */
 .table-row-preone { transition: all var(--transition-normal); }
 .table-row-preone:hover { background: #F8FAFC; }
+.dark .table-row-preone:hover { background: rgba(139, 92, 246, 0.06); }
 
 /* ── Focus Rings ── */
 .focus-ring-preone:focus-visible { outline: 2px solid #7C3AED; outline-offset: 2px; }
 .focus-ring-portal:focus-visible { outline: 2px solid var(--portal-500); outline-offset: 2px; }
+.dark .focus-ring-preone:focus-visible { outline-color: #8B5CF6; }
+.dark .focus-ring-portal:focus-visible { outline-color: #8B5CF6; }
 
 /* ============================================================
    RESPONSIVE UTILITIES
@@ -1025,13 +1060,13 @@
   transform: translateY(-1px);
 }
 .dark .preone-card {
-  background: var(--bg-secondary);
-  border-color: var(--border-default);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.05);
 }
 .dark .preone-card:hover {
-  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.15);
-  border-color: rgba(108, 92, 231, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.25);
 }
 
 .preone-hero-card {
@@ -1042,6 +1077,9 @@
   color: white;
   overflow: hidden;
   position: relative;
+}
+.dark .preone-hero-card {
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.30), 0 0 0 1px rgba(139, 92, 246, 0.10);
 }
 .preone-hero-card::after {
   content: '';
@@ -1063,8 +1101,8 @@
   padding: 20px;
 }
 .dark .preone-achievement-card {
-  background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(253, 203, 110, 0.05));
-  border-color: rgba(253, 203, 110, 0.2);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(251, 191, 36, 0.03));
+  border-color: rgba(251, 191, 36, 0.18);
 }
 
 .preone-glass-card {
@@ -1114,6 +1152,7 @@
   transition: all var(--transition-normal);
 }
 .preone-btn-secondary:hover { background: var(--preone-primary-50); }
+.dark .preone-btn-secondary:hover { background: rgba(139, 92, 246, 0.12); }
 
 .preone-btn-icon {
   width: 40px;
@@ -1129,13 +1168,15 @@
   transition: all var(--transition-normal);
 }
 .preone-btn-icon:hover { background: var(--preone-primary-50); color: var(--preone-primary); }
+.dark .preone-btn-icon:hover { background: rgba(139, 92, 246, 0.12); color: #A5B4FC; }
 
 /* ============================================================
    AURORA BACKGROUND — Dark Mode Only
    ============================================================ */
 
-.dark body { background: #0a0a1a; position: relative; }
+.dark body { background: var(--background); position: relative; }
 
+/* ── Midnight Garden Aurora — subtle, colorful, alive ── */
 .dark .aurora-bg::before {
   content: '';
   position: fixed;
@@ -1143,9 +1184,10 @@
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 210, 211, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(255, 118, 117, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 15% 50%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 85%, rgba(52, 211, 153, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(244, 114, 182, 0.04) 0%, transparent 40%);
   animation: aurora-shift 25s ease-in-out infinite alternate;
 }
 
@@ -1188,7 +1230,7 @@ body, p, span, div { font-family: var(--font-secondary); }
 .story-circle-viewed { background: #d1d5db; }
 .dark .story-circle-viewed { background: #4a5568; }
 .story-circle-inner { width: 100%; height: 100%; border-radius: 50%; border: 2px solid white; object-fit: cover; }
-.dark .story-circle-inner { border-color: #121234; }
+.dark .story-circle-inner { border-color: var(--bg-secondary); }
 
 /* ============================================================
    SIDEBAR — Living Universe Refined
@@ -1205,5 +1247,5 @@ body, p, span, div { font-family: var(--font-secondary); }
 .preone-sidebar-item:hover { background: rgba(255, 255, 255, 0.1); color: white; }
 .preone-sidebar-item.active { background: rgba(255, 255, 255, 0.2); color: white; font-weight: 600; }
 .dark .preone-sidebar-item { color: var(--text-secondary); }
-.dark .preone-sidebar-item:hover { background: rgba(108, 92, 231, 0.1); color: var(--preone-primary); }
-.dark .preone-sidebar-item.active { background: rgba(108, 92, 231, 0.15); color: var(--preone-primary); }
+.dark .preone-sidebar-item:hover { background: rgba(139, 92, 246, 0.1); color: var(--preone-primary); }
+.dark .preone-sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: var(--preone-primary); }
