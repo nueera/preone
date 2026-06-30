@@ -372,6 +372,60 @@
   --portal-900: #0c4a6e;
 }
 
+/* ── Admin Module Tokens ── */
+[data-portal="admin"] {
+  --admin-bg: #F8F9FA;
+  --admin-primary: #6366F1;
+  --admin-primary-soft: #EEF2FF;
+  --admin-primary-hover: #4F46E5;
+  --admin-primary-foreground: #FFFFFF;
+  --admin-info: #3B82F6;
+  --admin-info-soft: #DBEAFE;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #FEF3C7;
+  --admin-success: #10B981;
+  --admin-success-soft: #D1FAE5;
+  --admin-danger: #EF4444;
+  --admin-danger-soft: #FEE2E2;
+  --admin-accent: #F59E0B;
+  --admin-accent-soft: rgba(245, 158, 11, 0.1);
+  --admin-error: #EF4444;
+  --admin-error-soft: #FEE2E2;
+  --admin-text: #1F2937;
+  --admin-text-muted: #6B7280;
+  --admin-text-subtle: #9CA3AF;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F9FAFB;
+  --admin-border: #E5E7EB;
+  --admin-border-strong: #D1D5DB;
+}
+
+.dark [data-portal="admin"] {
+  --admin-bg: #0B0F1A;
+  --admin-surface: #131826;
+  --admin-surface-2: #1A2030;
+  --admin-border: #232B3D;
+  --admin-border-strong: #2D3A4F;
+  --admin-text: #F5F7FA;
+  --admin-text-muted: #9CA3B4;
+  --admin-text-subtle: #6B7280;
+  --admin-primary: #818CF8;
+  --admin-primary-soft: rgba(129, 140, 248, 0.15);
+  --admin-primary-hover: #6366F1;
+  --admin-success: #34D399;
+  --admin-success-soft: rgba(52, 211, 153, 0.15);
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251, 191, 36, 0.15);
+  --admin-info: #60A5FA;
+  --admin-info-soft: rgba(96, 165, 250, 0.15);
+  --admin-danger: #F87171;
+  --admin-danger-soft: rgba(248, 113, 113, 0.15);
+  --admin-accent: #FBBF24;
+  --admin-accent-soft: rgba(251, 191, 36, 0.15);
+  --admin-error: #F87171;
+  --admin-error-soft: rgba(248, 113, 113, 0.15);
+}
+
 /* ============================================================
    DARK MODE — PreOne Brand
    ============================================================ */
