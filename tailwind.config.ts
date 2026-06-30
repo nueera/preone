@@ -30,6 +30,14 @@ const config: Config = {
         '3xl': ['clamp(1.5rem, 2vw, 1.875rem)', { lineHeight: '2.25rem' }],
         '4xl': ['clamp(1.875rem, 3vw, 2.25rem)', { lineHeight: '2.5rem' }],
       },
+      spacing: {
+        'admin-xs': 'var(--space-xs)',
+        'admin-sm': 'var(--space-sm)',
+        'admin-md': 'var(--space-md)',
+        'admin-lg': 'var(--space-lg)',
+        'admin-xl': 'var(--space-xl)',
+        'admin-2xl': 'var(--space-2xl)',
+      },
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
@@ -85,7 +93,7 @@ const config: Config = {
           800: 'var(--portal-800)',
           900: 'var(--portal-900)',
         },
-        /** PreOne Cosmic colors */
+        /** PreOne Brand colors */
         preone: {
           primary: 'var(--preone-primary)',
           'primary-dark': 'var(--preone-primary-dark)',
@@ -98,7 +106,31 @@ const config: Config = {
           green: 'var(--preone-green)',
           coral: 'var(--preone-coral)',
         },
-        /** Cosmic text colors */
+        /** Admin module colors */
+        admin: {
+          bg: 'var(--admin-bg)',
+          primary: 'var(--admin-primary)',
+          'primary-soft': 'var(--admin-primary-soft)',
+          'primary-hover': 'var(--admin-primary-hover)',
+          info: 'var(--admin-info)',
+          'info-soft': 'var(--admin-info-soft)',
+          warning: 'var(--admin-warning)',
+          'warning-soft': 'var(--admin-warning-soft)',
+          success: 'var(--admin-success)',
+          'success-soft': 'var(--admin-success-soft)',
+          danger: 'var(--admin-danger)',
+          'danger-soft': 'var(--admin-danger-soft)',
+          accent: 'var(--admin-accent)',
+          'accent-soft': 'var(--admin-accent-soft)',
+          text: 'var(--admin-text)',
+          'text-muted': 'var(--admin-text-muted)',
+          'text-subtle': 'var(--admin-text-subtle)',
+          surface: 'var(--admin-surface)',
+          'surface-2': 'var(--admin-surface-2)',
+          border: 'var(--admin-border)',
+          'border-strong': 'var(--admin-border-strong)',
+        },
+        /** Cosmic/Semantic colors */
         cosmic: {
           'text-primary': 'var(--text-primary)',
           'text-secondary': 'var(--text-secondary)',
@@ -128,14 +160,30 @@ const config: Config = {
         badge: '12px',
       },
       boxShadow: {
-        card: '0px 8px 24px rgba(15,23,42,0.06)',
+        'card': '0px 8px 24px rgba(15,23,42,0.06)',
         'card-hover': '0px 20px 40px rgba(15,23,42,0.08)',
-        floating: '0px 30px 60px rgba(15,23,42,0.10)',
-        portal: '0px 8px 24px rgba(15,23,42,0.06)',
-        glow: '0 0 20px rgba(99, 102, 241, 0.15)',
+        'floating': '0px 30px 60px rgba(15,23,42,0.10)',
+        'portal': '0px 8px 24px rgba(15,23,42,0.06)',
+        'glow': 'var(--shadow-glow)',
         'glow-dark': '0 0 20px rgba(108, 92, 231, 0.25)',
         'hero': '0 10px 25px rgba(99, 102, 241, 0.25)',
         'hero-dark': '0 10px 25px rgba(108, 92, 231, 0.35)',
+        'admin-xs': 'var(--shadow-xs)',
+        'admin-sm': 'var(--shadow-sm)',
+        'admin-md': 'var(--shadow-md)',
+        'admin-lg': 'var(--shadow-lg)',
+        'admin-xl': 'var(--shadow-xl)',
+      },
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      transitionDuration: {
+        'fast': '150ms',
+        'normal': '240ms',
+        'smooth': '350ms',
+        'spring': '500ms',
+        'theme': '300ms',
       },
       keyframes: {
         twinkle: {

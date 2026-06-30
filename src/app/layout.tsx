@@ -3,6 +3,7 @@ import { Poppins, Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorHandlerProvider } from "@/components/providers/error-handler-provider";
+import { QueryProvider } from "@/components/providers";
 import { ThemeProvider } from "next-themes";
 
 const poppins = Poppins({
@@ -70,7 +71,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
+          <QueryProvider>
+            <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
+          </QueryProvider>
         </ThemeProvider>
         <Toaster />
       </body>
