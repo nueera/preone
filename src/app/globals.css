@@ -372,6 +372,45 @@
   --portal-900: #0c4a6e;
 }
 
+/* ── Admin Module Tokens ── */
+[data-portal="admin"] {
+  --admin-primary: #6366F1;
+  --admin-primary-soft: rgba(99, 102, 241, 0.1);
+  --admin-primary-foreground: #FFFFFF;
+  --admin-info: #3B82F6;
+  --admin-info-soft: rgba(59, 130, 246, 0.1);
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: rgba(245, 158, 11, 0.1);
+  --admin-success: #10B981;
+  --admin-success-soft: rgba(16, 185, 129, 0.1);
+  --admin-danger: #EF4444;
+  --admin-danger-soft: rgba(239, 68, 68, 0.1);
+  --admin-accent: #F97316;
+  --admin-accent-soft: rgba(249, 115, 22, 0.1);
+  --admin-error: #EF4444;
+  --admin-text: #1F2937;
+  --admin-text-muted: #6B7280;
+  --admin-text-subtle: #9CA3AF;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F3F4F6;
+  --admin-border: #E5E7EB;
+}
+
+.dark [data-portal="admin"] {
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #6B7280;
+  --admin-primary-soft: rgba(99, 102, 241, 0.15);
+  --admin-info-soft: rgba(59, 130, 246, 0.15);
+  --admin-warning-soft: rgba(245, 158, 11, 0.15);
+  --admin-success-soft: rgba(16, 185, 129, 0.15);
+  --admin-danger-soft: rgba(239, 68, 68, 0.15);
+  --admin-accent-soft: rgba(249, 115, 22, 0.15);
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: #475569;
+}
+
 /* ============================================================
    DARK MODE — PreOne Brand
    ============================================================ */
