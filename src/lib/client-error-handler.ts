@@ -54,15 +54,18 @@ export function initClientErrorHandler(userId?: string, userRole?: string, schoo
   console.error = (...args: any[]) => {
     const message = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
 
-    // Only report meaningful errors, not React dev warnings
-    if (
-      !message.includes('Warning:') &&
-      !message.includes('act(') &&
-      !message.includes('ReactDOM.render') &&
-      !message.includes('[HMR]') &&
-      !message.includes('hydrated') &&
-      !message.includes('fdprocessedid') &&
-      message.length > 10 &&
+    // Suppress noise from browser extensions (fdprocessedid) and React warnings
+    const isNoise =
+      message.includes('Warning:') ||
+      message.includes('act(') ||
+      message.includes('ReactDOM.render') ||
+      message.includes('[HMR]') ||
+      message.includes('hydrated') ||
+      message.includes('fdprocessedid');
+
+    if (isNoise) return;
+
+    if (message.length > 10 &&
       (
         message.includes('Error') ||
         message.includes('error') ||
