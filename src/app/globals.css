@@ -481,6 +481,220 @@
 }
 
 /* ============================================================
+   GLASS-MORPHISM & FUTURISTIC TOKENS
+   ============================================================ */
+
+:root {
+  /* ── Glass Effects ── */
+  --glass-bg: rgba(255, 255, 255, 0.80);
+  --glass-border: rgba(255, 255, 255, 0.30);
+  --glass-blur: 16px;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  
+  /* ── Glow Effects ── */
+  --glow-primary: 0 0 20px rgba(99, 102, 241, 0.15);
+  --glow-success: 0 0 20px rgba(16, 185, 129, 0.15);
+  --glow-warning: 0 0 20px rgba(245, 158, 11, 0.15);
+  --glow-error: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.dark {
+  --glass-bg: rgba(18, 18, 52, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 20px;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  
+  --glow-primary: 0 0 20px rgba(129, 140, 248, 0.2);
+  --glow-success: 0 0 20px rgba(52, 211, 153, 0.2);
+  --glow-warning: 0 0 20px rgba(251, 191, 36, 0.2);
+  --glow-error: 0 0 20px rgba(248, 113, 113, 0.2);
+}
+
+/* ── Glass Utility Classes ── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-header {
+  background: color-mix(in srgb, var(--admin-surface) 80%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.glass-card {
+  background: color-mix(in srgb, var(--admin-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow-card);
+}
+
+.glass-sidebar {
+  background: linear-gradient(180deg, 
+    color-mix(in srgb, var(--portal-700) 90%, transparent) 0%, 
+    color-mix(in srgb, var(--portal-500) 85%, transparent) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Glow Utility Classes ── */
+.glow-primary { box-shadow: var(--glow-primary); }
+.glow-success { box-shadow: var(--glow-success); }
+.glow-warning { box-shadow: var(--glow-warning); }
+.glow-error { box-shadow: var(--glow-error); }
+
+/* ── Gradient Border Effect ── */
+.gradient-border {
+  position: relative;
+  border: none;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--admin-primary), var(--admin-info));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ============================================================
+   MICRO-ANIMATIONS & DELIGHT
+   ============================================================ */
+
+/* ── Pulse Glow for Active Elements ── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--admin-primary-soft); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Shimmer loading effect ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, 
+    var(--admin-surface-2) 25%, 
+    var(--admin-border) 50%, 
+    var(--admin-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Ripple Effect for buttons ── */
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+/* ── Scale-in entrance ── */
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* ── Slide-up entrance ── */
+@keyframes slide-up {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* ── Hover lift effect ── */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Notification badge pulse ── */
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.animate-badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* ── Confetti burst (for milestone celebrations) ── */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ============================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================ */
+
+/* ── Skip to main content link ── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--admin-primary);
+  color: white;
+  border-radius: 0 0 8px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── Custom focus-visible ring ── */
+:focus-visible {
+  outline: 2px solid var(--admin-primary);
+  outline-offset: 2px;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* ── Focus ring for interactive elements ── */
+.focus-ring-admin:focus-visible {
+  outline: 2px solid var(--admin-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
    BASE LAYER
    ============================================================ */
 @layer base {

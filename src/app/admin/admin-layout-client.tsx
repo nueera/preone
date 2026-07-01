@@ -6,6 +6,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
 import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes (with sub-paths)
@@ -25,11 +27,15 @@ interface AdminLayoutClientProps {
 
 /**
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
- * Provides the sidebar + header + main content structure with Aurora Background.
- * Supports ADMIN, SUPER_ADMIN, and TASK_MASTER roles.
- *   - SUPER_ADMIN: Full access including System section
- *   - ADMIN: Full access except System section
- *   - TASK_MASTER: Only Dashboard + Admissions + Communication (Chat, Announcements, Notifications)
+ * 
+ * Provides:
+ * - Sidebar + Header + Main content structure with Aurora Background
+ * - Command Palette (Ctrl+K) for quick navigation
+ * - Keyboard Shortcuts panel (press ?)
+ * - School branding context (logo, name, colors)
+ * - Undo/Redo global action system
+ * - Role-based route guards
+ * 
  * data-portal="admin" for CSS theme scoping.
  * data-role attribute for role-specific styling.
  */
@@ -57,15 +63,14 @@ export function AdminLayoutClient({
     }
   }, [userRole, pathname, router]);
 
-  // SUPER_ADMIN / ADMIN system route guard — only SUPER_ADMIN can access /admin/system
+  // SUPER_ADMIN / ADMIN system route guard
   useEffect(() => {
     if (userRole === 'ADMIN' && pathname.startsWith('/admin/system')) {
       router.replace('/admin/dashboard');
     }
   }, [userRole, pathname, router]);
 
-  // Onboarding redirect: if admin's school hasn't completed onboarding,
-  // redirect to the setup wizard (unless already there)
+  // Onboarding redirect
   useEffect(() => {
     if ((userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && !onboardingComplete && !pathname.startsWith('/admin/onboarding') && !pathname.startsWith('/admin/setup')) {
       router.replace('/admin/setup');
@@ -98,6 +103,10 @@ export function AdminLayoutClient({
           </main>
         </div>
       </SidebarProvider>
+
+      {/* Global overlays — rendered outside SidebarProvider to avoid layout conflicts */}
+      <CommandPalette />
+      <KeyboardShortcuts />
     </AuroraBackground>
   );
 }

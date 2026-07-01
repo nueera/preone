@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Poppins, Inter, Outfit, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorHandlerProvider } from "@/components/providers/error-handler-provider";
+import { SchoolBrandingProvider } from "@/contexts/school-branding";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -62,7 +64,16 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >
-        <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SchoolBrandingProvider>
+            <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
+          </SchoolBrandingProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
