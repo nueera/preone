@@ -13,9 +13,6 @@ import {
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { BranchSwitcher } from '@/components/ui/branch-switcher';
 import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
@@ -153,9 +150,7 @@ export function AdminHeader() {
           Task Master
         </span>
       )}
-      {/* ── Left: Sidebar trigger + Breadcrumb ── */}
-      <SidebarTrigger className="shrink-0" />
-
+      {/* ── Left: Breadcrumb ── */}
       <Breadcrumb>
         <BreadcrumbList>
           {segments.map((seg, idx) => {
