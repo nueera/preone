@@ -144,7 +144,14 @@ export function verifyToken(token: string): TokenPayload | null {
 // Read a cookie value from either a NextRequest (.cookies) or a plain Request
 // (parses the Cookie header). Lets cookie-based auth work in every handler.
 function getCookieValue(request: NextRequest | Request, name: string): string | undefined {
-  const anyReq = request as unknown as { cookies?: { get?: (n: string) => { value?: string } | undefined   }
+  const anyReq = request as unknown as { cookies?: { get?: (n: string) => { value?: string } | undefined } };
+  if (anyReq.cookies?.get) {
+    return anyReq.cookies.get(name)?.value;
+  }
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+  const match = header.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
 }
 
 // ============================================================
