@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Poppins, Inter, Outfit, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorHandlerProvider } from "@/components/providers/error-handler-provider";
-import { QueryProvider } from "@/components/providers";
-import { ThemeProvider } from "next-themes";
+import { SchoolBrandingProvider } from "@/contexts/school-branding";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -67,13 +67,13 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
-          disableTransitionOnChange={false}
+          disableTransitionOnChange
         >
-          <QueryProvider>
+          <SchoolBrandingProvider>
             <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
-          </QueryProvider>
+          </SchoolBrandingProvider>
         </ThemeProvider>
         <Toaster />
       </body>

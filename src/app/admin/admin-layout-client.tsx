@@ -22,8 +22,12 @@
 
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AdminTopbar } from '@/components/layout/admin-topbar';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AdminSidebar } from '@/components/admin-sidebar';
+import { AdminHeader } from '@/components/admin-header';
+import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
 import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes (with sub-paths)
@@ -42,18 +46,20 @@ interface AdminLayoutClientProps {
   schoolId: string;
 }
 
-const pageVariants = {
-  initial: { opacity: 0, y: 8 },
-  enter: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 0 },
-};
-
-const pageTransition = {
-  initial: { duration: 0.28, ease: 'easeOut' },
-  enter: { duration: 0.28, ease: 'easeOut' },
-  exit: { duration: 0.18, ease: 'easeIn' },
-};
-
+/**
+ * Admin Layout Client — Client component wrapping the PreOne admin portal.
+ * 
+ * Provides:
+ * - Sidebar + Header + Main content structure with Aurora Background
+ * - Command Palette (Ctrl+K) for quick navigation
+ * - Keyboard Shortcuts panel (press ?)
+ * - School branding context (logo, name, colors)
+ * - Undo/Redo global action system
+ * - Role-based route guards
+ * 
+ * data-portal="admin" for CSS theme scoping.
+ * data-role attribute for role-specific styling.
+ */
 export function AdminLayoutClient({
   children,
   userRole,
@@ -140,7 +146,11 @@ export function AdminLayoutClient({
             </motion.div>
           </AnimatePresence>
         </div>
-      </main>
-    </div>
+      </SidebarProvider>
+
+      {/* Global overlays — rendered outside SidebarProvider to avoid layout conflicts */}
+      <CommandPalette />
+      <KeyboardShortcuts />
+    </AuroraBackground>
   );
 }
