@@ -60,6 +60,8 @@ export function initClientErrorHandler(userId?: string, userRole?: string, schoo
       !message.includes('act(') &&
       !message.includes('ReactDOM.render') &&
       !message.includes('[HMR]') &&
+      !message.includes('hydrated') &&
+      !message.includes('fdprocessedid') &&
       message.length > 10 &&
       (
         message.includes('Error') ||
