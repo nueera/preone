@@ -233,7 +233,7 @@ export function AddLeadDialog({ open, onOpenChange, onLeadCreated }: AddLeadDial
         <div className="space-y-4">
           {/* Parent Info */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-1.5">
               <UserCircle className="h-4 w-4 text-purple-500" />
               Parent Information
             </h3>
@@ -272,7 +272,7 @@ export function AddLeadDialog({ open, onOpenChange, onLeadCreated }: AddLeadDial
 
           {/* Child Info */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-1.5">
               🧒 Child Information
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -299,7 +299,7 @@ export function AddLeadDialog({ open, onOpenChange, onLeadCreated }: AddLeadDial
 
           {/* Lead Details */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-1.5">
               <Tag className="h-4 w-4 text-purple-500" />
               Lead Details
             </h3>
@@ -345,7 +345,7 @@ export function AddLeadDialog({ open, onOpenChange, onLeadCreated }: AddLeadDial
                       'rounded-full px-3 py-1.5 text-xs font-medium border transition-colors',
                       form.programInterest.includes(program)
                         ? 'bg-purple-50 text-purple-700 border-purple-200'
-                        : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                        : 'bg-white text-muted-foreground border-border hover:border-border'
                     )}
                   >
                     {program}

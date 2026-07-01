@@ -159,12 +159,12 @@ const roleColors: Record<string, string> = {
   'Assistant Teacher': 'bg-sky-50 text-sky-700 border-sky-200',
   'Admin Staff': 'bg-amber-50 text-amber-700 border-amber-200',
   'Transport Staff': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Support Staff': 'bg-gray-100 text-gray-700 border-gray-200',
+  'Support Staff': 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 const statusConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   active: { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle2 className="h-3 w-3 mr-1" /> },
-  inactive: { bg: 'bg-gray-100 text-gray-500 border-gray-200', icon: <XCircle className="h-3 w-3 mr-1" /> },
+  inactive: { bg: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]', icon: <XCircle className="h-3 w-3 mr-1" /> },
   onboarding: { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock className="h-3 w-3 mr-1" /> },
 };
 
@@ -237,11 +237,11 @@ export default function StaffSetupPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Users className="h-6 w-6 text-violet-600" />
               Staff Setup & Onboarding
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Manage staff members, roles, qualifications, and onboarding
             </p>
           </div>
@@ -258,16 +258,16 @@ export default function StaffSetupPage() {
                   <DialogTitle>Import Staff from CSV</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 pt-2">
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-violet-300 transition-colors cursor-pointer">
-                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 font-medium">
+                  <div className="border-2 border-dashed border-[var(--admin-border)] rounded-xl p-8 text-center hover:border-violet-300 transition-colors cursor-pointer">
+                    <Upload className="h-8 w-8 text-[var(--admin-text-subtle)] mx-auto mb-2" />
+                    <p className="text-sm text-[var(--admin-text-muted)] font-medium">
                       Drop CSV file here or click to browse
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-[var(--admin-text-subtle)] mt-1">
                       CSV with columns: name, role, qualification, phone, email
                     </p>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+                  <div className="flex items-center justify-between text-xs text-[var(--admin-text-muted)] bg-[var(--admin-surface-2)] rounded-lg p-3">
                     <span>Download template:</span>
                     <Button variant="link" size="sm" className="h-auto p-0 text-xs">
                       staff_template.csv
@@ -436,7 +436,7 @@ export default function StaffSetupPage() {
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -445,7 +445,7 @@ export default function StaffSetupPage() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
+            <Filter className="h-4 w-4 text-[var(--admin-text-subtle)]" />
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by role" />
@@ -477,13 +477,13 @@ export default function StaffSetupPage() {
                         .join('')}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm text-gray-900">
+                      <h3 className="font-semibold text-sm text-[var(--admin-text)]">
                         {member.name}
                       </h3>
                       <Badge
                         className={cn(
                           'text-[10px] mt-0.5',
-                          roleColors[member.role] || 'bg-gray-50 text-gray-700'
+                          roleColors[member.role] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'
                         )}
                       >
                         {member.role}
@@ -507,15 +507,15 @@ export default function StaffSetupPage() {
 
                 {/* Details */}
                 <div className="space-y-1.5 text-sm">
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
                     <GraduationCap className="h-3.5 w-3.5 flex-shrink-0" />
                     <span className="truncate">{member.qualification}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
                     <Phone className="h-3.5 w-3.5" />
                     <span>{member.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
                     <Mail className="h-3.5 w-3.5" />
                     <span className="truncate">{member.email}</span>
                   </div>
@@ -527,7 +527,7 @@ export default function StaffSetupPage() {
                     {statusConfig[member.status].icon}
                     {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
                   </Badge>
-                  <span className="text-xs text-gray-400">{member.branch}</span>
+                  <span className="text-xs text-[var(--admin-text-subtle)]">{member.branch}</span>
                 </div>
               </div>
             </PreOneCard>
@@ -536,8 +536,8 @@ export default function StaffSetupPage() {
 
         {filteredStaff.length === 0 && (
           <div className="text-center py-12">
-            <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No staff members match your search</p>
+            <Users className="h-12 w-12 text-[var(--admin-text-subtle)] mx-auto mb-3" />
+            <p className="text-[var(--admin-text-muted)]">No staff members match your search</p>
           </div>
         )}
       </div>

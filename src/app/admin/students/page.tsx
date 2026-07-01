@@ -94,7 +94,7 @@ interface ProgramGroup {
 // ── Status badge colors ──
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  INACTIVE: 'bg-gray-50 text-gray-600 border-gray-200',
+  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
   GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
   TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
 };
@@ -298,7 +298,7 @@ export default function StudentsListPage() {
       {/* ── Top Bar ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
             Students
           </h1>
           <p className="text-sm text-muted-foreground">Manage all students</p>
@@ -323,7 +323,7 @@ export default function StudentsListPage() {
       </div>
 
       {/* ── Filters Row ── */}
-      <div className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-900 space-y-3">
+      <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Filter className="h-4 w-4" />
           Filters
@@ -377,7 +377,7 @@ export default function StudentsListPage() {
                 className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                   selectedStatuses.includes(key)
                     ? STATUS_COLORS[key]
-                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
                 }`}
               >
                 {label}
@@ -394,7 +394,7 @@ export default function StudentsListPage() {
                 className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                   gender === g
                     ? 'bg-portal-50 text-portal-700 border-portal-200'
-                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
                 }`}
               >
                 {g}
@@ -446,7 +446,7 @@ export default function StudentsListPage() {
       </div>
 
       {/* ── Students Table ── */}
-      <div className="rounded-xl border bg-white shadow-sm dark:bg-gray-900">
+      <div className="rounded-xl border bg-[var(--admin-surface)] shadow-sm dark:bg-[var(--admin-surface)]">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -527,7 +527,7 @@ export default function StudentsListPage() {
                       </Avatar>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-gray-900 dark:text-gray-100">
+                      <div className="font-medium text-[var(--admin-text)]">
                         {student.firstName} {student.lastName}
                       </div>
                       {student.rollNumber && (

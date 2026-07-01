@@ -447,7 +447,7 @@ function getAttendanceColor(status: string) {
     case 'Late': return THEME_ATTENDANCE_COLORS.LATE?.dot ?? 'bg-amber-500';
     case 'HalfDay': return THEME_ATTENDANCE_COLORS.HALF_DAY?.dot ?? 'bg-yellow-500';
     case 'Excused': return THEME_ATTENDANCE_COLORS.EXCUSED?.dot ?? 'bg-blue-500';
-    default: return 'bg-gray-300';
+    default: return 'bg-muted-foreground/20';
   }
 }
 
@@ -1548,7 +1548,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
         {Object.keys(cats).length > 0 && (
           <div className="flex flex-wrap gap-2">
             {Object.entries(cats).map(([cat, count]) => (
-              <Badge key={cat} className={CATEGORY_COLORS[cat] || 'bg-gray-100 text-gray-700'}>
+              <Badge key={cat} className={CATEGORY_COLORS[cat] || 'bg-muted text-muted-foreground'}>
                 {cat} ({count})
               </Badge>
             ))}
@@ -1563,7 +1563,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Badge className={CATEGORY_COLORS[o.category] || 'bg-gray-100 text-gray-700'}>
+                      <Badge className={CATEGORY_COLORS[o.category] || 'bg-muted text-muted-foreground'}>
                         {o.category}
                       </Badge>
                       {o.priority && (
@@ -2120,7 +2120,7 @@ export default function ParentPortal({ token, user, onLogout }: ParentPortalProp
   // MAIN LAYOUT
   // ============================================================
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-muted">
       {/* Desktop Sidebar */}
       {!isMobile && (
         <aside className={`${sidebarCollapsed ? 'w-[68px]' : 'w-[280px]'} bg-sidebar-gradient text-white flex flex-col transition-all duration-300 shrink-0`}>

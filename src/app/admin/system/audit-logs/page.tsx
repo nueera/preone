@@ -83,7 +83,7 @@ const ACTION_COLORS: Record<string, { bg: string; text: string; dot: string }> =
   UPDATE:  { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
   DELETE:  { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
   LOGIN:   { bg: 'bg-teal-100', text: 'text-teal-700', dot: 'bg-teal-500' },
-  LOGOUT:  { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' },
+  LOGOUT:  { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', dot: 'bg-[var(--admin-text-muted)]' },
   READ:    { bg: 'bg-cyan-100', text: 'text-cyan-700', dot: 'bg-cyan-500' },
   EXPORT:  { bg: 'bg-violet-100', text: 'text-violet-700', dot: 'bg-violet-500' },
   IMPORT:  { bg: 'bg-amber-100', text: 'text-amber-700', dot: 'bg-amber-500' },
@@ -108,7 +108,7 @@ const ACTION_OPTIONS = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'READ',
 const ENTITY_OPTIONS = ['Student', 'Teacher', 'Invoice', 'Payment', 'Lead', 'Attendance', 'User', 'Activity', 'Parent', 'FeeStructure'];
 
 function getActionColor(action: string) {
-  return ACTION_COLORS[action] || { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' };
+  return ACTION_COLORS[action] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', dot: 'bg-[var(--admin-text-muted)]' };
 }
 
 function getEntityColor(entity: string) {
@@ -287,8 +287,8 @@ export default function AuditLogsPage() {
               <Shield className="h-5 w-5 text-violet-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
-              <p className="text-sm text-gray-500">Track all system activities and changes</p>
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">Audit Logs</h1>
+              <p className="text-sm text-[var(--admin-text-muted)]">Track all system activities and changes</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -320,8 +320,8 @@ export default function AuditLogsPage() {
                 <Calendar className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-medium">Today&apos;s Events</p>
-                <p className="text-2xl font-bold text-gray-900">{stats?.totalToday ?? 0}</p>
+                <p className="text-xs text-[var(--admin-text-muted)] font-medium">Today&apos;s Events</p>
+                <p className="text-2xl font-bold font-heading text-[var(--admin-text)]">{stats?.totalToday ?? 0}</p>
               </div>
             </div>
           </AnimatedCard>
@@ -332,8 +332,8 @@ export default function AuditLogsPage() {
                 <Activity className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-medium">This Week</p>
-                <p className="text-2xl font-bold text-gray-900">{stats?.totalThisWeek ?? 0}</p>
+                <p className="text-xs text-[var(--admin-text-muted)] font-medium">This Week</p>
+                <p className="text-2xl font-bold font-heading text-[var(--admin-text)]">{stats?.totalThisWeek ?? 0}</p>
               </div>
             </div>
           </AnimatedCard>
@@ -344,12 +344,12 @@ export default function AuditLogsPage() {
                 <User className="h-5 w-5 text-violet-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-medium">Top Actor Today</p>
-                <p className="text-lg font-bold text-gray-900 truncate">
+                <p className="text-xs text-[var(--admin-text-muted)] font-medium">Top Actor Today</p>
+                <p className="text-lg font-bold text-[var(--admin-text)] truncate">
                   {stats?.topActor ? stats.topActor.name : 'No activity'}
                 </p>
                 {stats?.topActor && (
-                  <p className="text-xs text-gray-500">{stats.topActor.count} actions</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">{stats.topActor.count} actions</p>
                 )}
               </div>
             </div>
@@ -360,9 +360,9 @@ export default function AuditLogsPage() {
         <AnimatedCard delay={0.15} hover={false} className="p-4">
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex-1 min-w-[180px]">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">Search</label>
+              <label className="text-xs font-medium text-[var(--admin-text-muted)] mb-1 block">Search</label>
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-[var(--admin-text-subtle)]" />
                 <Input
                   placeholder="Search user, action, entity..."
                   value={searchQuery}
@@ -373,7 +373,7 @@ export default function AuditLogsPage() {
             </div>
 
             <div className="min-w-[140px]">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">Entity Type</label>
+              <label className="text-xs font-medium text-[var(--admin-text-muted)] mb-1 block">Entity Type</label>
               <Select value={entityFilter} onValueChange={setEntityFilter}>
                 <SelectTrigger className="h-9 w-full">
                   <SelectValue placeholder="All Entities" />
@@ -388,7 +388,7 @@ export default function AuditLogsPage() {
             </div>
 
             <div className="min-w-[140px]">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">Action Type</label>
+              <label className="text-xs font-medium text-[var(--admin-text-muted)] mb-1 block">Action Type</label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
                 <SelectTrigger className="h-9 w-full">
                   <SelectValue placeholder="All Actions" />
@@ -403,7 +403,7 @@ export default function AuditLogsPage() {
             </div>
 
             <div className="min-w-[140px]">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">From Date</label>
+              <label className="text-xs font-medium text-[var(--admin-text-muted)] mb-1 block">From Date</label>
               <Input
                 type="date"
                 value={fromDate}
@@ -413,7 +413,7 @@ export default function AuditLogsPage() {
             </div>
 
             <div className="min-w-[140px]">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">To Date</label>
+              <label className="text-xs font-medium text-[var(--admin-text-muted)] mb-1 block">To Date</label>
               <Input
                 type="date"
                 value={toDate}
@@ -444,21 +444,21 @@ export default function AuditLogsPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50/80">
-                  <TableHead className="text-xs font-semibold text-gray-600">Timestamp</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">User</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">Action</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">Entity</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">Entity ID</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">Details</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-600">IP Address</TableHead>
+                <TableRow className="bg-[var(--admin-surface-2)]/80">
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">Timestamp</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">User</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">Action</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">Entity</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">Entity ID</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">Details</TableHead>
+                  <TableHead className="text-xs font-semibold text-[var(--admin-text-muted)]">IP Address</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-12">
-                      <div className="flex items-center justify-center gap-2 text-gray-400">
+                      <div className="flex items-center justify-center gap-2 text-[var(--admin-text-subtle)]">
                         <RefreshCw className="h-4 w-4 animate-spin" />
                         Loading audit logs...
                       </div>
@@ -467,7 +467,7 @@ export default function AuditLogsPage() {
                 ) : logs.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-12">
-                      <div className="flex flex-col items-center gap-2 text-gray-400">
+                      <div className="flex flex-col items-center gap-2 text-[var(--admin-text-subtle)]">
                         <Shield className="h-8 w-8" />
                         <p className="text-sm font-medium">No audit logs found</p>
                         <p className="text-xs">Try adjusting your filters</p>
@@ -485,20 +485,20 @@ export default function AuditLogsPage() {
                     return (
                       <React.Fragment key={log.id}>
                         <TableRow className="group hover:bg-violet-50/30 transition-colors">
-                          <TableCell className="text-xs text-gray-600 min-w-[160px]">
+                          <TableCell className="text-xs text-[var(--admin-text-muted)] min-w-[160px]">
                             <div className="flex items-center gap-1.5">
-                              <Clock className="h-3 w-3 text-gray-400" />
+                              <Clock className="h-3 w-3 text-[var(--admin-text-subtle)]" />
                               {formatTimestamp(log.createdAt)}
                             </div>
                           </TableCell>
                           <TableCell className="text-sm">
                             {log.user ? (
                               <div>
-                                <p className="font-medium text-gray-900 text-xs">{log.user.name}</p>
-                                <p className="text-[10px] text-gray-400">{log.user.email}</p>
+                                <p className="font-medium text-[var(--admin-text)] text-xs">{log.user.name}</p>
+                                <p className="text-[10px] text-[var(--admin-text-subtle)]">{log.user.email}</p>
                               </div>
                             ) : (
-                              <span className="text-xs text-gray-400">System</span>
+                              <span className="text-xs text-[var(--admin-text-subtle)]">System</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -512,11 +512,11 @@ export default function AuditLogsPage() {
                               {log.entity}
                             </span>
                           </TableCell>
-                          <TableCell className="text-xs text-gray-500 font-mono max-w-[120px] truncate">
+                          <TableCell className="text-xs text-[var(--admin-text-muted)] font-mono max-w-[120px] truncate">
                             {log.entityId ? (
                               <span title={log.entityId}>{log.entityId.slice(0, 12)}...</span>
                             ) : (
-                              <span className="text-gray-300">—</span>
+                              <span className="text-[var(--admin-text-subtle)]">—</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -529,10 +529,10 @@ export default function AuditLogsPage() {
                                 {isExpanded ? 'Hide' : 'View'}
                               </button>
                             ) : (
-                              <span className="text-xs text-gray-300">—</span>
+                              <span className="text-xs text-[var(--admin-text-subtle)]">—</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-xs text-gray-500 font-mono">
+                          <TableCell className="text-xs text-[var(--admin-text-muted)] font-mono">
                             {log.ipAddress || '—'}
                           </TableCell>
                         </TableRow>
@@ -540,7 +540,7 @@ export default function AuditLogsPage() {
                           <TableRow className="bg-violet-50/20">
                             <TableCell colSpan={7} className="p-0">
                               <div className="px-6 py-3 border-l-4 border-violet-300 ml-4">
-                                <p className="text-xs font-semibold text-gray-600 mb-2">Field Changes</p>
+                                <p className="text-xs font-semibold text-[var(--admin-text-muted)] mb-2">Field Changes</p>
                                 {details.changes && Array.isArray(details.changes) ? (
                                   <div className="space-y-1.5">
                                     {details.changes.map((change: { field: string; oldValue: unknown; newValue: unknown }, idx: number) => (
@@ -549,7 +549,7 @@ export default function AuditLogsPage() {
                                         <span className="text-red-500 bg-red-50 rounded px-1.5 py-0.5 font-mono max-w-[200px] truncate">
                                           {String(change.oldValue ?? 'null')}
                                         </span>
-                                        <ArrowRight className="h-3 w-3 text-gray-400 shrink-0" />
+                                        <ArrowRight className="h-3 w-3 text-[var(--admin-text-subtle)] shrink-0" />
                                         <span className="text-green-600 bg-green-50 rounded px-1.5 py-0.5 font-mono max-w-[200px] truncate">
                                           {String(change.newValue ?? 'null')}
                                         </span>
@@ -557,7 +557,7 @@ export default function AuditLogsPage() {
                                     ))}
                                   </div>
                                 ) : (
-                                  <pre className="text-xs text-gray-600 bg-gray-50 rounded p-2 overflow-x-auto max-h-40">
+                                  <pre className="text-xs text-[var(--admin-text-muted)] bg-[var(--admin-surface-2)] rounded p-2 overflow-x-auto max-h-40">
                                     {JSON.stringify(details, null, 2)}
                                   </pre>
                                 )}
@@ -575,8 +575,8 @@ export default function AuditLogsPage() {
 
           {/* ── Pagination ── */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50/50">
-              <p className="text-xs text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t bg-[var(--admin-surface-2)]/50">
+              <p className="text-xs text-[var(--admin-text-muted)]">
                 Showing {(pagination.page - 1) * pagination.limit + 1}–
                 {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
               </p>

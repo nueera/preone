@@ -777,7 +777,7 @@ export default function TransportPage() {
               ) : (
                 filteredVehicles.map((vehicle) => {
                   const typeConfig = VEHICLE_TYPE_CONFIG[vehicle.type] || {
-                    label: vehicle.type, color: 'text-gray-700', bg: 'bg-gray-50 border-gray-200',
+                    label: vehicle.type, color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)] border-[var(--admin-border)]',
                   };
                   const insExpired = isExpired(vehicle.insuranceExpiry);
                   const fitExpired = isExpired(vehicle.fitnessExpiry);
@@ -795,7 +795,7 @@ export default function TransportPage() {
                         {vehicle.route ? (
                           <span className="text-sm">{vehicle.route.name}</span>
                         ) : (
-                          <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
+                          <Badge variant="outline" className="bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]">
                             Unassigned
                           </Badge>
                         )}
@@ -818,7 +818,7 @@ export default function TransportPage() {
                           className={
                             vehicle.isActive
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-gray-50 text-gray-500 border-gray-200'
+                              : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                           }
                         >
                           {vehicle.isActive ? 'Active' : 'Inactive'}
@@ -896,7 +896,7 @@ export default function TransportPage() {
                 <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                   <Navigation className="h-4 w-4 text-emerald-600" />
                 </div>
-                <div className="w-0.5 h-6 bg-gray-200" />
+                <div className="w-0.5 h-6 bg-[var(--admin-border)]" />
               </div>
               <div className="pt-1">
                 <p className="text-sm font-medium text-emerald-700">Start: {viewStopsRoute.startPoint}</p>
@@ -911,7 +911,7 @@ export default function TransportPage() {
                     <MapPin className="h-4 w-4 text-portal-600" />
                   </div>
                   {index < stops.length - 1 && (
-                    <div className="w-0.5 h-6 bg-gray-200" />
+                    <div className="w-0.5 h-6 bg-[var(--admin-border)]" />
                   )}
                 </div>
                 <div className="pt-1 flex items-center gap-2">
@@ -931,7 +931,7 @@ export default function TransportPage() {
             <div className="flex items-start gap-3">
               <div className="flex flex-col items-center">
                 {stops.length > 0 && (
-                  <div className="w-0.5 h-6 bg-gray-200" />
+                  <div className="w-0.5 h-6 bg-[var(--admin-border)]" />
                 )}
                 <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
                   <MapPin className="h-4 w-4 text-rose-600" />
@@ -1050,14 +1050,14 @@ export default function TransportPage() {
             </div>
 
             {routeStops.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <div className="text-center py-6 text-muted-foreground text-sm bg-[var(--admin-surface-2)] rounded-xl border border-dashed border-[var(--admin-border)]">
                 No stops added. Click &quot;Add Stop&quot; to add pickup/drop points.
               </div>
             ) : (
               <ScrollArea className="max-h-60">
                 <div className="space-y-3">
                   {routeStops.map((stop, index) => (
-                    <div key={index} className="flex items-start gap-3 bg-gray-50 p-3 rounded-xl">
+                    <div key={index} className="flex items-start gap-3 bg-[var(--admin-surface-2)] p-3 rounded-xl">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-portal-100 text-portal-700 text-xs font-bold">
                         {index + 1}
                       </div>
@@ -1366,7 +1366,7 @@ export default function TransportPage() {
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <Bus className="h-7 w-7 text-portal-600" />
             Transport
           </h1>
@@ -1383,7 +1383,7 @@ export default function TransportPage() {
 
       {/* ── Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white dark:bg-gray-800 border rounded-xl p-1 h-auto">
+        <TabsList className="bg-[var(--admin-surface)] border rounded-xl p-1 h-auto">
           <TabsTrigger
             value="routes"
             className={`rounded-lg px-4 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:${theme.btnGradientClass} data-[state=active]:text-white data-[state=active]:shadow-sm`}

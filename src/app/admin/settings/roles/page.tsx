@@ -60,11 +60,11 @@ export default function RolesSettingsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Shield className="w-6 h-6" style={{ color: theme.primary }} />
                 Role Management
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Manage roles and their permission matrices</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage roles and their permission matrices</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Add Role
@@ -77,24 +77,24 @@ export default function RolesSettingsPage() {
           <StaggerItem>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-4">Roles</h3>
+                <h3 className="font-semibold text-[var(--admin-text)] mb-4">Roles</h3>
                 <div className="space-y-2">
                   {roles.map((role) => (
                     <div
                       key={role.id}
                       className={`p-3 rounded-xl border cursor-pointer transition-colors ${
-                        selectedRole.id === role.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-gray-50'
+                        selectedRole.id === role.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-[var(--admin-surface-2)]'
                       }`}
                       onClick={() => setSelectedRole(role)}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-sm font-medium text-gray-900">{role.name}</h4>
+                        <h4 className="text-sm font-medium text-[var(--admin-text)]">{role.name}</h4>
                         <div className="flex items-center gap-1">
-                          {role.isSystem && <Badge className="bg-gray-50 text-gray-500 text-[9px]">System</Badge>}
+                          {role.isSystem && <Badge className="bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] text-[9px]">System</Badge>}
                           <Badge variant="outline" className="text-[9px]"><Users className="w-2.5 h-2.5 mr-0.5" />{role.userCount}</Badge>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400">{role.description}</p>
+                      <p className="text-xs text-[var(--admin-text-subtle)]">{role.description}</p>
                     </div>
                   ))}
                 </div>
@@ -108,8 +108,8 @@ export default function RolesSettingsPage() {
               <PreOneCardContent>
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{selectedRole.name} — Permissions</h3>
-                    <p className="text-xs text-gray-400">{selectedRole.description}</p>
+                    <h3 className="font-semibold text-[var(--admin-text)]">{selectedRole.name} — Permissions</h3>
+                    <p className="text-xs text-[var(--admin-text-subtle)]">{selectedRole.description}</p>
                   </div>
                   <div className="flex gap-1">
                     {!selectedRole.isSystem && <Button variant="ghost" size="sm" className="h-7 text-xs"><Edit className="w-3 h-3 mr-1" /> Edit</Button>}
@@ -120,14 +120,14 @@ export default function RolesSettingsPage() {
                   {PERMISSION_CATEGORIES.map((cat) => {
                     const hasPermission = selectedRole.permissions[cat.key];
                     return (
-                      <div key={cat.key} className="flex items-center justify-between p-3 rounded-xl border hover:bg-gray-50">
+                      <div key={cat.key} className="flex items-center justify-between p-3 rounded-xl border hover:bg-[var(--admin-surface-2)]">
                         <div className="flex items-center gap-3">
                           {hasPermission ? (
                             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                           ) : (
-                            <XCircle className="w-4 h-4 text-gray-300" />
+                            <XCircle className="w-4 h-4 text-[var(--admin-text-subtle)]" />
                           )}
-                          <span className="text-sm text-gray-700">{cat.label}</span>
+                          <span className="text-sm text-[var(--admin-text-muted)]">{cat.label}</span>
                         </div>
                         <Switch checked={hasPermission} disabled={selectedRole.isSystem} />
                       </div>

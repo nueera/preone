@@ -287,7 +287,7 @@ export function AddActivityDialog({ open, onOpenChange, onActivityCreated, defau
                 type="checkbox"
                 checked={form.isPublished}
                 onChange={(e) => updateField('isPublished', e.target.checked)}
-                className="rounded border-gray-300"
+                className="rounded border-border"
               />
               <span className="text-sm">Publish to Parents</span>
             </label>

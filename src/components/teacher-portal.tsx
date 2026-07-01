@@ -207,7 +207,7 @@ const ATTENDANCE_COLORS = {
   PRESENT: THEME_ATTENDANCE_COLORS.PRESENT ? `${THEME_ATTENDANCE_COLORS.PRESENT.bg} border-emerald-400 ${THEME_ATTENDANCE_COLORS.PRESENT.text}` : 'bg-emerald-100 border-emerald-400 text-emerald-800',
   ABSENT: THEME_ATTENDANCE_COLORS.ABSENT ? `${THEME_ATTENDANCE_COLORS.ABSENT.bg} border-rose-400 ${THEME_ATTENDANCE_COLORS.ABSENT.text}` : 'bg-rose-100 border-rose-400 text-rose-800',
   LATE: THEME_ATTENDANCE_COLORS.LATE ? `${THEME_ATTENDANCE_COLORS.LATE.bg} border-amber-400 ${THEME_ATTENDANCE_COLORS.LATE.text}` : 'bg-amber-100 border-amber-400 text-amber-800',
-  UNMARKED: 'bg-gray-100 border-gray-300 text-gray-600',
+  UNMARKED: 'bg-muted border-border text-muted-foreground',
 };
 
 const FOOD_OPTIONS = ['Eaten', 'Partial', 'Not Eaten', 'Skipped'];
@@ -1134,7 +1134,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
             { label: 'Present', value: attendanceSummary.present, color: 'text-emerald-600', bg: 'bg-emerald-50' },
             { label: 'Absent', value: attendanceSummary.absent, color: 'text-rose-600', bg: 'bg-rose-50' },
             { label: 'Late', value: attendanceSummary.late, color: 'text-amber-600', bg: 'bg-amber-50' },
-            { label: 'Unmarked', value: attendanceSummary.unmarked, color: 'text-gray-600', bg: 'bg-gray-50' },
+            { label: 'Unmarked', value: attendanceSummary.unmarked, color: 'text-muted-foreground', bg: 'bg-muted' },
           ].map((s) => (
             <Card key={s.label} className={`${s.bg} border-0 rounded-3xl shadow-sm transition-all duration-300`}>
               <CardContent className="p-4 text-center">
@@ -1190,7 +1190,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                         status === 'PRESENT' ? 'bg-emerald-200 text-emerald-700' :
                         status === 'ABSENT' ? 'bg-rose-200 text-rose-700' :
                         status === 'LATE' ? 'bg-amber-200 text-amber-700' :
-                        'bg-gray-200 text-gray-600'
+                        'bg-muted text-muted-foreground'
                       }`}>
                         {student.firstName[0]}{student.lastName[0]}
                       </AvatarFallback>
@@ -1203,7 +1203,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                       status === 'PRESENT' ? 'border-emerald-400 text-emerald-700' :
                       status === 'ABSENT' ? 'border-rose-400 text-rose-700' :
                       status === 'LATE' ? 'border-amber-400 text-amber-700' :
-                      'border-gray-300 text-gray-500'
+                      'border-border text-muted-foreground'
                     }`}>
                       {status === 'UNMARKED' ? 'Tap' : status}
                     </Badge>
@@ -1659,7 +1659,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                                 obs.priority === 'Critical' ? 'border-rose-400 text-rose-600' :
                                 obs.priority === 'High' ? 'border-orange-400 text-orange-600' :
                                 obs.priority === 'Medium' ? 'border-amber-400 text-amber-600' :
-                                'border-gray-300 text-gray-600'
+                                'border-border text-muted-foreground'
                               }`}>{obs.priority}</Badge>
                               {obs.shareWithParent && (
                                 <Badge className="text-[10px] bg-emerald-100 text-emerald-700 border-0">
@@ -1784,7 +1784,7 @@ export default function TeacherPortal({ token, user, onLogout }: TeacherPortalPr
                     Art: 'bg-emerald-100 text-emerald-700', Music: 'bg-teal-100 text-teal-700',
                     Dance: 'bg-orange-100 text-orange-700', Sports: 'bg-emerald-100 text-emerald-700',
                     Story: 'bg-blue-100 text-blue-700', Science: 'bg-teal-100 text-teal-700',
-                    Celebration: 'bg-orange-100 text-orange-700', Other: 'bg-gray-100 text-gray-700',
+                    Celebration: 'bg-orange-100 text-orange-700', Other: 'bg-muted text-muted-foreground',
                   };
                   return (
                     <Card key={act.id || i} className="hover:shadow-md transition-shadow rounded-3xl">

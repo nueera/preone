@@ -73,7 +73,7 @@ function getStatusBadge(status: string) {
       );
     case 'INACTIVE':
       return (
-        <Badge className="bg-gray-100 text-gray-700 text-[10px] border border-gray-200">
+        <Badge className="bg-muted text-muted-foreground text-[10px] border border-border">
           Inactive
         </Badge>
       );

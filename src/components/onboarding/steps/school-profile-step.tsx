@@ -36,9 +36,9 @@ const THEMES = [
 ] as const;
 
 const INPUT_CLASS =
-  'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all';
+  'w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all';
 
-const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--text-primary)]';
+const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--admin-text)]';
 
 function generateId(): string {
   return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -108,14 +108,14 @@ export function SchoolProfileStep() {
       {/* ── Step Header ── */}
       <motion.div variants={itemVariants} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 flex items-center justify-center text-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: 'var(--admin-primary-soft)' }}>
             🏫
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)] font-[var(--font-primary)]">
+            <h2 className="text-xl font-bold text-[var(--admin-text)] font-[var(--font-primary)]">
               School Profile
             </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Tell us about your school — name, contact details, and board
             </p>
           </div>
@@ -126,7 +126,7 @@ export function SchoolProfileStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">📋</span> Basic Information
             </h3>
 
@@ -159,12 +159,12 @@ export function SchoolProfileStep() {
                   onChange={(e) => updateDraft('schoolType', e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
                   className={cn(INPUT_CLASS, 'pr-40')}
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)] bg-[var(--bg-tertiary)] px-2 py-1 rounded-lg">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-text-subtle)] bg-[var(--admin-surface-2)] px-2 py-1 rounded-lg">
                   .preone.app
                 </div>
               </div>
-              <p className="text-xs text-[var(--text-muted)] mt-1.5">
-                Preview: <span className="font-medium text-[var(--preone-primary)]">{draft.schoolType || 'yourschool'}.preone.app</span>
+              <p className="text-xs text-[var(--admin-text-subtle)] mt-1.5">
+                Preview: <span className="font-medium text-[var(--admin-primary)]">{draft.schoolType || 'yourschool'}.preone.app</span>
               </p>
             </div>
 
@@ -182,8 +182,8 @@ export function SchoolProfileStep() {
                     className={cn(
                       'px-3 py-2.5 rounded-xl text-xs font-medium border transition-all min-h-[44px]',
                       draft.schoolBoard === board.value
-                        ? 'bg-[var(--preone-primary)] text-white border-[var(--preone-primary)] shadow-md shadow-[var(--preone-primary)]/20'
-                        : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--preone-primary)]/50 hover:bg-[var(--preone-primary-50)]'
+                        ? 'bg-[var(--admin-primary)] text-white border-[var(--admin-primary)] shadow-md shadow-[var(--admin-primary)]/20'
+                        : 'bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:border-[var(--admin-primary)]/50 hover:bg-[var(--admin-primary-soft)]'
                     )}
                   >
                     {board.label}
@@ -199,7 +199,7 @@ export function SchoolProfileStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">📍</span> Address
             </h3>
 
@@ -282,7 +282,7 @@ export function SchoolProfileStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">📞</span> Contact Details
             </h3>
 
@@ -338,10 +338,10 @@ export function SchoolProfileStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">🎨</span> Choose a Theme
             </h3>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Pick a fun theme for your school app — parents and kids will love it!
             </p>
 
@@ -356,15 +356,15 @@ export function SchoolProfileStep() {
                     className={cn(
                       'flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all min-h-[44px]',
                       isSelected
-                        ? 'border-[var(--preone-primary)] shadow-lg shadow-[var(--preone-primary)]/20 bg-[var(--preone-primary-50)]'
-                        : 'border-[var(--border-default)] hover:border-[var(--preone-primary)]/40 bg-[var(--bg-primary)]'
+                        ? 'border-[var(--admin-primary)] shadow-lg shadow-[var(--admin-primary)]/20 bg-[var(--admin-primary-soft)]'
+                        : 'border-[var(--admin-border)] hover:border-[var(--admin-primary)]/40 bg-[var(--admin-bg)]'
                     )}
                   >
                     <span className="text-2xl">{theme.icon}</span>
                     <span
                       className={cn(
                         'text-xs font-medium',
-                        isSelected ? 'text-[var(--preone-primary)]' : 'text-[var(--text-secondary)]'
+                        isSelected ? 'text-[var(--admin-primary)]' : 'text-[var(--admin-text-muted)]'
                       )}
                     >
                       {theme.label}
@@ -373,7 +373,7 @@ export function SchoolProfileStep() {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="w-2 h-2 rounded-full bg-[var(--preone-primary)]"
+                        className="w-2 h-2 rounded-full bg-[var(--admin-primary)]"
                       />
                     )}
                   </button>

@@ -100,7 +100,7 @@ const TYPE_CONFIG: Record<ActivityType, { label: string; icon: string; color: st
 const STATUS_CONFIG: Record<ActivityStatus, { label: string; color: string; bg: string; border: string }> = {
   UPCOMING:  { label: 'Upcoming',  color: 'text-blue-700',   bg: 'bg-blue-100',   border: 'border-blue-300' },
   ONGOING:   { label: 'Ongoing',   color: 'text-emerald-700',bg: 'bg-emerald-100', border: 'border-emerald-300' },
-  COMPLETED: { label: 'Completed', color: 'text-gray-600',   bg: 'bg-gray-100',   border: 'border-gray-300' },
+  COMPLETED: { label: 'Completed', color: 'text-muted-foreground',   bg: 'bg-muted',   border: 'border-border' },
   CANCELLED: { label: 'Cancelled', color: 'text-red-700',    bg: 'bg-red-100',    border: 'border-red-300' },
 };
 
@@ -433,8 +433,8 @@ function ActivitiesContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Activities</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Activities</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button onClick={fetchActivities} className="bg-portal-600 hover:bg-portal-700 rounded-xl">
           Retry
         </Button>
@@ -451,11 +451,11 @@ function ActivitiesContent() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-portal-500" />
                 Activities
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {data?.className || 'Class'} | {data?.total || 0} Activities
               </p>
             </div>
@@ -471,7 +471,7 @@ function ActivitiesContent() {
 
       {/* ── Tabs ── */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upcoming' | 'all')} className="space-y-4">
-        <TabsList className="bg-gray-100 p-1 rounded-xl h-auto">
+        <TabsList className="bg-muted p-1 rounded-xl h-auto">
           <TabsTrigger value="upcoming" className="rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Calendar className="h-4 w-4 mr-1.5" /> Today & Upcoming
           </TabsTrigger>
@@ -485,9 +485,9 @@ function ActivitiesContent() {
           {activities.length === 0 ? (
             <Card className="border-0 shadow-md">
               <CardContent className="py-16 text-center">
-                <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">No Activities Scheduled</h3>
-                <p className="text-sm text-gray-500 mb-4">No activities for the next 7 days. Create one to get started!</p>
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-1">No Activities Scheduled</h3>
+                <p className="text-sm text-muted-foreground mb-4">No activities for the next 7 days. Create one to get started!</p>
                 <Button className="bg-portal-600 hover:bg-portal-700 rounded-xl text-sm" onClick={() => setShowCreateDialog(true)}>
                   <Plus className="h-4 w-4 mr-1" /> Create Activity
                 </Button>
@@ -507,23 +507,23 @@ function ActivitiesContent() {
                         isToday(date)
                           ? 'bg-portal-600 text-white'
                           : past
-                            ? 'bg-gray-100 text-gray-400'
-                            : 'bg-gray-100 text-gray-700'
+                            ? 'bg-muted text-muted-foreground'
+                            : 'bg-muted text-muted-foreground'
                       }`}>
                         {new Date(date + 'T00:00:00').getDate()}
                       </div>
                       <div>
-                        <p className={`text-sm font-semibold ${past ? 'text-gray-400' : 'text-gray-900'}`}>
+                        <p className={`text-sm font-semibold ${past ? 'text-muted-foreground' : 'text-foreground'}`}>
                           {dayLabel}
                           {isToday(date) && <span className="ml-2 text-portal-600 text-xs">— {formatDate(date)}</span>}
-                          {!isToday(date) && <span className="ml-2 text-gray-400 text-xs">— {formatDate(date)}</span>}
+                          {!isToday(date) && <span className="ml-2 text-muted-foreground text-xs">— {formatDate(date)}</span>}
                         </p>
-                        <p className="text-xs text-gray-400">{dayActivities.length} activit{dayActivities.length === 1 ? 'y' : 'ies'}</p>
+                        <p className="text-xs text-muted-foreground">{dayActivities.length} activit{dayActivities.length === 1 ? 'y' : 'ies'}</p>
                       </div>
                     </div>
 
                     {/* Activity timeline */}
-                    <div className="ml-5 border-l-2 border-gray-200 pl-5 space-y-3">
+                    <div className="ml-5 border-l-2 border-border pl-5 space-y-3">
                       {dayActivities.map((activity) => {
                         const typeConfig = TYPE_CONFIG[activity.type];
                         const isHappening = isCurrentActivity(activity.date, activity.startTime, activity.endTime);
@@ -541,12 +541,12 @@ function ActivitiesContent() {
                           >
                             <CardContent className="p-3">
                               <div className="flex items-start gap-3">
-                                <div className="text-xs font-mono text-gray-500 min-w-[44px] pt-0.5">
+                                <div className="text-xs font-mono text-muted-foreground min-w-[44px] pt-0.5">
                                   {activity.startTime || '--:--'}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className={`text-sm font-medium ${past ? 'text-gray-500' : 'text-gray-900'}`}>
+                                    <span className={`text-sm font-medium ${past ? 'text-muted-foreground' : 'text-foreground'}`}>
                                       {typeConfig.icon} {activity.title}
                                     </span>
                                     <Badge className={`${typeConfig.bg} ${typeConfig.color} ${typeConfig.border} border text-[10px] px-1.5 py-0 rounded-md`}>
@@ -558,10 +558,10 @@ function ActivitiesContent() {
                                       </Badge>
                                     )}
                                     {!activity.isPublished && (
-                                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md text-gray-400">Draft</Badge>
+                                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md text-muted-foreground">Draft</Badge>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                     {activity.startTime && (
                                       <span className="flex items-center gap-1">
                                         <Clock className="h-3 w-3" />
@@ -628,7 +628,7 @@ function ActivitiesContent() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs rounded-xl text-gray-500 h-8"
+                    className="text-xs rounded-xl text-muted-foreground h-8"
                     onClick={() => { setFilterType('all'); setFilterStatus('all'); setFilterPublished('all'); }}
                   >
                     <X className="h-3 w-3 mr-1" /> Clear
@@ -644,14 +644,14 @@ function ActivitiesContent() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50/50">
-                      <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs">Title</th>
-                      <th className="text-left py-3 px-2 font-medium text-gray-500 text-xs">Type</th>
-                      <th className="text-left py-3 px-2 font-medium text-gray-500 text-xs">Date</th>
-                      <th className="text-left py-3 px-2 font-medium text-gray-500 text-xs">Time</th>
-                      <th className="text-left py-3 px-2 font-medium text-gray-500 text-xs">Status</th>
-                      <th className="text-center py-3 px-2 font-medium text-gray-500 text-xs">Published</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-500 text-xs">Actions</th>
+                    <tr className="border-b border-border bg-muted/50">
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground text-xs">Title</th>
+                      <th className="text-left py-3 px-2 font-medium text-muted-foreground text-xs">Type</th>
+                      <th className="text-left py-3 px-2 font-medium text-muted-foreground text-xs">Date</th>
+                      <th className="text-left py-3 px-2 font-medium text-muted-foreground text-xs">Time</th>
+                      <th className="text-left py-3 px-2 font-medium text-muted-foreground text-xs">Status</th>
+                      <th className="text-center py-3 px-2 font-medium text-muted-foreground text-xs">Published</th>
+                      <th className="text-right py-3 px-4 font-medium text-muted-foreground text-xs">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -662,20 +662,20 @@ function ActivitiesContent() {
                       return (
                         <tr
                           key={a.id}
-                          className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                          className="border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
                           onClick={() => { setSelectedActivity(a); setShowDetailDialog(true); }}
                         >
                           <td className="py-3 px-4">
-                            <p className="text-sm font-medium text-gray-900">{typeConfig.icon} {a.title}</p>
-                            {a.location && <p className="text-[10px] text-gray-400 flex items-center gap-0.5 mt-0.5"><MapPin className="h-2.5 w-2.5" />{a.location}</p>}
+                            <p className="text-sm font-medium text-foreground">{typeConfig.icon} {a.title}</p>
+                            {a.location && <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5"><MapPin className="h-2.5 w-2.5" />{a.location}</p>}
                           </td>
                           <td className="py-3 px-2">
                             <Badge className={`${typeConfig.bg} ${typeConfig.color} ${typeConfig.border} border text-[10px] px-1.5 py-0 rounded-md`}>
                               {typeConfig.label}
                             </Badge>
                           </td>
-                          <td className="py-3 px-2 text-xs text-gray-600">{formatDateShort(a.date)}</td>
-                          <td className="py-3 px-2 text-xs text-gray-600 font-mono">{a.startTime || '-'}</td>
+                          <td className="py-3 px-2 text-xs text-muted-foreground">{formatDateShort(a.date)}</td>
+                          <td className="py-3 px-2 text-xs text-muted-foreground font-mono">{a.startTime || '-'}</td>
                           <td className="py-3 px-2">
                             <Badge className={`${statusConfig.bg} ${statusConfig.color} ${statusConfig.border} border text-[10px] px-1.5 py-0 rounded-md`}>
                               {a.status === 'ONGOING' && <Radio className="h-2.5 w-2.5 mr-0.5 animate-pulse inline" />}
@@ -686,15 +686,15 @@ function ActivitiesContent() {
                             {a.isPublished ? (
                               <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" />
                             ) : (
-                              <XCircle className="h-4 w-4 text-gray-300 mx-auto" />
+                              <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
                             )}
                           </td>
                           <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50" onClick={() => openEdit(a)} title="Edit">
+                              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-blue-600 hover:bg-blue-50" onClick={() => openEdit(a)} title="Edit">
                                 <Edit3 className="h-3.5 w-3.5" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50" onClick={() => { setDeleteTarget(a); setShowDeleteDialog(true); }} title="Delete">
+                              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50" onClick={() => { setDeleteTarget(a); setShowDeleteDialog(true); }} title="Delete">
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
                             </div>
@@ -704,8 +704,8 @@ function ActivitiesContent() {
                     })}
                     {activities.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-12 text-center text-gray-500">
-                          <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                        <td colSpan={7} className="py-12 text-center text-muted-foreground">
+                          <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                           <p className="font-medium">No Activities Found</p>
                         </td>
                       </tr>
@@ -836,10 +836,10 @@ function ActivitiesContent() {
             </div>
 
             {/* Publish toggle */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-xl">
               <div>
                 <Label className="text-xs font-medium">Publish to Parents</Label>
-                <p className="text-[10px] text-gray-500">Parents will be notified when published</p>
+                <p className="text-[10px] text-muted-foreground">Parents will be notified when published</p>
               </div>
               <Switch
                 checked={createForm.isPublished}
@@ -890,17 +890,17 @@ function ActivitiesContent() {
                 <div className="space-y-4 py-2">
                   {/* Location */}
                   {selectedActivity.location && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       {selectedActivity.location}
                     </div>
                   )}
 
                   {/* Description */}
                   {selectedActivity.description && (
-                    <div className="bg-gray-50 p-4 rounded-xl">
-                      <h4 className="text-xs font-semibold text-gray-700 mb-1.5">📝 Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedActivity.description}</p>
+                    <div className="bg-muted p-4 rounded-xl">
+                      <h4 className="text-xs font-semibold text-muted-foreground mb-1.5">📝 Description</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{selectedActivity.description}</p>
                     </div>
                   )}
 
@@ -921,12 +921,12 @@ function ActivitiesContent() {
                   )}
 
                   {/* Parent Visibility */}
-                  <div className="p-4 border border-gray-200 rounded-xl">
-                    <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                  <div className="p-4 border border-border rounded-xl">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
                       <Eye className="h-3.5 w-3.5" /> Parent Visibility
                     </h4>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm ${selectedActivity.isPublished ? 'text-portal-600' : 'text-gray-500'}`}>
+                      <span className={`text-sm ${selectedActivity.isPublished ? 'text-portal-600' : 'text-muted-foreground'}`}>
                         {selectedActivity.isPublished ? (
                           <><CheckCircle2 className="h-4 w-4 inline mr-1" /> Published ✅</>
                         ) : (

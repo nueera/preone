@@ -183,7 +183,7 @@ interface StudentData {
 // ── Status badge ──
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  INACTIVE: 'bg-gray-50 text-gray-600 border-gray-200',
+  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
   GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
   TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
 };
@@ -193,7 +193,7 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
   PARTIAL: 'bg-sky-50 text-sky-700 border-sky-200',
   PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   OVERDUE: 'bg-red-50 text-red-700 border-red-200',
-  CANCELLED: 'bg-gray-50 text-gray-600 border-gray-200',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 function getToken(): string | null {
@@ -334,7 +334,7 @@ export default function StudentDetailPage() {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = format(new Date(attendanceMonth.getFullYear(), attendanceMonth.getMonth(), d), 'yyyy-MM-dd');
       const record = monthAttendance.find((a) => format(new Date(a.date), 'yyyy-MM-dd') === dateStr);
-      let bgColor = 'bg-gray-50';
+      let bgColor = 'bg-[var(--admin-surface-2)]';
       if (record) {
         if (record.status === 'PRESENT') bgColor = 'bg-emerald-100 text-emerald-700';
         else if (record.status === 'ABSENT') bgColor = 'bg-red-100 text-red-700';
@@ -365,7 +365,7 @@ export default function StudentDetailPage() {
       </Button>
 
       {/* ── Profile Header ── */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-gray-900">
+      <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
             <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
@@ -374,7 +374,7 @@ export default function StudentDetailPage() {
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
                 {student.firstName} {student.lastName}
               </h1>
               {student.class && (
@@ -589,7 +589,7 @@ export default function StudentDetailPage() {
                     <div className="h-3 w-3 rounded bg-amber-100" /> Late
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="h-3 w-3 rounded bg-gray-50" /> No Data
+                    <div className="h-3 w-3 rounded bg-[var(--admin-surface-2)]" /> No Data
                   </div>
                 </div>
               </CardContent>

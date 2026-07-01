@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { withAuth, verifyPassword, hashPassword } from '@/lib/auth-utils';
+import { withAuth, verifyPassword, hashPassword } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 const changePasswordSchema = z.object({

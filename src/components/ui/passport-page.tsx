@@ -321,7 +321,7 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
     return (
       <PageTransition>
         <div className="flex flex-col items-center justify-center py-24">
-          <div className="h-8 w-8 border-3 border-gray-300 border-t-purple-600 rounded-full animate-spin mb-4" />
+          <div className="h-8 w-8 border-3 border-border border-t-purple-600 rounded-full animate-spin mb-4" />
           <p className="text-sm text-muted-foreground">Loading Childhood Passport...</p>
         </div>
       </PageTransition>
@@ -532,7 +532,7 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
               ) : (
                 <div className="relative">
                   {/* Timeline line */}
-                  <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200" />
+                  <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-muted" />
 
                   <div className="space-y-4">
                     {timelineEntries.map((entry, idx) => {
@@ -643,7 +643,7 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
                       <AnimatedCard key={memory.id} delay={idx * 0.05}>
                         <div className="overflow-hidden rounded-xl">
                           {memory.mediaUrl && memory.mediaType === 'image' ? (
-                            <div className="aspect-video bg-gray-100 relative">
+                            <div className="aspect-video bg-muted relative">
                               <img
                                 src={memory.mediaUrl}
                                 alt={memory.title}
@@ -769,11 +769,11 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
                             {milestone.achieved ? (
                               <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
                             ) : (
-                              <Circle className="h-5 w-5 text-gray-300 flex-shrink-0" />
+                              <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className={cn('text-sm font-medium', milestone.achieved ? '' : 'text-gray-500')}>
+                                <span className={cn('text-sm font-medium', milestone.achieved ? '' : 'text-muted-foreground')}>
                                   {milestone.name}
                                 </span>
                                 <Badge variant="outline" className="text-[9px] capitalize">
@@ -874,14 +874,14 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                           {radarData.map((d) => {
                             const colorKey = d.dimension.toLowerCase();
-                            const colors = GROWTH_COLORS[colorKey] || { bg: 'bg-gray-100', text: 'text-gray-700', hex: '#9ca3af' };
+                            const colors = GROWTH_COLORS[colorKey] || { bg: 'bg-muted', text: 'text-muted-foreground', hex: '#9ca3af' };
                             return (
-                              <div key={d.dimension} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
+                              <div key={d.dimension} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                                 <div className={cn('h-2 w-2 rounded-full flex-shrink-0')} style={{ backgroundColor: colors.hex }} />
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[10px] text-muted-foreground">{d.dimension}</p>
                                   <div className="flex items-center gap-2">
-                                    <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                                       <div
                                         className="h-full rounded-full transition-all duration-500"
                                         style={{ width: `${d.value}%`, backgroundColor: colors.hex }}
@@ -896,7 +896,7 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
                         </div>
 
                         {selectedGrowth?.comments && (
-                          <div className="mt-4 p-3 rounded-lg bg-gray-50 border">
+                          <div className="mt-4 p-3 rounded-lg bg-muted border">
                             <p className="text-xs font-medium text-muted-foreground mb-1">Teacher Comments</p>
                             <p className="text-sm">{selectedGrowth.comments}</p>
                           </div>
@@ -964,7 +964,7 @@ export function PassportPage({ studentId, role, portalPrefix }: PassportPageProp
                             </Button>
                           )}
                         </div>
-                        <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0 mt-1" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
                       </div>
                     </AnimatedCard>
                   ))}
@@ -1046,7 +1046,7 @@ function ReactionBar({
             key={type}
             className={cn(
               'flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all',
-              'bg-gray-100 hover:bg-gray-200 border border-transparent hover:border-gray-300'
+              'bg-muted hover:bg-muted border border-transparent hover:border-border'
             )}
             onClick={() => canReact && onReact(targetType, targetId, type)}
             disabled={!canReact}
@@ -1064,7 +1064,7 @@ function ReactionBar({
           {Object.entries(REACTION_EMOJIS).map(([type, config]) => (
             <button
               key={type}
-              className="h-6 w-6 rounded-full hover:bg-gray-100 flex items-center justify-center transition-all text-sm opacity-60 hover:opacity-100"
+              className="h-6 w-6 rounded-full hover:bg-muted flex items-center justify-center transition-all text-sm opacity-60 hover:opacity-100"
               onClick={() => onReact(targetType, targetId, type)}
               title={config.label}
             >
@@ -1194,7 +1194,7 @@ function AddMemoryDialog({
                 </div>
               </div>
             </div>
-            <div className="flex gap-2 px-5 py-4 border-t bg-gray-50">
+            <div className="flex gap-2 px-5 py-4 border-t bg-muted">
               <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
               <Button className={cn('flex-1', getAccentClass(role))} onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Add Memory'}
@@ -1317,7 +1317,7 @@ function AddAchievementDialog({
                       key={e}
                       className={cn(
                         'h-8 w-8 rounded-lg text-lg flex items-center justify-center border transition-all',
-                        icon === e ? 'border-amber-400 bg-amber-50 scale-110' : 'border-gray-200 hover:border-gray-300'
+                        icon === e ? 'border-amber-400 bg-amber-50 scale-110' : 'border-border hover:border-border'
                       )}
                       onClick={() => setIcon(e)}
                     >
@@ -1331,7 +1331,7 @@ function AddAchievementDialog({
                 <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="text-sm" />
               </div>
             </div>
-            <div className="flex gap-2 px-5 py-4 border-t bg-gray-50">
+            <div className="flex gap-2 px-5 py-4 border-t bg-muted">
               <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
               <Button className={cn('flex-1', getAccentClass(role))} onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Add Achievement'}
@@ -1450,7 +1450,7 @@ function AddCertificateDialog({
                 />
               </div>
             </div>
-            <div className="flex gap-2 px-5 py-4 border-t bg-gray-50">
+            <div className="flex gap-2 px-5 py-4 border-t bg-muted">
               <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
               <Button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white" onClick={handleSave} disabled={saving}>
                 {saving ? 'Issuing...' : 'Issue Certificate'}
@@ -1559,7 +1559,7 @@ function MarkMilestoneDialog({
                 />
               </div>
             </div>
-            <div className="flex gap-2 px-5 py-4 border-t bg-gray-50">
+            <div className="flex gap-2 px-5 py-4 border-t bg-muted">
               <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
               <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Mark Achieved'}

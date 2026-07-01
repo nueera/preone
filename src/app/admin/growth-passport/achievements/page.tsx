@@ -97,11 +97,11 @@ export default function AchievementsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Trophy className="w-6 h-6" style={{ color: theme.primary }} />
                 Achievements
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Certificates, badges, milestones, and awards</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Certificates, badges, milestones, and awards</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Add Achievement
@@ -122,7 +122,7 @@ export default function AchievementsPage() {
                       <Icon className={`w-5 h-5 ${cfg.color}`} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{type}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">{type}</p>
                       <p className="text-lg font-bold" style={{ color: theme.primary }}>{count}</p>
                     </div>
                   </div>
@@ -136,7 +136,7 @@ export default function AchievementsPage() {
         <StaggerItem>
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input placeholder="Search by student or title..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
           </div>
@@ -146,13 +146,13 @@ export default function AchievementsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">All Achievements</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">All Achievements</h3>
               {loading ? (
-                <p className="text-sm text-gray-400 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading achievements…</p>
+                <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading achievements…</p>
               ) : error ? (
                 <p className="text-sm text-red-500 py-10 text-center">{error}</p>
               ) : filtered.length === 0 ? (
-                <p className="text-sm text-gray-400 py-10 text-center">No achievements recorded yet.</p>
+                <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center">No achievements recorded yet.</p>
               ) : (
                 <ScrollArea className="max-h-96">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -165,16 +165,16 @@ export default function AchievementsPage() {
                           <div className="text-2xl">{a.icon}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
-                              <h4 className="text-sm font-medium text-gray-900 truncate">{a.title}</h4>
+                              <h4 className="text-sm font-medium text-[var(--admin-text)] truncate">{a.title}</h4>
                               <div className={`w-6 h-6 rounded-full ${typeCfg.bg} flex items-center justify-center shrink-0`}>
                                 <TypeIcon className={`w-3 h-3 ${typeCfg.color}`} />
                               </div>
                             </div>
-                            <p className="text-xs text-gray-600 mb-1">{a.student}</p>
-                            <p className="text-xs text-gray-400 mb-1.5 line-clamp-2">{a.description}</p>
+                            <p className="text-xs text-[var(--admin-text-muted)] mb-1">{a.student}</p>
+                            <p className="text-xs text-[var(--admin-text-subtle)] mb-1.5 line-clamp-2">{a.description}</p>
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-[9px]">{a.type}</Badge>
-                              {a.date && <span className="text-[10px] text-gray-400">{new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
+                              {a.date && <span className="text-[10px] text-[var(--admin-text-subtle)]">{new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
                             </div>
                           </div>
                         </div>

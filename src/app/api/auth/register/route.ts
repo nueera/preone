@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
-import { hashPassword } from '@/lib/auth-utils';
+import { hashPassword } from '@/lib/auth';
 
 const registerSchema = z.object({
   schoolName: z.string().min(2, 'School name must be at least 2 characters'),
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     // In development mode, also return the OTP code for testing
     if (process.env.NODE_ENV === 'development') {
-      const { createOTP } = await import('@/lib/auth-utils');
+      const { createOTP } = await import('@/lib/auth');
       const otp = await createOTP(email.toLowerCase(), 'LOGIN');
       response.devOtpCode = otp.code;
     }

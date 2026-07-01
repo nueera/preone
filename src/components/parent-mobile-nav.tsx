@@ -31,7 +31,7 @@ export function ParentMobileNav() {
   const { selectedChild } = useParentAuth();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border pb-safe md:hidden">
       <div className="flex items-center justify-around h-16">
         {MOBILE_NAV_ITEMS.map((item) => {
           const isActive =
@@ -46,7 +46,7 @@ export function ParentMobileNav() {
               className={`flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px] min-h-[44px] transition-colors ${
                 isActive
                   ? theme.selectedClass
-                  : 'text-gray-400 hover:text-gray-600'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               }`}
             >
               <item.icon className="h-5 w-5" />

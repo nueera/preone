@@ -305,7 +305,7 @@ export function NotificationsPage() {
                 'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
                 activeCategory === tab.value
                   ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                  : 'bg-muted text-muted-foreground hover:bg-muted dark:bg-card dark:text-muted-foreground dark:hover:bg-muted'
               )}
             >
               {tab.label}
@@ -321,7 +321,7 @@ export function NotificationsPage() {
         {/* ── Notifications List ── */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="h-6 w-6 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin" />
+            <div className="h-6 w-6 border-2 border-border border-t-purple-600 rounded-full animate-spin" />
           </div>
         ) : filteredNotifications.length === 0 ? (
           <EmptyState
@@ -354,7 +354,7 @@ export function NotificationsPage() {
                         className={cn(
                           'p-4 rounded-xl border-l-4 cursor-pointer transition-colors',
                           style.border,
-                          !notification.isRead ? style.bg : 'bg-white dark:bg-gray-900'
+                          !notification.isRead ? style.bg : 'bg-card'
                         )}
                         onClick={() => markAsRead(notification.id, notification.link)}
                       >
@@ -364,7 +364,7 @@ export function NotificationsPage() {
                             {!notification.isRead ? (
                               <div className={cn('h-2.5 w-2.5 rounded-full', style.dot)} />
                             ) : (
-                              <div className="h-2.5 w-2.5 rounded-full bg-gray-200 dark:bg-gray-700" />
+                              <div className="h-2.5 w-2.5 rounded-full bg-muted dark:bg-card" />
                             )}
                           </div>
 
@@ -401,7 +401,7 @@ export function NotificationsPage() {
 
                             {/* Meta row */}
                             <div className="flex items-center gap-2 mt-2">
-                              <span className="px-1.5 py-0.5 rounded-md bg-gray-100 text-[10px] font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                              <span className="px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-medium text-muted-foreground dark:bg-card dark:text-muted-foreground">
                                 {CATEGORY_LABELS[notification.category] || notification.category}
                               </span>
                               {notification.sender && (

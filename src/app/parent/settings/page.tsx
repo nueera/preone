@@ -249,7 +249,7 @@ function ProfileTab() {
             <Input
               value={parentFullName}
               disabled
-              className="rounded-xl bg-gray-50"
+              className="rounded-xl bg-muted"
             />
             <Badge variant="secondary" className="text-[9px] shrink-0">Read Only</Badge>
           </div>
@@ -262,7 +262,7 @@ function ProfileTab() {
           <Input
             value={parent.relation}
             disabled
-            className="rounded-xl bg-gray-50"
+            className="rounded-xl bg-muted"
           />
         </div>
 
@@ -275,7 +275,7 @@ function ProfileTab() {
             value={formData.phone}
             onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
             disabled={!isEditing}
-            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-gray-50'}`}
+            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-muted'}`}
             placeholder="Enter phone number"
           />
         </div>
@@ -290,7 +290,7 @@ function ProfileTab() {
             onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
             disabled={!isEditing}
             type="email"
-            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-gray-50'}`}
+            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-muted'}`}
             placeholder="Enter email address"
           />
         </div>
@@ -304,7 +304,7 @@ function ProfileTab() {
             value={formData.occupation}
             onChange={(e) => setFormData((p) => ({ ...p, occupation: e.target.value }))}
             disabled={!isEditing}
-            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-gray-50'}`}
+            className={`rounded-xl ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-muted'}`}
             placeholder="Enter occupation"
           />
         </div>
@@ -318,7 +318,7 @@ function ProfileTab() {
             value={formData.address}
             onChange={(e) => setFormData((p) => ({ ...p, address: e.target.value }))}
             disabled={!isEditing}
-            className={`rounded-xl min-h-[80px] ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-gray-50'}`}
+            className={`rounded-xl min-h-[80px] ${isEditing ? 'border-sky-300 focus:border-sky-500' : 'bg-muted'}`}
             placeholder="Enter address"
           />
         </div>
@@ -334,7 +334,7 @@ function ProfileTab() {
             {children.map((child) => (
               <div
                 key={child.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100"
+                className="flex items-center gap-3 p-3 rounded-xl bg-muted border border-border"
               >
                 <Avatar className="h-8 w-8 border border-sky-100">
                   <AvatarImage src={child.photo || undefined} />
@@ -497,7 +497,7 @@ function KycTab() {
       );
     }
     return (
-      <Badge className="bg-gray-100 text-gray-600 gap-1 text-sm px-3 py-1">
+      <Badge className="bg-muted text-muted-foreground gap-1 text-sm px-3 py-1">
         <AlertTriangle className="h-4 w-4" /> Not Submitted
       </Badge>
     );
@@ -584,10 +584,10 @@ function KycTab() {
                 {!isLocked ? (
                   <div className="space-y-2">
                     <div
-                      className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-sky-300 transition-colors cursor-pointer"
+                      className="border-2 border-dashed border-border rounded-xl p-4 text-center hover:border-sky-300 transition-colors cursor-pointer"
                       onClick={() => fileInputRefs.current[docType]?.click()}
                     >
-                      <Upload className="h-5 w-5 text-gray-400 mx-auto mb-1" />
+                      <Upload className="h-5 w-5 text-muted-foreground mx-auto mb-1" />
                       <p className="text-xs text-muted-foreground">
                         {hasFile ? selectedFiles[docType]?.name : 'Choose File or Drag & Drop'}
                       </p>
@@ -754,7 +754,7 @@ function NotificationsTab() {
         {NOTIFICATION_ROWS.map((row) => (
           <div
             key={row.appField}
-            className="bg-gray-50 rounded-xl p-3 sm:p-4 hover:bg-gray-100/80 transition-colors"
+            className="bg-muted rounded-xl p-3 sm:p-4 hover:bg-muted/80 transition-colors"
           >
             {/* Mobile Layout */}
             <div className="sm:hidden space-y-3">
@@ -912,7 +912,7 @@ function ChangePasswordTab() {
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
             onClick={() => setShowCurrent(!showCurrent)}
           >
             {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -936,7 +936,7 @@ function ChangePasswordTab() {
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
             onClick={() => setShowNew(!showNew)}
           >
             {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -960,7 +960,7 @@ function ChangePasswordTab() {
                 {strength.label}
               </span>
             </div>
-            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div className={`h-full ${strength.color} rounded-full transition-all duration-300 ${strength.width}`} />
             </div>
           </div>
@@ -980,7 +980,7 @@ function ChangePasswordTab() {
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
             onClick={() => setShowConfirm(!showConfirm)}
           >
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -1040,7 +1040,7 @@ function SettingsContent() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="w-full grid grid-cols-4 h-12 rounded-2xl bg-gray-100 p-1">
+        <TabsList className="w-full grid grid-cols-4 h-12 rounded-2xl bg-muted p-1">
           <TabsTrigger
             value="profile"
             className="rounded-xl text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-sky-700 min-h-[40px]"

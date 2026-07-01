@@ -106,7 +106,7 @@ export default function ParentPaymentsPage() {
 
         {/* ── Header ── */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
             Payment History
           </h1>
           <p className="text-sm text-muted-foreground">

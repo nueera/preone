@@ -39,7 +39,7 @@ export function AiCompanion({
       {expanded && (
         <div
           className={cn(
-            'max-w-xs rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl',
+            'max-w-xs rounded-2xl bg-white/90 dark:bg-card/90 backdrop-blur-xl',
             'border border-purple-200/50 shadow-xl p-4',
             'animate-in fade-in slide-in-from-bottom-2 duration-300'
           )}
@@ -52,15 +52,15 @@ export function AiCompanion({
               <p className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-0.5">
                 PreOne AI
               </p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {message}
               </p>
             </div>
             <button
               onClick={() => setExpanded(false)}
-              className="shrink-0 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="shrink-0 p-1 rounded-full hover:bg-muted dark:hover:bg-muted transition-colors"
             >
-              <X className="h-3 w-3 text-gray-400" />
+              <X className="h-3 w-3 text-muted-foreground" />
             </button>
           </div>
         </div>
