@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkRateLimit, createOTP } from '@/lib/auth-utils';
+import { checkRateLimit, createOTP } from '@/lib/auth';
 import { sendOtpEmail } from '@/lib/messaging';
 import { prisma } from '@/lib/db';
 
