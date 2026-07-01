@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { verifyOTP, hashPassword } from '@/lib/auth-utils';
+import { verifyOTP, hashPassword } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 const resetPasswordSchema = z.object({
