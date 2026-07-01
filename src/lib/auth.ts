@@ -318,14 +318,6 @@ export function generateApiToken(): string {
     token += chars[Math.floor(Math.random() * chars.length)];
   }
   return token;
-};
-  if (anyReq.cookies?.get) {
-    return anyReq.cookies.get(name)?.value;
-  }
-  const header = request.headers.get('cookie');
-  if (!header) return undefined;
-  const match = header.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${name}=`));
-  return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
 }
 
 export function getAuthUser(request: NextRequest | Request): TokenPayload | null {
