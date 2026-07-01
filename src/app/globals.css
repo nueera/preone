@@ -4,9 +4,26 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   PREONE DESIGN SYSTEM — Global Tokens
-   Brand: Purple (#7C3AED) → Sky Blue (#0EA5E9) Gradient
-   Style: Modern SaaS + Space Exploration + Preschool Education
+   PREONE DESIGN SYSTEM — Unified Global Tokens
+   
+   Architecture: Single layered token system
+   ┌─────────────────────────────────────────────────────┐
+   │  :root (base semantic tokens)                       │
+   │    └── [data-portal="admin"] (admin module tokens)  │
+   │    └── [data-portal="teacher"] (teacher overrides)  │
+   │    └── [data-portal="parent"]  (parent overrides)   │
+   │  .dark (dark mode overrides for all above)          │
+   └─────────────────────────────────────────────────────┘
+   
+   Naming convention:
+   - Semantic: --primary, --background, --card, etc. (shadcn compat)
+   - PreOne:   --preone-* (brand + Living Universe)
+   - Admin:    --admin-* (admin module specific)
+   - Portal:   --portal-* (portal-scoped colors)
+   - System:   --text-*, --space-*, --radius-*, --transition-*
+   
+   Color rule: ALL soft colors use solid hex, never rgba()
+   This ensures consistent dark mode rendering and easier theming.
    ============================================================ */
 
 @theme inline {
@@ -68,7 +85,7 @@
   --radius-3xl: 28px;
   --radius-4xl: 32px;
 
-  /* ── Brand Color Palette ── */
+  /* ── Brand Color Palette (used by Tailwind classes) ── */
   --color-primary-50: #F0F9FF;
   --color-primary-100: #E0F2FE;
   --color-primary-200: #BAE6FD;
@@ -97,7 +114,7 @@
   --color-status-pending: #F59E0B;
   --color-status-paid: #10B981;
 
-  /* ── Neutral Palette ── */
+  /* ── Neutral Palette (Slate) ── */
   --color-slate-50: #F8FAFC;
   --color-slate-100: #F1F5F9;
   --color-slate-200: #E2E8F0;
@@ -109,7 +126,7 @@
   --color-slate-800: #1E293B;
   --color-slate-900: #0F172A;
 
-  /* ── Legacy color overrides (for Tailwind compat) ── */
+  /* ── Extended Color Palettes (for Tailwind compat) ── */
   --color-amber-50: #fffbeb;
   --color-amber-100: #fef3c7;
   --color-amber-200: #fde68a;
@@ -170,8 +187,6 @@
   --color-indigo-500: #6366f1;
   --color-indigo-600: #4f46e5;
   --color-indigo-700: #4338ca;
-
-  /* ── Pink palette ── */
   --color-pink-50: #fdf2f8;
   --color-pink-100: #fce7f3;
   --color-pink-200: #fbcfe8;
@@ -180,8 +195,6 @@
   --color-pink-500: #ec4899;
   --color-pink-600: #db2777;
   --color-pink-700: #be185d;
-
-  /* ── Blue palette ── */
   --color-blue-50: #eff6ff;
   --color-blue-100: #dbeafe;
   --color-blue-200: #bfdbfe;
@@ -191,8 +204,6 @@
   --color-blue-600: #2563eb;
   --color-blue-700: #1d4ed8;
   --color-blue-800: #1e40af;
-
-  /* ── Teal palette ── */
   --color-teal-50: #f0fdfa;
   --color-teal-100: #ccfbf1;
   --color-teal-200: #99f6e4;
@@ -201,8 +212,6 @@
   --color-teal-500: #14b8a6;
   --color-teal-600: #0d9488;
   --color-teal-700: #0f766e;
-
-  /* ── Green palette ── */
   --color-green-50: #f0fdf4;
   --color-green-100: #dcfce7;
   --color-green-200: #bbf7d0;
@@ -211,8 +220,6 @@
   --color-green-500: #22c55e;
   --color-green-600: #16a34a;
   --color-green-700: #15803d;
-
-  /* ── Red palette ── */
   --color-red-50: #fef2f2;
   --color-red-100: #fee2e2;
   --color-red-200: #fecaca;
@@ -221,8 +228,6 @@
   --color-red-500: #ef4444;
   --color-red-600: #dc2626;
   --color-red-700: #b91c1c;
-
-  /* ── Yellow palette ── */
   --color-yellow-50: #fefce8;
   --color-yellow-100: #fef9c3;
   --color-yellow-200: #fef08a;
@@ -231,8 +236,6 @@
   --color-yellow-500: #eab308;
   --color-yellow-600: #ca8a04;
   --color-yellow-700: #a16207;
-
-  /* ── Gray palette ── */
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -243,55 +246,51 @@
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
+
+  /* ── Brand accent tokens (login + admin) ── */
+  --brand-purple: #7B2CBF;
+  --brand-blue: #3A86FF;
+  --brand-violet: #8B5CF6;
+  --brand-indigo: #6366F1;
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-indigo: var(--brand-indigo);
 }
 
 /* ============================================================
-   LIGHT MODE — PreOne Brand
+   LIGHT MODE — Unified Base Tokens
+   Merges shadcn semantic tokens + Living Universe brand tokens
+   into a single authoritative :root block.
    ============================================================ */
 :root {
   /* ── Core Radius ── */
   --radius: 1rem;
 
-  /* ── Semantic Colors ── */
+  /* ── Semantic Colors (shadcn compat) ── */
   --background: #F8FAFC;
   --foreground: #0F172A;
   --card: #FFFFFF;
   --card-foreground: #0F172A;
   --popover: #FFFFFF;
   --popover-foreground: #0F172A;
-
-  /* ── Primary: Purple (Brand) ── */
   --primary: #7C3AED;
   --primary-foreground: #FFFFFF;
-
-  /* ── Secondary: Sky Blue ── */
   --secondary: #E0F2FE;
   --secondary-foreground: #0369A1;
-
-  /* ── Muted ── */
   --muted: #F1F5F9;
   --muted-foreground: #64748B;
-
-  /* ── Accent: Sky Blue ── */
   --accent: #0EA5E9;
   --accent-foreground: #FFFFFF;
-
-  /* ── Destructive ── */
   --destructive: #EF4444;
-
-  /* ── Borders & Inputs ── */
   --border: #E2E8F0;
   --input: #E2E8F0;
   --ring: #7C3AED;
-
-  /* ── Chart Colors (Brand-inspired) ── */
   --chart-1: #7C3AED;
   --chart-2: #0EA5E9;
   --chart-3: #22C55E;
   --chart-4: #FACC15;
   --chart-5: #EC4899;
-
-  /* ── Sidebar: Purple → Blue Gradient ── */
   --sidebar: #5B21B6;
   --sidebar-foreground: #F8FAFC;
   --sidebar-primary: #FFFFFF;
@@ -300,8 +299,6 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: rgba(255,255,255,0.1);
   --sidebar-ring: #7C3AED;
-
-  /* ── Portal-scoped defaults (Admin = Purple/Violet) ── */
   --portal: #7C3AED;
   --portal-foreground: #FFFFFF;
   --portal-50: #f5f3ff;
@@ -314,6 +311,103 @@
   --portal-700: #5B21B6;
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
+
+  /* ── PreOne Brand Tokens (Living Universe) ── */
+  --preone-primary: #6366F1;
+  --preone-primary-dark: #4F46E5;
+  --preone-primary-light: #818CF8;
+  --preone-primary-50: #EEF2FF;
+  --preone-primary-100: #E0E7FF;
+  --preone-blue: #0096C7;
+  --preone-orange: #FFB700;
+  --preone-pink: #FF4D6D;
+  --preone-green: #34D399;
+  --preone-coral: #FB7185;
+
+  /* ── Semantic Surface Tokens ── */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border-default: #E5E7EB;
+  --border-light: #F3F4F6;
+
+  /* ── Typography Scale ── */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.5rem;
+
+  /* ── Spacing Scale ── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* ── Font Families ── */
+  --font-primary: var(--font-poppins), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: var(--font-outfit), sans-serif;
+
+  /* ── Transition Tokens ── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 240ms ease;
+  --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-theme: 300ms ease;
+
+  /* ── Shadow Tokens ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+
+  /* ── Login Page Tokens ── */
+  --login-card: rgba(255, 255, 255, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.6);
+  --login-input: rgba(255, 255, 255, 0.7);
+  --login-input-border: #E5E7EB;
+  --login-text: #1F2937;
+  --login-muted: #6B7280;
+  --login-subtle: #9CA3AF;
+  --login-label: #374151;
+  --login-link: #7C3AED;
+  --login-divider: #E5E7EB;
+  --login-focus: #6366F1;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.5);
+  --login-tab-active: #6366F1;
+  --login-icon: #6366F1;
+  --login-icon-muted: #6B7280;
+  --color-login-card: var(--login-card);
+  --color-login-card-border: var(--login-card-border);
+  --color-login-input: var(--login-input);
+  --color-login-input-border: var(--login-input-border);
+  --color-login-text: var(--login-text);
+  --color-login-muted: var(--login-muted);
+  --color-login-subtle: var(--login-subtle);
+  --color-login-label: var(--login-label);
+  --color-login-link: var(--login-link);
+  --color-login-divider: var(--login-divider);
+  --color-login-focus: var(--login-focus);
+  --color-login-error: var(--login-error);
+  --color-login-tab-bg: var(--login-tab-bg);
+  --color-login-tab-active: var(--login-tab-active);
+  --color-login-icon: var(--login-icon);
+  --color-login-icon-muted: var(--login-icon-muted);
 }
 
 /* ============================================================
@@ -372,52 +466,159 @@
   --portal-900: #0c4a6e;
 }
 
+/* ── Admin Module Tokens (all soft colors = solid hex) ── */
+[data-portal="admin"] {
+  --admin-bg: #F8F9FA;
+  --admin-primary: #6366F1;
+  --admin-primary-soft: #EEF2FF;
+  --admin-primary-hover: #4F46E5;
+  --admin-primary-foreground: #FFFFFF;
+  --admin-info: #3B82F6;
+  --admin-info-soft: #DBEAFE;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #FEF3C7;
+  --admin-success: #10B981;
+  --admin-success-soft: #D1FAE5;
+  --admin-danger: #EF4444;
+  --admin-danger-soft: #FEE2E2;
+  --admin-accent: #F97316;
+  --admin-accent-soft: #FFEDD5;
+  --admin-error: #EF4444;
+  --admin-error-soft: #FEE2E2;
+  --admin-text: #1F2937;
+  --admin-text-muted: #6B7280;
+  --admin-text-subtle: #9CA3AF;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F9FAFB;
+  --admin-border: #E5E7EB;
+  --admin-border-strong: #D1D5DB;
+}
+
 /* ============================================================
-   DARK MODE — PreOne Brand
+   DARK MODE — "Midnight Garden" Theme
+   
+   Philosophy: Positive, vibrant, beautiful — NOT gloomy.
+   - Deep indigo/navy backgrounds with subtle color warmth
+   - Surfaces have luminous quality (not flat black/gray)
+   - Vibrant glowing accents that feel alive
+   - Status colors that pop with optimism
+   - Every surface tells a story — subtle gradients, gentle glow
+   
+   Color DNA:
+   - Base: Deep indigo (#1A1A3E) with violet undertones
+   - Surface 1: Soft violet-navy (#222244) — cards float above
+   - Surface 2: Warm slate-indigo (#2A2A4A) — nested elements
+   - Borders: Visible but gentle — indigo-tinted lines
+   - Text: Warm whites and soft lavenders — never stark white
+   - Accents: Vivid violet, sky, emerald, amber — full spectrum
    ============================================================ */
 .dark {
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
-
-  --primary: #A78BFA;
-  --primary-foreground: #0F172A;
-
-  --secondary: #1E293B;
-  --secondary-foreground: #F8FAFC;
-
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
-
+  /* ── Semantic Colors (shadcn compat) ── */
+  --background: #13132B;
+  --foreground: #E8E8F0;
+  --card: #1E1E3F;
+  --card-foreground: #EAEAF5;
+  --popover: #1E1E3F;
+  --popover-foreground: #EAEAF5;
+  --primary: #8B5CF6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #252548;
+  --secondary-foreground: #C4B5FD;
+  --muted: #252548;
+  --muted-foreground: #A3A3C2;
   --accent: #38BDF8;
-  --accent-foreground: #0F172A;
-
-  --destructive: #FCA5A5;
-
-  --border: rgba(255,255,255,0.1);
-  --input: rgba(255,255,255,0.15);
-  --ring: #A78BFA;
-
-  --chart-1: #A78BFA;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FB7185;
+  --border: #33335A;
+  --input: #33335A;
+  --ring: #8B5CF6;
+  --chart-1: #8B5CF6;
   --chart-2: #38BDF8;
-  --chart-3: #4ADE80;
-  --chart-4: #FDE047;
+  --chart-3: #34D399;
+  --chart-4: #FBBF24;
   --chart-5: #F472B6;
+  --sidebar: #1A1A3E;
+  --sidebar-foreground: #E8E8F0;
+  --sidebar-primary: #8B5CF6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2D2D55;
+  --sidebar-accent-foreground: #E8E8F0;
+  --sidebar-border: #33335A;
+  --sidebar-ring: #8B5CF6;
+  --portal: #8B5CF6;
+  --portal-foreground: #FFFFFF;
 
-  --sidebar: #1E1B4B;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #A78BFA;
-  --sidebar-primary-foreground: #0F172A;
-  --sidebar-accent: rgba(255,255,255,0.08);
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: rgba(255,255,255,0.08);
-  --sidebar-ring: #A78BFA;
+  /* ── PreOne Brand Tokens (dark mode) ── */
+  --preone-primary: #818CF8;
+  --preone-primary-light: #A5B4FC;
+  --preone-blue: #22D3EE;
+  --preone-orange: #FCD34D;
+  --preone-pink: #FB7185;
+  --preone-green: #6EE7B7;
 
-  --portal: #A78BFA;
-  --portal-foreground: #0F172A;
+  /* ── Semantic Surface Tokens (dark mode — Midnight Garden) ── */
+  --bg-primary: #1A1A3E;
+  --bg-secondary: #222244;
+  --bg-tertiary: #2A2A4A;
+  --bg-glass: rgba(30, 30, 63, 0.8);
+  --text-primary: #F0F0FF;
+  --text-secondary: #C4C4E0;
+  --text-tertiary: #8888AA;
+  --text-muted: #666688;
+  --border-default: #33335A;
+  --border-light: #2A2A4A;
+
+  /* ── Shadow Tokens (dark mode — glowing, not dark) ── */
+  --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.2);
+
+  /* ── Glass Effects (dark mode) ── */
+  --glass-border: rgba(139, 92, 246, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.05);
+  --glass-blur: 20px;
+
+  /* ── Login Page Tokens (dark mode) ── */
+  --login-card: rgba(26, 26, 62, 0.65);
+  --login-card-border: rgba(139, 92, 246, 0.15);
+  --login-input: rgba(34, 34, 68, 0.6);
+  --login-input-border: #33335A;
+  --login-text: #F0F0FF;
+  --login-muted: #A3A3C2;
+  --login-subtle: #8888AA;
+  --login-label: #C4C4E0;
+  --login-link: #818CF8;
+  --login-divider: #33335A;
+  --login-focus: #8B5CF6;
+  --login-error: #FB7185;
+  --login-tab-bg: #252548;
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #A3A3C2;
+}
+
+.dark [data-portal="admin"] {
+  --admin-bg: #13132B;
+  --admin-surface: #1E1E3F;
+  --admin-surface-2: #262650;
+  --admin-border: #33335A;
+  --admin-border-strong: #44446E;
+  --admin-text: #F0F0FF;
+  --admin-text-muted: #A3A3C2;
+  --admin-text-subtle: #8888AA;
+  --admin-primary: #818CF8;
+  --admin-primary-soft: #2E2B5E;
+  --admin-primary-hover: #6366F1;
+  --admin-success: #34D399;
+  --admin-success-soft: #0D3D2E;
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: #3D3010;
+  --admin-info: #60A5FA;
+  --admin-info-soft: #1A3050;
+  --admin-danger: #FB7185;
+  --admin-danger-soft: #3D1525;
+  --admin-accent: #FB923C;
+  --admin-accent-soft: #3D2510;
+  --admin-error: #FB7185;
+  --admin-error-soft: #3D1525;
 }
 
 .dark [data-portal="teacher"] {
@@ -449,11 +650,10 @@
    PREONE BRAND UTILITIES
    ============================================================ */
 
-/* ── Main Brand Gradient (Purple → Sky Blue) ── */
+/* ── Main Brand Gradient (Purple -> Sky Blue) ── */
 .bg-brand-gradient {
   background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
 }
-
 .bg-brand-gradient-hover {
   background: linear-gradient(135deg, #6D28D9 0%, #0284C7 100%);
 }
@@ -462,7 +662,6 @@
 .bg-portal-gradient {
   background: linear-gradient(135deg, var(--portal-600) 0%, var(--portal-400) 100%);
 }
-
 .bg-portal-gradient-hover {
   background: linear-gradient(135deg, var(--portal-700) 0%, var(--portal-500) 100%);
 }
@@ -485,32 +684,14 @@
   background-clip: text;
 }
 
-/* ── Success Gradient ── */
-.bg-success-gradient {
-  background: linear-gradient(135deg, #22C55E, #84CC16);
-}
+/* ── Success / Pink / Yellow Gradients ── */
+.bg-success-gradient { background: linear-gradient(135deg, #22C55E, #84CC16); }
+.bg-pink-gradient { background: linear-gradient(135deg, #EC4899, #F472B6); }
+.bg-yellow-gradient { background: linear-gradient(135deg, #FACC15, #FB923C); }
 
-/* ── Pink Gradient ── */
-.bg-pink-gradient {
-  background: linear-gradient(135deg, #EC4899, #F472B6);
-}
-
-/* ── Yellow Gradient ── */
-.bg-yellow-gradient {
-  background: linear-gradient(135deg, #FACC15, #FB923C);
-}
-
-/* ── Sidebar Gradient ── */
-.bg-sidebar-gradient {
-  background: linear-gradient(180deg, #5B21B6 0%, #1D4ED8 50%, #0369A1 100%);
-}
-
-/* ── Login Background Gradient ── */
-.bg-login-gradient {
-  background: linear-gradient(135deg, #EDE9FE 0%, #E0F2FE 50%, #F0FDF4 100%);
-}
-
-/* ── Brand Text Gradient ── */
+/* ── Sidebar / Login / Brand Text Gradients ── */
+.bg-sidebar-gradient { background: linear-gradient(180deg, #5B21B6 0%, #1D4ED8 50%, #0369A1 100%); }
+.bg-login-gradient { background: linear-gradient(135deg, #EDE9FE 0%, #E0F2FE 50%, #F0FDF4 100%); }
 .text-brand-gradient {
   background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
   -webkit-background-clip: text;
@@ -518,18 +699,17 @@
   background-clip: text;
 }
 
-/* ── Card Hover Effects ── */
+/* ── Card Hover Effect ── */
 .card-preone {
   background: white;
   border-radius: 24px;
   padding: 24px;
   border: 1px solid #E2E8F0;
-  box-shadow: 0px 8px 24px rgba(15,23,42,0.06);
-  transition: all 300ms ease;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
 }
-
 .card-preone:hover {
-  box-shadow: 0px 20px 40px rgba(15,23,42,0.08);
+  box-shadow: var(--shadow-xl);
   transform: translateY(-4px);
 }
 
@@ -539,20 +719,16 @@
   color: white;
   border-radius: 16px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
   border: none;
   cursor: pointer;
 }
-
 .btn-brand:hover {
   background: linear-gradient(135deg, #6D28D9 0%, #0284C7 100%);
   box-shadow: 0px 8px 24px rgba(124,58,237,0.3);
   transform: translateY(-2px);
 }
-
-.btn-brand:active {
-  transform: translateY(0px);
-}
+.btn-brand:active { transform: translateY(0px); }
 
 /* ── Button: Portal Gradient (auto-scoped per portal) ── */
 .btn-portal {
@@ -560,71 +736,216 @@
   color: white;
   border-radius: 16px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--transition-normal);
   border: none;
   cursor: pointer;
 }
-
 .btn-portal:hover {
   background: linear-gradient(135deg, var(--portal-700) 0%, var(--portal-500) 100%);
   box-shadow: 0px 8px 24px rgba(0,0,0,0.15);
   transform: translateY(-2px);
 }
-
-.btn-portal:active {
-  transform: translateY(0px);
-}
+.btn-portal:active { transform: translateY(0px); }
 
 /* ── Button: Ghost Hover ── */
-.btn-ghost-preone {
-  transition: all 200ms ease;
+.btn-ghost-preone { transition: all var(--transition-normal); }
+.btn-ghost-preone:hover { background: #F1F5F9; }
+.dark .btn-ghost-preone:hover { background: rgba(139, 92, 246, 0.10); }
+
+/* ============================================================
+   LOGIN PAGE — Glassmorphism + Playful-Space Utilities
+   ============================================================ */
+
+.btn-launch {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--transition-fast), box-shadow var(--transition-normal), transform var(--transition-fast);
+}
+.btn-launch:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(123, 44, 191, 0.35);
+}
+.btn-launch:active:not(:disabled) { transform: scale(0.99); }
+.btn-launch:disabled { cursor: not-allowed; opacity: 0.85; }
+
+.login-card-glass {
+  background: var(--login-card);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--login-card-border);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px 0 rgba(91, 33, 182, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme), box-shadow var(--transition-smooth);
+}
+.dark .login-card-glass {
+  box-shadow:
+    0 20px 60px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.btn-ghost-preone:hover {
-  background: #F1F5F9;
+.login-input-focus:focus-within {
+  border-color: var(--login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
+}
+
+.login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(123, 44, 191, 0.08) 50%, rgba(10, 10, 26, 0.22) 100%);
+  transition: background var(--transition-theme);
+}
+.dark .login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(10, 10, 26, 0.55) 0%, rgba(123, 44, 191, 0.35) 100%);
+}
+
+.login-panel-dark, .login-panel-light { background: transparent; }
+
+.login-checkbox-checked {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  border-color: transparent;
+}
+
+.login-theme-transition, .login-theme-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: var(--transition-theme);
+  transition-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-theme-transition, .login-theme-transition * { transition: none; }
+  .btn-launch { transition: none; }
+  .btn-launch:active:not(:disabled) { transform: none; }
+}
+
+/* ── Login Mobile ── */
+.login-page-shell {
+  height: 100vh;
+  height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+}
+@media (max-width: 767px) {
+  .login-page-shell { overflow-y: auto; overflow-x: hidden; }
+}
+@media (max-width: 639px) {
+  .login-card-glass input[type="text"],
+  .login-card-glass input[type="email"],
+  .login-card-glass input[type="password"],
+  .login-card-glass input[type="tel"],
+  .login-card-glass input:not([type]) { font-size: 16px !important; }
+}
+
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pl-safe { padding-left: env(safe-area-inset-left); }
+.pr-safe { padding-right: env(safe-area-inset-right); }
+.mt-safe { margin-top: env(safe-area-inset-top); }
+.mb-safe { margin-bottom: env(safe-area-inset-bottom); }
+
+.login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(10, 10, 26, 0.55) 0%, rgba(10, 10, 26, 0.15) 35%, rgba(10, 10, 26, 0.35) 70%, rgba(10, 10, 26, 0.7) 100%);
+  transition: background var(--transition-theme);
+}
+:is(.dark) .login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(10, 10, 26, 0.65) 0%, rgba(10, 10, 26, 0.25) 35%, rgba(10, 10, 26, 0.45) 70%, rgba(10, 10, 26, 0.8) 100%);
+}
+
+@media (hover: none) {
+  .btn-launch:hover:not(:disabled) { filter: none; box-shadow: none; }
+}
+
+.login-toggle-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+:is(.dark) .login-toggle-pill {
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.login-toggle-pill-btn {
+  color: #B0B0B0;
+  transition: color var(--transition-fast), background var(--transition-normal);
+}
+.login-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(123, 44, 191, 0.35);
+}
+
+.login-brand-wordmark { color: #FFFFFF; }
+:is(.light) .login-brand-wordmark {
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-violet) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@media (max-width: 639px) {
+  .login-demo-cell { min-height: 56px; }
+}
+
+/* ============================================================
+   GLOBAL THEME TOGGLE PILL
+   ============================================================ */
+.theme-toggle-pill {
+  background: rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+.dark .theme-toggle-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.theme-toggle-pill-btn {
+  color: var(--muted-foreground);
+  transition: color var(--transition-fast), background var(--transition-normal);
+}
+.theme-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(123, 44, 191, 0.3);
+}
+.theme-toggle-pill-btn[data-active="true"]:is(.dark *) {
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-violet) 100%);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+@media (max-height: 680px) and (max-width: 767px) {
+  .login-card-glass { padding: 16px !important; border-radius: 16px !important; }
+  .login-card-glass .btn-launch { height: 44px !important; }
 }
 
 /* ── Floating Action Element ── */
-.floating-shadow {
-  box-shadow: 0px 30px 60px rgba(15,23,42,0.10);
-}
+.floating-shadow { box-shadow: 0px 30px 60px rgba(15,23,42,0.10); }
 
 /* ── Stat Card Gradient Backgrounds ── */
-.stat-card-violet {
-  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
-  border: 1px solid #DDD6FE;
-}
+.stat-card-violet { background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%); border: 1px solid #DDD6FE; }
+.stat-card-sky { background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border: 1px solid #BAE6FD; }
+.stat-card-emerald { background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 1px solid #A7F3D0; }
+.stat-card-rose { background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border: 1px solid #FECDD3; }
+.stat-card-amber { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1px solid #FDE68A; }
+.stat-card-indigo { background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border: 1px solid #C7D2FE; }
+.stat-card-portal { background: linear-gradient(135deg, var(--portal-50) 0%, var(--portal-100) 100%); border: 1px solid var(--portal-200); }
 
-.stat-card-sky {
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-  border: 1px solid #BAE6FD;
-}
-
-.stat-card-emerald {
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-  border: 1px solid #A7F3D0;
-}
-
-.stat-card-rose {
-  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
-  border: 1px solid #FECDD3;
-}
-
-.stat-card-amber {
-  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
-  border: 1px solid #FDE68A;
-}
-
-.stat-card-indigo {
-  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
-  border: 1px solid #C7D2FE;
-}
-
-/* ── Portal-scoped stat card ── */
-.stat-card-portal {
-  background: linear-gradient(135deg, var(--portal-50) 0%, var(--portal-100) 100%);
-  border: 1px solid var(--portal-200);
-}
+/* ── Stat Card Gradient Backgrounds (Dark Mode — Midnight Garden) ── */
+.dark .stat-card-violet { background: linear-gradient(135deg, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.04) 100%); border-color: rgba(139, 92, 246, 0.20); }
+.dark .stat-card-sky { background: linear-gradient(135deg, rgba(56, 189, 248, 0.10) 0%, rgba(56, 189, 248, 0.04) 100%); border-color: rgba(56, 189, 248, 0.20); }
+.dark .stat-card-emerald { background: linear-gradient(135deg, rgba(52, 211, 153, 0.10) 0%, rgba(52, 211, 153, 0.04) 100%); border-color: rgba(52, 211, 153, 0.20); }
+.dark .stat-card-rose { background: linear-gradient(135deg, rgba(251, 113, 133, 0.10) 0%, rgba(251, 113, 133, 0.04) 100%); border-color: rgba(251, 113, 133, 0.20); }
+.dark .stat-card-amber { background: linear-gradient(135deg, rgba(251, 191, 36, 0.10) 0%, rgba(251, 191, 36, 0.04) 100%); border-color: rgba(251, 191, 36, 0.20); }
+.dark .stat-card-indigo { background: linear-gradient(135deg, rgba(129, 140, 248, 0.10) 0%, rgba(129, 140, 248, 0.04) 100%); border-color: rgba(129, 140, 248, 0.20); }
+.dark .stat-card-portal { background: linear-gradient(135deg, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.04) 100%); border-color: rgba(139, 92, 246, 0.20); }
 
 /* ── Space-themed Decorative Elements ── */
 .space-dots {
@@ -642,255 +963,84 @@
 }
 
 /* ── Status Badges ── */
-.badge-present {
-  background: #DCFCE7;
-  color: #166534;
-  border-radius: 12px;
-}
+.badge-present { background: #DCFCE7; color: #166534; border-radius: 12px; }
+.badge-absent { background: #FEE2E2; color: #991B1B; border-radius: 12px; }
+.badge-pending { background: #FEF3C7; color: #92400E; border-radius: 12px; }
+.badge-paid { background: #D1FAE5; color: #065F46; border-radius: 12px; }
 
-.badge-absent {
-  background: #FEE2E2;
-  color: #991B1B;
-  border-radius: 12px;
-}
+/* ── Status Badges (Dark Mode — Midnight Garden) ── */
+.dark .badge-present { background: rgba(52, 211, 153, 0.15); color: #6EE7B7; }
+.dark .badge-absent { background: rgba(251, 113, 133, 0.15); color: #FCA5A5; }
+.dark .badge-pending { background: rgba(251, 191, 36, 0.15); color: #FDE68A; }
+.dark .badge-paid { background: rgba(52, 211, 153, 0.15); color: #6EE7B7; }
 
-.badge-pending {
-  background: #FEF3C7;
-  color: #92400E;
-  border-radius: 12px;
-}
+/* ── Animations ── */
+@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
 
-.badge-paid {
-  background: #D1FAE5;
-  color: #065F46;
-  border-radius: 12px;
-}
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+.animate-float { animation: float 4s ease-in-out infinite; }
 
-/* ── Animated Star (Space Theme) ── */
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
+@keyframes orbit { from { transform: rotate(0deg) translateX(20px) rotate(0deg); } to { transform: rotate(360deg) translateX(20px) rotate(-360deg); } }
+.animate-orbit { animation: orbit 8s linear infinite; }
 
-.animate-twinkle {
-  animation: twinkle 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-@keyframes orbit {
-  from { transform: rotate(0deg) translateX(20px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
-}
-
-.animate-orbit {
-  animation: orbit 8s linear infinite;
-}
-
-/* ── Custom Scrollbar (Brand-styled) ── */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
+/* ── Custom Scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #44446E; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #5555AA; }
 
 /* ── Table Row Hover ── */
-.table-row-preone {
-  transition: all 200ms ease;
-}
-.table-row-preone:hover {
-  background: #F8FAFC;
-}
+.table-row-preone { transition: all var(--transition-normal); }
+.table-row-preone:hover { background: #F8FAFC; }
+.dark .table-row-preone:hover { background: rgba(139, 92, 246, 0.06); }
 
-/* ── Focus Ring ── */
-.focus-ring-preone:focus-visible {
-  outline: 2px solid #7C3AED;
-  outline-offset: 2px;
-}
-
-/* ── Focus Ring (Portal-scoped) ── */
-.focus-ring-portal:focus-visible {
-  outline: 2px solid var(--portal-500);
-  outline-offset: 2px;
-}
+/* ── Focus Rings ── */
+.focus-ring-preone:focus-visible { outline: 2px solid #7C3AED; outline-offset: 2px; }
+.focus-ring-portal:focus-visible { outline: 2px solid var(--portal-500); outline-offset: 2px; }
+.dark .focus-ring-preone:focus-visible { outline-color: #8B5CF6; }
+.dark .focus-ring-portal:focus-visible { outline-color: #8B5CF6; }
 
 /* ============================================================
-   RESPONSIVE UTILITIES — PreOne
+   RESPONSIVE UTILITIES
    ============================================================ */
 
-/* ── Mobile-first touch targets (min 44px for accessibility) ── */
-@media (max-width: 767px) {
-  /* Ensure buttons have adequate touch targets on mobile */
-  button, [role="button"] {
-    min-height: 44px;
-  }
-
-  /* Smaller stat card text on mobile */
-  .stat-card-mobile {
-    padding: 12px;
-  }
-
-  .stat-card-mobile p:last-child {
-    font-size: 11px;
-  }
-
-  /* Reduce card border radius on mobile for more content space */
-  .card-mobile-sm {
-    border-radius: 16px;
-  }
-
-  /* Full-width inputs on mobile */
-  .input-mobile-full {
-    width: 100%;
-  }
-
-  /* Reduce heading sizes on mobile */
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1.125rem; }
-
-  /* Prevent horizontal overflow */
-  .overflow-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+@media (max-width: 639px) {
+  [data-slot="preone-card"] { border-radius: 16px !important; }
+  [data-slot="preone-card-content"] { padding: 16px !important; }
+  .module-card-icon { transform: scale(0.7); transform-origin: center; }
 }
 
-/* ── Tablet adjustments (768px–1023px) ── */
+.page-heading { font-size: 22px; }
+@media (min-width: 640px) { .page-heading { font-size: 28px; } }
+
+.section-heading { font-size: 18px; }
+@media (min-width: 640px) { .section-heading { font-size: 20px; } }
+
+@media (max-width: 767px) {
+  button, [role="button"] { min-height: 44px; }
+  .stat-card-mobile { padding: 12px; }
+  .stat-card-mobile p:last-child { font-size: 11px; }
+  .card-mobile-sm { border-radius: 16px; }
+  .input-mobile-full { width: 100%; }
+  .overflow-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  [role="dialog"] { max-height: 90vh; margin: auto 0; }
+}
+
 @media (min-width: 768px) and (max-width: 1023px) {
-  /* Comfortable spacing for tablets */
-  .tablet-spacing {
-    padding: 20px;
-  }
+  .tablet-spacing { padding: 20px; }
 }
 
-/* ── Prevent layout shift when sidebar opens/closes ── */
-.sidebar-transition {
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
+.sidebar-transition { transition: width var(--transition-smooth); }
 
-/* ── Mobile sheet overlay adjustments ── */
-@media (max-width: 767px) {
-  /* Make dialogs full-screen on mobile */
-  [role="dialog"] {
-    max-height: 90vh;
-    margin: auto 0;
-  }
-}
+.responsive-chart { width: 100%; min-height: 200px; }
+@media (max-width: 767px) { .responsive-chart { min-height: 180px; } }
 
-/* ── Responsive chart containers ── */
-.responsive-chart {
-  width: 100%;
-  min-height: 200px;
-}
-
-@media (max-width: 767px) {
-  .responsive-chart {
-    min-height: 180px;
-  }
-}
-
-/* ── Safe area insets for notched devices ── */
 @supports (padding: env(safe-area-inset-bottom)) {
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-}
-
-/* ============================================================
-   PREONE LIVING UNIVERSE — Refined Design System
-   Brand Primary: Indigo-Purple (#6366F1)
-   Dark Mode: Cosmic Deep Space (#0a0a1a)
-   ============================================================ */
-
-:root {
-  /* ── Living Universe Brand Tokens ── */
-  --preone-primary: #6366F1;
-  --preone-primary-dark: #4F46E5;
-  --preone-primary-light: #818CF8;
-  --preone-primary-50: #EEF2FF;
-  --preone-primary-100: #E0E7FF;
-  
-  --preone-blue: #0096C7;
-  --preone-orange: #FFB700;
-  --preone-pink: #FF4D6D;
-  --preone-green: #34D399;
-  --preone-coral: #FB7185;
-  
-  /* ── Warm-tinted Neutrals ── */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F9FAFB;
-  --bg-tertiary: #F3F4F6;
-  --text-primary: #1F2937;
-  --text-secondary: #4B5563;
-  --text-tertiary: #6B7280;
-  --text-muted: #9CA3AF;
-  --border-default: #E5E7EB;
-  --border-light: #F3F4F6;
-  
-  /* ── Typography Scale ── */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.5rem;
-  
-  /* ── Font Families ── */
-  --font-primary: var(--font-poppins), -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-secondary: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
-  --font-display: var(--font-outfit), sans-serif;
-}
-
-/* ── Dark Cosmic Mode (Living Universe) ── */
-.dark {
-  /* Deep Space Backgrounds */
-  --bg-primary: #0a0a1a;
-  --bg-secondary: #121234;
-  --bg-tertiary: #1a1a3a;
-  --bg-glass: rgba(18, 18, 52, 0.7);
-  
-  /* Cosmic Accents */
-  --preone-primary: #6c5ce7;
-  --preone-primary-light: #a29bfe;
-  --preone-blue: #00d2d3;
-  --preone-orange: #fdcb6e;
-  --preone-pink: #ff7675;
-  --preone-green: #55efc4;
-  
-  /* Glass Effects */
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --glass-blur: 20px;
-  
-  /* Text overrides for dark */
-  --text-primary: #FFFFFF;
-  --text-secondary: #b2bec3;
-  --text-tertiary: #636e72;
-  --text-muted: #4a5568;
-  --border-default: #2d2d4a;
-  --border-light: #1a1a3a;
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-top { padding-top: env(safe-area-inset-top); }
 }
 
 /* ============================================================
@@ -902,27 +1052,23 @@
   border: 1px solid var(--border-default);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
 }
-
 .preone-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
-
 .dark .preone-card {
-  background: var(--bg-secondary);
-  border-color: var(--border-default);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.05);
 }
-
 .dark .preone-card:hover {
-  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.15);
-  border-color: rgba(108, 92, 231, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.25);
 }
 
-/* Hero Card — Gradient background with planet decoration */
 .preone-hero-card {
   border-radius: 20px;
   background: linear-gradient(135deg, var(--preone-primary), var(--preone-primary-light));
@@ -932,7 +1078,9 @@
   overflow: hidden;
   position: relative;
 }
-
+.dark .preone-hero-card {
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.30), 0 0 0 1px rgba(139, 92, 246, 0.10);
+}
 .preone-hero-card::after {
   content: '';
   position: absolute;
@@ -945,7 +1093,6 @@
   box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.05);
 }
 
-/* Achievement Card — Golden border */
 .preone-achievement-card {
   position: relative;
   border: 1px solid rgba(252, 211, 77, 0.3);
@@ -953,13 +1100,11 @@
   border-radius: 16px;
   padding: 20px;
 }
-
 .dark .preone-achievement-card {
-  background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(253, 203, 110, 0.05));
-  border-color: rgba(253, 203, 110, 0.2);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(251, 191, 36, 0.03));
+  border-color: rgba(251, 191, 36, 0.18);
 }
 
-/* Glass Card — Dark mode glass morphism */
 .preone-glass-card {
   background: var(--bg-primary);
   border: 1px solid var(--border-default);
@@ -967,7 +1112,6 @@
   padding: 20px;
   backdrop-filter: blur(0px);
 }
-
 .dark .preone-glass-card {
   background: var(--bg-glass);
   border-color: var(--glass-border);
@@ -976,7 +1120,7 @@
 }
 
 /* ============================================================
-   PREONE BUTTON SYSTEM — Living Universe
+   PREONE BUTTON SYSTEM
    ============================================================ */
 
 .preone-btn-primary {
@@ -987,20 +1131,13 @@
   font-weight: 600;
   font-size: 14px;
   font-family: var(--font-primary);
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   border: none;
   cursor: pointer;
 }
-
-.preone-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.preone-btn-primary:active {
-  transform: scale(0.97);
-}
+.preone-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+.preone-btn-primary:active { transform: scale(0.97); }
 
 .preone-btn-secondary {
   background: transparent;
@@ -1012,12 +1149,10 @@
   font-size: 14px;
   font-family: var(--font-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
-
-.preone-btn-secondary:hover {
-  background: var(--preone-primary-50);
-}
+.preone-btn-secondary:hover { background: var(--preone-primary-50); }
+.dark .preone-btn-secondary:hover { background: rgba(139, 92, 246, 0.12); }
 
 .preone-btn-icon {
   width: 40px;
@@ -1030,23 +1165,18 @@
   color: var(--text-tertiary);
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
-
-.preone-btn-icon:hover {
-  background: var(--preone-primary-50);
-  color: var(--preone-primary);
-}
+.preone-btn-icon:hover { background: var(--preone-primary-50); color: var(--preone-primary); }
+.dark .preone-btn-icon:hover { background: rgba(139, 92, 246, 0.12); color: #A5B4FC; }
 
 /* ============================================================
    AURORA BACKGROUND — Dark Mode Only
    ============================================================ */
 
-.dark body {
-  background: #0a0a1a;
-  position: relative;
-}
+.dark body { background: var(--background); position: relative; }
 
+/* ── Midnight Garden Aurora — subtle, colorful, alive ── */
 .dark .aurora-bg::before {
   content: '';
   position: fixed;
@@ -1054,9 +1184,10 @@
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 210, 211, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(255, 118, 117, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 15% 50%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 85%, rgba(52, 211, 153, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(244, 114, 182, 0.04) 0%, transparent 40%);
   animation: aurora-shift 25s ease-in-out infinite alternate;
 }
 
@@ -1069,142 +1200,52 @@
 .dark .aurora-bg main,
 .dark .aurora-bg header,
 .dark .aurora-bg aside,
-.dark .aurora-bg nav {
-  position: relative;
-  z-index: 1;
-}
+.dark .aurora-bg nav { position: relative; z-index: 1; }
 
 /* ============================================================
    TYPOGRAPHY — Living Universe
    Poppins for headings, Inter for body
    ============================================================ */
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-primary);
-  color: var(--text-primary);
-}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-primary); color: var(--text-primary); }
+body, p, span, div { font-family: var(--font-secondary); }
+.font-display { font-family: var(--font-display); }
 
-body, p, span, div {
-  font-family: var(--font-secondary);
-}
-
-.font-display {
-  font-family: var(--font-display);
-}
-
-.text-hero {
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  font-family: var(--font-primary);
-  line-height: 1.2;
-}
-
-.text-page-title {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  font-family: var(--font-primary);
-}
-
-.text-section-title {
-  font-size: var(--text-xl);
-  font-weight: 600;
-  font-family: var(--font-primary);
-}
-
-.text-card-title {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  font-family: var(--font-primary);
-}
-
-.text-body {
-  font-size: var(--text-base);
-  font-weight: 400;
-  color: var(--text-secondary);
-}
-
-.text-label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-tertiary);
-}
-
-.text-badge {
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--text-muted);
-}
+.text-hero { font-size: var(--text-4xl); font-weight: 700; font-family: var(--font-primary); line-height: 1.2; }
+.text-page-title { font-size: var(--text-2xl); font-weight: 700; font-family: var(--font-primary); }
+.text-section-title { font-size: var(--text-xl); font-weight: 600; font-family: var(--font-primary); }
+.text-card-title { font-size: var(--text-lg); font-weight: 600; font-family: var(--font-primary); }
+.text-body { font-size: var(--text-base); font-weight: 400; color: var(--text-secondary); }
+.text-label { font-size: var(--text-sm); font-weight: 500; color: var(--text-tertiary); }
+.text-badge { font-size: var(--text-xs); font-weight: 500; color: var(--text-muted); }
 
 /* ============================================================
    EMOTIONAL TIMELINE — Story Circles
    ============================================================ */
 
 .story-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  padding: 2px;
+  width: 56px; height: 56px; border-radius: 50%; padding: 2px;
   background: linear-gradient(to top right, #6c5ce7, #ff7675, #fdcb6e);
 }
-
-.story-circle-viewed {
-  background: #d1d5db;
-}
-
-.dark .story-circle-viewed {
-  background: #4a5568;
-}
-
-.story-circle-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 2px solid white;
-  object-fit: cover;
-}
-
-.dark .story-circle-inner {
-  border-color: #121234;
-}
+.story-circle-viewed { background: #d1d5db; }
+.dark .story-circle-viewed { background: #4a5568; }
+.story-circle-inner { width: 100%; height: 100%; border-radius: 50%; border: 2px solid white; object-fit: cover; }
+.dark .story-circle-inner { border-color: var(--bg-secondary); }
 
 /* ============================================================
    SIDEBAR — Living Universe Refined
    ============================================================ */
 
 .preone-sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; border-radius: 10px;
+  font-size: 14px; font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   cursor: pointer;
 }
-
-.preone-sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.preone-sidebar-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-weight: 600;
-}
-
-.dark .preone-sidebar-item {
-  color: var(--text-secondary);
-}
-
-.dark .preone-sidebar-item:hover {
-  background: rgba(108, 92, 231, 0.1);
-  color: var(--preone-primary);
-}
-
-.dark .preone-sidebar-item.active {
-  background: rgba(108, 92, 231, 0.15);
-  color: var(--preone-primary);
-}
+.preone-sidebar-item:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+.preone-sidebar-item.active { background: rgba(255, 255, 255, 0.2); color: white; font-weight: 600; }
+.dark .preone-sidebar-item { color: var(--text-secondary); }
+.dark .preone-sidebar-item:hover { background: rgba(139, 92, 246, 0.1); color: var(--preone-primary); }
+.dark .preone-sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: var(--preone-primary); }
