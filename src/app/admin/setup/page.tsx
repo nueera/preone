@@ -90,7 +90,7 @@ const SETUP_MODULES: SetupModule[] = [
     key: 'group',
     title: 'Group',
     description: 'Manage groups for different age categories in your school.',
-    href: '/admin/setup/classes?tab=groups',
+    href: '/admin/setup/group',
     icon: Users,
     statusIcon: Users,
     statusText: '5 Groups',
