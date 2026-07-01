@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PreOne — Architecture Docs</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
+<style>
+  :root{
+    --bg:#eceff4; --surface:#fff; --ink:#151a23; --muted:#5a6474; --faint:#8b94a3;
+    --line:#dde2ea; --accent:#4f46e5; --accent-2:#0ea5e9;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(20,26,35,.06),0 10px 30px rgba(20,26,35,.10);
+  }
+  *{box-sizing:border-box} body{margin:0}
+  body{font-family:var(--sans); color:var(--ink); background:var(--bg); line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px; margin:0 auto; padding:56px 22px 70px}
+  .kicker{font-size:12.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--accent)}
+  h1{font-size:clamp(28px,5vw,40px); margin:8px 0 10px; letter-spacing:-.02em}
+  .lede{font-size:17.5px; color:var(--muted); max-width:620px; margin:0}
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:34px}
+  @media(max-width:680px){.cards{grid-template-columns:1fr}}
+  .card{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:24px; box-shadow:var(--shadow); text-decoration:none; color:inherit; transition:transform .16s ease, box-shadow .16s ease}
+  .card:hover{transform:translateY(-3px); box-shadow:0 6px 14px rgba(20,26,35,.08),0 18px 40px rgba(20,26,35,.14)}
+  .ico{width:52px; height:52px; border-radius:14px; display:grid; place-items:center; margin-bottom:16px; box-shadow:0 6px 16px rgba(79,70,229,.28)}
+  .ico svg{width:28px; height:28px; stroke:#fff; fill:none; stroke-width:1.7}
+  .ico.a{background:linear-gradient(140deg,#8E68D6,#6A47B0)} .ico.b{background:linear-gradient(140deg,var(--accent),var(--accent-2))}
+  .card h2{font-size:20px; margin:0 0 6px; letter-spacing:-.01em}
+  .card p{font-size:14.5px; color:var(--muted); margin:0 0 18px; flex:1}
+  .go{font-size:14px; font-weight:700; color:var(--accent); display:inline-flex; align-items:center; gap:6px}
+  .go svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+  .tags{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px}
+  .tag{font-size:11px; font-weight:600; color:var(--faint); background:#f2f4f8; border:1px solid var(--line); padding:2px 9px; border-radius:999px}
+  .note{margin-top:30px; font-size:13px; color:var(--faint); border-top:1px solid var(--line); padding-top:16px}
+  .note b{color:var(--muted)}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="kicker">PreOne · Internal Documentation</div>
+    <h1>Architecture &amp; Access Docs</h1>
+    <p class="lede">Two living references generated straight from the PreOne codebase — a guided tour of who can do what, and the full data model.</p>
+
+    <div class="cards">
+      <a class="card" href="./roles.html">
+        <span class="ico a"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <div class="tags"><span class="tag">RBAC</span><span class="tag">Security</span><span class="tag">4 roles</span></div>
+        <h2>Who Holds Which Key</h2>
+        <p>A first-principles tour of every role — Admin, Task Master, Teacher, Parent — what each can access, how it's enforced, and where the doors sit propped open.</p>
+        <span class="go">Open the roles tour <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="card" href="./erd.html">
+        <span class="ico b"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-6"/><path d="M4.5 11.5v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-6"/></svg></span>
+        <div class="tags"><span class="tag">ERD</span><span class="tag">65 entities</span><span class="tag">Prisma</span></div>
+        <h2>Entity Relationship Diagram</h2>
+        <p>The complete data model — all 65 entities, ~70 relationships in crow's-foot notation, a domain index, and the copyable Mermaid source.</p>
+        <span class="go">Open the ERD <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+
+    <p class="note"><b>Generated from the codebase.</b> Reflects <code>prisma/schema.prisma</code>, <code>src/lib/auth.ts</code>, <code>src/middleware.ts</code> and <code>src/lib/api-auth.ts</code> as of 2026-07-01. Regenerate when the schema or auth layer changes.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<title>PreOne Playground — Who Holds Which Key</title>
+<style>
+  :root{
+    --paper:#FBF7F0; --paper-2:#FDFBF6; --card:#FFFFFF;
+    --ink:#332F3D; --ink-2:#6E6979; --ink-3:#9A95A3; --line:#EDE7DC; --line-2:#F4EFE6;
+
+    --plum:#7C5AC2; --plum-ink:#5B3E96; --plum-bg:#F2ECFB; --plum-g1:#8E68D6; --plum-g2:#6A47B0;
+    --honey:#DE9A2C; --honey-ink:#A16B12; --honey-bg:#FBF0D9; --honey-g1:#F0B455; --honey-g2:#D98E2E;
+    --teal:#2FA6BE; --teal-ink:#1C7C90; --teal-bg:#E3F2F5; --teal-g1:#45B8CE; --teal-g2:#2790A6;
+    --leaf:#57A267; --leaf-ink:#3C7749; --leaf-bg:#E8F2E9; --leaf-g1:#6FB87C; --leaf-g2:#4C9159;
+
+    --danger:#C9504B; --amber:#B77A16; --info:#3F7BA5;
+    --danger-bg:#FBE9E7; --amber-bg:#FBF0DB; --info-bg:#E7F0F7;
+
+    --shadow-sm:0 1px 2px rgba(51,47,61,.05), 0 2px 6px rgba(51,47,61,.05);
+    --shadow:0 2px 4px rgba(51,47,61,.04), 0 12px 30px rgba(51,47,61,.09);
+    --r-card:22px; --r-sm:14px;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --round:ui-rounded,"SF Pro Rounded","Segoe UI",var(--sans);
+  }
+  *{box-sizing:border-box}
+  body{margin:0}
+  .wrap{
+    font-family:var(--sans); color:var(--ink); -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1100px 520px at 50% -220px, #FCEFE0 0%, rgba(252,239,224,0) 70%),
+      linear-gradient(180deg,var(--paper-2),var(--paper));
+    line-height:1.65; padding-bottom:70px; overflow-x:hidden;
+  }
+  .inner{max-width:940px; margin:0 auto; padding:0 24px}
+  h1,h2,h3,h4,.round{font-family:var(--round); letter-spacing:-.01em}
+  h1,h2,h3,h4{margin:0; line-height:1.18; font-weight:800}
+  p{margin:.65em 0}
+  code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Consolas,monospace; font-size:.84em;
+    background:#F4EFE4; border:1px solid #EBE3D3; padding:.5px 6px; border-radius:6px; color:#7A6636; white-space:nowrap}
+  .ic{width:1em; height:1em; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; display:inline-block; vertical-align:-.14em}
+
+  /* ---------- emblem (custom app-icon style) ---------- */
+  .emblem{border-radius:30%; display:grid; place-items:center; color:#fff; box-shadow:var(--shadow-sm); flex:none;
+    background-image:linear-gradient(150deg, var(--g1), var(--g2)); position:relative; overflow:hidden}
+  .emblem::after{content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%); mix-blend-mode:soft-light}
+  .emblem .ic{stroke:#fff; width:56%; height:56%; stroke-width:1.8}
+  .em-plum{--g1:var(--plum-g1);--g2:var(--plum-g2)} .em-honey{--g1:var(--honey-g1);--g2:var(--honey-g2)}
+  .em-teal{--g1:var(--teal-g1);--g2:var(--teal-g2)} .em-leaf{--g1:var(--leaf-g1);--g2:var(--leaf-g2)}
+  .em-ink{--g1:#6E6979;--g2:#514D5B} .em-danger{--g1:#E08079;--g2:#C9504B}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center; padding:64px 24px 8px}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-family:var(--round); font-weight:700; font-size:12.5px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--plum-ink); background:#fff; border:1px solid var(--line);
+    padding:7px 14px 7px 10px; border-radius:999px; box-shadow:var(--shadow-sm)}
+  .eyebrow .emblem{width:22px; height:22px; border-radius:33%}
+  .hero h1{font-size:clamp(34px,6.6vw,58px); margin:20px 0 12px; color:var(--ink)}
+  .hero h1 .hl{color:var(--plum)}
+  .hero .sub{font-size:clamp(16px,2.3vw,20px); color:var(--ink-2); max-width:620px; margin:0 auto}
+  .hero-emblems{display:flex; justify-content:center; gap:14px; margin:30px 0 6px; flex-wrap:wrap}
+  .hero-emblems .emblem{width:60px; height:60px}
+
+  .scallop{display:block; width:100%; height:40px; margin-top:22px}
+
+  /* ---------- section scaffolding ---------- */
+  section{padding:30px 0}
+  .kicker{display:flex; align-items:center; gap:8px; font-family:var(--round); font-weight:700; font-size:12.5px;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3)}
+  .kicker .dot{width:7px; height:7px; border-radius:50%; background:var(--honey)}
+  h2.sec{font-size:clamp(25px,4.4vw,36px); margin:8px 0 6px}
+  .lead{font-size:18.5px; color:var(--ink)}
+  .muted{color:var(--ink-2)}
+
+  .callout{display:flex; gap:14px; align-items:flex-start; background:#FFFDF7; border:1px solid var(--line);
+    border-left:4px solid var(--honey); border-radius:var(--r-sm); padding:15px 18px; font-size:15.5px; margin:18px 0}
+  .callout .emblem{width:34px;height:34px;border-radius:32%}
+
+  .rule{display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 4px}
+  .rule span{height:1px; width:46px; background:var(--line)} .rule b{width:6px;height:6px;border-radius:50%;background:var(--line)}
+
+  /* ---------- three gates ---------- */
+  .gates{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:22px}
+  .gate{background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); padding:20px; box-shadow:var(--shadow-sm); position:relative}
+  .gate .step{position:absolute; top:16px; right:16px; font-family:var(--round); font-weight:800; font-size:13px; color:var(--ink-3)}
+  .gate .emblem{width:46px; height:46px; margin-bottom:12px}
+  .gate h4{font-size:16.5px; margin-bottom:5px}
+  .gate p{font-size:14px; color:var(--ink-2); margin:0}
+
+  /* ---------- hierarchy ladder ---------- */
+  .ladder{margin:24px 0 6px; display:flex; flex-direction:column; gap:10px}
+  .rung{display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line);
+    border-radius:16px; padding:12px 16px; box-shadow:var(--shadow-sm); max-width:100%}
+  .rung .emblem{width:40px; height:40px}
+  .rung .lbl{font-family:var(--round); font-weight:800; font-size:16px}
+  .rung .desc{color:var(--ink-2); font-size:13.5px}
+  .rung .w{margin-left:auto; font-family:var(--round); font-weight:800; font-size:13px; padding:4px 11px; border-radius:999px; white-space:nowrap}
+  .r1{width:100%} .r2{width:88%} .r3{width:76%} .r4{width:64%}
+  @media(max-width:560px){.r2,.r3,.r4{width:100%}}
+
+  /* ---------- role cards ---------- */
+  .role{background:var(--card); border:1px solid var(--line); border-radius:26px; box-shadow:var(--shadow); overflow:hidden; margin:20px 0}
+  .role .head{display:flex; align-items:center; gap:16px; padding:22px 24px; border-bottom:1px solid var(--line-2)}
+  .role .head .emblem{width:60px; height:60px}
+  .role .head h3{font-size:23px}
+  .role .head .meta{font-size:13.5px; color:var(--ink-2); margin-top:3px}
+  .role .head .w{margin-left:auto; font-family:var(--round); font-weight:800; font-size:12.5px; padding:6px 13px; border-radius:999px; border:1.5px solid; white-space:nowrap}
+  .role .content{padding:20px 24px 24px}
+  .role h4{font-size:12.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3); margin:18px 0 8px; display:flex; align-items:center; gap:7px}
+  .role h4:first-child{margin-top:0}
+  .role p{font-size:15.5px; margin:.4em 0}
+  .role ul{margin:.3em 0; padding-left:6px; list-style:none; font-size:15.5px}
+  .role li{margin:6px 0; padding-left:26px; position:relative}
+  .role li::before{content:""; position:absolute; left:2px; top:.5em; width:12px; height:12px; border-radius:4px; background:var(--accent-bg); border:1.5px solid var(--accent)}
+  .chips{display:flex; flex-wrap:wrap; gap:7px}
+  .chip{font-size:12.5px; font-family:ui-monospace,Consolas,monospace; padding:5px 11px; border-radius:9px; background:var(--accent-bg); color:var(--accent-ink); border:1px solid color-mix(in srgb, var(--accent) 22%, transparent)}
+  .role.admin{--accent:var(--plum);--accent-ink:var(--plum-ink);--accent-bg:var(--plum-bg)}
+  .role.task{--accent:var(--honey);--accent-ink:var(--honey-ink);--accent-bg:var(--honey-bg)}
+  .role.teacher{--accent:var(--teal);--accent-ink:var(--teal-ink);--accent-bg:var(--teal-bg)}
+  .role.parent{--accent:var(--leaf);--accent-ink:var(--leaf-ink);--accent-bg:var(--leaf-bg)}
+  .role .head{background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 8%, #fff), #fff)}
+  .role .w{color:var(--accent-ink); border-color:color-mix(in srgb,var(--accent) 40%, transparent)}
+
+  /* ---------- vulnerabilities ---------- */
+  .vuln{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px 22px; margin:16px 0; box-shadow:var(--shadow-sm); position:relative; overflow:hidden}
+  .vuln::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--sv)}
+  .vuln.crit{--sv:var(--danger)} .vuln.high{--sv:var(--amber)} .vuln.med{--sv:var(--info)}
+  .vuln .hd{display:flex; align-items:center; gap:11px; flex-wrap:wrap}
+  .vuln .emblem{width:38px; height:38px; border-radius:32%}
+  .vuln h4{font-size:18px}
+  .sev{font-family:var(--round); font-weight:800; font-size:10.5px; letter-spacing:.06em; color:#fff; padding:4px 10px; border-radius:999px}
+  .sev.crit{background:var(--danger)} .sev.high{background:var(--amber)} .sev.med{background:var(--info)}
+  .vuln .loc{width:100%; font-size:12.5px; color:var(--ink-3); margin:8px 0 2px}
+  .vuln p{font-size:15px; margin:.5em 0}
+  .fix{display:flex; gap:10px; align-items:flex-start; background:var(--leaf-bg); border-radius:12px; padding:11px 14px; font-size:14.5px; margin-top:12px; color:#345E3E}
+  .fix .ic{color:var(--leaf-ink); margin-top:3px; flex:none; font-size:16px}
+  details{margin-top:10px}
+  summary{cursor:pointer; font-size:13px; font-family:var(--round); font-weight:700; color:var(--info); list-style:none; display:inline-flex; align-items:center; gap:6px}
+  summary::-webkit-details-marker{display:none}
+  summary .ic{font-size:15px; transition:transform .2s}
+  details[open] summary .ic{transform:rotate(90deg)}
+  details pre{background:#2B2732; color:#EDE6F5; border-radius:12px; padding:13px 15px; overflow-x:auto; font-size:12.5px; line-height:1.6; margin-top:10px;
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  details pre .c{color:#9B93B5}
+
+  /* ---------- new roles ---------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:14px; margin-top:20px}
+  .nr{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:var(--shadow-sm)}
+  .nr .emblem{width:42px; height:42px; margin-bottom:11px}
+  .nr h4{font-size:16px; margin-bottom:4px}
+  .nr p{font-size:13.5px; color:var(--ink-2); margin:0}
+
+  /* ---------- table ---------- */
+  .tablecard{background:var(--card); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-sm); overflow:hidden; margin-top:20px}
+  .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:560px}
+  th,td{padding:13px 16px; text-align:left; border-bottom:1px solid var(--line-2)}
+  th{font-family:var(--round); font-weight:800; font-size:12.5px; color:var(--ink-2); background:#FBF7EF; text-transform:uppercase; letter-spacing:.04em}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:#FDFBF6}
+  td .rc{display:inline-flex; align-items:center; gap:9px; font-weight:600}
+  td .rc .emblem{width:26px; height:26px; border-radius:34%}
+
+  .foot{margin-top:40px; padding-top:22px; border-top:1px solid var(--line); color:var(--ink-3); font-size:13px; text-align:center}
+  .foot code{font-size:11.5px}
+  @media(max-width:600px){ .gates{grid-template-columns:1fr} .hero{padding-top:48px} }
+</style>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l3.5 3L12 5l5.5 6L21 8l-1.5 10.5A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5L3 8z"/><path d="M8.5 16h7"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 11h6M9 15h4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10.5 5 8 4.5 4 5v13c4-.5 6.5 0 8 1.5 1.5-1.5 4-2 8-1.5V5c-4-.5-6.5 0-8 1.5z"/><path d="M12 6.5V20"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.6-7-9.5A3.8 3.8 0 0 1 12 7a3.8 3.8 0 0 1 7 3.5C19 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M16 16l2-2M19 19l1.5-1.5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15" r="1.3"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 15.5H3L12 4z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-blocks" viewBox="0 0 24 24"><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/><rect x="8.5" y="4" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M4 12.5V5a1 1 0 0 1 1-1h7.5L20 11.5a2 2 0 0 1 0 2.8l-5.7 5.7a2 2 0 0 1-2.8 0L4 12.5z"/><circle cx="8.5" cy="8.5" r="1.3"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="5" ry="2.6"/><path d="M4 7v5c0 1.4 2.2 2.6 5 2.6s5-1.2 5-2.6V7"/><path d="M10 15.5c.6 2 2.9 3.1 6 3.1 3.3 0 6-1.3 6-2.8v-5"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v16"/><path d="M14 10h4a1 1 0 0 1 1 1v10"/><path d="M8 8h3M8 12h3M8 16h3M3 21h18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/></symbol>
+  <symbol id="i-bus" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M4 11h16M9 5v6"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-ghost" viewBox="0 0 24 24"><path d="M5 20V11a7 7 0 0 1 14 0v9l-2.3-1.6L14.4 20 12 18.4 9.6 20l-2.3-1.6L5 20z"/><circle cx="9.5" cy="10.5" r=".3"/><circle cx="14.5" cy="10.5" r=".3"/></symbol>
+  <symbol id="i-cross" viewBox="0 0 24 24"><rect x="4.5" y="6" width="15" height="12" rx="2.5"/><path d="M12 9v6M9 12h6"/></symbol>
+</svg>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <span class="eyebrow"><span class="emblem em-plum"><svg class="ic"><use href="#i-tag"/></svg></span> PreOne · Access &amp; Roles</span>
+    <h1>Who Holds <span class="hl">Which Key?</span></h1>
+    <p class="sub">A first-principles tour of everyone who can walk into the PreOne preschool app — the door their key opens, and where a few doors sit quietly propped open.</p>
+    <div class="hero-emblems">
+      <span class="emblem em-plum" title="Admin"><svg class="ic"><use href="#i-crown"/></svg></span>
+      <span class="emblem em-honey" title="Task Master"><svg class="ic"><use href="#i-clipboard"/></svg></span>
+      <span class="emblem em-teal" title="Teacher"><svg class="ic"><use href="#i-book"/></svg></span>
+      <span class="emblem em-leaf" title="Parent"><svg class="ic"><use href="#i-heart"/></svg></span>
+    </div>
+  </header>
+  <svg class="scallop" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 40 V20 Q30 4 60 20 T120 20 T180 20 T240 20 T300 20 T360 20 T420 20 T480 20 T540 20 T600 20 T660 20 T720 20 T780 20 T840 20 T900 20 T960 20 T1020 20 T1080 20 T1140 20 T1200 20 V40 Z" fill="#fff" opacity=".55"/>
+  </svg>
+
+  <div class="inner">
+
+    <!-- ============ FIRST PRINCIPLES ============ -->
+    <section>
+      <div class="kicker"><span class="dot"></span> Start from zero</div>
+      <h2 class="sec">A school is a building. A role is a key.</h2>
+      <p class="lead">Picture PreOne as a big, sunny preschool. Inside are rooms full of precious things — children's records, medical notes, fee ledgers, private chats between parents and teachers. You can't let just anyone wander in, so the building asks every visitor one question first:</p>
+      <p class="lead"><strong>“Who are you, and what may you touch?”</strong></p>
+      <p class="muted">PreOne answers with a small paper name-tag called a <strong>token</strong>. When you log in, the office hands you a tag with your name, your role and your branch, then presses a wax seal so it can't be forged. Technically that's <code>base64url(payload).HMAC-SHA256</code>, it expires after <strong>24 hours</strong>, and you carry a copy in a cookie (<code>preone_token</code>) and in the browser's pocket.</p>
+
+      <div class="callout">
+        <span class="emblem em-honey"><svg class="ic"><use href="#i-tag"/></svg></span>
+        <div><strong>The wax seal is the whole game.</strong> Every gate below trusts the tag only because the seal matches — and the seal is made with a secret key. As we'll see, PreOne keeps a spare key under the doormat for when nobody set a real one.</div>
+      </div>
+
+      <h3 style="font-size:20px; margin-top:28px">Three gates guard every room</h3>
+      <p class="muted">Reaching a piece of data means passing up to three checkpoints. This layering is the healthiest part of the design — no single lock has to be perfect.</p>
+      <div class="gates">
+        <div class="gate"><span class="step">01</span><span class="emblem em-plum"><svg class="ic"><use href="#i-shield"/></svg></span><h4>The Front Gate</h4><p>The <strong>middleware</strong> checks your tag on every request. No tag on a page → sent to <code>/login</code>; no tag on an API → <code>401</code>. It also runs a quick, coarse role check.</p></div>
+        <div class="gate"><span class="step">02</span><span class="emblem em-teal"><svg class="ic"><use href="#i-key"/></svg></span><h4>The Classroom Door</h4><p>Each route re-opens the tag itself (<code>requireAdmin</code>, <code>requireRole</code>…). It never trusts hallway headers — it re-checks the wax seal from scratch.</p></div>
+        <div class="gate"><span class="step">03</span><span class="emblem em-leaf"><svg class="ic"><use href="#i-lock"/></svg></span><h4>The Cubby Lock</h4><p>Even inside, you reach only <em>your</em> things: a parent sees only their own children, a teacher only their class, an admin only their branch.</p></div>
+      </div>
+    </section>
+
+    <div class="rule"><span></span><b></b><span></span></div>
+
+    <!-- ============ HIERARCHY ============ -->
+    <section>
+      <div class="kicker"><span class="dot"></span> The pecking order</div>
+      <h2 class="sec">Four real keys, stacked like building blocks</h2>
+      <p class="muted"><code>src/lib/auth.ts</code> defines exactly <strong>four</strong> roles, each with a numeric “height.” Taller blocks reach more shelves.</p>
+      <div class="ladder">
+        <div class="rung r1"><span class="emblem em-plum"><svg class="ic"><use href="#i-crown"/></svg></span><div><div class="lbl">ADMIN</div><div class="desc">The Principal — runs the whole school</div></div><span class="w" style="background:var(--plum-bg);color:var(--plum-ink)">weight 100</span></div>
+        <div class="rung r2"><span class="emblem em-honey"><svg class="ic"><use href="#i-clipboard"/></svg></span><div><div class="lbl">TASK_MASTER</div><div class="desc">The Front-Desk clerk — admissions &amp; messages</div></div><span class="w" style="background:var(--honey-bg);color:var(--honey-ink)">weight 80</span></div>
+        <div class="rung r3"><span class="emblem em-teal"><svg class="ic"><use href="#i-book"/></svg></span><div><div class="lbl">TEACHER</div><div class="desc">The Class Teacher — one classroom</div></div><span class="w" style="background:var(--teal-bg);color:var(--teal-ink)">weight 50</span></div>
+        <div class="rung r4"><span class="emblem em-leaf"><svg class="ic"><use href="#i-heart"/></svg></span><div><div class="lbl">PARENT</div><div class="desc">The Guardian — one family</div></div><span class="w" style="background:var(--leaf-bg);color:var(--leaf-ink)">weight 30</span></div>
+      </div>
+      <div class="callout" style="border-left-color:var(--ink-3)">
+        <span class="emblem em-ink"><svg class="ic"><use href="#i-ghost"/></svg></span>
+        <div>There's a <strong>fifth key drawn on the wall</strong> — <code>SuperAdmin</code> — that the front gate keeps mentioning. But no locksmith can actually cut it: the token layer only knows four roles. More on this ghost below.</div>
+      </div>
+    </section>
+
+    <div class="rule"><span></span><b></b><span></span></div>
+
+    <!-- ============ THE CAST ============ -->
+    <section>
+      <div class="kicker"><span class="dot"></span> Meet the cast</div>
+      <h2 class="sec">Everyone who can walk in the door</h2>
+
+      <!-- ADMIN -->
+      <article class="role admin">
+        <div class="head">
+          <span class="emblem em-plum"><svg class="ic"><use href="#i-crown"/></svg></span>
+          <div><h3>The Admin — “Principal”</h3><div class="meta">Role <code>ADMIN</code> · portal <code>/admin</code> · created at sign-up</div></div>
+          <span class="w">weight 100</span>
+        </div>
+        <div class="content">
+          <p>The Admin is born the moment a school signs up: <code>POST /api/auth/register</code> creates a <strong>School</strong> and its first <strong>ADMIN</strong> in one breath. From then on the Principal holds the master ring — nearly every room opens to them.</p>
+          <h4><svg class="ic" style="color:var(--plum)"><use href="#i-sparkle"/></svg> What they can do</h4>
+          <ul>
+            <li>Enroll and edit <strong>students</strong>, <strong>teachers</strong>, classes and programs.</li>
+            <li>Run the money — <strong>fees, invoices, payments, reminders, refunds</strong>.</li>
+            <li>Mark and review <strong>attendance</strong>; read/write <strong>growth</strong> observations &amp; milestones.</li>
+            <li>Broadcast <strong>announcements</strong>, run <strong>chat</strong>, manage <strong>users</strong> &amp; school <strong>settings</strong>.</li>
+            <li>See the whole <strong>dashboard</strong>, reports, admissions pipeline and calendar.</li>
+          </ul>
+          <h4><svg class="ic" style="color:var(--plum)"><use href="#i-key"/></svg> Where the keys reach</h4>
+          <div class="chips"><span class="chip">/api/students</span><span class="chip">/api/teachers</span><span class="chip">/api/fees</span><span class="chip">/api/attendance</span><span class="chip">/api/growth</span><span class="chip">/api/communication</span><span class="chip">/api/settings</span><span class="chip">/api/reports</span><span class="chip">/api/dashboard</span><span class="chip">/api/events</span></div>
+          <h4><svg class="ic" style="color:var(--plum)"><use href="#i-lock"/></svg> How far they see</h4>
+          <p>Branch isolation decides <em>how much</em> of the school an Admin sees. An Admin whose tag carries a <code>branchId</code> is scoped to that campus. But an Admin with <strong>no branch</strong> is treated as “all branches” and sees everything — the closest thing PreOne has to a super-user, created implicitly rather than on purpose.</p>
+        </div>
+      </article>
+
+      <!-- TASK MASTER -->
+      <article class="role task">
+        <div class="head">
+          <span class="emblem em-honey"><svg class="ic"><use href="#i-clipboard"/></svg></span>
+          <div><h3>The Task Master — “Front Desk”</h3><div class="meta">Role <code>TASK_MASTER</code> · borrows <code>/admin</code> · fenced in</div></div>
+          <span class="w">weight 80</span>
+        </div>
+        <div class="content">
+          <p>The Task Master has no building of their own — they're handed a visitor pass to the Principal's portal, with tape on the floor marking where they may walk. They're the admissions &amp; reception clerk: chase leads, message families, watch the dashboard.</p>
+          <h4><svg class="ic" style="color:var(--honey)"><use href="#i-eye"/></svg> Where they may walk</h4>
+          <p class="muted" style="margin-top:0">The front gate fences them to four hallways (<code>TASK_MASTER_ALLOWED_PREFIXES</code>). Wander off, and they're bounced back to Admissions.</p>
+          <div class="chips"><span class="chip">/admin/dashboard</span><span class="chip">/admin/admissions</span><span class="chip">/admin/communication/chat</span><span class="chip">/admin/communication/announcements</span></div>
+          <h4><svg class="ic" style="color:var(--honey)"><use href="#i-key"/></svg> What their key opens</h4>
+          <div class="chips"><span class="chip">/api/admissions</span><span class="chip">/api/crm</span><span class="chip">/api/dashboard</span><span class="chip">/api/auth/me</span></div>
+          <p style="margin-top:12px">Students, fees, teachers, settings? Locked — those routes demand a full <code>ADMIN</code> key and answer with <code>403</code>.</p>
+        </div>
+      </article>
+
+      <!-- TEACHER -->
+      <article class="role teacher">
+        <div class="head">
+          <span class="emblem em-teal"><svg class="ic"><use href="#i-book"/></svg></span>
+          <div><h3>The Teacher — “Class Teacher”</h3><div class="meta">Role <code>TEACHER</code> · portal <code>/teacher</code> · one classroom</div></div>
+          <span class="w">weight 50</span>
+        </div>
+        <div class="content">
+          <p>The Teacher lives in their own bright portal. When they knock, PreOne doesn't just check the tag — it looks up their staff record and finds the <strong>one class assigned to them</strong> (<code>requireTeacher</code> → <code>assignedClass</code>). Everything they do stays inside those lines.</p>
+          <h4><svg class="ic" style="color:var(--teal)"><use href="#i-sparkle"/></svg> What they can do</h4>
+          <ul>
+            <li>Take daily <strong>attendance</strong> for their class.</li>
+            <li>Write <strong>observations</strong> and <strong>daily updates</strong> (meals, nap, mood).</li>
+            <li>Record <strong>growth</strong> notes — the one “grown-up” API they share with Admin.</li>
+            <li><strong>Chat</strong> with their class's families and apply for <strong>leave</strong>.</li>
+          </ul>
+          <h4><svg class="ic" style="color:var(--teal)"><use href="#i-key"/></svg> What their key opens</h4>
+          <div class="chips"><span class="chip">/api/teacher/*</span><span class="chip">/api/growth</span><span class="chip">/api/auth/me</span></div>
+          <p style="margin-top:12px">Reach for the admin wing and the front gate returns <code>403</code> before they touch the handle.</p>
+        </div>
+      </article>
+
+      <!-- PARENT -->
+      <article class="role parent">
+        <div class="head">
+          <span class="emblem em-leaf"><svg class="ic"><use href="#i-heart"/></svg></span>
+          <div><h3>The Parent — “Guardian”</h3><div class="meta">Role <code>PARENT</code> · portal <code>/parent</code> · one family</div></div>
+          <span class="w">weight 30</span>
+        </div>
+        <div class="content">
+          <p>The Parent has the smallest, most tender key — and the tightest cubby lock. On every request PreOne finds their guardian record, gathers the children linked to them, then <strong>refuses any child not on that list</strong> (<code>verifyChildAccess</code> → <code>403</code>). A parent literally cannot peek at another family's little one.</p>
+          <h4><svg class="ic" style="color:var(--leaf)"><use href="#i-sparkle"/></svg> What they can do</h4>
+          <ul>
+            <li>See their own child's <strong>daily updates, growth passport, attendance</strong> and <strong>memories</strong>.</li>
+            <li>View <strong>fees</strong> and pay; read <strong>announcements</strong>.</li>
+            <li><strong>Chat</strong> with their child's teacher; upload <strong>KYC</strong> documents.</li>
+            <li>Tune their own <strong>notification preferences</strong> (app / SMS / email).</li>
+          </ul>
+          <h4><svg class="ic" style="color:var(--leaf)"><use href="#i-key"/></svg> What their key opens</h4>
+          <div class="chips"><span class="chip">/api/parent/*</span><span class="chip">/api/auth/me</span></div>
+          <h4><svg class="ic" style="color:var(--leaf)"><use href="#i-alert"/></svg> The fragile bit</h4>
+          <p>A Parent has <strong>no direct link</strong> to their login account. PreOne re-finds them each time by matching the login email against <code>Parent.email</code> <em>or</em> <code>Parent.phone</code> — an identity handshake made of string-matching rather than a firm ID.</p>
+        </div>
+      </article>
+    </section>
+
+    <div class="rule"><span></span><b></b><span></span></div>
+
+    <!-- ============ VULNERABILITIES ============ -->
+    <section>
+      <div class="kicker"><span class="dot" style="background:var(--danger)"></span> Mind the gap</div>
+      <h2 class="sec">Doors that sit quietly propped open</h2>
+      <p class="muted">None of these are “the sky is falling.” They're the ordinary soft spots of a young codebase — a spare key here, a guest list left on the counter there. Worst first.</p>
+
+      <div class="vuln crit">
+        <div class="hd"><span class="emblem em-danger"><svg class="ic"><use href="#i-key"/></svg></span><h4>A spare key under the doormat</h4><span class="sev crit">CRITICAL</span>
+          <div class="loc"><code>src/lib/auth.ts</code> · <code>src/middleware.ts</code></div></div>
+        <p>The wax seal is made with <code>JWT_SECRET || TOKEN_SECRET || 'preone-demo-secret-key-2024'</code>. If neither env secret is set in production, the app silently signs every token with a <strong>public, hard-coded string</strong> — anyone who knows it can forge a valid <code>ADMIN</code> tag and pass all three gates.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> refuse to boot in production if no secret is configured — never fall back to a shipped default.</div></div>
+        <details><summary><svg class="ic"><use href="#i-chevron"/></svg> Show the evidence</summary><pre>const JWT_SECRET = process.env.JWT_SECRET
+  || process.env.TOKEN_SECRET
+  || 'preone-demo-secret-key-2024';  <span class="c">// ← forgeable if envs unset</span></pre></details>
+      </div>
+
+      <div class="vuln high">
+        <div class="hd"><span class="emblem em-honey"><svg class="ic"><use href="#i-eye"/></svg></span><h4>A guest list anyone logged-in can read</h4><span class="sev high">HIGH</span>
+          <div class="loc"><code>/api/settings/users</code> (GET) — not covered by the front gate's role map</div></div>
+        <p>The coarse role map (<code>API_ROUTE_RULES</code>) lists only ~13 route families. Sensitive ones — <code>/api/settings</code>, <code>/api/reports</code>, <code>/api/events</code>, <code>/api/branches</code> — aren't in it, so the gate merely checks “is this tag valid?” and lets any role through. The user-directory listing then authenticates with <code>getAuthUser</code> (any logged-in user) instead of <code>requireAdmin</code> — so a <strong>Parent or Teacher token can list every user's name, email and role</strong>.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> add <code>/api/settings</code>, <code>/api/reports</code>, <code>/api/system</code> to the route map and upgrade those handlers from <code>getAuthUser</code> to <code>requireAdmin</code>.</div></div>
+      </div>
+
+      <div class="vuln high">
+        <div class="hd"><span class="emblem em-ink"><svg class="ic"><use href="#i-ghost"/></svg></span><h4>The ghost hall-monitor</h4><span class="sev high">HIGH</span>
+          <div class="loc"><code>middleware.ts</code> defines it · <code>auth.ts</code> can never mint it</div></div>
+        <p>The front gate treats <code>SuperAdmin</code> as the top rank — the only role allowed into <code>/admin/system</code> and <code>/api/system</code>. But the token layer knows only four roles, and <code>verifyToken</code> <strong>rejects any tag whose role isn't one of them</strong>. So no real person can ever be a SuperAdmin — the whole system-admin wing is a locked room nobody can enter. Two layers disagree about how many keys exist.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> decide deliberately — promote <code>SUPER_ADMIN</code> to a real role in the Prisma enum + token validator, or delete the phantom references so the “top tier” isn't a fiction.</div></div>
+        <details><summary><svg class="ic"><use href="#i-chevron"/></svg> Show the mismatch</summary><pre><span class="c">// middleware.ts — five names, SuperAdmin is highest</span>
+type RoleName = 'Admin'|'Teacher'|'Parent'|'TaskMaster'|'SuperAdmin';
+{ pattern: /^\/api\/system/, allowedRoles: ['SuperAdmin'] }
+
+<span class="c">// auth.ts — only four are real; anything else fails</span>
+export const ALL_ROLES = [ADMIN, TEACHER, PARENT, TASK_MASTER];
+if (!ALL_ROLES.includes(role)) return null; <span class="c">// SuperAdmin never verifies</span></pre></details>
+      </div>
+
+      <div class="vuln high">
+        <div class="hd"><span class="emblem em-honey"><svg class="ic"><use href="#i-building"/></svg></span><h4>“No branch” quietly means “all branches”</h4><span class="sev high">HIGH</span>
+          <div class="loc">branch isolation · <code>getBranchFromRequest</code></div></div>
+        <p>Branch scoping keys off whether an Admin's tag carries a <code>branchId</code>. Leave it blank and the Admin is promoted to see <strong>every branch in the school</strong>. There's no separate “branch admin” vs “head-office admin” role — cross-campus visibility is decided by an <em>absent field</em>. Worse, a few models (<code>Lead</code>, <code>FeeStructure</code>, <code>Event</code>, <code>Holiday</code>) carry <strong>no school/branch column at all</strong>, so they're global across every tenant on the deployment.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> make org-wide access an explicit role, not a missing value; add a tenant column to the global models.</div></div>
+      </div>
+
+      <div class="vuln med">
+        <div class="hd"><span class="emblem em-teal"><svg class="ic"><use href="#i-tag"/></svg></span><h4>A hall-pass that can't be torn up</h4><span class="sev med">MEDIUM</span>
+          <div class="loc"><code>verifyToken</code> checks signature + 24h expiry only</div></div>
+        <p>There's no server-side session or revocation list. Logging out only empties the browser's pockets — the signed tag stays valid its full 24 hours. A leaked or stolen token can't be cancelled. (A <code>RefreshToken</code> table exists, but the verifier never consults it.)</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> shorten access-token life and check a server-side refresh / denylist so “log out everywhere” actually works.</div></div>
+      </div>
+
+      <div class="vuln med">
+        <div class="hd"><span class="emblem em-teal"><svg class="ic"><use href="#i-heart"/></svg></span><h4>Guardian identity held together with string-matching</h4><span class="sev med">MEDIUM</span>
+          <div class="loc"><code>api-auth.ts</code> · <code>requireParent</code></div></div>
+        <p>A Parent record has no foreign key to its login. Each request re-links them by matching the login email to <code>Parent.email</code> <strong>or</strong> <code>Parent.phone</code>. Shared numbers, recycled emails, or a typo could resolve one login to the wrong guardian — and the cubby lock is only as trustworthy as that match.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> add a real <code>Parent.userId</code> foreign key and match on it.</div></div>
+      </div>
+
+      <div class="vuln med">
+        <div class="hd"><span class="emblem em-honey"><svg class="ic"><use href="#i-clipboard"/></svg></span><h4>The front door signs up instant principals</h4><span class="sev med">MEDIUM</span>
+          <div class="loc"><code>/api/auth/register</code> (public)</div></div>
+        <p>Anyone can create a School and an active <code>ADMIN</code> in one unauthenticated call — the new admin is <code>isActive: true</code> immediately, with no email verification first. The good news: the role is <strong>hard-coded to ADMIN</strong>, so you can't self-escalate higher through the request body. The risk is abuse and unverified accounts, not privilege injection.</p>
+        <div class="fix"><svg class="ic"><use href="#i-check"/></svg><div><strong>Fix:</strong> require email/OTP verification before activation, and rate-limit + captcha the endpoint.</div></div>
+      </div>
+    </section>
+
+    <div class="rule"><span></span><b></b><span></span></div>
+
+    <!-- ============ NEW ROLES ============ -->
+    <section>
+      <div class="kicker"><span class="dot" style="background:var(--teal)"></span> Room for more friends</div>
+      <h2 class="sec">New name-tags worth printing</h2>
+      <p class="muted">PreOne runs a whole preschool on four keys. A real school has more shapes of grown-up. First principles: give a role to every distinct “need-to-touch,” so the master key stops being the answer to everything.</p>
+      <div class="grid">
+        <div class="nr"><span class="emblem em-plum"><svg class="ic"><use href="#i-shield"/></svg></span><h4>Super Admin / Owner</h4><p>Make the ghost real: cross-branch, billing, and the <code>/admin/system</code> wing that's currently unreachable.</p></div>
+        <div class="nr"><span class="emblem em-plum"><svg class="ic"><use href="#i-building"/></svg></span><h4>Branch vs School Admin</h4><p>Split “runs one campus” from “runs the org,” so wide access is a choice — not a blank field.</p></div>
+        <div class="nr"><span class="emblem em-honey"><svg class="ic"><use href="#i-coins"/></svg></span><h4>Accountant / Fee Desk</h4><p>Fees, invoices, payments, refunds — and nothing else. Today only the all-powerful Admin touches money.</p></div>
+        <div class="nr"><span class="emblem em-leaf"><svg class="ic"><use href="#i-cross"/></svg></span><h4>Nurse / Caregiver</h4><p>Medical records and daily care (meals, nap, meds) — sensitive health data deserves its own narrow key.</p></div>
+        <div class="nr"><span class="emblem em-teal"><svg class="ic"><use href="#i-book"/></svg></span><h4>Academic Head</h4><p>Read-mostly oversight of growth, attendance and reports across classes, without edit rights.</p></div>
+        <div class="nr"><span class="emblem em-leaf"><svg class="ic"><use href="#i-heart"/></svg></span><h4>Co-Guardian (view-only)</h4><p>A second parent or grandparent with read access. The <code>isPrimary</code> flag exists but isn't used for permissions yet.</p></div>
+        <div class="nr"><span class="emblem em-ink"><svg class="ic"><use href="#i-search"/></svg></span><h4>Auditor</h4><p>Read-only access plus the audit log — for compliance, without the ability to change anything.</p></div>
+        <div class="nr"><span class="emblem em-honey"><svg class="ic"><use href="#i-bus"/></svg></span><h4>Transport Coordinator</h4><p>Routes, vehicles, pickup/drop. The data models exist; no role or portal uses them yet.</p></div>
+      </div>
+    </section>
+
+    <div class="rule"><span></span><b></b><span></span></div>
+
+    <!-- ============ SUMMARY ============ -->
+    <section>
+      <div class="kicker"><span class="dot"></span> The one-glance version</div>
+      <h2 class="sec">Keys &amp; doors at a glance</h2>
+      <div class="tablecard"><div class="scroll">
+        <table>
+          <thead><tr><th>Role</th><th>Weight</th><th>Portal</th><th>Reaches</th><th>Scoped to</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rc"><span class="emblem em-plum"><svg class="ic"><use href="#i-crown"/></svg></span>ADMIN</span></td><td>100</td><td><code>/admin</code></td><td>Nearly all APIs</td><td>Branch (or <em>all</em> if unset)</td></tr>
+            <tr><td><span class="rc"><span class="emblem em-honey"><svg class="ic"><use href="#i-clipboard"/></svg></span>TASK_MASTER</span></td><td>80</td><td><code>/admin</code> (fenced)</td><td>admissions · crm · dashboard</td><td>4 allowed hallways</td></tr>
+            <tr><td><span class="rc"><span class="emblem em-teal"><svg class="ic"><use href="#i-book"/></svg></span>TEACHER</span></td><td>50</td><td><code>/teacher</code></td><td>teacher/* · growth</td><td>Their assigned class</td></tr>
+            <tr><td><span class="rc"><span class="emblem em-leaf"><svg class="ic"><use href="#i-heart"/></svg></span>PARENT</span></td><td>30</td><td><code>/parent</code></td><td>parent/*</td><td>Only their own children</td></tr>
+            <tr><td><span class="rc"><span class="emblem em-ink"><svg class="ic"><use href="#i-ghost"/></svg></span>SuperAdmin</span></td><td>—</td><td><code>/admin/system</code></td><td>system/* <em>(on paper)</em></td><td>Cannot be minted — phantom</td></tr>
+          </tbody>
+        </table>
+      </div></div>
+
+      <p class="foot">
+        Grounded in the current <code>main</code> after pulling the latest.<br>
+        Read first-hand: <code>src/lib/auth.ts</code> · <code>src/middleware.ts</code> · <code>src/lib/api-auth.ts</code> · <code>src/app/api/auth/register/route.ts</code> · <code>prisma/schema.prisma</code>.<br>
+        Reflects code as read on 2026-07-01 — verify against production config before acting.
+      </p>
+    </section>
+  </div>
+</div>
