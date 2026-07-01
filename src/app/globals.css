@@ -338,6 +338,56 @@
   --portal-700: #5B21B6;
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
+
+  /* ── Admin Design Tokens (Light Mode) ── */
+  --admin-bg: #F8F9FA;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F9FAFB;
+  --admin-border: #E5E7EB;
+  --admin-border-strong: #D1D5DB;
+  --admin-text: #1F2937;
+  --admin-text-muted: #6B7280;
+  --admin-text-subtle: #9CA3AF;
+  --admin-primary: #6366F1;
+  --admin-primary-hover: #4F46E5;
+  --admin-primary-foreground: #FFFFFF;
+  --admin-primary-soft: #EEF2FF;
+  --admin-accent: #F59E0B;
+  --admin-success: #10B981;
+  --admin-success-soft: #D1FAE5;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #FEF3C7;
+  --admin-info: #3B82F6;
+  --admin-info-soft: #DBEAFE;
+  --admin-error: #EF4444;
+  --admin-error-soft: #FEE2E2;
+  --admin-shadow-card: 0px 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Admin Design Tokens (Dark Mode) ── */
+.dark [data-portal="admin"] {
+  --admin-bg: #0B0F1A;
+  --admin-surface: #131826;
+  --admin-surface-2: #1A2030;
+  --admin-border: #232B3D;
+  --admin-border-strong: #2E3A52;
+  --admin-text: #F5F7FA;
+  --admin-text-muted: #9CA3B4;
+  --admin-text-subtle: #6B7A8D;
+  --admin-primary: #818CF8;
+  --admin-primary-hover: #6366F1;
+  --admin-primary-foreground: #FFFFFF;
+  --admin-primary-soft: rgba(129, 140, 248, 0.15);
+  --admin-accent: #FBBF24;
+  --admin-success: #34D399;
+  --admin-success-soft: rgba(52, 211, 153, 0.15);
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251, 191, 36, 0.15);
+  --admin-info: #60A5FA;
+  --admin-info-soft: rgba(96, 165, 250, 0.15);
+  --admin-error: #F87171;
+  --admin-error-soft: rgba(248, 113, 113, 0.15);
+  --admin-shadow-card: 0px 2px 8px rgba(0,0,0,0.3);
 }
 
 /* ── Teacher Portal: Emerald / Teal ── */
