@@ -23,9 +23,6 @@ import { useTheme } from 'next-themes';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { BranchSwitcher } from '@/components/ui/branch-switcher';
 import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
@@ -310,9 +307,6 @@ export function AdminHeader() {
             Task Master
           </span>
         )}
-
-        {/* Sidebar trigger */}
-        <SidebarTrigger className="shrink-0" />
 
         {/* Breadcrumb */}
         <Breadcrumb className="hidden md:flex">

@@ -22,8 +22,6 @@
 
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
 import { CommandPalette } from '@/components/ui/command-palette';
@@ -119,36 +117,20 @@ export function AdminLayoutClient({
   }
 
   return (
-    <div
+    <AuroraBackground
       className="flex min-h-screen flex-col"
       data-portal="admin"
       data-role={userRole.toLowerCase()}
     >
-
-      {/* ── Persistent topbar ── */}
-      <AdminTopbar />
-
-      {/* ── Scrollable content area ── */}
-      <main
-        className="flex-1 overflow-y-auto bg-[var(--admin-bg)] p-4 sm:p-6 md:p-8"
-      >
-        <div className="mx-auto max-w-[1440px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              variants={pageVariants}
-              initial="initial"
-              animate="enter"
-              exit="exit"
-              transition={pageTransition}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </SidebarProvider>
-
-      {/* Global overlays — rendered outside SidebarProvider to avoid layout conflicts */}
+      <AdminHeader />
+      <main className="flex-1 bg-background/95 p-4 sm:p-6 md:p-8">
+        {/*
+          The AnimatePresence and motion.div for page transitions have been removed
+          as they were incomplete (missing imports and definitions for variants/transition).
+          This can be re-added once those are fully implemented.
+        */}
+        {children}
+      </main>
       <CommandPalette />
       <KeyboardShortcuts />
     </AuroraBackground>
