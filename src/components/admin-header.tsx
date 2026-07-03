@@ -212,137 +212,62 @@ export function AdminHeader() {
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   return (
-    <header
-      className="sticky top-0 z-30 flex h-16 items-center gap-3 px-4"
-      style={{
-        backgroundColor: 'color-mix(in srgb, var(--admin-surface) 80%, transparent)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--admin-border)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-      }}
-    >
-      {/* ── Left Section: Brand + Sidebar + Breadcrumb ── */}
-      <div className="flex items-center gap-2">
-        {/* Home Button */}
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-lg"
-                onClick={() => router.push('/admin/dashboard')}
-                style={{ color: 'var(--admin-text-muted)' }}
-              >
-                <Home className="h-4.5 w-4.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Dashboard (G then D)</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+      {/* ── Role badge ── */}
+      {isSuperAdmin && (
+        <span
+          className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+          style={{
+            backgroundColor: PREONE_COLORS.purple[50],
+            color: PREONE_COLORS.purple[700],
+            borderColor: PREONE_COLORS.purple[200],
+          }}
+        >
+          <Shield className="h-3 w-3" />
+          Super Admin
+        </span>
+      )}
+      {isTaskMaster && (
+        <span
+          className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+          style={{
+            backgroundColor: PREONE_COLORS.star[50],
+            color: PREONE_COLORS.star[700],
+            borderColor: PREONE_COLORS.star[200],
+          }}
+        >
+          <Zap className="h-3 w-3" />
+          Task Master
+        </span>
+      )}
+      {/* ── Left: Breadcrumb ── */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          {segments.map((seg, idx) => {
+            const isLast = idx === segments.length - 1;
+            const label = PATH_LABELS[seg] || seg;
+            return (
+              <React.Fragment key={`${seg}-${idx}`}>
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage className="font-medium">
+                      {label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">
+                      {label}
+                    </span>
+                  )}
+                </BreadcrumbItem>
+                {!isLast && <BreadcrumbSeparator />}
+              </React.Fragment>
+            );
+          })}
+        </BreadcrumbList>
+      </Breadcrumb>
 
-        {/* School Branding */}
-        <div className="flex items-center gap-2 mr-1">
-          <div
-            className="h-8 w-8 rounded-lg flex items-center justify-center overflow-hidden"
-            style={{ backgroundColor: 'var(--admin-primary-soft)' }}
-          >
-            {schoolLogo ? (
-              <Image
-                src={schoolLogo}
-                alt={schoolName}
-                width={28}
-                height={28}
-                className="h-7 w-7 object-contain rounded"
-              />
-            ) : (
-              <Image
-                src="/preonelogo.png"
-                alt="PreOne"
-                width={28}
-                height={28}
-                className="h-7 w-7 object-contain rounded"
-              />
-            )}
-          </div>
-          <span
-            className="hidden md:inline text-sm font-semibold font-heading"
-            style={{ color: 'var(--admin-text)' }}
-          >
-            {schoolName}
-          </span>
-        </div>
-
-        {/* Divider */}
-        <div
-          className="h-6 w-px mx-1 hidden sm:block"
-          style={{ backgroundColor: 'var(--admin-border)' }}
-        />
-
-        {/* Role badge */}
-        {isSuperAdmin && (
-          <span
-            className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
-            style={{
-              backgroundColor: 'var(--admin-primary-soft)',
-              color: 'var(--admin-primary)',
-              borderColor: 'var(--admin-border)',
-            }}
-          >
-            <Shield className="h-3 w-3" />
-            Super Admin
-          </span>
-        )}
-        {isTaskMaster && (
-          <span
-            className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border"
-            style={{
-              backgroundColor: 'var(--admin-warning-soft)',
-              color: 'var(--admin-warning)',
-              borderColor: 'var(--admin-border)',
-            }}
-          >
-            <Zap className="h-3 w-3" />
-            Task Master
-          </span>
-        )}
-
-        {/* Breadcrumb */}
-        <Breadcrumb className="hidden md:flex">
-          <BreadcrumbList>
-            {segments.map((seg, idx) => {
-              const isLast = idx === segments.length - 1;
-              const label = PATH_LABELS[seg] || seg;
-              return (
-                <React.Fragment key={`${seg}-${idx}`}>
-                  <BreadcrumbItem>
-                    {isLast ? (
-                      <BreadcrumbPage
-                        className="font-medium text-sm"
-                        style={{ color: 'var(--admin-text)' }}
-                      >
-                        {label}
-                      </BreadcrumbPage>
-                    ) : (
-                      <span
-                        className="text-sm"
-                        style={{ color: 'var(--admin-text-muted)' }}
-                      >
-                        {label}
-                      </span>
-                    )}
-                  </BreadcrumbItem>
-                  {!isLast && <BreadcrumbSeparator />}
-                </React.Fragment>
-              );
-            })}
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
-      {/* ── Right Section: Actions ── */}
-      <div className="ml-auto flex items-center gap-1">
+      {/* ── Right: Branch Switcher, Search, Notifications, User Menu ── */}
+      <div className="ml-auto flex items-center gap-2">
         {/* Branch Switcher */}
         <BranchSwitcher />
 

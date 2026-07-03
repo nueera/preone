@@ -1,25 +1,5 @@
 'use client';
 
-// ============================================================
-// PreOne — Admin Layout Client (No Sidebar)
-//
-// Provides the 2-region shell:
-//   - Sticky topbar (48px, AdminTopbar)
-//   - Scrollable content area (bg admin-bg, max-w 1440px)
-//
-// Preserves the auth guards from the original layout:
-//   - TASK_MASTER: limited route access
-//   - ADMIN: no /admin/system
-//   - Onboarding redirect for incomplete schools
-//   - Onboarding routes render standalone (no topbar)
-//
-// Framer Motion page transition wraps the content area:
-//   - Enter: fade-in + 8px upward translate, 280ms ease-out
-//   - Exit:  fade-out, 180ms ease-in
-//   - Topbar does NOT animate — it stays persistent.
-//   - prefers-reduced-motion: disable transforms, keep only opacity.
-// ============================================================
-
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/components/admin-header';
@@ -46,15 +26,15 @@ interface AdminLayoutClientProps {
 
 /**
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
- * 
+ *
  * Provides:
- * - Sidebar + Header + Main content structure with Aurora Background
+ * - Header + Main content structure with Aurora Background
  * - Command Palette (Ctrl+K) for quick navigation
  * - Keyboard Shortcuts panel (press ?)
  * - School branding context (logo, name, colors)
  * - Undo/Redo global action system
  * - Role-based route guards
- * 
+ *
  * data-portal="admin" for CSS theme scoping.
  * data-role attribute for role-specific styling.
  */
@@ -117,22 +97,17 @@ export function AdminLayoutClient({
   }
 
   return (
-    <AuroraBackground
-      className="flex min-h-screen flex-col"
-      data-portal="admin"
-      data-role={userRole.toLowerCase()}
-    >
-      <AdminHeader />
-      <main className="flex-1 bg-background/95 p-4 sm:p-6 md:p-8">
-        {/*
-          The AnimatePresence and motion.div for page transitions have been removed
-          as they were incomplete (missing imports and definitions for variants/transition).
-          This can be re-added once those are fully implemented.
-        */}
-        {children}
-      </main>
-      <CommandPalette />
-      <KeyboardShortcuts />
+    <AuroraBackground intensity="subtle">
+      <div className="flex flex-col min-h-screen">
+        <AdminHeader />
+        <main
+          className="flex-1 bg-background/80 p-6 overflow-auto"
+          data-portal="admin"
+          data-role={userRole.toLowerCase()}
+        >
+          {children}
+        </main>
+      </div>
     </AuroraBackground>
   );
 }
