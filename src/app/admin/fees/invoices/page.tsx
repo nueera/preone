@@ -124,11 +124,11 @@ export default function InvoicesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <FileText className="w-6 h-6" style={{ color: theme.primary }} />
                 Invoice Management
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Create, manage and track invoices</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Create, manage and track invoices</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -151,7 +151,7 @@ export default function InvoicesPage() {
               { label: 'Overdue', value: `${filteredInvoices.filter((i) => i.status === 'OVERDUE').length}`, color: 'text-red-700 bg-red-50' },
             ].map((stat) => (
               <PreOneCard key={stat.label} variant="strip" className="p-4">
-                <p className="text-xs text-gray-500">{stat.label}</p>
+                <p className="text-xs text-[var(--admin-text-muted)]">{stat.label}</p>
                 <p className={`text-lg font-bold mt-1 ${stat.color.split(' ')[0]}`}>{stat.value}</p>
               </PreOneCard>
             ))}
@@ -162,7 +162,7 @@ export default function InvoicesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input
                 placeholder="Search by student or invoice number..."
                 value={searchQuery}
@@ -204,7 +204,7 @@ export default function InvoicesPage() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-12 text-center text-gray-500">
+                      <TableCell colSpan={7} className="py-12 text-center text-[var(--admin-text-muted)]">
                         <Loader2 className="w-5 h-5 mx-auto animate-spin" />
                       </TableCell>
                     </TableRow>
@@ -217,7 +217,7 @@ export default function InvoicesPage() {
                     </TableRow>
                   ) : filteredInvoices.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-12 text-center text-gray-500 text-sm">
+                      <TableCell colSpan={7} className="py-12 text-center text-[var(--admin-text-muted)] text-sm">
                         No invoices found.
                       </TableCell>
                     </TableRow>
@@ -226,9 +226,9 @@ export default function InvoicesPage() {
                       <TableRow key={inv.id} className="hover:bg-purple-50/30">
                         <TableCell className="text-sm font-medium">{inv.invoiceNo}</TableCell>
                         <TableCell className="text-sm">{inv.student}</TableCell>
-                        <TableCell className="text-sm text-gray-500">{inv.class}</TableCell>
+                        <TableCell className="text-sm text-[var(--admin-text-muted)]">{inv.class}</TableCell>
                         <TableCell className="text-sm font-medium">₹{inv.amount.toLocaleString('en-IN')}</TableCell>
-                        <TableCell className="text-sm text-gray-500">
+                        <TableCell className="text-sm text-[var(--admin-text-muted)]">
                           {new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </TableCell>
                         <TableCell>

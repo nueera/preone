@@ -6,6 +6,7 @@ import {
   User, Settings, LogOut, ChevronDown,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -88,7 +89,7 @@ export function ParentHeader() {
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
       {/* ── Left: Sidebar trigger + Breadcrumb ── */}
       <SidebarTrigger className="shrink-0" />
 
@@ -117,7 +118,7 @@ export function ParentHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Child badge, Notifications, User Menu ── */}
+      {/* ── Right: Child badge, Theme Toggle, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Selected Child Badge */}
         {selectedChild && (
@@ -137,6 +138,9 @@ export function ParentHeader() {
             <span>{selectedChild.className || 'No class'}</span>
           </Badge>
         )}
+
+        {/* ── Global Theme Toggle ── */}
+        <GlobalThemeToggle variant="pill" />
 
         {/* Notification Bell */}
         <NotificationBell />

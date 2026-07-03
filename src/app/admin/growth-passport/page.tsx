@@ -342,11 +342,11 @@ export default function GrowthPage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <TrendingUp className="h-6 w-6 text-portal-600" />
             Growth & AI
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Track student development, analyze growth patterns, and get AI insights</p>
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">Track student development, analyze growth patterns, and get AI insights</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
@@ -373,13 +373,13 @@ export default function GrowthPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64 text-gray-400">
+        <div className="flex items-center justify-center h-64 text-[var(--admin-text-subtle)]">
           <RefreshCw className="h-6 w-6 animate-spin mr-2" />
           Loading growth data...
         </div>
       ) : (
         <Tabs defaultValue="overview">
-          <TabsList className="bg-gray-100">
+          <TabsList className="bg-[var(--admin-surface-2)]">
             <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
             <TabsTrigger value="scores" className="text-xs">Score Entry</TabsTrigger>
             <TabsTrigger value="attention" className="text-xs">Needs Attention</TabsTrigger>
@@ -393,18 +393,18 @@ export default function GrowthPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Card className="p-4">
-                <p className="text-xs text-gray-500">Assessed Students</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-xs text-[var(--admin-text-muted)]">Assessed Students</p>
+                <p className="text-2xl font-bold font-heading text-[var(--admin-text)] mt-1">
                   {classData?.assessedCount || 0} / {classData?.totalStudents || 0}
                 </p>
                 <Progress value={classData ? (classData.assessedCount / classData.totalStudents) * 100 : 0} className="mt-2 h-2" />
               </Card>
               <Card className="p-4">
-                <p className="text-xs text-gray-500">Needs Attention</p>
+                <p className="text-xs text-[var(--admin-text-muted)]">Needs Attention</p>
                 <p className="text-2xl font-bold text-red-600 mt-1">{classData?.needsAttention?.length || 0}</p>
               </Card>
               <Card className="p-4">
-                <p className="text-xs text-gray-500">Top Performers</p>
+                <p className="text-xs text-[var(--admin-text-muted)]">Top Performers</p>
                 <p className="text-2xl font-bold text-green-600 mt-1">{classData?.topPerformers?.length || 0}</p>
               </Card>
             </div>
@@ -412,7 +412,7 @@ export default function GrowthPage() {
             {/* Radar Chart + Student Comparison */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="p-5">
-                <h3 className="text-sm font-semibold text-gray-800 mb-4">Class Growth Overview</h3>
+                <h3 className="text-sm font-semibold text-[var(--admin-text)] mb-4">Class Growth Overview</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={radarData}>
@@ -446,7 +446,7 @@ export default function GrowthPage() {
 
               <Card className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-800">Student Comparison</h3>
+                  <h3 className="text-sm font-semibold text-[var(--admin-text)]">Student Comparison</h3>
                   <Select value={compareStudentId} onValueChange={setCompareStudentId}>
                     <SelectTrigger className="w-[180px] h-7 text-xs">
                       <SelectValue placeholder="Select student" />
@@ -464,7 +464,7 @@ export default function GrowthPage() {
                   <div className="space-y-3">
                     {(() => {
                       const student = classData.students.find((s) => s.id === compareStudentId);
-                      if (!student?.growthScore) return <p className="text-sm text-gray-400">No growth data for this student</p>;
+                      if (!student?.growthScore) return <p className="text-sm text-[var(--admin-text-subtle)]">No growth data for this student</p>;
                       const gs = student.growthScore;
                       return DIMENSIONS.map((dim) => {
                         const studentVal = gs[dim.key as keyof GrowthScore] as number || 0;
@@ -472,8 +472,8 @@ export default function GrowthPage() {
                         const diff = Math.round(studentVal - classAvg);
                         return (
                           <div key={dim.key} className="flex items-center gap-3">
-                            <span className="text-xs text-gray-600 w-24">{dim.label}</span>
-                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <span className="text-xs text-[var(--admin-text-muted)] w-24">{dim.label}</span>
+                            <div className="flex-1 h-2 bg-[var(--admin-surface-2)] rounded-full overflow-hidden">
                               <div className="h-full rounded-full" style={{ width: `${studentVal}%`, backgroundColor: dim.color }} />
                             </div>
                             <span className="text-xs font-medium w-8 text-right">{studentVal}</span>
@@ -486,7 +486,7 @@ export default function GrowthPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
+                  <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)] text-sm">
                     Select a student to compare
                   </div>
                 )}
@@ -517,8 +517,8 @@ export default function GrowthPage() {
 
             {scoreMode === 'bulk' ? (
               <Card className="overflow-hidden">
-                <div className="p-3 bg-gray-50 border-b">
-                  <p className="text-xs text-gray-500">Enter scores (0-100) for each dimension. All students in the selected class will be updated for {selectedPeriod}.</p>
+                <div className="p-3 bg-[var(--admin-surface-2)] border-b">
+                  <p className="text-xs text-[var(--admin-text-muted)]">Enter scores (0-100) for each dimension. All students in the selected class will be updated for {selectedPeriod}.</p>
                 </div>
                 <div className="overflow-x-auto">
                   <Table>
@@ -644,7 +644,7 @@ export default function GrowthPage() {
                 <TableBody>
                   {(classData?.needsAttention || []).length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-gray-400">No students need attention — great job!</TableCell>
+                      <TableCell colSpan={3} className="text-center py-8 text-[var(--admin-text-subtle)]">No students need attention — great job!</TableCell>
                     </TableRow>
                   ) : (
                     (classData?.needsAttention || []).map((s) => (
@@ -682,7 +682,7 @@ export default function GrowthPage() {
                 <TableBody>
                   {(classData?.topPerformers || []).length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-gray-400">No top performers yet</TableCell>
+                      <TableCell colSpan={3} className="text-center py-8 text-[var(--admin-text-subtle)]">No top performers yet</TableCell>
                     </TableRow>
                   ) : (
                     (classData?.topPerformers || []).map((s) => (
@@ -704,7 +704,7 @@ export default function GrowthPage() {
           <TabsContent value="ai" className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {aiObservations.length === 0 ? (
-                <div className="col-span-2 text-center py-12 text-gray-400">
+                <div className="col-span-2 text-center py-12 text-[var(--admin-text-subtle)]">
                   <Bot className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No AI insights available yet. Insights are generated from growth score data.</p>
                 </div>
@@ -717,7 +717,7 @@ export default function GrowthPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold text-gray-800">{obs.studentName}</span>
+                          <span className="text-xs font-semibold text-[var(--admin-text)]">{obs.studentName}</span>
                           {obs.dimension && (
                             <Badge variant="outline" className="text-[10px]">{obs.dimension}</Badge>
                           )}
@@ -732,12 +732,12 @@ export default function GrowthPage() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 leading-relaxed">{obs.insight}</p>
+                        <p className="text-xs text-[var(--admin-text-muted)] leading-relaxed">{obs.insight}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <Button variant="ghost" size="sm" className="h-6 text-[10px] text-portal-600 hover:text-portal-700">
                             Create Action Plan
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 text-[10px] text-gray-400 hover:text-gray-600">
+                          <Button variant="ghost" size="sm" className="h-6 text-[10px] text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]">
                             Dismiss
                           </Button>
                         </div>
@@ -779,7 +779,7 @@ export default function GrowthPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-sm font-semibold">{milestoneData.student.name} — Milestones</h3>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--admin-text-muted)]">
                       {milestoneData.progress.achieved} of {milestoneData.progress.total} achieved ({milestoneData.progress.percentage}%)
                     </p>
                   </div>
@@ -790,26 +790,26 @@ export default function GrowthPage() {
 
                 <div className="space-y-1">
                   {milestoneData.milestones.map((m) => (
-                    <div key={m.milestoneId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                    <div key={m.milestoneId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--admin-surface-2)]">
                       <input
                         type="checkbox"
                         checked={m.status === 'ACHIEVED'}
                         onChange={() => handleToggleMilestone(m.milestoneId, m.status)}
-                        className="rounded border-gray-300 h-4 w-4"
+                        className="rounded border-[var(--admin-border)] h-4 w-4"
                       />
-                      <span className={cn('text-sm flex-1', m.status === 'ACHIEVED' ? 'line-through text-gray-400' : 'text-gray-700')}>
+                      <span className={cn('text-sm flex-1', m.status === 'ACHIEVED' ? 'line-through text-[var(--admin-text-subtle)]' : 'text-[var(--admin-text-muted)]')}>
                         {m.name}
                       </span>
                       <Badge variant="outline" className="text-[10px]">{m.category}</Badge>
                       {m.achievedDate && (
-                        <span className="text-[10px] text-gray-400">{new Date(m.achievedDate).toLocaleDateString()}</span>
+                        <span className="text-[10px] text-[var(--admin-text-subtle)]">{new Date(m.achievedDate).toLocaleDateString()}</span>
                       )}
                     </div>
                   ))}
                 </div>
               </Card>
             ) : (
-              <div className="text-center py-12 text-gray-400">
+              <div className="text-center py-12 text-[var(--admin-text-subtle)]">
                 <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">Select a student to view milestone tracking</p>
               </div>

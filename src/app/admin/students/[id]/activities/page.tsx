@@ -47,7 +47,7 @@ const STATUS_BADGE: Record<string, string> = {
   COMPLETED: 'bg-emerald-50 text-emerald-700',
   UPCOMING: 'bg-blue-50 text-blue-700',
   ONGOING: 'bg-amber-50 text-amber-700',
-  CANCELLED: 'bg-gray-100 text-gray-500',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
 };
 
 export default function StudentActivitiesPage() {
@@ -115,11 +115,11 @@ export default function StudentActivitiesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Palette className="w-6 h-6" style={{ color: theme.primary }} />
                 Student Activities
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Activities for this student&apos;s class</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Activities for this student&apos;s class</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Assign Activity
@@ -131,19 +131,19 @@ export default function StudentActivitiesPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Total Activities</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Total Activities</p>
               <p className="text-lg font-bold text-purple-700">{activities.length}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Completed</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Completed</p>
               <p className="text-lg font-bold text-emerald-700">{completed}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Upcoming</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Upcoming</p>
               <p className="text-lg font-bold text-blue-700">{upcoming}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Ongoing</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Ongoing</p>
               <p className="text-lg font-bold text-amber-700">{ongoing}</p>
             </PreOneCard>
           </div>
@@ -153,7 +153,7 @@ export default function StudentActivitiesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input placeholder="Search activities..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -171,37 +171,37 @@ export default function StudentActivitiesPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Participation History</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Participation History</h3>
               {loading ? (
-                <div className="flex items-center justify-center py-12 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading activities…</div>
+                <div className="flex items-center justify-center py-12 text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading activities…</div>
               ) : error ? (
                 <div className="py-12 text-center text-red-500 text-sm">{error}</div>
               ) : filteredActivities.length === 0 ? (
-                <div className="py-12 text-center text-gray-400 text-sm">No activities found for this student&apos;s class.</div>
+                <div className="py-12 text-center text-[var(--admin-text-subtle)] text-sm">No activities found for this student&apos;s class.</div>
               ) : (
                 <ScrollArea className="max-h-96">
                   <div className="space-y-3">
                     {filteredActivities.map((a) => {
-                      const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER || { bg: 'bg-gray-50', icon: '🎯' };
+                      const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER || { bg: 'bg-[var(--admin-surface-2)]', icon: '🎯' };
                       return (
-                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--admin-surface-2)] transition-colors">
                           <div className={`w-10 h-10 rounded-xl ${typeCfg.bg} flex items-center justify-center shrink-0`}>
                             <span className="text-lg">{typeCfg.icon}</span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-gray-900">{a.name}</p>
-                              <Badge className={`${STATUS_BADGE[a.status] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{a.status}</Badge>
+                              <p className="text-sm font-medium text-[var(--admin-text)]">{a.name}</p>
+                              <Badge className={`${STATUS_BADGE[a.status] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{a.status}</Badge>
                             </div>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                            <div className="flex items-center gap-3 mt-1 text-xs text-[var(--admin-text-muted)]">
                               <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                               {a.time && <span>{a.time}</span>}
                               {a.className && <span>{a.className}</span>}
                               <Badge variant="outline" className="text-[9px]">{a.type}</Badge>
                             </div>
-                            {a.notes && <p className="text-xs text-gray-400 mt-1">{a.notes}</p>}
+                            {a.notes && <p className="text-xs text-[var(--admin-text-subtle)] mt-1">{a.notes}</p>}
                           </div>
-                          <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 mt-1" />
+                          <ChevronRight className="w-4 h-4 text-[var(--admin-text-subtle)] shrink-0 mt-1" />
                         </div>
                       );
                     })}

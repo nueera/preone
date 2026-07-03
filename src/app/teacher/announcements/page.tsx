@@ -99,11 +99,11 @@ export default function TeacherAnnouncementsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Megaphone className="h-6 w-6 text-portal-600" />
             Announcements
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             View announcements and create ones for your class
           </p>
         </div>
@@ -130,7 +130,7 @@ export default function TeacherAnnouncementsPage() {
       {/* Search + Filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <div className="relative flex-1 w-full sm:w-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search announcements..."
             value={searchQuery}
@@ -209,11 +209,11 @@ export default function TeacherAnnouncementsPage() {
       ) : displayAnnouncements.length === 0 ? (
         <Card className="rounded-2xl border-0 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-            <Megaphone className="h-12 w-12 text-gray-200" />
-            <p className="text-sm font-medium text-gray-500">
+            <Megaphone className="h-12 w-12 text-muted-foreground" />
+            <p className="text-sm font-medium text-muted-foreground">
               No announcements found
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Announcements from your school will appear here
             </p>
           </CardContent>

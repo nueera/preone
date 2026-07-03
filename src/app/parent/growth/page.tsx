@@ -103,13 +103,13 @@ function getStatusBadge(score: number): { label: string; className: string } {
 function getDifferenceIcon(diff: number) {
   if (diff > 0) return <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />;
   if (diff < 0) return <ArrowDown className="h-3.5 w-3.5 text-red-500" />;
-  return <ArrowRight className="h-3.5 w-3.5 text-gray-400" />;
+  return <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />;
 }
 
 function getDifferenceColor(diff: number): string {
   if (diff > 0) return 'text-emerald-600';
   if (diff < 0) return 'text-red-500';
-  return 'text-gray-400';
+  return 'text-muted-foreground';
 }
 
 function getSeverityStyle(severity: string | null): { bg: string; border: string; icon: string } {
@@ -137,7 +137,7 @@ function PeriodSelector({
   onSelect: (period: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-1.5 p-1 bg-gray-100 rounded-xl">
+    <div className="flex items-center gap-1.5 p-1 bg-muted rounded-xl">
       {PERIODS.map((p) => (
         <button
           key={p.key}
@@ -218,7 +218,7 @@ function GrowthRadarChart({
               <Legend
                 wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
                 formatter={(value: string) => (
-                  <span className={value === 'Your Child' ? 'text-sky-700 font-medium' : 'text-gray-500'}>
+                  <span className={value === 'Your Child' ? 'text-sky-700 font-medium' : 'text-muted-foreground'}>
                     {value}
                   </span>
                 )}
@@ -293,7 +293,7 @@ function ScoreBreakdownTable({
             </TableHeader>
             <TableBody>
               {rows.map(({ dim, childScore, avgScore, diff, status }) => (
-                <TableRow key={dim.key} className="hover:bg-gray-50/50">
+                <TableRow key={dim.key} className="hover:bg-muted/50">
                   <TableCell className="py-2.5">
                     <div className="flex items-center gap-2">
                       <div className={`h-2.5 w-2.5 rounded-full`} style={{ backgroundColor: dim.color }} />
@@ -543,13 +543,13 @@ function MilestonesSection({
               {items.map((milestone) => (
                 <div
                   key={milestone.id}
-                  className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors"
                 >
                   {/* Status icon */}
                   {milestone.status === 'ACHIEVED' ? (
                     <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                   ) : (
-                    <Circle className="h-5 w-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                    <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                   )}
 
                   <div className="flex-1 min-w-0 space-y-0.5">

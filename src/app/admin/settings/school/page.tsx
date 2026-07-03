@@ -40,11 +40,11 @@ export default function SchoolSettingsPage() {
         <StaggerItem>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <School className="w-6 h-6" style={{ color: theme.primary }} />
                 School Settings
               </h1>
-              <p className="text-sm text-gray-500 mt-1">General info, branding, and academic configuration</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">General info, branding, and academic configuration</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Save className="w-4 h-4 mr-2" /> Save Changes
@@ -56,8 +56,8 @@ export default function SchoolSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-gray-500" /> School Profile
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[var(--admin-text-muted)]" /> School Profile
               </h3>
               <div className="flex items-start gap-6 mb-6">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-sky-500 flex items-center justify-center text-white text-2xl font-bold shrink-0">
@@ -65,29 +65,29 @@ export default function SchoolSettingsPage() {
                 </div>
                 <div>
                   <Button variant="outline" size="sm"><Upload className="w-4 h-4 mr-2" /> Upload Logo</Button>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG or SVG. Max 2MB.</p>
+                  <p className="text-xs text-[var(--admin-text-subtle)] mt-1">PNG, JPG or SVG. Max 2MB.</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">School Name</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">School Name</label>
                   <Input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Email</label>
-                  <div className="relative"><Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><Input value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" /></div>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Email</label>
+                  <div className="relative"><Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" /><Input value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" /></div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Phone</label>
-                  <div className="relative"><Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><Input value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-9" /></div>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Phone</label>
+                  <div className="relative"><Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" /><Input value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-9" /></div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Website</label>
-                  <div className="relative"><Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><Input value={website} onChange={(e) => setWebsite(e.target.value)} className="pl-9" /></div>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Website</label>
+                  <div className="relative"><Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" /><Input value={website} onChange={(e) => setWebsite(e.target.value)} className="pl-9" /></div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Address</label>
-                  <div className="relative"><MapPin className="w-4 h-4 absolute left-3 top-3 text-gray-400" /><Textarea value={address} onChange={(e) => setAddress(e.target.value)} className="pl-9" rows={2} /></div>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Address</label>
+                  <div className="relative"><MapPin className="w-4 h-4 absolute left-3 top-3 text-[var(--admin-text-subtle)]" /><Textarea value={address} onChange={(e) => setAddress(e.target.value)} className="pl-9" rows={2} /></div>
                 </div>
               </div>
             </PreOneCardContent>
@@ -98,24 +98,24 @@ export default function SchoolSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-gray-500" /> Academic Configuration
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-[var(--admin-text-muted)]" /> Academic Configuration
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Academic Year</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Academic Year</label>
                   <Input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Working Days / Week</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Working Days / Week</label>
                   <Input value={workingDays} onChange={(e) => setWorkingDays(e.target.value)} type="number" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block flex items-center gap-1"><Clock className="w-3 h-3" /> School Start Time</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block flex items-center gap-1"><Clock className="w-3 h-3" /> School Start Time</label>
                   <Input value={startTime} onChange={(e) => setStartTime(e.target.value)} type="time" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block flex items-center gap-1"><Clock className="w-3 h-3" /> School End Time</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block flex items-center gap-1"><Clock className="w-3 h-3" /> School End Time</label>
                   <Input value={endTime} onChange={(e) => setEndTime(e.target.value)} type="time" />
                 </div>
               </div>

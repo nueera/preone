@@ -85,11 +85,11 @@ export default function GrowthReportsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <BarChart3 className="w-6 h-6" style={{ color: theme.primary }} />
                 Growth Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Report cards, progress summaries, and developmental analysis</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Report cards, progress summaries, and developmental analysis</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <FileText className="w-4 h-4 mr-2" /> Generate Report
@@ -107,10 +107,10 @@ export default function GrowthReportsPage() {
                 <PreOneCard key={d.key} variant="strip" className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className={`w-4 h-4 ${cfg.text}`} />
-                    <span className="text-sm font-medium text-gray-700">{d.label}</span>
+                    <span className="text-sm font-medium text-[var(--admin-text-muted)]">{d.label}</span>
                   </div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-400">Avg Score</span>
+                    <span className="text-xs text-[var(--admin-text-subtle)]">Avg Score</span>
                     <span className="text-sm font-bold" style={{ color: cfg.hex }}>{d.score}%</span>
                   </div>
                   <Progress value={d.score} className="h-1.5" />
@@ -125,8 +125,8 @@ export default function GrowthReportsPage() {
           <StaggerItem>
             <PreOneCard variant="default" className="p-0">
               <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900">Developmental Scores vs Benchmark</h3>
-                <p className="text-sm text-gray-500 mt-0.5">School average vs age-appropriate benchmarks</p>
+                <h3 className="text-base font-semibold text-[var(--admin-text)]">Developmental Scores vs Benchmark</h3>
+                <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">School average vs age-appropriate benchmarks</p>
               </div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={280}>
@@ -147,8 +147,8 @@ export default function GrowthReportsPage() {
           <StaggerItem>
             <PreOneCard variant="default" className="p-0">
               <div className="p-6 pb-2">
-                <h3 className="text-base font-semibold text-gray-900">Class Comparison</h3>
-                <p className="text-sm text-gray-500 mt-0.5">Average developmental scores by class</p>
+                <h3 className="text-base font-semibold text-[var(--admin-text)]">Class Comparison</h3>
+                <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">Average developmental scores by class</p>
               </div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={280}>
@@ -171,8 +171,8 @@ export default function GrowthReportsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-gray-500" /> Recent Reports
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-[var(--admin-text-muted)]" /> Recent Reports
               </h3>
               <div className="space-y-3">
                 {RECENT_REPORTS.map((r) => (
@@ -182,8 +182,8 @@ export default function GrowthReportsPage() {
                         <FileText className="w-5 h-5 text-purple-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{r.title}</p>
-                        <p className="text-xs text-gray-400">{r.type} • {r.students} students • {new Date(r.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        <p className="text-sm font-medium text-[var(--admin-text)]">{r.title}</p>
+                        <p className="text-xs text-[var(--admin-text-subtle)]">{r.type} • {r.students} students • {new Date(r.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                       </div>
                     </div>
                     <Button variant="outline" size="sm" className="h-7 text-xs">

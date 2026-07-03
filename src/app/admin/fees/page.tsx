@@ -119,7 +119,7 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
   PARTIAL: `${FEE_COLORS.PARTIAL.bg} ${FEE_COLORS.PARTIAL.text} border-yellow-200`,
   PAID: `${FEE_COLORS.PAID.bg} ${FEE_COLORS.PAID.text} border-emerald-200`,
   OVERDUE: `${FEE_COLORS.OVERDUE.bg} ${FEE_COLORS.OVERDUE.text} border-red-200`,
-  CANCELLED: 'bg-gray-50 text-gray-600 border-gray-200',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 const FEE_TYPE_LABELS: Record<string, string> = {
@@ -442,7 +442,7 @@ export default function FeesPage() {
       {/* ── Top Bar ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fees</h1>
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">Fees</h1>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" className="gap-2" onClick={() => setReminderDialogOpen(true)}>
@@ -738,14 +738,14 @@ export default function FeesPage() {
               <button
                 onClick={() => setGenerateMode('single')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'single' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-white text-gray-500 border-gray-200')}
+                  generateMode === 'single' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)]')}
               >
                 Single Invoice
               </button>
               <button
                 onClick={() => setGenerateMode('bulk')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'bulk' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-white text-gray-500 border-gray-200')}
+                  generateMode === 'bulk' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)]')}
               >
                 Bulk Invoice
               </button>
@@ -880,7 +880,7 @@ export default function FeesPage() {
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-4">
-              <div className="rounded-lg bg-gray-50 p-3 space-y-1">
+              <div className="rounded-lg bg-[var(--admin-surface-2)] p-3 space-y-1">
                 <p className="text-sm font-medium">{selectedInvoice.student.firstName} {selectedInvoice.student.lastName}</p>
                 <p className="text-xs text-muted-foreground">Invoice: {selectedInvoice.invoiceNo}</p>
                 <p className="text-xs text-muted-foreground">

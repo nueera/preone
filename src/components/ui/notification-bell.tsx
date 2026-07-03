@@ -213,10 +213,10 @@ export function NotificationBell() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 z-50 w-80 sm:w-96 rounded-xl border bg-white shadow-xl dark:bg-gray-900 dark:border-gray-800 overflow-hidden"
+              className="absolute right-0 top-full mt-2 z-50 w-80 sm:w-96 rounded-xl border bg-white shadow-xl dark:bg-card dark:border-border overflow-hidden"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-800">
+              <div className="flex items-center justify-between px-4 py-3 border-b dark:border-border">
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-semibold">Notifications</h3>
                   {unreadCount > 0 && (
@@ -240,7 +240,7 @@ export function NotificationBell() {
               <div className="max-h-80 overflow-y-auto">
                 {loading ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="h-5 w-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                    <div className="h-5 w-5 border-2 border-border border-t-gray-600 rounded-full animate-spin" />
                   </div>
                 ) : notifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
@@ -256,7 +256,7 @@ export function NotificationBell() {
                         <motion.div
                           key={notification.id}
                           className={cn(
-                            'px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b last:border-b-0 dark:hover:bg-gray-800/50 dark:border-gray-800',
+                            'px-4 py-3 cursor-pointer hover:bg-muted transition-colors border-b last:border-b-0 dark:hover:bg-muted/50 dark:border-border',
                             !notification.isRead && style.bg
                           )}
                           onClick={() => markAsRead(notification.id, notification.link)}
@@ -288,7 +288,7 @@ export function NotificationBell() {
                                 {notification.message}
                               </p>
                               <div className="flex items-center gap-2 mt-1.5">
-                                <span className="px-1.5 py-0.5 rounded-md bg-gray-100 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                <span className="px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-medium text-muted-foreground dark:bg-card dark:text-muted-foreground">
                                   {CATEGORY_LABELS[notification.category] || notification.category}
                                 </span>
                                 {notification.link && (
@@ -305,7 +305,7 @@ export function NotificationBell() {
               </div>
 
               {/* Footer */}
-              <div className="border-t px-4 py-2.5 dark:border-gray-800">
+              <div className="border-t px-4 py-2.5 dark:border-border">
                 <Link
                   href={`${portalPrefix}/notifications`}
                   className="text-xs font-medium text-purple-600 hover:text-purple-800 hover:underline text-center block"

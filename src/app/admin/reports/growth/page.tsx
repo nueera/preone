@@ -119,7 +119,7 @@ export default function GrowthReportPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]">
         <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading growth report…
       </div>
     );
@@ -134,11 +134,11 @@ export default function GrowthReportPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Target className="w-6 h-6" style={{ color: theme.primary }} />
                 Growth Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Developmental dimension averages, benchmark, and class comparison</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Developmental dimension averages, benchmark, and class comparison</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -146,7 +146,7 @@ export default function GrowthReportPage() {
 
         {totalAssessments === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+            <PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">
               No growth assessments recorded yet.
             </PreOneCard>
           </StaggerItem>
@@ -163,10 +163,10 @@ export default function GrowthReportPage() {
                     <PreOneCard key={d} variant="strip" className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Icon className="w-4 h-4" style={{ color: cfg.hex }} />
-                        <span className="text-sm font-medium text-gray-700">{DIM_LABEL[d]}</span>
+                        <span className="text-sm font-medium text-[var(--admin-text-muted)]">{DIM_LABEL[d]}</span>
                       </div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">avg score</span>
+                        <span className="text-xs text-[var(--admin-text-subtle)]">avg score</span>
                         <span className="text-sm font-bold" style={{ color: cfg.hex }}>{score}</span>
                       </div>
                       <Progress value={score} className="h-1.5" />
@@ -181,7 +181,7 @@ export default function GrowthReportPage() {
               <StaggerItem>
                 <PreOneCard variant="default" className="p-0">
                   <div className="p-6 pb-2">
-                    <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Dimension Averages vs Benchmark</h3>
+                    <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Dimension Averages vs Benchmark</h3>
                   </div>
                   <div className="px-6 pb-6">
                     <ResponsiveContainer width="100%" height={280}>
@@ -201,7 +201,7 @@ export default function GrowthReportPage() {
               {/* Class Comparison */}
               <StaggerItem>
                 <PreOneCard variant="default" className="p-0">
-                  <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Class Comparison (avg overall)</h3></div>
+                  <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Class Comparison (avg overall)</h3></div>
                   <div className="px-6 pb-6">
                     <ResponsiveContainer width="100%" height={280}>
                       <BarChart data={classComparison}>

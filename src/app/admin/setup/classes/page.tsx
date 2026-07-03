@@ -216,11 +216,11 @@ export default function SetupClassesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <GraduationCap className="h-6 w-6 text-violet-600" />
               Class & Program Setup
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Configure programs, classes, sections, and student capacity
             </p>
           </div>
@@ -341,10 +341,10 @@ export default function SetupClassesPage() {
                     {program.icon}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-[var(--admin-text)]">
                       {program.name}
                     </h3>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--admin-text-muted)]">
                       Age group: {program.ageRange}
                     </p>
                   </div>
@@ -366,12 +366,12 @@ export default function SetupClassesPage() {
                   return (
                     <div
                       key={cls.id}
-                      className="rounded-xl border bg-white p-4 hover:shadow-md transition-shadow"
+                      className="rounded-xl border bg-[var(--admin-surface)] p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="space-y-3">
                         {/* Class Header */}
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm text-gray-900">
+                          <h4 className="font-medium text-sm text-[var(--admin-text)]">
                             {cls.name}
                           </h4>
                           <Button
@@ -384,7 +384,7 @@ export default function SetupClassesPage() {
                         </div>
 
                         {/* Teacher */}
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
                           <UserCheck className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate">{cls.teacher}</span>
                         </div>
@@ -397,13 +397,13 @@ export default function SetupClassesPage() {
                           >
                             {cls.room}
                           </Badge>
-                          <span className="text-gray-400">{cls.ageGroup}</span>
+                          <span className="text-[var(--admin-text-subtle)]">{cls.ageGroup}</span>
                         </div>
 
                         {/* Enrollment Bar */}
                         <div>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-[var(--admin-text-muted)]">
                               {cls.enrolled}/{cls.capacity} students
                             </span>
                             <span
@@ -417,7 +417,7 @@ export default function SetupClassesPage() {
                               {fillPercent}%
                             </span>
                           </div>
-                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[var(--admin-surface-2)] rounded-full overflow-hidden">
                             <div
                               className={cn(
                                 'h-full rounded-full transition-all duration-500',
@@ -437,9 +437,9 @@ export default function SetupClassesPage() {
                 {/* Add Class Placeholder */}
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
-                    <div className="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 hover:bg-violet-50/20 transition-all cursor-pointer min-h-[160px]">
-                      <Plus className="h-5 w-5 text-gray-400" />
-                      <p className="text-xs text-gray-500 font-medium">
+                    <div className="rounded-xl border-2 border-dashed border-[var(--admin-border)] p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 hover:bg-violet-50/20 transition-all cursor-pointer min-h-[160px]">
+                      <Plus className="h-5 w-5 text-[var(--admin-text-subtle)]" />
+                      <p className="text-xs text-[var(--admin-text-muted)] font-medium">
                         Add Class
                       </p>
                     </div>

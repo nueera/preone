@@ -102,7 +102,7 @@ interface LeadDetailDrawerProps {
 
 // ── Constants — using centralized theme tokens ──
 const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af', cardBg: CRM_COLORS.NEW?.bg ?? 'bg-gray-50' },
+  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af', cardBg: CRM_COLORS.NEW?.bg ?? 'bg-muted' },
   CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#3b82f6', cardBg: CRM_COLORS.CONTACTED?.bg ?? 'bg-blue-50' },
   VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#8b5cf6', cardBg: 'bg-purple-50' },
   APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f59e0b', cardBg: 'bg-yellow-50' },
@@ -113,7 +113,7 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: strin
 const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   HIGH: { label: 'High', color: THEME_PRIORITY_COLORS.HIGH?.text ?? 'text-red-600', bg: 'bg-red-50 border-red-200' },
   NORMAL: { label: 'Medium', color: THEME_PRIORITY_COLORS.MEDIUM?.text ?? 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200' },
-  LOW: { label: 'Low', color: THEME_PRIORITY_COLORS.LOW?.text ?? 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
+  LOW: { label: 'Low', color: THEME_PRIORITY_COLORS.LOW?.text ?? 'text-muted-foreground', bg: 'bg-muted border-border' },
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -163,7 +163,7 @@ function FollowUpTypeIcon({ type }: { type: string }) {
     case 'WhatsApp': return <MessageSquare className="h-4 w-4 text-green-500" />;
     case 'Email': return <Mail className="h-4 w-4 text-orange-500" />;
     case 'Visit': return <Eye className="h-4 w-4 text-purple-500" />;
-    default: return <FileText className="h-4 w-4 text-gray-500" />;
+    default: return <FileText className="h-4 w-4 text-muted-foreground" />;
   }
 }
 
@@ -316,7 +316,7 @@ function ConvertToStudentDialog({
         <div className="space-y-4">
           {/* Student Info */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Student Information</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">Student Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>First Name *</Label>
@@ -386,7 +386,7 @@ function ConvertToStudentDialog({
 
           {/* Father Info (pre-filled) */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Father Information</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">Father Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>First Name *</Label>
@@ -661,11 +661,11 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="w-[480px] sm:max-w-[480px] p-0 overflow-y-auto">
-          <SheetHeader className="p-4 pb-3 border-b bg-gray-50/50">
+          <SheetHeader className="p-4 pb-3 border-b bg-muted/50">
             <div className="flex items-start justify-between">
               <div>
                 <SheetTitle className="text-lg font-bold">{leadData.parentName}</SheetTitle>
-                <SheetDescription className="text-sm text-gray-500">
+                <SheetDescription className="text-sm text-muted-foreground">
                   Child: {leadData.childName}
                 </SheetDescription>
               </div>
@@ -734,7 +734,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
           {/* ── Tabs ── */}
           <div className="p-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full bg-gray-100">
+              <TabsList className="w-full bg-muted">
                 <TabsTrigger value="details" className="flex-1 text-xs">Details</TabsTrigger>
                 <TabsTrigger value="followups" className="flex-1 text-xs">Follow-ups</TabsTrigger>
                 <TabsTrigger value="activity" className="flex-1 text-xs">Activity</TabsTrigger>
@@ -745,7 +745,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                 <div className="grid grid-cols-1 gap-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs text-gray-500">Parent Name</Label>
+                      <Label className="text-xs text-muted-foreground">Parent Name</Label>
                       <Input
                         className="h-8 text-sm"
                         value={editForm.parentName}
@@ -753,7 +753,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-500">Phone</Label>
+                      <Label className="text-xs text-muted-foreground">Phone</Label>
                       <Input
                         className="h-8 text-sm"
                         value={editForm.parentPhone}
@@ -763,7 +763,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                   </div>
 
                   <div>
-                    <Label className="text-xs text-gray-500">Email</Label>
+                    <Label className="text-xs text-muted-foreground">Email</Label>
                     <Input
                       className="h-8 text-sm"
                       value={editForm.parentEmail}
@@ -773,7 +773,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs text-gray-500">Child Name</Label>
+                      <Label className="text-xs text-muted-foreground">Child Name</Label>
                       <Input
                         className="h-8 text-sm"
                         value={editForm.childName}
@@ -781,7 +781,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-500">Child Age</Label>
+                      <Label className="text-xs text-muted-foreground">Child Age</Label>
                       <Input
                         className="h-8 text-sm"
                         value={editForm.childAge}
@@ -792,7 +792,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs text-gray-500">Source</Label>
+                      <Label className="text-xs text-muted-foreground">Source</Label>
                       <Select value={editForm.source} onValueChange={(v) => setEditForm((p) => ({ ...p, source: v }))}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue />
@@ -805,7 +805,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-500">Est. Fee (₹)</Label>
+                      <Label className="text-xs text-muted-foreground">Est. Fee (₹)</Label>
                       <Input
                         type="number"
                         className="h-8 text-sm"
@@ -817,7 +817,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                   {/* Program Interest */}
                   <div>
-                    <Label className="text-xs text-gray-500">Program Interest</Label>
+                    <Label className="text-xs text-muted-foreground">Program Interest</Label>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {PROGRAMS.map((program) => (
                         <button
@@ -833,7 +833,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                             'rounded-full px-2.5 py-1 text-xs font-medium border transition-colors',
                             editForm.programInterest.includes(program)
                               ? theme.selectedClass
-                              : 'bg-white text-gray-400 border-gray-200'
+                              : 'bg-white text-muted-foreground border-border'
                           )}
                         >
                           {program}
@@ -844,7 +844,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                   {/* Next Follow-up */}
                   <div>
-                    <Label className="text-xs text-gray-500">Next Follow-up</Label>
+                    <Label className="text-xs text-muted-foreground">Next Follow-up</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -868,7 +868,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                   {/* Notes */}
                   <div>
-                    <Label className="text-xs text-gray-500">Notes</Label>
+                    <Label className="text-xs text-muted-foreground">Notes</Label>
                     <Textarea
                       className="text-sm"
                       value={editForm.notes}
@@ -880,7 +880,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                   {/* Lost Reason (only for LOST stage) */}
                   {editForm.stage === 'LOST' && (
                     <div>
-                      <Label className="text-xs text-gray-500">Lost Reason</Label>
+                      <Label className="text-xs text-muted-foreground">Lost Reason</Label>
                       <Input
                         className="h-8 text-sm"
                         value={editForm.lostReason}
@@ -916,7 +916,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
 
                 {/* Add Follow-up Form */}
                 {showFollowUpForm && (
-                  <div className="bg-gray-50 rounded-lg p-3 space-y-3 border">
+                  <div className="bg-muted rounded-lg p-3 space-y-3 border">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label className="text-xs">Type *</Label>
@@ -999,7 +999,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                 {/* Follow-up Timeline */}
                 <div className="space-y-0">
                   {leadData.followUps.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-muted-foreground text-sm">
                       No follow-ups yet. Add one above.
                     </div>
                   ) : (
@@ -1007,7 +1007,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                       <div key={fu.id} className="relative pl-6 pb-4">
                         {/* Timeline line */}
                         {idx < leadData.followUps.length - 1 && (
-                          <div className="absolute left-[9px] top-5 bottom-0 w-px bg-gray-200" />
+                          <div className="absolute left-[9px] top-5 bottom-0 w-px bg-muted" />
                         )}
                         {/* Timeline dot */}
                         <div className="absolute left-0 top-1">
@@ -1015,7 +1015,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                         </div>
                         <div className="ml-2">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-gray-700">
+                            <span className="text-xs font-medium text-muted-foreground">
                               {format(new Date(fu.dateTime), 'dd MMM')}
                             </span>
                             <Badge variant="outline" className="text-[10px] h-4">
@@ -1034,11 +1034,11 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                               {fu.outcome}
                             </Badge>
                           </div>
-                          <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                             &quot;{fu.notes}&quot;
                           </p>
                           {fu.createdBy && (
-                            <p className="text-[11px] text-gray-400 mt-1">
+                            <p className="text-[11px] text-muted-foreground mt-1">
                               — {fu.createdBy}
                             </p>
                           )}
@@ -1055,15 +1055,15 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                 <div className="space-y-0">
                   {/* Created */}
                   <div className="relative pl-6 pb-4">
-                    <div className="absolute left-[9px] top-5 bottom-0 w-px bg-gray-200" />
+                    <div className="absolute left-[9px] top-5 bottom-0 w-px bg-muted" />
                     <div className="absolute left-0 top-1">
                       <div className="h-4 w-4 rounded-full bg-green-500 flex items-center justify-center">
                         <CheckCircle2 className="h-2.5 w-2.5 text-white" />
                       </div>
                     </div>
                     <div className="ml-2">
-                      <p className="text-xs font-medium text-gray-700">Lead created</p>
-                      <p className="text-[11px] text-gray-400">
+                      <p className="text-xs font-medium text-muted-foreground">Lead created</p>
+                      <p className="text-[11px] text-muted-foreground">
                         {format(new Date(leadData.createdAt), 'dd MMM yyyy, hh:mm a')}
                       </p>
                     </div>
@@ -1072,20 +1072,20 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                   {/* Stage changes from follow-ups */}
                   {leadData.followUps.map((fu) => (
                     <div key={fu.id} className="relative pl-6 pb-4">
-                      <div className="absolute left-[9px] top-5 bottom-0 w-px bg-gray-200" />
+                      <div className="absolute left-[9px] top-5 bottom-0 w-px bg-muted" />
                       <div className="absolute left-0 top-1">
                         <FollowUpTypeIcon type={fu.type} />
                       </div>
                       <div className="ml-2">
-                        <p className="text-xs font-medium text-gray-700">
+                        <p className="text-xs font-medium text-muted-foreground">
                           {fu.type} — {fu.outcome}
                         </p>
-                        <p className="text-[11px] text-gray-400">
+                        <p className="text-[11px] text-muted-foreground">
                           {format(new Date(fu.dateTime), 'dd MMM yyyy, hh:mm a')}
                           {fu.createdBy && ` — ${fu.createdBy}`}
                         </p>
                         {fu.notes && (
-                          <p className="text-[11px] text-gray-500 mt-0.5">{fu.notes}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{fu.notes}</p>
                         )}
                       </div>
                     </div>
@@ -1101,7 +1101,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
                       </div>
                       <div className="ml-2">
                         <p className="text-xs font-medium text-green-700">Converted to Student</p>
-                        <p className="text-[11px] text-gray-400">
+                        <p className="text-[11px] text-muted-foreground">
                           {format(new Date(leadData.updatedAt), 'dd MMM yyyy, hh:mm a')}
                         </p>
                       </div>
@@ -1135,7 +1135,7 @@ export function LeadDetailDrawer({ open, onOpenChange, lead, onLeadUpdated }: Le
               Delete Lead
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Are you sure you want to delete <strong>{leadData?.parentName}</strong>&apos;s lead for <strong>{leadData?.childName}</strong>? This action cannot be undone.
           </p>
           <div className="flex items-center justify-end gap-2 mt-4">

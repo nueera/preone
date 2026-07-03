@@ -323,7 +323,7 @@ export default function AttendancePage() {
       {/* ── Top Bar ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Attendance</h1>
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">Attendance</h1>
         </div>
         <div className="flex items-center gap-3">
           {/* Date Picker */}
@@ -409,7 +409,7 @@ export default function AttendancePage() {
                       <TableCell className="text-center text-amber-600 font-medium">{cls.late}</TableCell>
                       <TableCell className="text-center font-bold">{cls.rate}%</TableCell>
                       <TableCell>
-                        <div className="flex h-4 w-full rounded-full overflow-hidden bg-gray-100">
+                        <div className="flex h-4 w-full rounded-full overflow-hidden bg-[var(--admin-surface-2)]">
                           <div
                             className="transition-all"
                             style={{ width: `${(cls.present / Math.max(cls.total, 1)) * 100}%`, backgroundColor: ATTENDANCE_COLORS.PRESENT.hex }}
@@ -438,7 +438,7 @@ export default function AttendancePage() {
                   ))}
                   {/* Total Row */}
                   {classStats.length > 0 && (
-                    <TableRow className="font-bold bg-gray-50">
+                    <TableRow className="font-bold bg-[var(--admin-surface-2)]">
                       <TableCell>Total</TableCell>
                       <TableCell className="text-center">{classStats.reduce((s, c) => s + c.total, 0)}</TableCell>
                       <TableCell className="text-center text-emerald-600">{classStats.reduce((s, c) => s + c.present, 0)}</TableCell>
@@ -558,7 +558,7 @@ export default function AttendancePage() {
                         LATE: `${ATTENDANCE_COLORS.LATE.bg} ${ATTENDANCE_COLORS.LATE.text} border-amber-200`,
                         ABSENT: `${ATTENDANCE_COLORS.ABSENT.bg} ${ATTENDANCE_COLORS.ABSENT.text} border-red-200`,
                         ON_LEAVE: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                        UNMARKED: 'bg-gray-50 text-gray-500 border-gray-200',
+                        UNMARKED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
                       };
                       return (
                         <TableRow key={staff.id}>

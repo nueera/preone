@@ -41,12 +41,12 @@ const GRADE_PRESETS = [
 ] as const;
 
 const INPUT_CLASS =
-  'w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all';
+  'w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all';
 
 const SMALL_INPUT_CLASS =
-  'px-3 py-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all text-sm';
+  'px-3 py-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all text-sm';
 
-const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--text-primary)]';
+const LABEL_CLASS = 'block text-sm font-medium mb-1.5 text-[var(--admin-text)]';
 
 function generateId(): string {
   return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -295,14 +295,14 @@ export function AcademicYearStep() {
       {/* ── Step Header ── */}
       <motion.div variants={itemVariants} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center text-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: 'var(--admin-primary-soft)' }}>
             📚
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)] font-[var(--font-primary)]">
+            <h2 className="text-xl font-bold text-[var(--admin-text)] font-[var(--font-primary)]">
               Academic Year &amp; Classes
             </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Define the academic year and set up classes with sections
             </p>
           </div>
@@ -313,7 +313,7 @@ export function AcademicYearStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">📅</span> Academic Year
             </h3>
 
@@ -367,10 +367,10 @@ export function AcademicYearStep() {
       <PreOneCard variant="default" className="mb-4">
         <PreOneCardContent>
           <motion.div variants={itemVariants} className="space-y-5">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2">
               <span className="text-lg">🎓</span> Select Grades
             </h3>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               Tap to select the grades/classes your school offers
             </p>
 
@@ -386,8 +386,8 @@ export function AcademicYearStep() {
                     className={cn(
                       'px-4 py-2.5 rounded-xl text-sm font-medium border transition-all min-h-[40px]',
                       isSelected
-                        ? 'bg-[var(--preone-primary)] text-white border-[var(--preone-primary)] shadow-md shadow-[var(--preone-primary)]/20'
-                        : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--preone-primary)]/50'
+                        ? 'bg-[var(--admin-primary)] text-white border-[var(--admin-primary)] shadow-md shadow-[var(--admin-primary)]/20'
+                        : 'bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:border-[var(--admin-primary)]/50'
                     )}
                   >
                     {isSelected && <span className="mr-1">✓</span>}
@@ -411,7 +411,7 @@ export function AcademicYearStep() {
                 type="button"
                 onClick={handleAddCustomGrade}
                 disabled={!customGradeInput.trim()}
-                className="px-4 py-3 rounded-xl bg-[var(--preone-primary)] text-white text-sm font-medium hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px]"
+                className="px-4 py-3 rounded-xl bg-[var(--admin-primary)] text-white text-sm font-medium hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px]"
               >
                 Add
               </button>
@@ -437,14 +437,14 @@ export function AcademicYearStep() {
                   {/* Grade Header */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--preone-primary)] to-[var(--preone-primary-light)] flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--admin-primary)] to-[var(--admin-primary)] flex items-center justify-center text-white text-sm font-bold shadow-sm">
                         {gc.gradeName.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-[var(--text-primary)]">
+                        <h4 className="text-sm font-semibold text-[var(--admin-text)]">
                           {gc.gradeName}
                         </h4>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-xs text-[var(--admin-text-subtle)]">
                           {gc.sections.length} section{gc.sections.length !== 1 ? 's' : ''}
                         </p>
                       </div>
@@ -471,16 +471,16 @@ export function AcademicYearStep() {
                     {gc.sections.map((section, sIdx) => (
                       <div
                         key={section.id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-secondary)]"
+                        className="flex items-center gap-3 p-3 rounded-xl bg-[var(--admin-surface)]"
                       >
                         {/* Section number */}
-                        <span className="text-xs font-medium text-[var(--text-muted)] w-6 text-center">
+                        <span className="text-xs font-medium text-[var(--admin-text-subtle)] w-6 text-center">
                           {sIdx + 1}
                         </span>
 
                         {/* Section Name */}
                         <div className="flex-1">
-                          <label className="text-xs text-[var(--text-muted)] mb-0.5 block">
+                          <label className="text-xs text-[var(--admin-text-subtle)] mb-0.5 block">
                             Section
                           </label>
                           <input
@@ -498,7 +498,7 @@ export function AcademicYearStep() {
 
                         {/* Capacity */}
                         <div className="flex-1">
-                          <label className="text-xs text-[var(--text-muted)] mb-0.5 block">
+                          <label className="text-xs text-[var(--admin-text-subtle)] mb-0.5 block">
                             Capacity
                           </label>
                           <input
@@ -534,7 +534,7 @@ export function AcademicYearStep() {
                   <button
                     type="button"
                     onClick={() => handleAddSection(gc.gradeName)}
-                    className="w-full py-2.5 rounded-xl border border-dashed border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--preone-primary)] hover:text-[var(--preone-primary)] transition-all text-sm font-medium min-h-[40px]"
+                    className="w-full py-2.5 rounded-xl border border-dashed border-[var(--admin-border)] text-[var(--admin-text-subtle)] hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)] transition-all text-sm font-medium min-h-[40px]"
                   >
                     + Add Section
                   </button>
@@ -550,7 +550,7 @@ export function AcademicYearStep() {
         <motion.div variants={itemVariants}>
           <div className="text-center py-8">
             <span className="text-4xl block mb-3">📚</span>
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-[var(--admin-text-subtle)]">
               Select grades above to configure sections
             </p>
           </div>

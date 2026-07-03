@@ -82,7 +82,7 @@ interface Lead {
 
 // ── Constants ──
 const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string; textColor: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af', cardBg: 'bg-gray-50', textColor: 'text-gray-600' },
+  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af', cardBg: 'bg-[var(--admin-surface-2)]', textColor: 'text-[var(--admin-text-muted)]' },
   CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#3b82f6', cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
   VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#8b5cf6', cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
   APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f59e0b', cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
@@ -99,7 +99,7 @@ const SOURCE_LABELS: Record<string, string> = {
 const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50' },
   NORMAL: { label: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50' },
+  LOW: { label: 'Low', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]' },
 };
 
 function getToken(): string | null {
@@ -219,11 +219,11 @@ export default function CrmLeadsPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Users className="h-6 w-6 text-portal-600" />
               Leads Management
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               {total} lead{total !== 1 ? 's' : ''} total
             </p>
           </div>
@@ -272,7 +272,7 @@ export default function CrmLeadsPage() {
       {/* Search + Filters Row */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
           <Input
             placeholder="Search by parent, child, phone..."
             value={searchQuery}
@@ -298,7 +298,7 @@ export default function CrmLeadsPage() {
 
       {/* Extended Filters */}
       {showFilters && (
-        <div className="flex items-center gap-3 flex-wrap p-3 bg-white rounded-xl border">
+        <div className="flex items-center gap-3 flex-wrap p-3 bg-[var(--admin-surface)] rounded-xl border">
           <Select value={sourceFilter} onValueChange={(v) => { setSourceFilter(v === 'ALL' ? '' : v); setPage(1); }}>
             <SelectTrigger className="w-[140px] h-8 text-xs">
               <SelectValue placeholder="Source" />
@@ -344,15 +344,15 @@ export default function CrmLeadsPage() {
       {/* Leads Table */}
       <Card className="overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center h-48 text-gray-400">
+          <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" />
             Loading leads...
           </div>
         ) : leads.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Users className="h-12 w-12 text-gray-300 mb-3" />
-            <p className="text-gray-500 font-medium">No leads found</p>
-            <p className="text-sm text-gray-400 mt-1">Try adjusting your filters or add a new lead</p>
+            <Users className="h-12 w-12 text-[var(--admin-text-subtle)] mb-3" />
+            <p className="text-[var(--admin-text-muted)] font-medium">No leads found</p>
+            <p className="text-sm text-[var(--admin-text-subtle)] mt-1">Try adjusting your filters or add a new lead</p>
           </div>
         ) : (
           <Table>
@@ -377,22 +377,22 @@ export default function CrmLeadsPage() {
                 return (
                   <TableRow
                     key={lead.id}
-                    className="cursor-pointer hover:bg-gray-50/80"
+                    className="cursor-pointer hover:bg-[var(--admin-surface-2)]/80"
                     onClick={() => handleLeadClick(lead)}
                   >
                     <TableCell>
                       <div>
                         <p className="font-medium text-sm">{lead.parentName}</p>
-                        <p className="text-xs text-gray-500">{lead.childName}{lead.childAge ? ` (${lead.childAge})` : ''}</p>
+                        <p className="text-xs text-[var(--admin-text-muted)]">{lead.childName}{lead.childAge ? ` (${lead.childAge})` : ''}</p>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-600">
+                    <TableCell className="text-sm text-[var(--admin-text-muted)]">
                       <div className="flex items-center gap-1">
-                        <Phone className="h-3 w-3 text-gray-400" />
+                        <Phone className="h-3 w-3 text-[var(--admin-text-subtle)]" />
                         {lead.parentPhone}
                       </div>
                       {lead.parentEmail && (
-                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+                        <div className="flex items-center gap-1 text-xs text-[var(--admin-text-subtle)] mt-0.5">
                           <Mail className="h-3 w-3" />
                           {lead.parentEmail}
                         </div>
@@ -433,7 +433,7 @@ export default function CrmLeadsPage() {
                           {isToday(followUpDate) ? 'Today' : isTomorrow(followUpDate) ? 'Tomorrow' : format(followUpDate, 'dd MMM')}
                         </span>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-[var(--admin-text-subtle)]">—</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -459,7 +459,7 @@ export default function CrmLeadsPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--admin-text-muted)]">
             Page {page} of {totalPages} ({total} leads)
           </p>
           <div className="flex items-center gap-2">

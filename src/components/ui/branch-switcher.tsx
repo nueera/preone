@@ -237,10 +237,10 @@ export function BranchSwitcher() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.15 }}
-              className="absolute left-0 top-full mt-2 z-50 w-64 rounded-xl border bg-white shadow-xl dark:bg-gray-900 dark:border-gray-800 overflow-hidden"
+              className="absolute left-0 top-full mt-2 z-50 w-64 rounded-xl border bg-white shadow-xl dark:bg-card dark:border-border overflow-hidden"
             >
               {/* Header */}
-              <div className="px-3 py-2.5 border-b dark:border-gray-800">
+              <div className="px-3 py-2.5 border-b dark:border-border">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Switch Branch
                 </p>
@@ -255,7 +255,7 @@ export function BranchSwitcher() {
                       'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                       !currentBranchId
                         ? `${theme.activeBg} ${theme.text} font-medium`
-                        : 'text-foreground hover:bg-gray-50 dark:hover:bg-gray-800'
+                        : 'text-foreground hover:bg-muted dark:hover:bg-muted'
                     )}
                     onClick={() => switchBranch(null)}
                     disabled={switching}
@@ -275,7 +275,7 @@ export function BranchSwitcher() {
                       'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                       currentBranchId === branch.id
                         ? `${theme.activeBg} ${theme.text} font-medium`
-                        : 'text-foreground hover:bg-gray-50 dark:hover:bg-gray-800'
+                        : 'text-foreground hover:bg-muted dark:hover:bg-muted'
                     )}
                     onClick={() => switchBranch(branch.id)}
                     disabled={switching}
@@ -298,8 +298,8 @@ export function BranchSwitcher() {
 
               {/* Loading / Switching indicator */}
               {switching && (
-                <div className="border-t px-3 py-2 flex items-center gap-2 dark:border-gray-800">
-                  <div className="h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                <div className="border-t px-3 py-2 flex items-center gap-2 dark:border-border">
+                  <div className="h-3 w-3 border-2 border-border border-t-gray-600 rounded-full animate-spin" />
                   <span className="text-xs text-muted-foreground">Switching...</span>
                 </div>
               )}

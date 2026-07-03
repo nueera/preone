@@ -109,7 +109,7 @@ interface TeacherData {
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   ON_LEAVE: 'bg-amber-50 text-amber-700 border-amber-200',
-  INACTIVE: 'bg-gray-50 text-gray-600 border-gray-200',
+  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -121,14 +121,14 @@ const STATUS_LABELS: Record<string, string> = {
 const SALARY_STATUS_COLORS: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  CANCELLED: 'bg-gray-50 text-gray-600 border-gray-200',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 const LEAVE_STATUS_COLORS: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   REJECTED: 'bg-red-50 text-red-700 border-red-200',
-  CANCELLED: 'bg-gray-50 text-gray-600 border-gray-200',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -450,7 +450,7 @@ export default function TeacherDetailPage() {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = format(new Date(attendanceMonth.getFullYear(), attendanceMonth.getMonth(), d), 'yyyy-MM-dd');
       const record = monthAttendance.find((a) => format(new Date(a.date), 'yyyy-MM-dd') === dateStr);
-      let bgColor = 'bg-gray-50';
+      let bgColor = 'bg-[var(--admin-surface-2)]';
       if (record) {
         if (record.status === 'PRESENT') bgColor = 'bg-emerald-100 text-emerald-700';
         else if (record.status === 'ABSENT') bgColor = 'bg-red-100 text-red-700';
@@ -480,7 +480,7 @@ export default function TeacherDetailPage() {
       {Array.from({ length: max }).map((_, i) => (
         <Star
           key={i}
-          className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`}
+          className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-[var(--admin-text-subtle)]'}`}
         />
       ))}
     </div>
@@ -502,7 +502,7 @@ export default function TeacherDetailPage() {
       </Button>
 
       {/* ── Profile Header ── */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-gray-900">
+      <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
             <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
@@ -511,7 +511,7 @@ export default function TeacherDetailPage() {
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
                 {teacher.firstName} {teacher.lastName}
               </h1>
               {teacher.qualification && (
@@ -692,7 +692,7 @@ export default function TeacherDetailPage() {
                               {schedule?.subject ? (
                                 <div className={cn(
                                   'rounded-lg px-2 py-1.5 text-xs font-medium',
-                                  SUBJECT_COLORS[schedule.subject] || 'bg-gray-100 text-gray-700'
+                                  SUBJECT_COLORS[schedule.subject] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'
                                 )}>
                                   {schedule.subject}
                                 </div>
@@ -754,7 +754,7 @@ export default function TeacherDetailPage() {
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-emerald-100" /> Present</div>
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-red-100" /> Absent</div>
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-amber-100" /> Late</div>
-                  <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-gray-50" /> No Data</div>
+                  <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-[var(--admin-surface-2)]" /> No Data</div>
                 </div>
               </CardContent>
             </Card>

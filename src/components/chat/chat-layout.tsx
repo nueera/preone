@@ -202,14 +202,14 @@ export function ChatLayout() {
               <div
                 className={cn(
                   'h-2 w-2 rounded-full',
-                  isConnected ? 'bg-green-500' : 'bg-gray-300'
+                  isConnected ? 'bg-green-500' : 'bg-muted-foreground/20'
                 )}
                 title={isConnected ? 'Connected' : 'Disconnected'}
               />
             </div>
           </div>
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               placeholder="Search conversations..."
               value={chatSearch}
@@ -223,8 +223,8 @@ export function ChatLayout() {
         <ScrollArea className="flex-1">
           {threads.length === 0 && !chatSearch ? (
             <div className="flex flex-col items-center justify-center p-8 gap-3">
-              <MessageSquare className="h-10 w-10 text-gray-200" />
-              <p className="text-xs text-gray-500 text-center">
+              <MessageSquare className="h-10 w-10 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground text-center">
                 No conversations yet
               </p>
             </div>
@@ -244,7 +244,7 @@ export function ChatLayout() {
                       'w-full text-left p-3 rounded-xl transition-all',
                       isSelected
                         ? 'bg-portal-50 border border-portal-200'
-                        : 'hover:bg-gray-50 border border-transparent'
+                        : 'hover:bg-muted border border-transparent'
                     )}
                   >
                     <div className="flex items-center gap-3">
@@ -259,14 +259,14 @@ export function ChatLayout() {
                             className={cn(
                               'text-xs truncate',
                               thread.unreadCount > 0
-                                ? 'font-semibold text-gray-900'
-                                : 'font-medium text-gray-700'
+                                ? 'font-semibold text-foreground'
+                                : 'font-medium text-muted-foreground'
                             )}
                           >
                             {displayName}
                           </span>
                           {thread.lastMessageAt && (
-                            <span className="text-[10px] text-gray-400 shrink-0 ml-2">
+                            <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
                               {formatTime(thread.lastMessageAt)}
                             </span>
                           )}
@@ -276,8 +276,8 @@ export function ChatLayout() {
                             className={cn(
                               'text-[10px] truncate mt-0.5',
                               thread.unreadCount > 0
-                                ? 'text-gray-700 font-medium'
-                                : 'text-gray-500'
+                                ? 'text-muted-foreground font-medium'
+                                : 'text-muted-foreground'
                             )}
                           >
                             {thread.lastMessagePreview}
@@ -312,7 +312,7 @@ export function ChatLayout() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 lg:hidden rounded-lg text-gray-500"
+                className="h-8 w-8 lg:hidden rounded-lg text-muted-foreground"
                 onClick={() => {
                   setMobileShowChat(false);
                   setActiveThread(null);
@@ -326,10 +326,10 @@ export function ChatLayout() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-gray-900 truncate">
+                <div className="text-sm font-semibold text-foreground truncate">
                   {activeThread.name || 'Conversation'}
                 </div>
-                <div className="text-[10px] text-gray-500">
+                <div className="text-[10px] text-muted-foreground">
                   {activeThread.participants?.length || 0} participants
                 </div>
               </div>
@@ -340,8 +340,8 @@ export function ChatLayout() {
               <div className="p-4 space-y-3">
                 {currentMessages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <MessageSquare className="h-10 w-10 text-gray-200 mb-3" />
-                    <p className="text-xs text-gray-500">
+                    <MessageSquare className="h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="text-xs text-muted-foreground">
                       Start the conversation!
                     </p>
                   </div>
@@ -361,7 +361,7 @@ export function ChatLayout() {
                             'max-w-[75%] px-3.5 py-2',
                             isOwn
                               ? 'bg-portal-600 text-white rounded-2xl rounded-br-md'
-                              : 'bg-gray-100 text-gray-800 rounded-2xl rounded-bl-md'
+                              : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
                           )}
                         >
                           {!isOwn && (
@@ -375,7 +375,7 @@ export function ChatLayout() {
                           <div
                             className={cn(
                               'flex items-center justify-end gap-1 mt-1',
-                              isOwn ? 'text-portal-200' : 'text-gray-400'
+                              isOwn ? 'text-portal-200' : 'text-muted-foreground'
                             )}
                           >
                             <span className="text-[9px]">
@@ -426,10 +426,10 @@ export function ChatLayout() {
             <div className="w-16 h-16 rounded-full bg-portal-50 flex items-center justify-center mb-4">
               <MessageCircle className="h-8 w-8 text-portal-300" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">
+            <h3 className="text-sm font-semibold text-foreground mb-1">
               Select a Conversation
             </h3>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Choose a conversation from the list to start messaging
             </p>
           </div>

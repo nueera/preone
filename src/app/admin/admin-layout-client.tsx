@@ -4,12 +4,15 @@ import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/components/admin-header';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
 import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes (with sub-paths)
 const TASK_MASTER_ALLOWED = [
   '/admin/dashboard',
   '/admin/admissions',
+  '/admin/admission',
   '/admin/communication/chat',
   '/admin/communication/announcements',
 ];
@@ -54,32 +57,40 @@ export function AdminLayoutClient({
         (route) => pathname === route || pathname.startsWith(route + '/')
       );
       if (!isAllowed) {
-        router.replace('/admin/admissions');
+        router.replace('/admin/admission');
       }
     }
   }, [userRole, pathname, router]);
 
-  // SUPER_ADMIN / ADMIN system route guard — only SUPER_ADMIN can access /admin/system
+  // SUPER_ADMIN / ADMIN system route guard
   useEffect(() => {
     if (userRole === 'ADMIN' && pathname.startsWith('/admin/system')) {
-      router.replace('/admin/dashboard');
+      router.replace('/admin');
     }
   }, [userRole, pathname, router]);
 
-  // Onboarding redirect: if admin's school hasn't completed onboarding,
-  // redirect to the setup wizard (unless already there)
+  // Onboarding redirect
   useEffect(() => {
-    if ((userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && !onboardingComplete && !pathname.startsWith('/admin/onboarding') && !pathname.startsWith('/admin/setup')) {
+    if (
+      (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') &&
+      !onboardingComplete &&
+      !pathname.startsWith('/admin/onboarding') &&
+      !pathname.startsWith('/admin/setup')
+    ) {
       router.replace('/admin/setup');
     }
   }, [userRole, onboardingComplete, pathname, router]);
 
-  // Onboarding routes are standalone full-page — no sidebar/header
+  // Onboarding routes are standalone full-page — no topbar
   const isOnboarding = pathname.startsWith('/admin/onboarding');
 
   if (isOnboarding) {
     return (
-      <div data-portal="admin" data-role={userRole.toLowerCase()}>
+      <div
+        className="min-h-screen"
+        data-portal="admin"
+        data-role={userRole.toLowerCase()}
+      >
         {children}
       </div>
     );

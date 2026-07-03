@@ -181,7 +181,7 @@ export default function ClassDetailPage() {
     );
   }
 
-  const programColors = PROGRAM_COLORS[classData.program.name] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+  const programColors = PROGRAM_COLORS[classData.program.name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
   const occupancy = classData.capacity > 0 ? Math.round((classData._count.students / classData.capacity) * 100) : 0;
 
   return (
@@ -208,7 +208,7 @@ export default function ClassDetailPage() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
                     {classData.name}
                   </h1>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${programColors.bg} ${programColors.text} ${programColors.border}`}>
@@ -275,9 +275,9 @@ export default function ClassDetailPage() {
         </div>
 
         {/* ── Capacity Bar ── */}
-        <div className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-900">
+        <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)]">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-[var(--admin-text-muted)]">
               Class Capacity
             </span>
             <span className="text-sm text-muted-foreground">
@@ -330,7 +330,7 @@ export default function ClassDetailPage() {
                     {students.slice(0, 9).map((student) => (
                       <div
                         key={student.id}
-                        className="flex items-center gap-3 p-3 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                        className="flex items-center gap-3 p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] cursor-pointer transition-colors"
                         onClick={() => router.push(`/admin/students/${student.id}`)}
                       >
                         <Avatar className="h-9 w-9">
@@ -339,7 +339,7 @@ export default function ClassDetailPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <p className="text-sm font-medium text-[var(--admin-text)] truncate">
                             {student.firstName} {student.lastName}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -348,7 +348,7 @@ export default function ClassDetailPage() {
                         </div>
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${student.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-50 text-gray-600'}`}
+                          className={`text-[10px] ${student.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'}`}
                         >
                           {student.status === 'ACTIVE' ? 'Active' : student.status}
                         </Badge>
@@ -429,10 +429,10 @@ export default function ClassDetailPage() {
                     {activities.slice(0, 5).map((activity) => (
                       <div
                         key={activity.id}
-                        className="flex items-center justify-between p-3 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        className="flex items-center justify-between p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] transition-colors"
                       >
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          <p className="text-sm font-medium text-[var(--admin-text)]">
                             {activity.title}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -441,7 +441,7 @@ export default function ClassDetailPage() {
                         </div>
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${activity.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' : activity.status === 'UPCOMING' ? 'bg-sky-50 text-sky-700' : 'bg-gray-50 text-gray-600'}`}
+                          className={`text-[10px] ${activity.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' : activity.status === 'UPCOMING' ? 'bg-sky-50 text-sky-700' : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'}`}
                         >
                           {activity.status}
                         </Badge>

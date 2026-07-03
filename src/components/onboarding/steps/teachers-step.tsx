@@ -179,10 +179,10 @@ export function TeachersStep() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h2 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-primary)' }}>
+        <h2 className="text-2xl font-bold text-[var(--admin-text)]" style={{ fontFamily: 'var(--font-primary)' }}>
           👩‍🏫 Add Teachers
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-sm text-[var(--admin-text-muted)] mt-1">
           Add your teachers and assign them to classes and subjects
         </p>
       </motion.div>
@@ -190,15 +190,15 @@ export function TeachersStep() {
       {/* Add Teacher Form */}
       <PreOneCard variant="default">
         <PreOneCardContent>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-[var(--preone-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-[var(--admin-primary)]" />
             Add Teacher
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* First Name */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">
                 First Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -206,13 +206,13 @@ export function TeachersStep() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="e.g. Priya"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
 
             {/* Last Name */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">
                 Last Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -220,55 +220,55 @@ export function TeachersStep() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="e.g. Sharma"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">Email</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="teacher@school.com"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">Phone</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">Phone</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
 
             {/* Qualification */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">Qualification</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">Qualification</label>
               <input
                 type="text"
                 value={qualification}
                 onChange={(e) => setQualification(e.target.value)}
                 placeholder="e.g. B.Ed, M.Ed"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
 
             {/* Specialization */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">Specialization</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">Specialization</label>
               <input
                 type="text"
                 value={specialization}
                 onChange={(e) => setSpecialization(e.target.value)}
                 placeholder="e.g. Early Childhood Education"
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               />
             </div>
           </div>
@@ -276,11 +276,11 @@ export function TeachersStep() {
           {/* Branch Selector */}
           {draft.branches.length > 1 && (
             <div className="mt-4">
-              <label className="block text-sm font-medium mb-1.5 text-[var(--text-primary)]">Branch</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--admin-text)]">Branch</label>
               <select
                 value={branchId}
                 onChange={(e) => setBranchId(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
               >
                 {draft.branches.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -292,9 +292,9 @@ export function TeachersStep() {
           )}
 
           {/* Assignments Section */}
-          <div className="mt-6 border-t border-[var(--border-light)] pt-4">
-            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[var(--preone-primary)]" />
+          <div className="mt-6 border-t border-[var(--admin-border)] pt-4">
+            <h4 className="text-sm font-semibold text-[var(--admin-text)] mb-3 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[var(--admin-primary)]" />
               Class & Subject Assignments
             </h4>
 
@@ -309,11 +309,11 @@ export function TeachersStep() {
                 >
                   {/* Class selector */}
                   <div className="flex-1 min-w-[140px]">
-                    <label className="block text-xs font-medium mb-1 text-[var(--text-secondary)]">Class</label>
+                    <label className="block text-xs font-medium mb-1 text-[var(--admin-text-muted)]">Class</label>
                     <select
                       value={assignment.classId}
                       onChange={(e) => updateAssignment(index, 'classId', e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] text-sm focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
                     >
                       <option value="">Select class</option>
                       {filteredClasses.map((c) => (
@@ -326,11 +326,11 @@ export function TeachersStep() {
 
                   {/* Subject selector */}
                   <div className="flex-1 min-w-[140px]">
-                    <label className="block text-xs font-medium mb-1 text-[var(--text-secondary)]">Subject</label>
+                    <label className="block text-xs font-medium mb-1 text-[var(--admin-text-muted)]">Subject</label>
                     <select
                       value={assignment.subjectId}
                       onChange={(e) => updateAssignment(index, 'subjectId', e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] text-sm focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
                     >
                       <option value="">Select subject</option>
                       {draft.subjects.map((s) => (
@@ -343,11 +343,11 @@ export function TeachersStep() {
 
                   {/* Role selector */}
                   <div className="flex-1 min-w-[130px]">
-                    <label className="block text-xs font-medium mb-1 text-[var(--text-secondary)]">Role</label>
+                    <label className="block text-xs font-medium mb-1 text-[var(--admin-text-muted)]">Role</label>
                     <select
                       value={assignment.role}
                       onChange={(e) => updateAssignment(index, 'role', e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--preone-primary)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text)] text-sm focus:ring-2 focus:ring-[var(--admin-primary)] focus:border-transparent outline-none transition-all"
                     >
                       <option value="class_teacher">Class Teacher</option>
                       <option value="subject_teacher">Subject Teacher</option>
@@ -360,7 +360,7 @@ export function TeachersStep() {
                     <button
                       type="button"
                       onClick={() => removeAssignment(index)}
-                      className="p-2.5 rounded-xl text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-all min-h-[44px]"
+                      className="p-2.5 rounded-xl text-[var(--admin-text-subtle)] hover:text-red-500 hover:bg-red-50 transition-all min-h-[44px]"
                       aria-label="Remove assignment"
                     >
                       <X className="w-4 h-4" />
@@ -373,7 +373,7 @@ export function TeachersStep() {
             <button
               type="button"
               onClick={addAssignment}
-              className="flex items-center gap-1.5 text-sm font-medium text-[var(--preone-primary)] hover:text-[var(--preone-primary-dark)] transition-colors mt-1 min-h-[44px]"
+              className="flex items-center gap-1.5 text-sm font-medium text-[var(--admin-primary)] hover:text-[var(--admin-primary-hover)] transition-colors mt-1 min-h-[44px]"
             >
               <Plus className="w-4 h-4" />
               Add Another Assignment
@@ -385,7 +385,7 @@ export function TeachersStep() {
             <button
               type="button"
               onClick={handleAddTeacher}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--preone-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--admin-primary)] to-[var(--admin-primary)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--admin-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
             >
               <Plus className="w-4 h-4 inline-block mr-1.5" />
               Add Teacher
@@ -397,9 +397,9 @@ export function TeachersStep() {
       {/* Added Teachers List */}
       {draft.teachers.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] flex items-center gap-2">
             Added Teachers
-            <span className="text-sm font-normal text-[var(--text-muted)]">
+            <span className="text-sm font-normal text-[var(--admin-text-subtle)]">
               ({draft.teachers.length})
             </span>
           </h3>
@@ -440,11 +440,11 @@ export function TeachersStep() {
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-[var(--text-primary)] text-sm truncate">
+                            <p className="font-medium text-[var(--admin-text)] text-sm truncate">
                               {teacher.name}
                             </p>
                             {teacher.phone && (
-                              <p className="text-xs text-[var(--text-muted)] truncate">{teacher.phone}</p>
+                              <p className="text-xs text-[var(--admin-text-subtle)] truncate">{teacher.phone}</p>
                             )}
 
                             {/* Assignment badges */}
@@ -453,7 +453,8 @@ export function TeachersStep() {
                                 {teacherClasses.map((c) => (
                                   <span
                                     key={c.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 text-xs font-medium"
+                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium"
+                                  style={{ background: 'var(--admin-info-soft)', color: 'var(--admin-info)' }}
                                   >
                                     {c.name} {c.section ? `- ${c.section}` : ''}
                                   </span>
@@ -461,7 +462,8 @@ export function TeachersStep() {
                                 {teacherSubjects.map((s) => (
                                   <span
                                     key={s.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 text-xs font-medium"
+                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium"
+                                  style={{ background: 'var(--admin-primary-soft)', color: 'var(--admin-primary)' }}
                                   >
                                     {s.name}
                                   </span>
@@ -473,7 +475,7 @@ export function TeachersStep() {
                           {/* Remove button */}
                           <button
                             onClick={() => handleRemoveTeacher(teacher.id)}
-                            className="p-2 rounded-lg text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            className="p-2 rounded-lg text-[var(--admin-text-subtle)] hover:text-red-500 hover:bg-red-50 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
                             aria-label={`Remove ${teacher.name}`}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -492,8 +494,8 @@ export function TeachersStep() {
       {/* CSV Import */}
       <PreOneCard variant="glass">
         <PreOneCardContent>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-            <Upload className="w-5 h-5 text-[var(--preone-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--admin-text)] mb-3 flex items-center gap-2">
+            <Upload className="w-5 h-5 text-[var(--admin-primary)]" />
             Import from CSV
           </h3>
 
@@ -502,7 +504,7 @@ export function TeachersStep() {
             <a
               href="/api/onboarding/template/teachers"
               download
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all text-sm font-medium min-h-[44px] justify-center"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] transition-all text-sm font-medium min-h-[44px] justify-center"
             >
               <Download className="w-4 h-4" />
               Download Template
@@ -513,10 +515,10 @@ export function TeachersStep() {
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleFileDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-[var(--border-default)] hover:border-[var(--preone-primary)] bg-[var(--bg-secondary)] cursor-pointer transition-all min-h-[44px]"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-[var(--admin-border)] hover:border-[var(--admin-primary)] bg-[var(--admin-surface)] cursor-pointer transition-all min-h-[44px]"
             >
-              <Upload className="w-4 h-4 text-[var(--text-muted)]" />
-              <span className="text-sm text-[var(--text-secondary)]">
+              <Upload className="w-4 h-4 text-[var(--admin-text-subtle)]" />
+              <span className="text-sm text-[var(--admin-text-muted)]">
                 Drop CSV here or click to browse
               </span>
               <input
@@ -533,8 +535,8 @@ export function TeachersStep() {
           </div>
 
           {isImporting && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-              <div className="w-4 h-4 border-2 border-[var(--preone-primary)] border-t-transparent rounded-full animate-spin" />
+            <div className="mt-3 flex items-center gap-2 text-sm text-[var(--admin-text-muted)]">
+              <div className="w-4 h-4 border-2 border-[var(--admin-primary)] border-t-transparent rounded-full animate-spin" />
               Importing teachers...
             </div>
           )}
@@ -546,7 +548,7 @@ export function TeachersStep() {
         <button
           type="button"
           onClick={handleContinue}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--preone-primary)] to-[var(--preone-primary-light)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--preone-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--admin-primary)] to-[var(--admin-primary)] text-white font-medium shadow-md hover:shadow-lg hover:shadow-[var(--admin-primary)]/25 transition-all active:scale-[0.97] min-h-[44px]"
         >
           Continue →
         </button>

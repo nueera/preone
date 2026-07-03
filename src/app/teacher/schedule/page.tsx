@@ -114,16 +114,16 @@ const SUBJECT_COLORS: Record<string, { bg: string; text: string; border: string;
   craft:     { bg: 'bg-yellow-50',   text: 'text-yellow-700',   border: 'border-yellow-200',   emoji: '🧶' },
   dance:     { bg: 'bg-orange-50',   text: 'text-orange-700',   border: 'border-orange-200',   emoji: '🎭' },
   story:     { bg: 'bg-teal-50',     text: 'text-teal-700',     border: 'border-teal-200',     emoji: '📖' },
-  break:     { bg: 'bg-gray-50',     text: 'text-gray-600',     border: 'border-gray-200',     emoji: '🍎' },
-  snack:     { bg: 'bg-gray-50',     text: 'text-gray-600',     border: 'border-gray-200',     emoji: '🍎' },
-  lunch:     { bg: 'bg-gray-50',     text: 'text-gray-600',     border: 'border-gray-200',     emoji: '🍱' },
-  nap:       { bg: 'bg-gray-50',     text: 'text-gray-600',     border: 'border-gray-200',     emoji: '😴' },
+  break:     { bg: 'bg-muted',     text: 'text-muted-foreground',     border: 'border-border',     emoji: '🍎' },
+  snack:     { bg: 'bg-muted',     text: 'text-muted-foreground',     border: 'border-border',     emoji: '🍎' },
+  lunch:     { bg: 'bg-muted',     text: 'text-muted-foreground',     border: 'border-border',     emoji: '🍱' },
+  nap:       { bg: 'bg-muted',     text: 'text-muted-foreground',     border: 'border-border',     emoji: '😴' },
   free:      { bg: 'bg-slate-50',    text: 'text-slate-600',    border: 'border-slate-200',    emoji: '🧩' },
   end:       { bg: 'bg-slate-50',    text: 'text-slate-600',    border: 'border-slate-200',    emoji: '👋' },
 };
 
 function getSubjectConfig(subject: string | null): { bg: string; text: string; border: string; emoji: string } {
-  if (!subject) return { bg: 'bg-gray-50', text: 'text-gray-400', border: 'border-gray-100', emoji: '' };
+  if (!subject) return { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border', emoji: '' };
   const lower = subject.toLowerCase();
   for (const [key, config] of Object.entries(SUBJECT_COLORS)) {
     if (lower.includes(key)) return config;
@@ -138,14 +138,14 @@ const LEAVE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: stri
   EARNED:      { label: 'Earned Leave',   color: 'text-emerald-700', bg: 'bg-emerald-100', border: 'border-emerald-300' },
   MATERNITY:   { label: 'Maternity Leave', color: 'text-pink-700',  bg: 'bg-pink-100',    border: 'border-pink-300' },
   PATERNITY:   { label: 'Paternity Leave', color: 'text-purple-700', bg: 'bg-purple-100',  border: 'border-purple-300' },
-  WITHOUT_PAY: { label: 'Without Pay',    color: 'text-gray-700',    bg: 'bg-gray-100',    border: 'border-gray-300' },
+  WITHOUT_PAY: { label: 'Without Pay',    color: 'text-muted-foreground',    bg: 'bg-muted',    border: 'border-border' },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
   PENDING:   { label: 'Pending',   color: 'text-amber-700', bg: 'bg-amber-100', icon: Clock4 },
   APPROVED:  { label: 'Approved',  color: 'text-emerald-700', bg: 'bg-emerald-100', icon: CheckCircle2 },
   REJECTED:  { label: 'Rejected',  color: 'text-red-700', bg: 'bg-red-100', icon: XCircle },
-  CANCELLED: { label: 'Cancelled', color: 'text-gray-600', bg: 'bg-gray-100', icon: Ban },
+  CANCELLED: { label: 'Cancelled', color: 'text-muted-foreground', bg: 'bg-muted', icon: Ban },
 };
 
 const BALANCE_COLORS: Record<string, { bar: string; bg: string; text: string; accent: string }> = {
@@ -388,8 +388,8 @@ function ScheduleContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Schedule</h3>
-        <p className="text-gray-500 mb-4">{scheduleError}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Schedule</h3>
+        <p className="text-muted-foreground mb-4">{scheduleError}</p>
         <Button onClick={fetchSchedule} className="bg-portal-600 hover:bg-portal-700 rounded-xl">Retry</Button>
       </div>
     );
@@ -404,11 +404,11 @@ function ScheduleContent() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-portal-500" />
                 Schedule & Leave
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {scheduleData?.teacher ? `${scheduleData.teacher.firstName} ${scheduleData.teacher.lastName}` : 'Teacher'}
               </p>
             </div>
@@ -426,7 +426,7 @@ function ScheduleContent() {
 
       {/* ── Main Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-gray-100 rounded-xl">
+        <TabsList className="bg-muted rounded-xl">
           <TabsTrigger value="schedule" className="rounded-lg text-xs">
             <CalendarDays className="h-3.5 w-3.5 mr-1" /> Weekly Schedule
           </TabsTrigger>
@@ -442,9 +442,9 @@ function ScheduleContent() {
           {!scheduleData?.hasSchedule ? (
             <Card className="border-0 shadow-md">
               <CardContent className="py-16 text-center">
-                <CalendarDays className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Schedule Set</h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No Schedule Set</h3>
+                <p className="text-sm text-muted-foreground mb-4">
                   No weekly schedule has been configured yet. Contact admin to set your weekly schedule.
                 </p>
               </CardContent>
@@ -455,15 +455,15 @@ function ScheduleContent() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs border-collapse min-w-[700px]">
                     <thead>
-                      <tr className="bg-gray-50">
-                        <th className="sticky left-0 bg-gray-50 z-10 py-2.5 px-3 text-left font-medium text-gray-500 w-[60px] border-b border-r border-gray-200">
+                      <tr className="bg-muted">
+                        <th className="sticky left-0 bg-muted z-10 py-2.5 px-3 text-left font-medium text-muted-foreground w-[60px] border-b border-r border-border">
                           Time
                         </th>
                         {scheduleGrid.workingDays.map((day) => (
                           <th
                             key={day}
-                            className={`py-2.5 px-2 text-center font-medium border-b border-gray-200 min-w-[90px] ${
-                              day === today ? 'bg-portal-50 text-portal-700' : 'text-gray-500'
+                            className={`py-2.5 px-2 text-center font-medium border-b border-border min-w-[90px] ${
+                              day === today ? 'bg-portal-50 text-portal-700' : 'text-muted-foreground'
                             }`}
                           >
                             <div>{DAY_SHORT[day]}</div>
@@ -493,10 +493,10 @@ function ScheduleContent() {
                             key={time}
                             className={`${
                               isCurrentTimeRow ? 'bg-portal-50/50' : ''
-                            } hover:bg-gray-50/50`}
+                            } hover:bg-muted/50`}
                           >
                             <td
-                              className={`sticky left-0 z-10 py-1.5 px-3 text-[10px] font-mono text-gray-500 border-r border-b border-gray-100 bg-white ${
+                              className={`sticky left-0 z-10 py-1.5 px-3 text-[10px] font-mono text-muted-foreground border-r border-b border-border bg-white ${
                                 isCurrentTimeRow ? 'bg-portal-50' : ''
                               }`}
                             >
@@ -513,7 +513,7 @@ function ScheduleContent() {
                                 return (
                                   <td
                                     key={`${day}-${time}`}
-                                    className="py-1.5 px-1.5 border-b border-gray-50"
+                                    className="py-1.5 px-1.5 border-b border-border"
                                   >
                                     <div className="h-10" />
                                   </td>
@@ -523,7 +523,7 @@ function ScheduleContent() {
                               return (
                                 <td
                                   key={`${day}-${time}`}
-                                  className={`py-1 px-1.5 border-b border-gray-50 ${
+                                  className={`py-1 px-1.5 border-b border-border ${
                                     day === today ? 'bg-portal-50/30' : ''
                                   }`}
                                 >
@@ -533,7 +533,7 @@ function ScheduleContent() {
                                     <div className={`${config.text} font-medium text-[11px] leading-tight`}>
                                       {config.emoji} {entry.subject}
                                     </div>
-                                    <div className="text-[9px] text-gray-400 mt-0.5">
+                                    <div className="text-[9px] text-muted-foreground mt-0.5">
                                       {entry.startTime} - {entry.endTime}
                                     </div>
                                   </div>
@@ -571,7 +571,7 @@ function ScheduleContent() {
                         <span className="text-sm">{config.emoji}</span>
                         <div>
                           <div className={`${config.text} text-xs font-medium`}>{item.subject}</div>
-                          <div className="text-[10px] text-gray-400">{item.startTime} - {item.endTime}</div>
+                          <div className="text-[10px] text-muted-foreground">{item.startTime} - {item.endTime}</div>
                         </div>
                       </div>
                     );
@@ -598,8 +598,8 @@ function ScheduleContent() {
           ) : leavesError ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Leaves</h3>
-              <p className="text-gray-500 mb-4">{leavesError}</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Leaves</h3>
+              <p className="text-muted-foreground mb-4">{leavesError}</p>
               <Button onClick={fetchLeaves} className="bg-portal-600 hover:bg-portal-700 rounded-xl">Retry</Button>
             </div>
           ) : leavesData ? (
@@ -624,13 +624,13 @@ function ScheduleContent() {
                           </Badge>
                         </div>
                         <div className={`text-2xl font-bold ${colors.accent} mb-1`}>
-                          {bal.remaining} <span className="text-sm font-normal text-gray-500">/ {bal.total}</span>
+                          {bal.remaining} <span className="text-sm font-normal text-muted-foreground">/ {bal.total}</span>
                         </div>
                         <Progress
                           value={percentage}
                           className={`h-2 ${colors.bg}`}
                         />
-                        <div className="text-[10px] text-gray-500 mt-1.5">
+                        <div className="text-[10px] text-muted-foreground mt-1.5">
                           {bal.used} day{bal.used !== 1 ? 's' : ''} used this year
                         </div>
                       </CardContent>
@@ -658,9 +658,9 @@ function ScheduleContent() {
                 <CardContent>
                   {leavesData.leaves.length === 0 ? (
                     <div className="py-12 text-center">
-                      <Clock className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">No Leave History</h3>
-                      <p className="text-xs text-gray-500 mb-4">You haven&apos;t applied for any leaves yet</p>
+                      <Clock className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                      <h3 className="text-sm font-semibold text-foreground mb-1">No Leave History</h3>
+                      <p className="text-xs text-muted-foreground mb-4">You haven&apos;t applied for any leaves yet</p>
                       <Button
                         className="bg-portal-600 hover:bg-portal-700 rounded-xl text-xs"
                         onClick={() => setShowApplyDialog(true)}
@@ -672,14 +672,14 @@ function ScheduleContent() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="border-b border-gray-200">
-                            <th className="text-left py-2.5 px-3 font-medium text-gray-600">Type</th>
-                            <th className="text-left py-2.5 px-3 font-medium text-gray-600">From</th>
-                            <th className="text-left py-2.5 px-3 font-medium text-gray-600">To</th>
-                            <th className="text-center py-2.5 px-3 font-medium text-gray-600">Days</th>
-                            <th className="text-left py-2.5 px-3 font-medium text-gray-600">Reason</th>
-                            <th className="text-center py-2.5 px-3 font-medium text-gray-600">Status</th>
-                            <th className="text-center py-2.5 px-3 font-medium text-gray-600">Actions</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2.5 px-3 font-medium text-muted-foreground">Type</th>
+                            <th className="text-left py-2.5 px-3 font-medium text-muted-foreground">From</th>
+                            <th className="text-left py-2.5 px-3 font-medium text-muted-foreground">To</th>
+                            <th className="text-center py-2.5 px-3 font-medium text-muted-foreground">Days</th>
+                            <th className="text-left py-2.5 px-3 font-medium text-muted-foreground">Reason</th>
+                            <th className="text-center py-2.5 px-3 font-medium text-muted-foreground">Status</th>
+                            <th className="text-center py-2.5 px-3 font-medium text-muted-foreground">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -689,16 +689,16 @@ function ScheduleContent() {
                             const StatusIcon = statusConfig.icon;
 
                             return (
-                              <tr key={leave.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                              <tr key={leave.id} className="border-b border-border hover:bg-muted/50">
                                 <td className="py-2.5 px-3">
                                   <Badge className={`${typeConfig.bg} ${typeConfig.color} ${typeConfig.border} border text-[10px] px-2 py-0.5`}>
                                     {typeConfig.label}
                                   </Badge>
                                 </td>
-                                <td className="py-2.5 px-3 text-gray-700">{formatShortDate(leave.startDate)}</td>
-                                <td className="py-2.5 px-3 text-gray-700">{formatShortDate(leave.endDate)}</td>
-                                <td className="py-2.5 px-3 text-center font-semibold text-gray-700">{leave.days}</td>
-                                <td className="py-2.5 px-3 text-gray-600 max-w-[200px] truncate">{leave.reason}</td>
+                                <td className="py-2.5 px-3 text-muted-foreground">{formatShortDate(leave.startDate)}</td>
+                                <td className="py-2.5 px-3 text-muted-foreground">{formatShortDate(leave.endDate)}</td>
+                                <td className="py-2.5 px-3 text-center font-semibold text-muted-foreground">{leave.days}</td>
+                                <td className="py-2.5 px-3 text-muted-foreground max-w-[200px] truncate">{leave.reason}</td>
                                 <td className="py-2.5 px-3 text-center">
                                   <Badge className={`${statusConfig.bg} ${statusConfig.color} border-0 text-[10px] px-2 py-0.5`}>
                                     <StatusIcon className="h-3 w-3 mr-0.5 inline" />
@@ -727,12 +727,12 @@ function ScheduleContent() {
 
                   {/* Summary */}
                   {leavesData.leaves.length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-500">
-                      <span>Total: <strong className="text-gray-700">{leavesData.summary.totalLeaves}</strong></span>
+                    <div className="mt-4 pt-3 border-t border-border flex flex-wrap gap-4 text-xs text-muted-foreground">
+                      <span>Total: <strong className="text-muted-foreground">{leavesData.summary.totalLeaves}</strong></span>
                       <span>Approved: <strong className="text-portal-600">{leavesData.summary.approvedCount}</strong></span>
                       <span>Pending: <strong className="text-amber-600">{leavesData.summary.pendingCount}</strong></span>
                       <span>Rejected: <strong className="text-red-600">{leavesData.summary.rejectedCount}</strong></span>
-                      <span>Days Used: <strong className="text-gray-700">{leavesData.summary.totalDaysUsed}</strong></span>
+                      <span>Days Used: <strong className="text-muted-foreground">{leavesData.summary.totalDaysUsed}</strong></span>
                     </div>
                   )}
                 </CardContent>
@@ -808,12 +808,12 @@ function ScheduleContent() {
 
             {/* Days Count */}
             {appliedDays > 0 && (
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <div className="text-xs text-gray-700">
+              <div className="p-3 bg-muted rounded-xl">
+                <div className="text-xs text-muted-foreground">
                   <strong>{appliedDays}</strong> day{appliedDays > 1 ? 's' : ''} of leave
                 </div>
                 {balanceWarning && (
-                  <div className={`text-xs mt-1 ${balanceWarning.includes('without pay') ? 'text-amber-600' : 'text-gray-500'}`}>
+                  <div className={`text-xs mt-1 ${balanceWarning.includes('without pay') ? 'text-amber-600' : 'text-muted-foreground'}`}>
                     {balanceWarning.includes('without pay') && '⚠️ '}{balanceWarning}
                   </div>
                 )}
@@ -831,7 +831,7 @@ function ScheduleContent() {
                 placeholder="Describe the reason for your leave (minimum 10 characters)..."
                 className="min-h-[80px] rounded-xl text-sm resize-none"
               />
-              <p className="text-[10px] text-gray-400 text-right">
+              <p className="text-[10px] text-muted-foreground text-right">
                 {applyForm.reason.length} characters (minimum 10)
               </p>
             </div>
@@ -840,7 +840,7 @@ function ScheduleContent() {
             <div className="space-y-2">
               <Label className="text-xs font-medium">Contact During Leave</Label>
               <div className="relative">
-                <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
                   type="tel"
                   value={applyForm.contactDuringLeave}
@@ -849,7 +849,7 @@ function ScheduleContent() {
                   className="pl-8 rounded-xl text-xs"
                 />
               </div>
-              <p className="text-[10px] text-gray-400">Optional — for emergency contact during your leave</p>
+              <p className="text-[10px] text-muted-foreground">Optional — for emergency contact during your leave</p>
             </div>
           </div>
 
@@ -890,15 +890,15 @@ function ScheduleContent() {
           {cancelTarget && (
             <div className="p-3 bg-red-50 rounded-xl space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-gray-500">Type</span>
+                <span className="text-muted-foreground">Type</span>
                 <span className="font-medium">{LEAVE_TYPE_CONFIG[cancelTarget.leaveType]?.label || cancelTarget.leaveType}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Duration</span>
+                <span className="text-muted-foreground">Duration</span>
                 <span className="font-medium">{formatShortDate(cancelTarget.startDate)} — {formatShortDate(cancelTarget.endDate)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Days</span>
+                <span className="text-muted-foreground">Days</span>
                 <span className="font-medium">{cancelTarget.days}</span>
               </div>
             </div>

@@ -118,7 +118,7 @@ export function AchievementGalaxy({
               <span className="text-xs text-muted-foreground w-20 truncate">
                 {skill.label}
               </span>
-              <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+              <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{

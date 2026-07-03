@@ -55,11 +55,11 @@ export default function BillingSettingsPage() {
     <PageTransition>
       <StaggerContainer className="space-y-6">
         <StaggerItem>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <CreditCard className="w-6 h-6" style={{ color: theme.primary }} />
             Billing & Subscription
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Current plan, usage, invoices, and upgrades</p>
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">Current plan, usage, invoices, and upgrades</p>
         </StaggerItem>
 
         {/* Current Plan */}
@@ -92,14 +92,14 @@ export default function BillingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-amber-500" /> Usage This Month</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-amber-500" /> Usage This Month</h3>
               <div className="space-y-4">
                 {USAGE.map((u) => {
                   const pct = Math.round((u.used / u.limit) * 100);
                   return (
                     <div key={u.label}>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-gray-700">{u.label}</span>
+                        <span className="text-sm text-[var(--admin-text-muted)]">{u.label}</span>
                         <span className={`text-sm font-medium ${u.color}`}>
                           {u.used}{u.unit ? ` ${u.unit}` : ''} / {u.limit}{u.unit ? ` ${u.unit}` : ''}
                         </span>
@@ -119,14 +119,14 @@ export default function BillingSettingsPage() {
             {PLANS.map((plan) => (
               <PreOneCard key={plan.name} variant={plan.current ? 'strip' : 'default'} className={`p-5 ${plan.current ? 'ring-2 ring-purple-400' : ''}`}>
                 <div className="text-center">
-                  <h4 className="font-semibold text-gray-900">{plan.name}</h4>
-                  <p className="text-2xl font-bold mt-1" style={{ color: theme.primary }}>{plan.price}<span className="text-sm text-gray-400">/mo</span></p>
-                  <p className="text-xs text-gray-500 mt-1">Up to {plan.students} students</p>
+                  <h4 className="font-semibold text-[var(--admin-text)]">{plan.name}</h4>
+                  <p className="text-2xl font-bold mt-1" style={{ color: theme.primary }}>{plan.price}<span className="text-sm text-[var(--admin-text-subtle)]">/mo</span></p>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-1">Up to {plan.students} students</p>
                   {plan.current && <Badge className="bg-purple-50 text-purple-700 text-[10px] mt-2">Current Plan</Badge>}
                 </div>
                 <div className="mt-4 space-y-1">
                   {plan.features.map((f) => (
-                    <div key={f} className="flex items-center gap-1 text-xs text-gray-500">
+                    <div key={f} className="flex items-center gap-1 text-xs text-[var(--admin-text-muted)]">
                       <CheckCircle2 className="w-3 h-3 text-emerald-500" /> {f}
                     </div>
                   ))}
@@ -143,13 +143,13 @@ export default function BillingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><CalendarDays className="w-4 h-4 text-gray-500" /> Invoices</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><CalendarDays className="w-4 h-4 text-[var(--admin-text-muted)]" /> Invoices</h3>
               <div className="space-y-2">
                 {INVOICES.map((inv) => (
                   <div key={inv.id} className="flex items-center justify-between p-3 rounded-xl border">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{inv.month}</p>
-                      <p className="text-xs text-gray-400">{inv.date}</p>
+                      <p className="text-sm font-medium text-[var(--admin-text)]">{inv.month}</p>
+                      <p className="text-xs text-[var(--admin-text-subtle)]">{inv.date}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium">{inv.amount}</span>

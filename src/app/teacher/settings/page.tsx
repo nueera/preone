@@ -217,7 +217,7 @@ export default function TeacherSettingsPage() {
 
       {/* ── Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-gray-100 rounded-xl p-1">
+        <TabsList className="bg-muted rounded-xl p-1">
           <TabsTrigger
             value="profile"
             className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
@@ -933,7 +933,7 @@ function NotificationsTab() {
             return (
               <div
                 key={type.key}
-                className="grid grid-cols-[1fr_80px_80px] items-center px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                className="grid grid-cols-[1fr_80px_80px] items-center px-4 py-3 rounded-xl hover:bg-muted transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-portal-50">
@@ -1047,12 +1047,12 @@ function DetailField({
       <div className="flex items-center justify-between">
         <Label className="text-xs text-muted-foreground">{label}</Label>
         {readonly && (
-          <Badge variant="outline" className="text-[9px] px-1.5 py-0 text-gray-400 border-gray-200">
+          <Badge variant="outline" className="text-[9px] px-1.5 py-0 text-muted-foreground border-border">
             Read only
           </Badge>
         )}
       </div>
-      <p className="text-sm font-medium bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
+      <p className="text-sm font-medium bg-muted px-3 py-2 rounded-xl border border-border">
         {value}
       </p>
     </div>

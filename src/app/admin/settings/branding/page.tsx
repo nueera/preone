@@ -32,11 +32,11 @@ export default function BrandingSettingsPage() {
         <StaggerItem>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Palette className="w-6 h-6" style={{ color: theme.primary }} />
                 Branding & Theme
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Logo, colors, and custom styling</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Logo, colors, and custom styling</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Save className="w-4 h-4 mr-2" /> Save Changes
@@ -48,14 +48,14 @@ export default function BrandingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">School Logo</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">School Logo</h3>
               <div className="flex items-start gap-6">
                 <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500 to-sky-500 flex items-center justify-center text-white text-3xl font-bold">
                   P1
                 </div>
                 <div className="space-y-2">
                   <Button variant="outline"><Upload className="w-4 h-4 mr-2" /> Upload Logo</Button>
-                  <p className="text-xs text-gray-400">SVG, PNG, or JPG. Recommended: 512×512px. Max 2MB.</p>
+                  <p className="text-xs text-[var(--admin-text-subtle)]">SVG, PNG, or JPG. Recommended: 512×512px. Max 2MB.</p>
                   <div className="flex gap-2">
                     <Badge variant="outline" className="text-[9px]">Light version</Badge>
                     <Badge variant="outline" className="text-[9px]">Dark version</Badge>
@@ -71,10 +71,10 @@ export default function BrandingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Color Scheme</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Color Scheme</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Primary Color</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-2 block">Primary Color</label>
                   <div className="flex items-center gap-3">
                     <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border" />
                     <Input value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1" />
@@ -82,7 +82,7 @@ export default function BrandingSettingsPage() {
                   <div className="mt-2 h-8 rounded-lg" style={{ backgroundColor: primaryColor }} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Secondary Color</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-2 block">Secondary Color</label>
                   <div className="flex items-center gap-3">
                     <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border" />
                     <Input value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} className="flex-1" />
@@ -90,7 +90,7 @@ export default function BrandingSettingsPage() {
                   <div className="mt-2 h-8 rounded-lg" style={{ backgroundColor: secondaryColor }} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Accent Color</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-2 block">Accent Color</label>
                   <div className="flex items-center gap-3">
                     <input type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border" />
                     <Input value={accentColor} onChange={(e) => setAccentColor(e.target.value)} className="flex-1" />
@@ -106,14 +106,14 @@ export default function BrandingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Brand Text</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Brand Text</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">School Name Display</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">School Name Display</label>
                   <Input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Tagline</label>
+                  <label className="text-sm font-medium text-[var(--admin-text-muted)] mb-1 block">Tagline</label>
                   <Input value={tagline} onChange={(e) => setTagline(e.target.value)} />
                 </div>
               </div>
@@ -130,14 +130,14 @@ export default function BrandingSettingsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Custom CSS</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Custom CSS</h3>
               <textarea
                 value={customCSS}
                 onChange={(e) => setCustomCSS(e.target.value)}
-                className="w-full h-40 p-3 rounded-xl border font-mono text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="w-full h-40 p-3 rounded-xl border font-mono text-sm text-[var(--admin-text-muted)] bg-[var(--admin-surface-2)] focus:outline-none focus:ring-2 focus:ring-purple-400"
                 spellCheck={false}
               />
-              <p className="text-xs text-gray-400 mt-1">Custom CSS will be applied after the default theme styles.</p>
+              <p className="text-xs text-[var(--admin-text-subtle)] mt-1">Custom CSS will be applied after the default theme styles.</p>
             </PreOneCardContent>
           </PreOneCard>
         </StaggerItem>

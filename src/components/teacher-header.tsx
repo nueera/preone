@@ -10,6 +10,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
@@ -88,7 +89,7 @@ export function TeacherHeader() {
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'T';
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
       {/* ── Left: Sidebar trigger + Breadcrumb ── */}
       <SidebarTrigger className="shrink-0" />
 
@@ -117,7 +118,7 @@ export function TeacherHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Quick Action, Notifications, User Menu ── */}
+      {/* ── Right: Quick Action, Theme Toggle, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Quick Mark Attendance Button */}
         <Button
@@ -129,6 +130,9 @@ export function TeacherHeader() {
           <Zap className="h-3.5 w-3.5" />
           Mark Attendance
         </Button>
+
+        {/* ── Global Theme Toggle ── */}
+        <GlobalThemeToggle variant="pill" />
 
         {/* Notification Bell */}
         <NotificationBell />

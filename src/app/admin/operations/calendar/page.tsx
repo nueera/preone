@@ -138,11 +138,11 @@ export default function CalendarPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <CalendarDays className="w-6 h-6" style={{ color: theme.primary }} />
                 School Calendar
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Manage events, holidays, and activities</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage events, holidays, and activities</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md hover:shadow-lg">
               <Plus className="w-4 h-4 mr-2" /> Add Event
@@ -160,7 +160,7 @@ export default function CalendarPage() {
                   <Button variant="outline" size="icon" onClick={prevMonth}>
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                     {MONTHS[month]} {year}
                   </h2>
                   <Button variant="outline" size="icon" onClick={nextMonth}>
@@ -171,7 +171,7 @@ export default function CalendarPage() {
                 {/* Day Headers */}
                 <div className="grid grid-cols-7 gap-1 mb-2">
                   {DAYS.map((d) => (
-                    <div key={d} className="text-center text-xs font-semibold text-gray-400 py-2">
+                    <div key={d} className="text-center text-xs font-semibold text-[var(--admin-text-subtle)] py-2">
                       {d}
                     </div>
                   ))}
@@ -188,13 +188,13 @@ export default function CalendarPage() {
                     return (
                       <div
                         key={`day-${day}`}
-                        className={`h-20 p-1 rounded-lg border text-sm transition-colors cursor-pointer hover:bg-gray-50 ${
+                        className={`h-20 p-1 rounded-lg border text-sm transition-colors cursor-pointer hover:bg-[var(--admin-surface-2)] ${
                           isToday ? 'border-purple-400 bg-purple-50/50' : 'border-transparent'
                         }`}
                       >
                         <span
                           className={`text-xs font-medium ${
-                            isToday ? 'text-purple-700' : 'text-gray-700'
+                            isToday ? 'text-purple-700' : 'text-[var(--admin-text-muted)]'
                           }`}
                         >
                           {day}
@@ -212,7 +212,7 @@ export default function CalendarPage() {
                             );
                           })}
                           {dayEvents.length > 2 && (
-                            <div className="text-[9px] text-gray-400 px-1">
+                            <div className="text-[9px] text-[var(--admin-text-subtle)] px-1">
                               +{dayEvents.length - 2} more
                             </div>
                           )}
@@ -230,12 +230,12 @@ export default function CalendarPage() {
             <PreOneCard variant="default">
               <PreOneCardContent>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Upcoming Events</h3>
+                  <h3 className="font-semibold text-[var(--admin-text)]">Upcoming Events</h3>
                 </div>
 
                 {/* Search */}
                 <div className="relative mb-3">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
                   <Input
                     placeholder="Search events..."
                     value={searchQuery}
@@ -269,11 +269,11 @@ export default function CalendarPage() {
                 <ScrollArea className="max-h-96">
                   <div className="space-y-2">
                     {loading ? (
-                      <div className="flex items-center justify-center py-6 text-gray-400"><Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading events…</div>
+                      <div className="flex items-center justify-center py-6 text-[var(--admin-text-subtle)]"><Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading events…</div>
                     ) : error ? (
                       <p className="text-sm text-red-500 text-center py-6">{error}</p>
                     ) : filteredEvents.length === 0 ? (
-                      <p className="text-sm text-gray-400 text-center py-6">No events found</p>
+                      <p className="text-sm text-[var(--admin-text-subtle)] text-center py-6">No events found</p>
                     ) : (
                       filteredEvents.map((ev) => {
                         const cfg = TYPE_CONFIG[ev.type];
@@ -281,19 +281,19 @@ export default function CalendarPage() {
                         return (
                           <div
                             key={ev.id}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--admin-surface-2)] transition-colors"
                           >
                             <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center shrink-0`}>
                               <Icon className={`w-4 h-4 ${cfg.color}`} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">{ev.title}</p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-sm font-medium text-[var(--admin-text)] truncate">{ev.title}</p>
+                              <p className="text-xs text-[var(--admin-text-muted)]">
                                 {new Date(ev.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                                 {ev.time && ` • ${ev.time}`}
                               </p>
                               {ev.description && (
-                                <p className="text-xs text-gray-400 mt-0.5 truncate">{ev.description}</p>
+                                <p className="text-xs text-[var(--admin-text-subtle)] mt-0.5 truncate">{ev.description}</p>
                               )}
                             </div>
                             <Badge className={`${cfg.bg} ${cfg.color} text-[9px] shrink-0`}>{cfg.label}</Badge>

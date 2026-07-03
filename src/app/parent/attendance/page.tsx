@@ -87,7 +87,7 @@ function getStatusIcon(status: string): string {
 function getStatusBg(status: string): string {
   const colors = ATTENDANCE_COLORS[status];
   if (colors) return `${colors.bg} ${colors.text}`;
-  return 'bg-gray-100 text-gray-500';
+  return 'bg-muted text-muted-foreground';
 }
 
 function getStatusBadge(status: string) {
@@ -249,11 +249,11 @@ function AttendanceCalendar({
             const status = cell.record?.status;
             const isWeekend = new Date(cell.dateStr!).getDay() === 0;
 
-            let cellBg = 'bg-gray-50 text-gray-400';
+            let cellBg = 'bg-muted text-muted-foreground';
             let statusIcon = '';
 
             if (cell.isFuture) {
-              cellBg = 'bg-white text-gray-300 border border-gray-100';
+              cellBg = 'bg-white text-muted-foreground border border-border';
             } else if (status === 'PRESENT') {
               cellBg = 'bg-emerald-100 text-emerald-800';
               statusIcon = '✅';
@@ -264,9 +264,9 @@ function AttendanceCalendar({
               cellBg = 'bg-amber-100 text-amber-800';
               statusIcon = '⏰';
             } else if (isWeekend) {
-              cellBg = 'bg-gray-50 text-gray-400';
+              cellBg = 'bg-muted text-muted-foreground';
             } else {
-              cellBg = 'bg-white text-gray-600 border border-gray-100';
+              cellBg = 'bg-white text-muted-foreground border border-border';
             }
 
             const dayContent = (
@@ -323,7 +323,7 @@ function AttendanceCalendar({
             <div className={`w-4 h-4 rounded ${ATTENDANCE_COLORS.LATE?.bg || 'bg-amber-100'}`} /> Late
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="w-4 h-4 rounded bg-gray-50 border border-gray-100" /> No Data
+            <div className="w-4 h-4 rounded bg-muted border border-border" /> No Data
           </div>
         </div>
       </div>
@@ -473,7 +473,7 @@ function AttendanceTable({
         {records.length > 0 ? (
           <div className="space-y-3">
             {/* Table Header */}
-            <div className="hidden sm:grid grid-cols-6 gap-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2 bg-gray-50 rounded-xl">
+            <div className="hidden sm:grid grid-cols-6 gap-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2 bg-muted rounded-xl">
               <span>Date</span>
               <span>Day</span>
               <span>Status</span>
@@ -487,7 +487,7 @@ function AttendanceTable({
               {displayRecords.map((record) => (
                 <div
                   key={record.date}
-                  className="grid grid-cols-2 sm:grid-cols-6 gap-2 items-center px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm"
+                  className="grid grid-cols-2 sm:grid-cols-6 gap-2 items-center px-3 py-2.5 rounded-xl hover:bg-muted transition-colors text-sm"
                 >
                   <span className="font-medium text-xs">
                     {formatDateShort(record.date)}

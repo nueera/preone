@@ -227,7 +227,7 @@ export default function ImportStudentsPage() {
 
       {/* ── Header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
           Import Students
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -256,7 +256,7 @@ export default function ImportStudentsPage() {
             className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
               dragOver
                 ? 'border-portal-400 bg-portal-50'
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-[var(--admin-border)] hover:border-[var(--admin-border)]'
             }`}
           >
             <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
