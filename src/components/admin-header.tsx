@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import {
   Search,
   User,
@@ -10,13 +9,8 @@ import {
   LogOut,
   Zap,
   Shield,
-  Home,
   Sun,
   Moon,
-  Maximize2,
-  Minimize2,
-  Undo2,
-  Redo2,
   Command,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -41,9 +35,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PORTAL_THEMES, ROLE_THEMES, PREONE_COLORS } from '@/lib/theme-tokens';
-import { useSchoolBranding } from '@/contexts/school-branding';
-import { useUndoRedoStore } from '@/lib/stores/undo-redo';
-import { toast } from 'sonner';
 
 const theme = PORTAL_THEMES.admin;
 
@@ -105,28 +96,23 @@ const PATH_LABELS: Record<string, string> = {
 };
 
 /**
- * AdminHeader — Redesigned top header bar for the PreOne admin portal.
- * 
+ * AdminHeader — Top header bar for the PreOne admin portal.
+ *
  * Features:
- * - Taller header (h-16 = 64px) with glass-morphism effect
- * - School branding (logo + name from SchoolBrandingContext)
- * - Home button for quick dashboard navigation
- * - Theme toggle (dark/light mode)
- * - Maximize/full-screen toggle
- * - Undo/Redo buttons (from global UndoRedoStore)
- * - Command palette trigger (Ctrl+K)
+ * - Role badges (Super Admin / Task Master)
  * - Breadcrumb navigation
- * - Notification bell, branch switcher, user menu
- * - All colors use CSS variable tokens — no hardcoded values
+ * - Command Palette trigger (Ctrl+K) with keyboard hint
+ * - Theme toggle (dark/light)
+ * - Notification bell
+ * - Branch switcher
+ * - User avatar dropdown
+ *
+ * No SidebarTrigger — sidebar has been removed for a cleaner layout.
  */
 export function AdminHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { theme: currentTheme, setTheme } = useTheme();
-  const { schoolName, schoolLogo } = useSchoolBranding();
-  const { undo, redo, canUndo, canRedo, past, future } = useUndoRedoStore();
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [user, setUser] = useState<AuthUser | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -152,67 +138,18 @@ export function AdminHeader() {
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
   }, [currentTheme, setTheme]);
 
-  // Full-screen toggle
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
-    }
+  // Open command palette
+  const openCommandPalette = useCallback(() => {
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
+    );
   }, []);
-
-  // Undo/Redo handlers
-  const handleUndo = useCallback(async () => {
-    const action = await undo();
-    if (action) {
-      toast.success(`Undone: ${action.description}`, { action: { label: 'Redo', onClick: () => redo() } });
-    }
-  }, [undo, redo]);
-
-  const handleRedo = useCallback(async () => {
-    const action = await redo();
-    if (action) {
-      toast.success(`Redone: ${action.description}`);
-    }
-  }, [redo]);
-
-  // Global keyboard shortcuts for this header
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
-
-      // Ctrl+Z for undo
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        handleUndo();
-      }
-      // Ctrl+Shift+Z for redo
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
-        e.preventDefault();
-        handleRedo();
-      }
-      // F for fullscreen
-      if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
-        toggleFullscreen();
-      }
-      // D for theme toggle
-      if (e.key === 'd' && !e.ctrlKey && !e.metaKey) {
-        toggleTheme();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleUndo, handleRedo, toggleFullscreen, toggleTheme]);
-
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'A';
   const isTaskMaster = user?.role === 'TASK_MASTER';
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white/80 backdrop-blur-lg shadow-sm px-4 dark:bg-gray-900/80 dark:border-gray-800">
       {/* ── Role badge ── */}
       {isSuperAdmin && (
         <span
@@ -240,7 +177,7 @@ export function AdminHeader() {
           Task Master
         </span>
       )}
-      {/* ── Left: Breadcrumb ── */}
+      {/* ── Breadcrumb ── */}
       <Breadcrumb>
         <BreadcrumbList>
           {segments.map((seg, idx) => {
@@ -266,88 +203,23 @@ export function AdminHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Branch Switcher, Search, Notifications, User Menu ── */}
+      {/* ── Right: Branch Switcher, Search, Theme, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Branch Switcher */}
         <BranchSwitcher />
-
-        {/* Divider */}
-        <div
-          className="h-6 w-px mx-1 hidden sm:block"
-          style={{ backgroundColor: 'var(--admin-border)' }}
-        />
-
-        {/* Undo / Redo */}
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg disabled:opacity-30"
-                disabled={past.length === 0}
-                onClick={handleUndo}
-                style={{ color: 'var(--admin-text-muted)' }}
-              >
-                <Undo2 className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Undo (Ctrl+Z)</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg disabled:opacity-30"
-                disabled={future.length === 0}
-                onClick={handleRedo}
-                style={{ color: 'var(--admin-text-muted)' }}
-              >
-                <Redo2 className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Redo (Ctrl+Shift+Z)</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        {/* Divider */}
-        <div
-          className="h-6 w-px mx-1 hidden sm:block"
-          style={{ backgroundColor: 'var(--admin-border)' }}
-        />
-
         {/* Command Palette Trigger */}
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 className="h-8 gap-1.5 rounded-lg px-2 hidden sm:flex"
-                onClick={() => {
-                  // Dispatch Ctrl+K event to open command palette
-                  document.dispatchEvent(
-                    new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
-                  );
-                }}
-                style={{
-                  color: 'var(--admin-text-muted)',
-                  border: '1px solid var(--admin-border)',
-                }}
+                onClick={openCommandPalette}
               >
                 <Search className="h-3.5 w-3.5" />
-                <span className="text-xs">Search</span>
-                <kbd
-                  className="ml-1 rounded border px-1 py-0.5 text-[9px] font-mono"
-                  style={{
-                    borderColor: 'var(--admin-border)',
-                    color: 'var(--admin-text-subtle)',
-                  }}
-                >
+                <span className="text-xs text-muted-foreground">Search</span>
+                <kbd className="ml-1 rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">
                   ⌘K
                 </kbd>
               </Button>
@@ -356,6 +228,16 @@ export function AdminHeader() {
           </Tooltip>
         </TooltipProvider>
 
+        {/* Mobile search button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 sm:hidden"
+          onClick={openCommandPalette}
+        >
+          <Search className="h-4 w-4" />
+        </Button>
+
         {/* Theme Toggle */}
         <TooltipProvider delayDuration={300}>
           <Tooltip>
@@ -363,9 +245,8 @@ export function AdminHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-lg"
+                className="h-8 w-8"
                 onClick={toggleTheme}
-                style={{ color: 'var(--admin-text-muted)' }}
               >
                 {currentTheme === 'dark' ? (
                   <Sun className="h-4 w-4" />
@@ -375,28 +256,6 @@ export function AdminHeader() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>Toggle theme (D)</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        {/* Fullscreen Toggle */}
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg hidden sm:flex"
-                onClick={toggleFullscreen}
-                style={{ color: 'var(--admin-text-muted)' }}
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Fullscreen (F)</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 

@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/components/admin-header';
+import { QueryProvider } from '@/components/providers';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
 import { CommandPalette } from '@/components/ui/command-palette';
 import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
@@ -28,11 +29,10 @@ interface AdminLayoutClientProps {
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
  *
  * Provides:
+ * - QueryProvider (React Query) for data fetching
  * - Header + Main content structure with Aurora Background
  * - Command Palette (Ctrl+K) for quick navigation
  * - Keyboard Shortcuts panel (press ?)
- * - School branding context (logo, name, colors)
- * - Undo/Redo global action system
  * - Role-based route guards
  *
  * data-portal="admin" for CSS theme scoping.
@@ -86,28 +86,32 @@ export function AdminLayoutClient({
 
   if (isOnboarding) {
     return (
-      <div
-        className="min-h-screen"
-        data-portal="admin"
-        data-role={userRole.toLowerCase()}
-      >
-        {children}
-      </div>
+      <QueryProvider>
+        <div data-portal="admin" data-role={userRole.toLowerCase()}>
+          {children}
+        </div>
+      </QueryProvider>
     );
   }
 
   return (
-    <AuroraBackground intensity="subtle">
-      <div className="flex flex-col min-h-screen">
-        <AdminHeader />
-        <main
-          className="flex-1 bg-background/80 p-6 overflow-auto"
-          data-portal="admin"
-          data-role={userRole.toLowerCase()}
-        >
-          {children}
-        </main>
-      </div>
-    </AuroraBackground>
+    <QueryProvider>
+      <AuroraBackground intensity="subtle">
+        <div className="flex flex-col min-h-screen">
+          <AdminHeader />
+          <main
+            className="flex-1 bg-background/80 p-6 overflow-auto"
+            data-portal="admin"
+            data-role={userRole.toLowerCase()}
+          >
+            {children}
+          </main>
+        </div>
+
+        {/* Global overlays */}
+        <CommandPalette />
+        <KeyboardShortcuts />
+      </AuroraBackground>
+    </QueryProvider>
   );
 }

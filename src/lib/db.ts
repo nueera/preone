@@ -6,8 +6,8 @@ const globalForPrisma = globalThis as unknown as {
 
 // Disable query logging in production for performance
 const logLevel = process.env.NODE_ENV === 'production'
-  ? ['error', 'warn'] as const
-  : ['query', 'error', 'warn'] as const
+  ? [{ level: 'error' as const }, { level: 'warn' as const }]
+  : [{ level: 'query' as const }, { level: 'error' as const }, { level: 'warn' as const }]
 
 export const db =
   globalForPrisma.prisma ??
