@@ -338,6 +338,35 @@
   --portal-700: #5B21B6;
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
+
+  /* ── Admin Design System Tokens ── */
+  --admin-bg: #F8FAFC;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F1F5F9;
+  --admin-border: #E2E8F0;
+  --admin-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
+  --admin-text: #1E293B;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+
+  --admin-primary: #7C3AED;
+  --admin-primary-soft: #EDE9FE;
+  --admin-primary-foreground: #FFFFFF;
+
+  --admin-success: #16A34A;
+  --admin-success-soft: #DCFCE7;
+
+  --admin-warning: #D97706;
+  --admin-warning-soft: #FEF3C7;
+
+  --admin-info: #0284C7;
+  --admin-info-soft: #E0F2FE;
+
+  --admin-error: #DC2626;
+  --admin-error-soft: #FEE2E2;
+
+  --admin-accent: #7C3AED;
 }
 
 /* ── Teacher Portal: Emerald / Teal ── */
@@ -418,6 +447,37 @@
 
   --portal: #A78BFA;
   --portal-foreground: #0F172A;
+}
+
+/* ── Dark mode: Admin tokens ── */
+.dark [data-portal="admin"] {
+  --admin-bg: #0F172A;
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: rgba(255,255,255,0.1);
+  --admin-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #64748B;
+
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167,139,250,0.15);
+  --admin-primary-foreground: #0F172A;
+
+  --admin-success: #4ADE80;
+  --admin-success-soft: rgba(74,222,128,0.15);
+
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251,191,36,0.15);
+
+  --admin-info: #38BDF8;
+  --admin-info-soft: rgba(56,189,248,0.15);
+
+  --admin-error: #FCA5A5;
+  --admin-error-soft: rgba(252,165,165,0.15);
+
+  --admin-accent: #A78BFA;
 }
 
 .dark [data-portal="teacher"] {
