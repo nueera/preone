@@ -419,7 +419,7 @@ export function getDashboardPath(role: Role): string {
     case Role.TASK_MASTER:
       return '/admin/crm';  // TASK_MASTER lands on CRM page within Admin portal
     case Role.TEACHER:
-      return '/teacher/dashboard';
+      return '/teacher';
     case Role.PARENT:
       return '/parent/dashboard';
     default:

@@ -8,12 +8,11 @@ import {
   Settings,
   LogOut,
   Zap,
+  Heart,
+  ChevronDown,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
-import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -47,7 +46,7 @@ interface AuthUser {
 
 // ── Map path segments to readable labels ──
 const PATH_LABELS: Record<string, string> = {
-  teacher: 'Teacher',
+  teacher: 'Home',
   dashboard: 'Dashboard',
   'my-class': 'My Class',
   attendance: 'Attendance',
@@ -57,12 +56,18 @@ const PATH_LABELS: Record<string, string> = {
   growth: 'Growth',
   schedule: 'Schedule',
   communication: 'Communication',
+  chat: 'Chat',
+  announcements: 'Announcements',
+  reports: 'Reports',
+  notifications: 'Notifications',
   settings: 'Settings',
+  assistant: 'PreOne Assistant',
 };
 
 /**
  * TeacherHeader — Top header bar for the PreOne teacher portal.
- * Shows sidebar trigger, breadcrumb, quick actions, notifications, and user menu.
+ * No sidebar trigger (sidebar removed — module cards grid is the primary navigation).
+ * Shows: PreOne branding, breadcrumb, quick actions, notifications, and user menu.
  */
 export function TeacherHeader() {
   const pathname = usePathname();
@@ -80,6 +85,9 @@ export function TeacherHeader() {
   // Build breadcrumb segments from pathname
   const segments = pathname.split('/').filter(Boolean);
 
+  // Check if we're on the landing page (/teacher with no further segments)
+  const isLandingPage = segments.length === 1 && segments[0] === 'teacher';
+
   const handleLogout = () => {
     localStorage.removeItem('preone_token');
     localStorage.removeItem('preone_user');
@@ -87,36 +95,69 @@ export function TeacherHeader() {
   };
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'T';
+  const displayName = user?.name || 'Teacher';
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
-      {/* ── Left: Sidebar trigger + Breadcrumb ── */}
-      <SidebarTrigger className="shrink-0" />
+    <header
+      className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b px-4"
+      style={{
+        background: 'var(--teacher-surface)',
+        borderColor: 'var(--teacher-border)',
+      }}
+    >
+      {/* ── Left: PreOne Branding (replaces sidebar trigger) ── */}
+      <Link href="/teacher" className="flex items-center gap-2 shrink-0">
+        <div
+          className="h-8 w-8 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--teacher-primary-soft)' }}
+        >
+          <Heart
+            className="h-4 w-4"
+            style={{ color: 'var(--teacher-primary)' }}
+          />
+        </div>
+        <span
+          className="text-sm font-bold hidden sm:inline"
+          style={{ color: 'var(--teacher-primary)' }}
+        >
+          PreOne
+        </span>
+      </Link>
 
-      <Breadcrumb>
-        <BreadcrumbList>
-          {segments.map((seg, idx) => {
-            const isLast = idx === segments.length - 1;
-            const label = PATH_LABELS[seg] || seg.charAt(0).toUpperCase() + seg.slice(1);
-            return (
-              <React.Fragment key={`${seg}-${idx}`}>
-                <BreadcrumbItem>
-                  {isLast ? (
-                    <BreadcrumbPage className="font-medium">
-                      {label}
-                    </BreadcrumbPage>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">
-                      {label}
-                    </span>
-                  )}
-                </BreadcrumbItem>
-                {!isLast && <BreadcrumbSeparator />}
-              </React.Fragment>
-            );
-          })}
-        </BreadcrumbList>
-      </Breadcrumb>
+      {/* ── Breadcrumb ── */}
+      {!isLandingPage && (
+        <Breadcrumb>
+          <BreadcrumbList>
+            {segments.map((seg, idx) => {
+              const isLast = idx === segments.length - 1;
+              const label = PATH_LABELS[seg] || seg.charAt(0).toUpperCase() + seg.slice(1);
+              return (
+                <React.Fragment key={`${seg}-${idx}`}>
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage
+                        className="font-medium"
+                        style={{ color: 'var(--teacher-text)' }}
+                      >
+                        {label}
+                      </BreadcrumbPage>
+                    ) : (
+                      <Link
+                        href={`/${segments.slice(0, idx + 1).join('/')}`}
+                        className="text-sm"
+                        style={{ color: 'var(--teacher-text-muted)' }}
+                      >
+                        {label}
+                      </Link>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && <BreadcrumbSeparator />}
+                </React.Fragment>
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
 
       {/* ── Right: Quick Action, Theme Toggle, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
@@ -124,7 +165,11 @@ export function TeacherHeader() {
         <Button
           variant="outline"
           size="sm"
-          className="hidden sm:flex items-center gap-1.5 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl"
+          className="hidden sm:flex items-center gap-1.5 text-xs rounded-xl"
+          style={{
+            borderColor: 'var(--teacher-primary)',
+            color: 'var(--teacher-primary)',
+          }}
           onClick={() => router.push('/teacher/attendance')}
         >
           <Zap className="h-3.5 w-3.5" />
@@ -145,13 +190,26 @@ export function TeacherHeader() {
               className="flex items-center gap-2 px-2 h-9"
             >
               <Avatar className="h-7 w-7">
-                <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
+                <AvatarFallback
+                  className="text-xs font-semibold"
+                  style={{
+                    background: 'var(--teacher-primary-soft)',
+                    color: 'var(--teacher-primary)',
+                  }}
+                >
                   {userInitial}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:inline text-sm font-medium">
-                {user?.name || 'Teacher'}
+              <span
+                className="hidden sm:inline text-sm font-medium"
+                style={{ color: 'var(--teacher-text)' }}
+              >
+                {displayName}
               </span>
+              <ChevronDown
+                className="h-3 w-3 hidden sm:block"
+                style={{ color: 'var(--teacher-text-subtle)' }}
+              />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
