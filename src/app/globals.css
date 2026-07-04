@@ -498,6 +498,35 @@
   --portal-700: #047857;
   --portal-800: #065f46;
   --portal-900: #064e3b;
+
+  /* ── Teacher Design System Tokens (mirrors --admin-* pattern) ── */
+  --teacher-bg: #F8FAFC;
+  --teacher-surface: #FFFFFF;
+  --teacher-surface-2: #F1F5F9;
+  --teacher-border: #E2E8F0;
+  --teacher-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
+  --teacher-text: #1E293B;
+  --teacher-text-muted: #64748B;
+  --teacher-text-subtle: #94A3B8;
+
+  --teacher-primary: #059669;
+  --teacher-primary-soft: #ECFDF5;
+  --teacher-primary-foreground: #FFFFFF;
+
+  --teacher-success: #16A34A;
+  --teacher-success-soft: #DCFCE7;
+
+  --teacher-warning: #D97706;
+  --teacher-warning-soft: #FEF3C7;
+
+  --teacher-info: #0284C7;
+  --teacher-info-soft: #E0F2FE;
+
+  --teacher-error: #DC2626;
+  --teacher-error-soft: #FEE2E2;
+
+  --teacher-accent: #059669;
 }
 
 /* ── Parent Portal: Sky / Blue ── */
@@ -679,6 +708,35 @@
 .dark [data-portal="teacher"] {
   --portal: #34D399;
   --portal-foreground: #0F172A;
+
+  /* ── Teacher Design System Tokens — Dark Mode ── */
+  --teacher-bg: #0F172A;
+  --teacher-surface: #1E293B;
+  --teacher-surface-2: #334155;
+  --teacher-border: rgba(255,255,255,0.1);
+  --teacher-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+
+  --teacher-text: #F8FAFC;
+  --teacher-text-muted: #94A3B8;
+  --teacher-text-subtle: #64748B;
+
+  --teacher-primary: #34D399;
+  --teacher-primary-soft: rgba(52,211,153,0.15);
+  --teacher-primary-foreground: #0F172A;
+
+  --teacher-success: #4ADE80;
+  --teacher-success-soft: rgba(74,222,128,0.15);
+
+  --teacher-warning: #FBBF24;
+  --teacher-warning-soft: rgba(251,191,36,0.15);
+
+  --teacher-info: #38BDF8;
+  --teacher-info-soft: rgba(56,189,248,0.15);
+
+  --teacher-error: #FCA5A5;
+  --teacher-error-soft: rgba(252,165,165,0.15);
+
+  --teacher-accent: #34D399;
 }
 
 .dark [data-portal="parent"] {
