@@ -433,32 +433,32 @@
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
 
-  /* ── Admin Design Tokens (Light Mode) ── */
-  --admin-bg: #F8F9FA;
+  /* ── Admin Design System Tokens (Light Mode) ── */
+  --admin-bg: #F8FAFC;
   --admin-surface: #FFFFFF;
-  --admin-surface-2: #F9FAFB;
-  --admin-border: #E5E7EB;
-  --admin-border-strong: #D1D5DB;
-  --admin-text: #1F2937;
-  --admin-text-muted: #6B7280;
-  --admin-text-subtle: #9CA3AF;
-  --admin-primary: #6366F1;
-  --admin-primary-hover: #4F46E5;
+  --admin-surface-2: #F1F5F9;
+  --admin-border: #E2E8F0;
+  --admin-border-strong: #CBD5E1;
+  --admin-text: #1E293B;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+  --admin-primary: #7C3AED;
+  --admin-primary-soft: #EDE9FE;
+  --admin-primary-hover: #6D28D9;
   --admin-primary-foreground: #FFFFFF;
-  --admin-primary-soft: #EEF2FF;
-  --admin-accent: #F59E0B;
-  --admin-success: #10B981;
-  --admin-success-soft: #D1FAE5;
-  --admin-warning: #F59E0B;
+  --admin-success: #16A34A;
+  --admin-success-soft: #DCFCE7;
+  --admin-warning: #D97706;
   --admin-warning-soft: #FEF3C7;
-  --admin-info: #3B82F6;
-  --admin-info-soft: #DBEAFE;
-  --admin-error: #EF4444;
+  --admin-info: #0284C7;
+  --admin-info-soft: #E0F2FE;
+  --admin-error: #DC2626;
   --admin-error-soft: #FEE2E2;
-  --admin-shadow-card: 0px 2px 8px rgba(0,0,0,0.06);
+  --admin-accent: #7C3AED;
+  --admin-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
 }
 
-/* ── Admin Design Tokens (Dark Mode) ── */
+/* ── Admin Design System Tokens (Dark Mode) ── */
 .dark [data-portal="admin"] {
   --admin-bg: #0B0F1A;
   --admin-surface: #131826;
@@ -468,11 +468,10 @@
   --admin-text: #F5F7FA;
   --admin-text-muted: #9CA3B4;
   --admin-text-subtle: #6B7A8D;
-  --admin-primary: #818CF8;
-  --admin-primary-hover: #6366F1;
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167, 139, 250, 0.15);
+  --admin-primary-hover: #8B5CF6;
   --admin-primary-foreground: #FFFFFF;
-  --admin-primary-soft: rgba(129, 140, 248, 0.15);
-  --admin-accent: #FBBF24;
   --admin-success: #34D399;
   --admin-success-soft: rgba(52, 211, 153, 0.15);
   --admin-warning: #FBBF24;
@@ -481,6 +480,7 @@
   --admin-info-soft: rgba(96, 165, 250, 0.15);
   --admin-error: #F87171;
   --admin-error-soft: rgba(248, 113, 113, 0.15);
+  --admin-accent: #A78BFA;
   --admin-shadow-card: 0px 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -516,33 +516,7 @@
   --portal-900: #0c4a6e;
 }
 
-/* ── Admin Module Tokens (all soft colors = solid hex) ── */
-[data-portal="admin"] {
-  --admin-bg: #F8F9FA;
-  --admin-primary: #6366F1;
-  --admin-primary-soft: #EEF2FF;
-  --admin-primary-hover: #4F46E5;
-  --admin-primary-foreground: #FFFFFF;
-  --admin-info: #3B82F6;
-  --admin-info-soft: #DBEAFE;
-  --admin-warning: #F59E0B;
-  --admin-warning-soft: #FEF3C7;
-  --admin-success: #10B981;
-  --admin-success-soft: #D1FAE5;
-  --admin-danger: #EF4444;
-  --admin-danger-soft: #FEE2E2;
-  --admin-accent: #F97316;
-  --admin-accent-soft: #FFEDD5;
-  --admin-error: #EF4444;
-  --admin-error-soft: #FEE2E2;
-  --admin-text: #1F2937;
-  --admin-text-muted: #6B7280;
-  --admin-text-subtle: #9CA3AF;
-  --admin-surface: #FFFFFF;
-  --admin-surface-2: #F9FAFB;
-  --admin-border: #E5E7EB;
-  --admin-border-strong: #D1D5DB;
-}
+
 
 /* ============================================================
    DARK MODE — "Midnight Garden" Theme
@@ -669,6 +643,37 @@
   --admin-accent-soft: #3D2510;
   --admin-error: #FB7185;
   --admin-error-soft: #3D1525;
+}
+
+/* ── Dark mode: Admin tokens ── */
+.dark [data-portal="admin"] {
+  --admin-bg: #0F172A;
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: rgba(255,255,255,0.1);
+  --admin-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #64748B;
+
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167,139,250,0.15);
+  --admin-primary-foreground: #0F172A;
+
+  --admin-success: #4ADE80;
+  --admin-success-soft: rgba(74,222,128,0.15);
+
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251,191,36,0.15);
+
+  --admin-info: #38BDF8;
+  --admin-info-soft: rgba(56,189,248,0.15);
+
+  --admin-error: #FCA5A5;
+  --admin-error-soft: rgba(252,165,165,0.15);
+
+  --admin-accent: #A78BFA;
 }
 
 .dark [data-portal="teacher"] {
