@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
+import { QueryProvider } from '@/components/providers';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
 import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes (with sub-paths)
@@ -25,11 +26,14 @@ interface AdminLayoutClientProps {
 
 /**
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
- * Provides the sidebar + header + main content structure with Aurora Background.
- * Supports ADMIN, SUPER_ADMIN, and TASK_MASTER roles.
- *   - SUPER_ADMIN: Full access including System section
- *   - ADMIN: Full access except System section
- *   - TASK_MASTER: Only Dashboard + Admissions + Communication (Chat, Announcements, Notifications)
+ *
+ * Provides:
+ * - QueryProvider (React Query) for data fetching
+ * - Header + Main content structure with Aurora Background
+ * - Command Palette (Ctrl+K) for quick navigation
+ * - Keyboard Shortcuts panel (press ?)
+ * - Role-based route guards
+ *
  * data-portal="admin" for CSS theme scoping.
  * data-role attribute for role-specific styling.
  */
@@ -77,17 +81,18 @@ export function AdminLayoutClient({
 
   if (isOnboarding) {
     return (
-      <div data-portal="admin" data-role={userRole.toLowerCase()}>
-        {children}
-      </div>
+      <QueryProvider>
+        <div data-portal="admin" data-role={userRole.toLowerCase()}>
+          {children}
+        </div>
+      </QueryProvider>
     );
   }
 
   return (
-    <AuroraBackground intensity="subtle">
-      <SidebarProvider>
-        <AdminSidebar />
-        <div className="flex flex-1 flex-col min-h-screen">
+    <QueryProvider>
+      <AuroraBackground intensity="subtle">
+        <div className="flex flex-col min-h-screen">
           <AdminHeader />
           <main
             className="flex-1 bg-background/80 p-6 overflow-auto"
@@ -97,7 +102,11 @@ export function AdminLayoutClient({
             {children}
           </main>
         </div>
-      </SidebarProvider>
-    </AuroraBackground>
+
+        {/* Global overlays */}
+        <CommandPalette />
+        <KeyboardShortcuts />
+      </AuroraBackground>
+    </QueryProvider>
   );
 }

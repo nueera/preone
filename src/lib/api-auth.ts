@@ -311,8 +311,8 @@ export async function getParentUserId(parentId: string): Promise<string | null> 
     where: {
       role: 'PARENT',
       OR: [
-        { email: parent.email },
-        { email: parent.phone },
+        ...(parent.email ? [{ email: parent.email }] : []),
+        ...(parent.phone ? [{ email: parent.phone }] : []),
       ],
     },
     select: { id: true },

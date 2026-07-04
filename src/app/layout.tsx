@@ -3,6 +3,7 @@ import { Poppins, Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorHandlerProvider } from "@/components/providers/error-handler-provider";
+import { ThemeProvider } from "next-themes";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -62,7 +63,16 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >
-        <ErrorHandlerProvider>{children}</ErrorHandlerProvider>
+        <ErrorHandlerProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            {children}
+          </ThemeProvider>
+        </ErrorHandlerProvider>
         <Toaster />
       </body>
     </html>
