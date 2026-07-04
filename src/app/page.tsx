@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 // Role-based dashboard paths
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
-  TEACHER: '/teacher/dashboard',
+  TEACHER: '/teacher',
   PARENT: '/parent/dashboard',
   TASK_MASTER: '/admin/crm',
 };

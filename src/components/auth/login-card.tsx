@@ -53,7 +53,7 @@ import {
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin',
   TASK_MASTER: '/admin/crm',
-  TEACHER: '/teacher/dashboard',
+  TEACHER: '/teacher',
   PARENT: '/parent/dashboard',
 };
 

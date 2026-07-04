@@ -297,8 +297,8 @@ describe('getDashboardPath', () => {
     expect(getDashboardPath(Role.TASK_MASTER)).toBe('/admin/crm');
   });
 
-  it('returns /teacher/dashboard for TEACHER', () => {
-    expect(getDashboardPath(Role.TEACHER)).toBe('/teacher/dashboard');
+  it('returns /teacher for TEACHER', () => {
+    expect(getDashboardPath(Role.TEACHER)).toBe('/teacher');
   });
 
   it('returns /parent/dashboard for PARENT', () => {

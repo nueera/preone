@@ -10,7 +10,7 @@ const USER_KEY = 'preone_user';
 // Role-based dashboard redirect map
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
-  TEACHER: '/teacher/dashboard',
+  TEACHER: '/teacher',
   PARENT: '/parent/dashboard',
   TASK_MASTER: '/admin/crm',
 };
