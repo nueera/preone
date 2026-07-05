@@ -1,45 +1,47 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+// ============================================================
+// PreOne — Teacher Portal Landing Page
+// Full-width single column layout with header bar and module cards
+// ============================================================
+
+import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Heart,
-  Bell,
-  ChevronDown,
   LayoutDashboard,
   Users,
   ClipboardCheck,
   FileEdit,
   Eye,
+  Activity,
   CalendarDays,
-  BarChart3,
   MessageCircle,
   Megaphone,
   FileBarChart,
+  Bell,
   Settings,
   Bot,
-  LucideIcon,
+  GraduationCap,
+  Clock,
+  ChevronDown,
 } from 'lucide-react';
 import { PreOneCard } from '@/components/ui/preone-card';
 
 // ============================================================
-// TYPES
+// Module Data
 // ============================================================
+
 interface ModuleCard {
   title: string;
   route: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   iconBg: string;
   iconColor: string;
+  titleColor: string;
   description: string;
-  slug: string;
-  iconSrc?: string;
-  isAssistant?: boolean;
+  comingSoon: boolean;
 }
 
-// ============================================================
-// MODULE DATA — 13 cards per specification
-// ============================================================
 const modules: ModuleCard[] = [
   {
     title: 'Dashboard',
@@ -47,19 +49,19 @@ const modules: ModuleCard[] = [
     icon: LayoutDashboard,
     iconBg: 'var(--teacher-primary-soft)',
     iconColor: 'var(--teacher-primary)',
-    description: 'Overview & analytics',
-    slug: 'dashboard',
-    iconSrc: '/icons/teacher/dashbaord.webp',
+    titleColor: 'var(--teacher-primary)',
+    description: 'Overview & updates',
+    comingSoon: false,
   },
   {
     title: 'My Class',
     route: '/teacher/my-class',
     icon: Users,
-    iconBg: 'var(--teacher-info-soft)',
-    iconColor: 'var(--teacher-info)',
-    description: 'Students & class info',
-    slug: 'my-class',
-    iconSrc: '/icons/teacher/myclass.webp',
+    iconBg: 'var(--teacher-primary-soft)',
+    iconColor: 'var(--teacher-primary)',
+    titleColor: 'var(--teacher-primary)',
+    description: 'Manage your class',
+    comingSoon: false,
   },
   {
     title: 'Attendance',
@@ -67,58 +69,59 @@ const modules: ModuleCard[] = [
     icon: ClipboardCheck,
     iconBg: 'var(--teacher-success-soft)',
     iconColor: 'var(--teacher-success)',
+    titleColor: 'var(--teacher-success)',
     description: 'Mark & track attendance',
-    slug: 'attendance',
-    iconSrc: '/icons/teacher/Attendance.webp',
+    comingSoon: false,
   },
   {
-    title: 'Daily Update',
+    title: 'Daily Updates',
     route: '/teacher/daily-updates',
     icon: FileEdit,
     iconBg: 'var(--teacher-warning-soft)',
     iconColor: 'var(--teacher-warning)',
-    description: 'Share daily activities',
-    slug: 'daily-updates',
-    iconSrc: '/icons/teacher/daily_update.webp',
+    titleColor: 'var(--teacher-warning)',
+    description: 'Log daily activities',
+    comingSoon: false,
   },
   {
-    title: 'Observation',
+    title: 'Observations',
     route: '/teacher/observations',
     icon: Eye,
-    iconBg: 'var(--teacher-error-soft)',
-    iconColor: 'var(--teacher-error)',
-    description: 'Student observations',
-    slug: 'observations',
-    iconSrc: '/icons/teacher/observation.webp',
+    iconBg: 'var(--teacher-info-soft)',
+    iconColor: 'var(--teacher-info)',
+    titleColor: 'var(--teacher-info)',
+    description: 'Record observations',
+    comingSoon: false,
   },
   {
     title: 'Activities',
     route: '/teacher/activities',
-    icon: CalendarDays,
+    icon: Activity,
     iconBg: 'var(--teacher-info-soft)',
     iconColor: 'var(--teacher-info)',
-    description: 'Plan & manage activities',
-    slug: 'activities',
+    titleColor: 'var(--teacher-info)',
+    description: 'Plan activities',
+    comingSoon: false,
+  },
+  {
+    title: 'Growth',
+    route: '/teacher/growth',
+    icon: Activity,
+    iconBg: 'var(--teacher-primary-soft)',
+    iconColor: 'var(--teacher-primary)',
+    titleColor: 'var(--teacher-primary)',
+    description: 'Track growth & milestones',
+    comingSoon: false,
   },
   {
     title: 'Schedule',
     route: '/teacher/schedule',
     icon: CalendarDays,
-    iconBg: 'var(--teacher-info-soft)',
-    iconColor: 'var(--teacher-info)',
-    description: 'Weekly & daily schedule',
-    slug: 'schedule',
-    iconSrc: '/icons/teacher/schedule.webp',
-  },
-  {
-    title: 'Growth Assessment',
-    route: '/teacher/growth',
-    icon: BarChart3,
-    iconBg: 'var(--teacher-primary-soft)',
-    iconColor: 'var(--teacher-primary)',
-    description: 'Track student growth',
-    slug: 'growth',
-    iconSrc: '/icons/teacher/growth_assessment.webp',
+    iconBg: 'var(--teacher-warning-soft)',
+    iconColor: 'var(--teacher-warning)',
+    titleColor: 'var(--teacher-warning)',
+    description: 'View your schedule',
+    comingSoon: false,
   },
   {
     title: 'Chat',
@@ -126,19 +129,19 @@ const modules: ModuleCard[] = [
     icon: MessageCircle,
     iconBg: 'var(--teacher-info-soft)',
     iconColor: 'var(--teacher-info)',
-    description: 'Parent & staff messaging',
-    slug: 'chat',
-    iconSrc: '/icons/teacher/chat.webp',
+    titleColor: 'var(--teacher-info)',
+    description: 'Message parents & staff',
+    comingSoon: false,
   },
   {
-    title: 'Announcement',
+    title: 'Announcements',
     route: '/teacher/announcements',
     icon: Megaphone,
-    iconBg: 'var(--teacher-error-soft)',
-    iconColor: 'var(--teacher-error)',
+    iconBg: 'var(--teacher-warning-soft)',
+    iconColor: 'var(--teacher-warning)',
+    titleColor: 'var(--teacher-warning)',
     description: 'School announcements',
-    slug: 'announcements',
-    iconSrc: '/icons/teacher/announcement.webp',
+    comingSoon: false,
   },
   {
     title: 'Reports',
@@ -146,19 +149,19 @@ const modules: ModuleCard[] = [
     icon: FileBarChart,
     iconBg: 'var(--teacher-info-soft)',
     iconColor: 'var(--teacher-info)',
-    description: 'Generate & view reports',
-    slug: 'reports',
-    iconSrc: '/icons/teacher/reports.webp',
+    titleColor: 'var(--teacher-info)',
+    description: 'Progress & reports',
+    comingSoon: false,
   },
   {
-    title: 'Settings',
-    route: '/teacher/settings',
-    icon: Settings,
-    iconBg: 'var(--teacher-surface-2)',
-    iconColor: 'var(--teacher-text-muted)',
-    description: 'Profile & preferences',
-    slug: 'settings',
-    iconSrc: '/icons/teacher/setting.webp',
+    title: 'Notifications',
+    route: '/teacher/notifications',
+    icon: Bell,
+    iconBg: 'var(--teacher-error-soft)',
+    iconColor: 'var(--teacher-error)',
+    titleColor: 'var(--teacher-error)',
+    description: 'View notifications',
+    comingSoon: false,
   },
   {
     title: 'PreOne Assistant',
@@ -166,15 +169,26 @@ const modules: ModuleCard[] = [
     icon: Bot,
     iconBg: 'var(--teacher-primary-soft)',
     iconColor: 'var(--teacher-primary)',
+    titleColor: 'var(--teacher-primary)',
     description: 'AI-powered help',
-    slug: 'assistant',
-    isAssistant: true,
+    comingSoon: true,
+  },
+  {
+    title: 'Settings',
+    route: '/teacher/settings',
+    icon: Settings,
+    iconBg: 'var(--teacher-surface-2)',
+    iconColor: 'var(--teacher-text-muted)',
+    titleColor: 'var(--teacher-text-muted)',
+    description: 'Profile & preferences',
+    comingSoon: false,
   },
 ];
 
 // ============================================================
-// TIME-AWARE GREETING
+// Helpers
 // ============================================================
+
 function getGreeting(): string {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good Morning';
@@ -183,33 +197,34 @@ function getGreeting(): string {
 }
 
 function getFormattedDate(): string {
-  const now = new Date();
-  const options: Intl.DateTimeFormatOptions = {
+  return new Date().toLocaleDateString('en-IN', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  };
-  return now.toLocaleDateString('en-IN', options);
+  });
+}
+
+function getSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
 }
 
 // ============================================================
-// TEACHER LANDING PAGE
+// Landing Page Component
 // ============================================================
-export default function TeacherLandingPage() {
-  const [greeting, setGreeting] = useState('Good Morning');
-  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    setGreeting(getGreeting());
-  }, []);
+export default function TeacherLandingPage() {
+  const [hasIllustration, setHasIllustration] = useState<Record<string, boolean>>({});
 
   const handleImgError = (key: string) => {
-    setImgErrors((prev) => ({ ...prev, [key]: false }));
+    setHasIllustration((prev) => ({ ...prev, [key]: false }));
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto w-full">
+    <>
       {/* ── Section 1: Top Header Bar ── */}
       <PreOneCard className="p-5">
         <div className="flex items-center justify-between">
@@ -219,114 +234,48 @@ export default function TeacherLandingPage() {
               className="h-10 w-10 rounded-xl flex items-center justify-center"
               style={{ background: 'var(--teacher-primary-soft)' }}
             >
-              <Heart
-                className="h-5 w-5"
-                style={{ color: 'var(--teacher-primary)' }}
-              />
+              <GraduationCap className="h-5 w-5" style={{ color: 'var(--teacher-primary)' }} />
             </div>
             <div>
-              <div
-                className="text-lg font-bold"
-                style={{ color: 'var(--teacher-primary)' }}
-              >
+              <h1 className="text-lg font-bold" style={{ color: 'var(--teacher-primary)' }}>
                 PreOne
-              </div>
-              <div
-                className="text-xs"
-                style={{ color: 'var(--teacher-text-muted)' }}
-              >
+              </h1>
+              <p className="text-xs" style={{ color: 'var(--teacher-text-muted)' }}>
                 Teacher Portal
-              </div>
+              </p>
             </div>
           </div>
 
           {/* Center Zone — Greeting (hidden on mobile) */}
-          <div className="hidden md:block">
-            <span
-              className="text-lg font-semibold"
-              style={{ color: 'var(--teacher-text)' }}
-            >
-              {greeting}, Priya! 👋
-            </span>
+          <div className="hidden md:block text-center">
+            <p className="text-lg font-semibold" style={{ color: 'var(--teacher-text)' }}>
+              {getGreeting()}, Priya! 👋
+            </p>
+            <p className="text-xs" style={{ color: 'var(--teacher-text-muted)' }}>
+              {getFormattedDate()}
+            </p>
           </div>
 
-          {/* Right Zone — Info + Actions */}
-          <div className="flex items-center gap-4">
-            {/* Date & Class Info (hidden on mobile) */}
-            <div className="hidden md:flex flex-col items-end">
-              <span
-                className="text-xs font-medium"
-                style={{ color: 'var(--teacher-text)' }}
-              >
-                {getFormattedDate()}
-              </span>
-              <span
-                className="text-xs"
-                style={{ color: 'var(--teacher-text-muted)' }}
-              >
-                Class: Nursery A
-              </span>
+          {/* Right Zone — Profile */}
+          <div className="flex items-center gap-2">
+            <div
+              className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold"
+              style={{
+                background: 'var(--teacher-primary-soft)',
+                color: 'var(--teacher-primary)',
+              }}
+            >
+              PS
             </div>
-
-            {/* Notification Bell */}
-            <div className="relative">
-              <button
-                className="h-9 w-9 rounded-lg flex items-center justify-center transition-colors"
-                style={{ background: 'transparent' }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background =
-                    'var(--teacher-surface-2)')
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = 'transparent')
-                }
-                aria-label="Notifications"
-              >
-                <Bell
-                  className="h-5 w-5"
-                  style={{ color: 'var(--teacher-text-muted)' }}
-                />
-                <div
-                  className="absolute h-2 w-2 rounded-full"
-                  style={{
-                    background: 'var(--teacher-error)',
-                    top: '6px',
-                    right: '6px',
-                  }}
-                />
-              </button>
+            <div className="hidden md:block">
+              <p className="text-sm font-medium" style={{ color: 'var(--teacher-text)' }}>
+                Priya Sharma
+              </p>
+              <p className="text-[11px]" style={{ color: 'var(--teacher-text-muted)' }}>
+                Teacher
+              </p>
             </div>
-
-            {/* Profile Section */}
-            <div className="flex items-center gap-2">
-              <div
-                className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{
-                  background: 'var(--teacher-primary-soft)',
-                  color: 'var(--teacher-primary)',
-                }}
-              >
-                PS
-              </div>
-              <div className="hidden md:flex flex-col">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--teacher-text)' }}
-                >
-                  Priya Sharma
-                </span>
-                <span
-                  className="text-[11px]"
-                  style={{ color: 'var(--teacher-text-muted)' }}
-                >
-                  Teacher
-                </span>
-              </div>
-              <ChevronDown
-                className="h-4 w-4 hidden md:block"
-                style={{ color: 'var(--teacher-text-subtle)' }}
-              />
-            </div>
+            <ChevronDown className="h-4 w-4" style={{ color: 'var(--teacher-text-subtle)' }} />
           </div>
         </div>
       </PreOneCard>
@@ -335,72 +284,78 @@ export default function TeacherLandingPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {modules.map((mod) => {
           const Icon = mod.icon;
+          const slug = getSlug(mod.title);
+          const isAssistant = mod.title === 'PreOne Assistant';
 
           return (
             <Link key={mod.title} href={mod.route} className="group">
               <PreOneCard
                 hover
-                className="flex flex-col items-center justify-center p-6 text-center relative overflow-hidden"
-                style={
-                  mod.isAssistant
-                    ? {
-                        border: '1.5px solid var(--teacher-primary)',
-                      }
-                    : undefined
-                }
+                className={`relative flex flex-col items-center justify-center p-6 text-center ${
+                  isAssistant ? 'border-2' : ''
+                }`}
+                {...(isAssistant
+                  ? {
+                      style: {
+                        borderColor: 'var(--teacher-primary)',
+                        boxShadow: '0 0 20px rgba(16,185,129,0.15)',
+                      },
+                    }
+                  : {})}
               >
-                {/* PreOne Assistant glow effect */}
-                {mod.isAssistant && (
-                  <div
-                    className="absolute h-24 w-24 -right-6 -top-6 blur-2xl opacity-20"
-                    style={{ background: 'var(--teacher-primary)' }}
-                  />
+                {/* Coming Soon Badge */}
+                {mod.comingSoon && (
+                  <span
+                    className="absolute right-3 top-3 rounded-full px-2 py-0.5 font-semibold"
+                    style={{
+                      fontSize: '10px',
+                      background: 'var(--teacher-warning-soft)',
+                      color: 'var(--teacher-warning)',
+                    }}
+                  >
+                    Coming Soon
+                  </span>
                 )}
 
-                {/* Icon / Illustration Area */}
+                {/* Illustration Area */}
                 <div
-                  className="h-20 w-20 rounded-2xl flex items-center justify-center mb-4 transition-all duration-200 group-hover:-translate-y-1"
+                  className="h-20 w-20 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: mod.iconBg }}
                 >
-                  {mod.iconSrc && imgErrors[mod.title] !== false ? (
+                  {hasIllustration[mod.title] !== false ? (
                     <img
-                      src={mod.iconSrc}
+                      src={`/illustrations/teacher-${slug}.svg`}
                       alt={mod.title}
                       className="h-14 w-14 object-contain"
                       onError={() => handleImgError(mod.title)}
                     />
                   ) : (
-                    <Icon
-                      className="h-10 w-10"
-                      style={{ color: mod.iconColor }}
-                    />
+                    <Icon className="h-10 w-10" style={{ color: mod.iconColor }} />
                   )}
                 </div>
 
                 {/* Card Title */}
-                <div
+                <h3
                   className="text-sm font-semibold"
                   style={{
-                    color: mod.isAssistant
-                      ? 'var(--teacher-primary)'
-                      : 'var(--teacher-text)',
+                    color: isAssistant ? 'var(--teacher-primary)' : mod.titleColor,
                   }}
                 >
                   {mod.title}
-                </div>
+                </h3>
 
                 {/* Card Description */}
-                <div
+                <p
                   className="text-[11px] mt-1"
                   style={{ color: 'var(--teacher-text-muted)' }}
                 >
                   {mod.description}
-                </div>
+                </p>
               </PreOneCard>
             </Link>
           );
         })}
       </div>
-    </div>
+    </>
   );
 }

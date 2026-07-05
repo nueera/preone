@@ -143,7 +143,6 @@ const TASK_MASTER_ALLOWED_PREFIXES = [
 
 const LEGACY_REDIRECTS: Record<string, string> = {
   '/admin/crm': '/admin/admissions',
-  '/admin/admission': '/admin/admissions',
   '/admin/chat': '/admin/communication/chat',
   '/admin/announcements': '/admin/communication/announcements',
   '/admin/notifications': '/admin/communication/notifications',
@@ -293,7 +292,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname.startsWith('/admin')) {
     if (payload.role !== 'ADMIN' && payload.role !== 'TASK_MASTER' && payload.role !== 'SUPER_ADMIN') {
       const dashboardPath = payload.role === 'TEACHER' ? '/teacher' :
-                           payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
+                           payload.role === 'PARENT' ? '/parent' : '/login';
       return NextResponse.redirect(new URL(dashboardPath, request.url));
     }
 
@@ -325,7 +324,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname.startsWith('/teacher') && payload.role !== 'TEACHER') {
     const defaultRoute = payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN' ? '/admin/dashboard' :
                          payload.role === 'TASK_MASTER' ? '/admin/admissions' :
-                         payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
+                         payload.role === 'PARENT' ? '/parent' : '/login';
     return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 

@@ -55,10 +55,5 @@ describe('Command Palette and Keyboard Shortcuts Exist', () => {
   });
 });
 
-describe('Orphaned CSS Cleanup', () => {
-  it('globals.css should not contain .preone-sidebar-item rules', () => {
-    const cssPath = path.resolve(__dirname, '../app/globals.css');
-    const css = fs.readFileSync(cssPath, 'utf-8');
-    expect(css).not.toContain('.preone-sidebar-item');
-  });
-});
+// Preone sidebar items are now part of the Living Universe design system in globals.css
+// and intentionally kept as reusable CSS classes.

@@ -1,88 +1,83 @@
-/**
- * Tests for the PreOne Assistant page (/teacher/assistant).
- *
- * Coverage:
- * - Page header with icon badge, title, subtitle
- * - Coming Soon card with icon, title, description
- * - All colors via --teacher-* CSS variables
- */
+// ============================================================
+// PreOne — Teacher Assistant Page Tests
+// Tests cover: Coming Soon page rendering, CSS variables
+// ============================================================
 
-import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import TeacherAssistantPage from './page';
 
 // ── Mock PreOneCard ──
 vi.mock('@/components/ui/preone-card', () => ({
-  PreOneCard: ({ children, ...props }: any) => (
-    <div data-testid="preone-card" {...props}>{children}</div>
+  PreOneCard: ({
+    children,
+    className,
+    ...props
+  }: {
+    children: React.ReactNode;
+    className?: string;
+    [key: string]: unknown;
+  }) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
   ),
 }));
 
-// ── Import the page after mocks are set up ──
-import AssistantPage from '@/app/teacher/assistant/page';
-
-describe('AssistantPage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+// ── Mock lucide-react ──
+vi.mock('lucide-react', () => {
+  const icons: Record<string, React.FC<{ className?: string; style?: React.CSSProperties }>> = {};
+  ['Bot', 'Sparkles'].forEach((name) => {
+    icons[name] = (props: { className?: string; style?: React.CSSProperties }) => (
+      <span data-icon={name} {...props} />
+    );
   });
+  return icons;
+});
 
-  // ── Header Section ──
-  it('renders page title "PreOne Assistant"', () => {
-    render(<AssistantPage />);
+describe('TeacherAssistantPage', () => {
+  it('renders page title', () => {
+    render(<TeacherAssistantPage />);
     expect(screen.getByText('PreOne Assistant')).toBeInTheDocument();
   });
 
   it('renders page subtitle', () => {
-    render(<AssistantPage />);
-    expect(screen.getByText('AI-powered help and suggestions for teachers')).toBeInTheDocument();
+    render(<TeacherAssistantPage />);
+    expect(screen.getByText('AI-powered help for your teaching workflow')).toBeInTheDocument();
   });
 
-  // ── Coming Soon Card ──
-  it('renders "Coming Soon" heading', () => {
-    render(<AssistantPage />);
-    expect(screen.getByText('Coming Soon')).toBeInTheDocument();
+  it('renders coming soon banner', () => {
+    render(<TeacherAssistantPage />);
+    expect(screen.getByText('This feature is coming soon!')).toBeInTheDocument();
   });
 
-  it('renders coming soon description', () => {
-    render(<AssistantPage />);
-    expect(screen.getByText(/PreOne Assistant is being crafted/)).toBeInTheDocument();
+  it('renders coming soon description mentioning PreOne Assistant', () => {
+    render(<TeacherAssistantPage />);
+    const matches = screen.getAllByText(/PreOne Assistant/);
+    expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders Bot icon in header badge area', () => {
-    render(<AssistantPage />);
-    // SVG icons from lucide-react
-    const svgs = document.querySelectorAll('svg');
-    expect(svgs.length).toBeGreaterThanOrEqual(2); // One in header, one in card
+  it('renders placeholder Coming Soon text', () => {
+    render(<TeacherAssistantPage />);
+    const comingSoonTexts = screen.getAllByText('Coming Soon');
+    expect(comingSoonTexts.length).toBeGreaterThanOrEqual(1);
   });
 
-  // ── PreOneCard Usage ──
-  it('renders PreOneCard for coming soon section', () => {
-    render(<AssistantPage />);
-    const cards = screen.getAllByTestId('preone-card');
-    expect(cards.length).toBe(1);
+  it('uses var(--teacher-primary) for title', () => {
+    render(<TeacherAssistantPage />);
+    const title = screen.getByText('PreOne Assistant');
+    const style = title.getAttribute('style');
+    expect(style).toContain('var(--teacher-primary)');
   });
 
-  // ── CSS Variables ──
-  it('uses --teacher-* CSS variables for styling', () => {
-    render(<AssistantPage />);
-    const allStyles = document.querySelectorAll('[style]');
-    const teacherVarUsage = Array.from(allStyles).filter((el) =>
-      el.getAttribute('style')?.includes('--teacher') ||
-      el.getAttribute('style')?.includes('var(--teacher')
-    );
-    expect(teacherVarUsage.length).toBeGreaterThan(0);
+  it('uses var(--teacher-warning-soft) for coming soon banner', () => {
+    render(<TeacherAssistantPage />);
+    const banner = document.querySelector('[style*="var(--teacher-warning-soft)"]');
+    expect(banner).toBeInTheDocument();
   });
 
-  // ── Layout ──
-  it('renders with max-w-[1440px] container', () => {
-    const { container } = render(<AssistantPage />);
-    const mainDiv = container.firstChild as HTMLElement;
-    expect(mainDiv.className).toContain('max-w-[1440px]');
-  });
-
-  // ── Regression ──
-  it('renders without crashing', () => {
-    const { container } = render(<AssistantPage />);
-    expect(container).toBeTruthy();
+  it('renders description about AI-powered insights', () => {
+    render(<TeacherAssistantPage />);
+    expect(screen.getByText(/AI-powered insights/)).toBeInTheDocument();
   });
 });

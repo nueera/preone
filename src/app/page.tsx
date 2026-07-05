@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
   TEACHER: '/teacher',
-  PARENT: '/parent/dashboard',
+  PARENT: '/parent',
   TASK_MASTER: '/admin/crm',
 };
 
