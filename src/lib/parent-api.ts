@@ -11,7 +11,7 @@ const USER_KEY = 'preone_user';
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
   TEACHER: '/teacher',
-  PARENT: '/parent/dashboard',
+  PARENT: '/parent',
   TASK_MASTER: '/admin/crm',
 };
 

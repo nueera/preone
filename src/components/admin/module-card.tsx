@@ -27,14 +27,22 @@ interface ModuleCardProps {
 
 // Per-module icon size overrides — [mobile, desktop]
 const ICON_SIZES: Record<string, [number, number]> = {
-  attendance: [64, 112],
-  operations: [56, 96],
-  teachers: [56, 96],
-  settings: [48, 80],
-  fees: [48, 80],
-  communication: [48, 80],
-  reports: [48, 80],
-  'growth-passport': [48, 80],
+  dashboard: [96, 160],
+  setup: [96, 160],
+  admission: [96, 160],
+  students: [96, 160],
+  parents: [96, 160],
+  classes: [96, 160],
+  'ai-center': [96, 160],
+  attendance: [96, 160],
+  operations: [96, 160],
+  teachers: [96, 160],
+  settings: [96, 160],
+  fees: [96, 160],
+  communication: [96, 160],
+  reports: [96, 160],
+  'growth-passport': [96, 160],
+  'daily-milestones': [96, 160],
 };
 const DEFAULT_ICON_SIZE: [number, number] = [40, 64];
 

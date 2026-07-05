@@ -197,19 +197,11 @@ function getCurrentTime(): string {
   });
 }
 
-function getSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
-
 // ============================================================
 // Landing Page Component
 // ============================================================
 
 export default function ParentLandingPage() {
-  const [hasIllustration, setHasIllustration] = useState<Record<string, boolean>>({});
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
 
   // Update time every minute
@@ -219,10 +211,6 @@ export default function ParentLandingPage() {
     }, 60000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleImgError = (key: string) => {
-    setHasIllustration((prev) => ({ ...prev, [key]: false }));
-  };
 
   return (
     <>
@@ -309,7 +297,6 @@ export default function ParentLandingPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {modules.map((mod) => {
           const Icon = mod.icon;
-          const slug = getSlug(mod.title);
 
           return (
             <Link key={mod.title} href={mod.route} className="group">
@@ -331,21 +318,9 @@ export default function ParentLandingPage() {
                   </span>
                 )}
 
-                {/* Illustration Area */}
-                <div
-                  className="h-20 w-20 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: mod.iconBg }}
-                >
-                  {hasIllustration[mod.title] !== false ? (
-                    <img
-                      src={`/illustrations/parent-${slug}.svg`}
-                      alt={mod.title}
-                      className="h-14 w-14 object-contain"
-                      onError={() => handleImgError(mod.title)}
-                    />
-                  ) : (
-                    <Icon className="h-10 w-10" style={{ color: mod.iconColor }} />
-                  )}
+                {/* Icon */}
+                <div className="h-28 w-28 flex items-center justify-center mb-4">
+                  <Icon className="h-20 w-20" style={{ color: mod.iconColor }} />
                 </div>
 
                 {/* Card Title */}

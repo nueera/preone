@@ -5,8 +5,8 @@
 // Full-width single column layout with header bar and module cards
 // ============================================================
 
-import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   Users,
@@ -26,6 +26,24 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { PreOneCard } from '@/components/ui/preone-card';
+
+// ============================================================
+// Custom icon map — module title → icon file path
+// Modules without an entry use their Lucide icon as fallback.
+// ============================================================
+const CUSTOM_ICONS: Record<string, string> = {
+  Dashboard: '/icons/teacher/dashbaord.webp',
+  'My Class': '/icons/teacher/myclass.webp',
+  Attendance: '/icons/teacher/Attendance.webp',
+  'Daily Updates': '/icons/teacher/daily_update.webp',
+  Observations: '/icons/teacher/observation.webp',
+  Growth: '/icons/teacher/growth_assessment.webp',
+  Schedule: '/icons/teacher/schedule.webp',
+  Chat: '/icons/teacher/chat.webp',
+  Announcements: '/icons/teacher/announcement.webp',
+  Reports: '/icons/teacher/reports.webp',
+  Settings: '/icons/teacher/setting.webp',
+};
 
 // ============================================================
 // Module Data
@@ -205,24 +223,11 @@ function getFormattedDate(): string {
   });
 }
 
-function getSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
-
 // ============================================================
 // Landing Page Component
 // ============================================================
 
 export default function TeacherLandingPage() {
-  const [hasIllustration, setHasIllustration] = useState<Record<string, boolean>>({});
-
-  const handleImgError = (key: string) => {
-    setHasIllustration((prev) => ({ ...prev, [key]: false }));
-  };
-
   return (
     <>
       {/* ── Section 1: Top Header Bar ── */}
@@ -284,7 +289,6 @@ export default function TeacherLandingPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {modules.map((mod) => {
           const Icon = mod.icon;
-          const slug = getSlug(mod.title);
           const isAssistant = mod.title === 'PreOne Assistant';
 
           return (
@@ -317,20 +321,18 @@ export default function TeacherLandingPage() {
                   </span>
                 )}
 
-                {/* Illustration Area */}
-                <div
-                  className="h-20 w-20 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: mod.iconBg }}
-                >
-                  {hasIllustration[mod.title] !== false ? (
-                    <img
-                      src={`/illustrations/teacher-${slug}.svg`}
+                {/* Icon */}
+                <div className="h-28 w-28 flex items-center justify-center mb-4">
+                  {CUSTOM_ICONS[mod.title] ? (
+                    <Image
+                      src={CUSTOM_ICONS[mod.title]}
                       alt={mod.title}
-                      className="h-14 w-14 object-contain"
-                      onError={() => handleImgError(mod.title)}
+                      width={160}
+                      height={160}
+                      className="object-contain"
                     />
                   ) : (
-                    <Icon className="h-10 w-10" style={{ color: mod.iconColor }} />
+                    <Icon className="h-20 w-20" style={{ color: mod.iconColor }} />
                   )}
                 </div>
 

@@ -421,7 +421,7 @@ export function getDashboardPath(role: Role): string {
     case Role.TEACHER:
       return '/teacher';
     case Role.PARENT:
-      return '/parent/dashboard';
+      return '/parent';
     default:
       return '/login';
   }

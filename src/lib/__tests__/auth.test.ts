@@ -301,8 +301,8 @@ describe('getDashboardPath', () => {
     expect(getDashboardPath(Role.TEACHER)).toBe('/teacher');
   });
 
-  it('returns /parent/dashboard for PARENT', () => {
-    expect(getDashboardPath(Role.PARENT)).toBe('/parent/dashboard');
+  it('returns /parent for PARENT', () => {
+    expect(getDashboardPath(Role.PARENT)).toBe('/parent');
   });
 });
 

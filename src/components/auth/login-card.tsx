@@ -54,7 +54,7 @@ const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin',
   TASK_MASTER: '/admin/crm',
   TEACHER: '/teacher',
-  PARENT: '/parent/dashboard',
+  PARENT: '/parent',
 };
 
 const TOKEN_KEY = 'preone_token';
