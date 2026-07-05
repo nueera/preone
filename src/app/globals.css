@@ -374,6 +374,28 @@
   --portal-700: #5B21B6;
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
+
+  /* ── Admin semantic tokens ── */
+  --admin-primary: #7C3AED;
+  --admin-primary-soft: #f5f3ff;
+  --admin-success: #16A34A;
+  --admin-success-soft: #dcfce7;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #fef3c7;
+  --admin-info: #0EA5E9;
+  --admin-info-soft: #e0f2fe;
+  --admin-error: #EF4444;
+  --admin-orange: #F97316;
+  --admin-orange-soft: #fff7ed;
+  --admin-pink: #EC4899;
+  --admin-pink-soft: #fce7f3;
+  --admin-text: #0F172A;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F8FAFC;
+  --admin-border: #E2E8F0;
+  --admin-bg: #F1F5F9;
 }
 
 /* ── Teacher Portal: Emerald / Teal ── */
@@ -522,6 +544,29 @@
   --login-tab-active: #818CF8;
   --login-icon: #818CF8;
   --login-icon-muted: #A3A3C2;
+}
+
+.dark [data-portal="admin"] {
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167,139,250,0.15);
+  --admin-success: #4ADE80;
+  --admin-success-soft: rgba(74,222,128,0.15);
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251,191,36,0.15);
+  --admin-info: #38BDF8;
+  --admin-info-soft: rgba(56,189,248,0.15);
+  --admin-error: #FCA5A5;
+  --admin-orange: #FB923C;
+  --admin-orange-soft: rgba(251,146,60,0.15);
+  --admin-pink: #F472B6;
+  --admin-pink-soft: rgba(244,114,182,0.15);
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #64748B;
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: rgba(255,255,255,0.1);
+  --admin-bg: #0F172A;
 }
 
 .dark [data-portal="teacher"] {

@@ -1,311 +1,454 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
 import {
-  Plus,
+  Users,
   Upload,
+  Plus,
   Search,
   X,
-  GraduationCap,
-  MoreHorizontal,
-  Eye,
-  Pencil,
-  ArrowRightLeft,
-  Trash2,
+  SlidersHorizontal,
+  Columns3,
+  ArrowUpDown,
   ChevronLeft,
   ChevronRight,
-  Filter,
+  Pencil,
+  MoreHorizontal,
+  GraduationCap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { AddStudentDialog } from '@/components/add-student-dialog';
 import { TransferStudentDialog } from '@/components/transfer-student-dialog';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
-interface ClassInfo {
-  id: string;
-  name: string;
-  program: { id: string; name: string };
-}
-
-interface PrimaryParent {
-  id: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email?: string;
-  relation: string;
-}
-
 interface Student {
   id: string;
-  firstName: string;
-  lastName: string;
-  dob: string;
-  gender: string;
-  bloodGroup?: string | null;
-  aadhaarNumber?: string | null;
-  photo?: string | null;
-  admissionDate: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'GRADUATED' | 'TRANSFERRED';
-  rollNumber?: string | null;
-  classId?: string | null;
-  class: ClassInfo | null;
-  primaryParent: PrimaryParent | null;
-}
-
-interface ProgramGroup {
-  id: string;
   name: string;
-  classes: { id: string; name: string; _count: { students: number } }[];
+  studentId: string;
+  class: string;
+  classColor: string;
+  classBg: string;
+  parent: string;
+  phone: string;
+  status: 'Active' | 'Inactive' | 'Graduated' | 'Transferred';
+  dob: string;
+  avatarInitials: string;
+  avatarColor: string;
+  avatarBg: string;
 }
 
-// ── Status badge colors ──
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
-  GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
-  TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
+// ── Mock Data: 10 Students ──
+const MOCK_STUDENTS: Student[] = [
+  {
+    id: '1',
+    name: 'Aarav Patel',
+    studentId: '#NUR-001',
+    class: 'Nursery-A',
+    classColor: 'var(--admin-info)',
+    classBg: 'var(--admin-info-soft)',
+    parent: 'Raj Patel',
+    phone: '+91 98765 43213',
+    status: 'Active',
+    dob: '15 Jun 2021',
+    avatarInitials: 'AP',
+    avatarColor: 'var(--admin-info)',
+    avatarBg: 'var(--admin-info-soft)',
+  },
+  {
+    id: '2',
+    name: 'Myra Verma',
+    studentId: '#LKG-012',
+    class: 'LKG-B',
+    classColor: 'var(--admin-success)',
+    classBg: 'var(--admin-success-soft)',
+    parent: 'Amit Verma',
+    phone: '+91 91234 56789',
+    status: 'Active',
+    dob: '21 Apr 2020',
+    avatarInitials: 'MV',
+    avatarColor: 'var(--admin-success)',
+    avatarBg: 'var(--admin-success-soft)',
+  },
+  {
+    id: '3',
+    name: 'Vihaan Singh',
+    studentId: '#UKG-021',
+    class: 'UKG-A',
+    classColor: 'var(--admin-primary)',
+    classBg: 'var(--admin-primary-soft)',
+    parent: 'Pooja Singh',
+    phone: '+91 99887 76655',
+    status: 'Active',
+    dob: '10 Mar 2019',
+    avatarInitials: 'VS',
+    avatarColor: 'var(--admin-primary)',
+    avatarBg: 'var(--admin-primary-soft)',
+  },
+  {
+    id: '4',
+    name: 'Anaya Mehta',
+    studentId: '#UKG-034',
+    class: 'UKG-B',
+    classColor: 'var(--admin-primary)',
+    classBg: 'var(--admin-primary-soft)',
+    parent: 'Rohit Mehta',
+    phone: '+91 87654 32109',
+    status: 'Inactive',
+    dob: '05 Aug 2018',
+    avatarInitials: 'AM',
+    avatarColor: 'var(--admin-error)',
+    avatarBg: 'rgba(239,68,68,0.1)',
+  },
+  {
+    id: '5',
+    name: 'Neha Kapoor',
+    studentId: '#PLG-011',
+    class: 'Playgroup-A',
+    classColor: 'var(--admin-orange)',
+    classBg: 'var(--admin-orange-soft)',
+    parent: 'Neha Kapoor',
+    phone: '+91 78965 43211',
+    status: 'Active',
+    dob: '28 Nov 2021',
+    avatarInitials: 'NK',
+    avatarColor: 'var(--admin-orange)',
+    avatarBg: 'var(--admin-orange-soft)',
+  },
+  {
+    id: '6',
+    name: 'Ibrahim Khan',
+    studentId: '#NUR-010',
+    class: 'Nursery-A',
+    classColor: 'var(--admin-info)',
+    classBg: 'var(--admin-info-soft)',
+    parent: 'Zara Khan',
+    phone: '+91 93214 56780',
+    status: 'Transferred',
+    dob: '12 Feb 2021',
+    avatarInitials: 'IK',
+    avatarColor: 'var(--admin-info)',
+    avatarBg: 'var(--admin-info-soft)',
+  },
+  {
+    id: '7',
+    name: 'Kiara Joshi',
+    studentId: '#PRE-002',
+    class: 'Pre-Nursery',
+    classColor: 'var(--admin-pink)',
+    classBg: 'var(--admin-pink-soft)',
+    parent: 'Manav Joshi',
+    phone: '+91 96587 41236',
+    status: 'Graduated',
+    dob: '30 Dec 2020',
+    avatarInitials: 'KJ',
+    avatarColor: 'var(--admin-pink)',
+    avatarBg: 'var(--admin-pink-soft)',
+  },
+  {
+    id: '8',
+    name: 'Arjun Reddy',
+    studentId: '#LKG-005',
+    class: 'LKG-A',
+    classColor: 'var(--admin-success)',
+    classBg: 'var(--admin-success-soft)',
+    parent: 'Suresh Reddy',
+    phone: '+91 87612 34567',
+    status: 'Active',
+    dob: '18 Sep 2020',
+    avatarInitials: 'AR',
+    avatarColor: 'var(--admin-success)',
+    avatarBg: 'var(--admin-success-soft)',
+  },
+  {
+    id: '9',
+    name: 'Diya Sharma',
+    studentId: '#NUR-015',
+    class: 'Nursery-B',
+    classColor: 'var(--admin-info)',
+    classBg: 'var(--admin-info-soft)',
+    parent: 'Vikram Sharma',
+    phone: '+91 91234 87654',
+    status: 'Active',
+    dob: '03 Jul 2021',
+    avatarInitials: 'DS',
+    avatarColor: 'var(--admin-pink)',
+    avatarBg: 'var(--admin-pink-soft)',
+  },
+  {
+    id: '10',
+    name: 'Rohan Gupta',
+    studentId: '#UKG-008',
+    class: 'UKG-A',
+    classColor: 'var(--admin-primary)',
+    classBg: 'var(--admin-primary-soft)',
+    parent: 'Anil Gupta',
+    phone: '+91 98765 12345',
+    status: 'Active',
+    dob: '22 Jan 2019',
+    avatarInitials: 'RG',
+    avatarColor: 'var(--admin-primary)',
+    avatarBg: 'var(--admin-primary-soft)',
+  },
+];
+
+// ── Status Config ──
+const STATUS_CONFIG: Record<string, { dotColor: string; badgeBg: string; badgeText: string }> = {
+  Active: {
+    dotColor: 'var(--admin-success)',
+    badgeBg: 'var(--admin-success-soft)',
+    badgeText: 'var(--admin-success)',
+  },
+  Inactive: {
+    dotColor: 'var(--admin-text-muted)',
+    badgeBg: 'var(--admin-surface-2)',
+    badgeText: 'var(--admin-text-muted)',
+  },
+  Graduated: {
+    dotColor: 'var(--admin-info)',
+    badgeBg: 'var(--admin-info-soft)',
+    badgeText: 'var(--admin-info)',
+  },
+  Transferred: {
+    dotColor: 'var(--admin-orange)',
+    badgeBg: 'var(--admin-orange-soft)',
+    badgeText: 'var(--admin-orange)',
+  },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
-  GRADUATED: 'Graduated',
-  TRANSFERRED: 'Transferred',
-};
+// ── Filter Pill Config ──
+const STATUS_PILLS = [
+  { label: 'All', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
+  { label: 'Active', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
+  { label: 'Inactive', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
+  { label: 'Graduated', activeColor: 'var(--admin-info)', activeBg: 'var(--admin-info-soft)' },
+  { label: 'Transferred', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
+];
 
-const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
+// ── Class Options ──
+const CLASS_OPTIONS = [
+  'All Classes',
+  'Nursery-A',
+  'Nursery-B',
+  'LKG-A',
+  'LKG-B',
+  'UKG-A',
+  'UKG-B',
+  'Playgroup-A',
+  'Pre-Nursery',
+];
 
-// ── Auth helper ──
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('preone_token');
+// ── Sub-Components ──
+
+function StatusBadge({ status }: { status: Student['status'] }) {
+  const config = STATUS_CONFIG[status];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+      style={{ background: config.badgeBg, color: config.badgeText }}
+    >
+      <span
+        className="h-1.5 w-1.5 rounded-full"
+        style={{ background: config.dotColor }}
+      />
+      {status}
+    </span>
+  );
 }
+
+function ClassPill({ label, color, bg }: { label: string; color: string; bg: string }) {
+  return (
+    <span
+      className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
+      style={{ background: bg, color }}
+    >
+      {label}
+    </span>
+  );
+}
+
+function FilterPill({
+  label,
+  active,
+  activeColor,
+  activeBg,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  activeColor: string;
+  activeBg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      style={
+        active
+          ? { background: activeBg, color: activeColor }
+          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
+      }
+    >
+      {label}
+    </button>
+  );
+}
+
+// ── Main Page ──
 
 export default function StudentsListPage() {
   const router = useRouter();
 
   // ── State ──
-  const [students, setStudents] = useState<Student[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [classId, setClassId] = useState('');
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['ACTIVE']);
-  const [selectedBloodGroups, setSelectedBloodGroups] = useState<string[]>([]);
-  const [gender, setGender] = useState('All');
-  const [programs, setPrograms] = useState<ProgramGroup[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [classFilter, setClassFilter] = useState('All Classes');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [sortField, setSortField] = useState<string>('createdAt');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  const limit = 25;
+  const hasActiveFilters =
+    searchQuery !== '' ||
+    statusFilter !== 'All' ||
+    classFilter !== 'All Classes';
 
-  // ── Debounce search ──
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  // ── Filtered & paginated data ──
+  const filteredStudents = useMemo(() => {
+    let result = MOCK_STUDENTS;
 
-  // ── Fetch programs/classes for filter ──
-  useEffect(() => {
-    async function fetchClasses() {
-      try {
-        const token = getToken();
-        const res = await fetch('/api/classes', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setPrograms(data.programs || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch classes:', err);
-      }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.parent.toLowerCase().includes(q) ||
+          s.phone.includes(q)
+      );
     }
-    fetchClasses();
-  }, []);
 
-  // ── Fetch students ──
-  const fetchStudents = useCallback(async () => {
-    setLoading(true);
-    try {
-      const token = getToken();
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
-      if (debouncedSearch) params.set('search', debouncedSearch);
-      if (classId) params.set('classId', classId);
-      if (selectedStatuses.length > 0) params.set('status', selectedStatuses.join(','));
-      if (gender && gender !== 'All') params.set('gender', gender);
-      if (selectedBloodGroups.length > 0) params.set('bloodGroup', selectedBloodGroups.join(','));
-
-      const res = await fetch(`/api/students?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setStudents(data.students || []);
-        setTotal(data.total || 0);
-      }
-    } catch (err) {
-      console.error('Failed to fetch students:', err);
-    } finally {
-      setLoading(false);
+    if (statusFilter !== 'All') {
+      result = result.filter((s) => s.status === statusFilter);
     }
-  }, [page, debouncedSearch, classId, selectedStatuses, gender, selectedBloodGroups]);
 
-  useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    if (classFilter !== 'All Classes') {
+      result = result.filter((s) => s.class === classFilter);
+    }
+
+    return result;
+  }, [searchQuery, statusFilter, classFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / rowsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+
+  const paginatedStudents = useMemo(() => {
+    const start = (safePage - 1) * rowsPerPage;
+    return filteredStudents.slice(start, start + rowsPerPage);
+  }, [filteredStudents, safePage, rowsPerPage]);
+
+  const startRow = filteredStudents.length === 0 ? 0 : (safePage - 1) * rowsPerPage + 1;
+  const endRow = Math.min(safePage * rowsPerPage, filteredStudents.length);
 
   // ── Handlers ──
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+  const clearFilters = useCallback(() => {
+    setSearchQuery('');
+    setStatusFilter('All');
+    setClassFilter('All Classes');
+    setCurrentPage(1);
+    setSelectedIds(new Set());
+  }, []);
+
+  const handleStatusFilter = useCallback((label: string) => {
+    setStatusFilter(label);
+    setCurrentPage(1);
+    setSelectedIds(new Set());
+  }, []);
+
+  const handleClassFilter = useCallback((value: string) => {
+    setClassFilter(value);
+    setCurrentPage(1);
+    setSelectedIds(new Set());
+  }, []);
+
+  const handleSearch = useCallback((value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+    setSelectedIds(new Set());
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selectedIds.size === paginatedStudents.length) {
+      setSelectedIds(new Set());
     } else {
-      setSortField(field);
-      setSortDir('asc');
+      setSelectedIds(new Set(paginatedStudents.map((s) => s.id)));
     }
-  };
+  }, [paginatedStudents, selectedIds]);
 
-  const clearFilters = () => {
-    setSearch('');
-    setDebouncedSearch('');
-    setClassId('');
-    setSelectedStatuses(['ACTIVE']);
-    setSelectedBloodGroups([]);
-    setGender('All');
-    setPage(1);
-  };
+  const toggleSelectRow = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
 
-  const toggleStatus = (status: string) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
-    );
-    setPage(1);
-  };
-
-  const toggleBloodGroup = (bg: string) => {
-    setSelectedBloodGroups((prev) =>
-      prev.includes(bg)
-        ? prev.filter((b) => b !== bg)
-        : [...prev, bg]
-    );
-    setPage(1);
-  };
-
-  const handleDelete = async (student: Student) => {
-    if (!confirm(`Deactivate ${student.firstName} ${student.lastName}?`)) return;
-    try {
-      const token = getToken();
-      await fetch(`/api/students/${student.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchStudents();
-    } catch (err) {
-      console.error('Delete failed:', err);
+  // ── Page numbers ──
+  const pageNumbers = useMemo(() => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 6) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (safePage > 3) pages.push('...');
+      const start = Math.max(2, safePage - 1);
+      const end = Math.min(totalPages - 1, safePage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (safePage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
     }
-  };
-
-  const totalPages = Math.ceil(total / limit);
-
-  // ── Sort students client-side ──
-  const sortedStudents = [...students].sort((a, b) => {
-    let valA: string | number = '';
-    let valB: string | number = '';
-
-    switch (sortField) {
-      case 'firstName':
-        valA = a.firstName;
-        valB = b.firstName;
-        break;
-      case 'lastName':
-        valA = a.lastName;
-        valB = b.lastName;
-        break;
-      case 'status':
-        valA = a.status;
-        valB = b.status;
-        break;
-      case 'dob':
-        valA = new Date(a.dob).getTime();
-        valB = new Date(b.dob).getTime();
-        break;
-      case 'className':
-        valA = a.class?.name || '';
-        valB = b.class?.name || '';
-        break;
-      default:
-        return 0;
-    }
-
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  // ── Get initials ──
-  const getInitials = (first: string, last: string) =>
-    `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+    return pages;
+  }, [totalPages, safePage]);
 
   return (
-    <div className="space-y-6">
-      {/* ── Top Bar ── */}
+    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+      {/* ── SECTION 1: HEADER ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-            Students
-          </h1>
-          <p className="text-sm text-muted-foreground">Manage all students</p>
+        {/* Left Side: Icon Badge + Title */}
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-xl"
+            style={{ background: 'var(--admin-primary-soft)' }}
+          >
+            <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+          </div>
+          <div>
+            <h1
+              className="text-2xl font-bold tracking-tight"
+              style={{ color: 'var(--admin-text)' }}
+            >
+              Students
+            </h1>
+            <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+              Manage and view all student records
+            </p>
+          </div>
         </div>
+
+        {/* Right Side: Action Buttons */}
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
+            size="sm"
             className="gap-2"
             onClick={() => router.push('/admin/students/import')}
           >
@@ -313,6 +456,7 @@ export default function StudentsListPage() {
             Import CSV
           </Button>
           <Button
+            size="sm"
             className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
             onClick={() => setAddDialogOpen(true)}
           >
@@ -322,357 +466,486 @@ export default function StudentsListPage() {
         </div>
       </div>
 
-      {/* ── Filters Row ── */}
-      <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Filter className="h-4 w-4" />
-          Filters
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or parent..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+      {/* ── SECTION 2: FILTER BAR ── */}
+      <PreOneCard className="!rounded-xl">
+        <div className="p-4 space-y-3">
+          {/* Row 1: Search + Class Dropdown */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              />
+              <input
+                type="text"
+                placeholder="Search by name, parent or phone..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="h-10 w-full rounded-lg border px-3 pl-9 text-sm outline-none transition-colors"
+                style={{
+                  background: 'var(--admin-surface-2)',
+                  borderColor: 'var(--admin-border)',
+                  color: 'var(--admin-text)',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Class Dropdown */}
+            <select
+              value={classFilter}
+              onChange={(e) => handleClassFilter(e.target.value)}
+              className="h-10 rounded-lg border px-3 text-sm outline-none"
+              style={{
+                background: 'var(--admin-surface)',
+                borderColor: 'var(--admin-border)',
+                color: 'var(--admin-text)',
+              }}
+            >
+              {CLASS_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Row 2: Status Pills + More/Clear */}
+          <div className="flex flex-wrap items-center gap-2">
+            {STATUS_PILLS.map((pill) => (
+              <FilterPill
+                key={pill.label}
+                label={pill.label}
+                active={statusFilter === pill.label}
+                activeColor={pill.activeColor}
+                activeBg={pill.activeBg}
+                onClick={() => handleStatusFilter(pill.label)}
+              />
+            ))}
+
+            {/* More Filters */}
+            <Button variant="ghost" size="sm" className="ml-auto gap-1.5">
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              More Filters
+            </Button>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                style={{ color: 'var(--admin-error)' }}
+                onClick={clearFilters}
               >
-                <X className="h-4 w-4" />
-              </button>
+                <X className="h-3.5 w-3.5" />
+                Clear Filters
+              </Button>
             )}
           </div>
+        </div>
+      </PreOneCard>
 
-          {/* Class Filter */}
-          <Select value={classId} onValueChange={(v) => { setClassId(v === 'ALL' ? '' : v); setPage(1); }}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All Classes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Classes</SelectItem>
-              {programs.map((program) => (
-                <SelectGroup key={program.id}>
-                  <SelectLabel>{program.name}</SelectLabel>
-                  {program.classes.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.name} ({cls._count.students})
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Status Filter */}
-          <div className="flex flex-wrap gap-1.5">
-            {Object.entries(STATUS_LABELS).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => toggleStatus(key)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                  selectedStatuses.includes(key)
-                    ? STATUS_COLORS[key]
-                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+      {/* ── SECTION 3: STATS BAR + DATA TABLE ── */}
+      <PreOneCard className="!rounded-xl overflow-hidden">
+        {/* Stats Bar */}
+        <div
+          className="flex items-center justify-between border-b px-5 py-3"
+          style={{ borderColor: 'var(--admin-border)' }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+              Total Students
+            </span>
+            <span
+              className="rounded-md px-2 py-0.5 text-sm font-bold"
+              style={{
+                background: 'var(--admin-primary-soft)',
+                color: 'var(--admin-primary)',
+              }}
+            >
+              {filteredStudents.length}
+            </span>
           </div>
-
-          {/* Gender Filter */}
-          <div className='flex gap-1.5'>
-            {['All', 'Male', 'Female'].map((g) => (
-              <button
-                key={g}
-                onClick={() => { setGender(g); setPage(1); }}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                  gender === g
-                    ? 'bg-portal-50 text-portal-700 border-portal-200'
-                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                }`}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
-
-          {/* Blood Group Filter */}
-          <Select
-            onValueChange={(v) => {
-              toggleBloodGroup(v);
-            }}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Blood Group" />
-            </SelectTrigger>
-            <SelectContent>
-              {BLOOD_GROUPS.map((bg) => (
-                <SelectItem key={bg} value={bg}>
-                  {bg}
-                  {selectedBloodGroups.includes(bg) ? ' ✓' : ''}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Clear Filters */}
-          {(debouncedSearch || classId || selectedStatuses.length !== 1 || selectedStatuses[0] !== 'ACTIVE' || selectedBloodGroups.length > 0 || gender !== 'All') && (
-            <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={clearFilters}>
-              <X className="h-3 w-3" />
-              Clear
-            </Button>
-          )}
+          <Button variant="ghost" size="sm" className="gap-1.5">
+            <Columns3 className="h-3.5 w-3.5" />
+            Columns
+          </Button>
         </div>
 
-        {/* Active Blood Group Tags */}
-        {selectedBloodGroups.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {selectedBloodGroups.map((bg) => (
-              <Badge key={bg} variant="secondary" className="gap-1 text-xs">
-                {bg}
-                <button onClick={() => toggleBloodGroup(bg)}>
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── Students Table ── */}
-      <div className="rounded-xl border bg-[var(--admin-surface)] shadow-sm dark:bg-[var(--admin-surface)]">
+        {/* Table */}
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">Photo</TableHead>
-                <TableHead
-                  className="cursor-pointer select-none min-w-[160px]"
-                  onClick={() => handleSort('firstName')}
+          <table className="w-full">
+            <thead>
+              <tr
+                className="border-b"
+                style={{ borderColor: 'var(--admin-border)' }}
+              >
+                {/* Checkbox Column */}
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded"
+                    style={{ accentColor: 'var(--admin-primary)' }}
+                    checked={
+                      paginatedStudents.length > 0 &&
+                      selectedIds.size === paginatedStudents.length
+                    }
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+
+                {/* Student Column */}
+                <th
+                  className="min-w-[180px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                 >
-                  Name {sortField === 'firstName' && (sortDir === 'asc' ? '↑' : '↓')}
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer select-none w-[120px]"
-                  onClick={() => handleSort('className')}
+                  <span className="inline-flex items-center gap-1">
+                    Student <ArrowUpDown className="h-3 w-3 opacity-40" />
+                  </span>
+                </th>
+
+                {/* Class Column */}
+                <th
+                  className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                 >
-                  Class {sortField === 'className' && (sortDir === 'asc' ? '↑' : '↓')}
-                </TableHead>
-                <TableHead className="w-[150px]">Parent</TableHead>
-                <TableHead className="w-[120px]">Phone</TableHead>
-                <TableHead
-                  className="cursor-pointer select-none w-[100px]"
-                  onClick={() => handleSort('status')}
+                  <span className="inline-flex items-center gap-1">
+                    Class <ArrowUpDown className="h-3 w-3 opacity-40" />
+                  </span>
+                </th>
+
+                {/* Parent Column */}
+                <th
+                  className="w-[150px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                 >
-                  Status {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer select-none w-[100px]"
-                  onClick={() => handleSort('dob')}
+                  Parent / Guardian
+                </th>
+
+                {/* Phone Column */}
+                <th
+                  className="w-[150px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                 >
-                  DOB {sortField === 'dob' && (sortDir === 'asc' ? '↑' : '↓')}
-                </TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                // Loading skeletons
-                Array.from({ length: 8 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
-                  </TableRow>
-                ))
-              ) : sortedStudents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-48 text-center">
+                  Phone
+                </th>
+
+                {/* Status Column */}
+                <th
+                  className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Status <ArrowUpDown className="h-3 w-3 opacity-40" />
+                  </span>
+                </th>
+
+                {/* DOB Column */}
+                <th
+                  className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    DOB <ArrowUpDown className="h-3 w-3 opacity-40" />
+                  </span>
+                </th>
+
+                {/* Actions Column */}
+                <th
+                  className="w-[80px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {paginatedStudents.length === 0 ? (
+                /* ── Empty State ── */
+                <tr>
+                  <td colSpan={8} className="py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <GraduationCap className="h-12 w-12 text-muted-foreground/30" />
-                      <p className="text-muted-foreground">No students found</p>
-                      <Button
-                        className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-                        onClick={() => setAddDialogOpen(true)}
+                      <Search
+                        className="h-10 w-10 opacity-40"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      />
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: 'var(--admin-text-muted)' }}
                       >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Student
-                      </Button>
+                        No students found
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                        Try adjusting your search or filters.
+                      </p>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
-                sortedStudents.map((student) => (
-                  <TableRow
-                    key={student.id}
-                    className="cursor-pointer table-row-preone"
-                    onClick={() => router.push(`/admin/students/${student.id}`)}
-                  >
-                    <TableCell>
-                      <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
-                          {getInitials(student.firstName, student.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium text-[var(--admin-text)]">
-                        {student.firstName} {student.lastName}
-                      </div>
-                      {student.rollNumber && (
-                        <div className="text-xs text-muted-foreground">
-                          #{student.rollNumber}
+                paginatedStudents.map((student) => {
+                  const isSelected = selectedIds.has(student.id);
+                  return (
+                    <tr
+                      key={student.id}
+                      className="cursor-pointer table-row-preone border-b"
+                      style={{
+                        borderColor: 'var(--admin-border)',
+                        background: isSelected
+                          ? 'var(--admin-primary-soft)'
+                          : undefined,
+                      }}
+                      onClick={() => router.push(`/admin/students/${student.id}`)}
+                    >
+                      {/* Checkbox */}
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded"
+                          style={{ accentColor: 'var(--admin-primary)' }}
+                          checked={isSelected}
+                          onChange={() => toggleSelectRow(student.id)}
+                        />
+                      </td>
+
+                      {/* Student: Avatar + Name + ID */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback
+                              className="text-xs font-semibold"
+                              style={{
+                                background: student.avatarBg,
+                                color: student.avatarColor,
+                              }}
+                            >
+                              {student.avatarInitials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <div
+                              className="truncate font-medium"
+                              style={{ color: 'var(--admin-text)' }}
+                            >
+                              {student.name}
+                            </div>
+                            <div
+                              className="text-xs"
+                              style={{ color: 'var(--admin-text-subtle)' }}
+                            >
+                              {student.studentId}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.class ? (
-                        <Badge variant="secondary" className="text-xs">
-                          {student.class.name}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Unassigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.primaryParent ? (
-                        <div className="text-sm">
-                          {student.primaryParent.firstName} {student.primaryParent.lastName}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.primaryParent?.phone ? (
-                        <span className="text-sm text-muted-foreground">
-                          {student.primaryParent.phone}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${STATUS_COLORS[student.status]}`}>
-                        {STATUS_LABELS[student.status]}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">
-                        {format(new Date(student.dob), 'dd MMM yyyy')}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                      </td>
+
+                      {/* Class */}
+                      <td className="px-4 py-3">
+                        <ClassPill
+                          label={student.class}
+                          color={student.classColor}
+                          bg={student.classBg}
+                        />
+                      </td>
+
+                      {/* Parent/Guardian */}
+                      <td
+                        className="whitespace-nowrap px-4 py-3"
+                        style={{ color: 'var(--admin-text)' }}
+                      >
+                        {student.parent}
+                      </td>
+
+                      {/* Phone */}
+                      <td
+                        className="whitespace-nowrap px-4 py-3 text-xs tabular-nums"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
+                        {student.phone}
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-4 py-3">
+                        <StatusBadge status={student.status} />
+                      </td>
+
+                      {/* DOB */}
+                      <td
+                        className="whitespace-nowrap px-4 py-3 text-xs"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
+                        {student.dob}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <button
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-80"
+                            style={{
+                              color: 'var(--admin-text-muted)',
+                              background: 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'var(--admin-surface-2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                            onClick={() => router.push(`/admin/students/${student.id}`)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-80"
+                            style={{
+                              color: 'var(--admin-text-muted)',
+                              background: 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'var(--admin-surface-2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/admin/students/${student.id}`);
-                            }}
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/admin/students/${student.id}`);
-                            }}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedStudent(student);
-                              setTransferDialogOpen(true);
-                            }}
-                          >
-                            <ArrowRightLeft className="mr-2 h-4 w-4" />
-                            Transfer
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600 focus:text-red-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(student);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
 
-        {/* ── Pagination ── */}
-        {!loading && total > 0 && (
-          <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total} students
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
+        {/* ── SECTION 4: PAGINATION ── */}
+        {filteredStudents.length > 0 && (
+          <div
+            className="flex flex-col gap-3 border-t px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            {/* Left: Showing info + Rows per page */}
+            <div className="flex items-center gap-4">
+              <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
+                Showing {startRow} to {endRow} of {filteredStudents.length} students
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                  Rows per page:
+                </span>
+                <select
+                  value={rowsPerPage}
+                  onChange={(e) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                    setSelectedIds(new Set());
+                  }}
+                  className="h-7 rounded border px-1.5 text-xs outline-none"
+                  style={{
+                    background: 'var(--admin-surface)',
+                    borderColor: 'var(--admin-border)',
+                    color: 'var(--admin-text)',
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Right: Page Navigation */}
+            <div className="flex items-center gap-1">
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+                style={{
+                  color: 'var(--admin-text-muted)',
+                  opacity: safePage <= 1 ? 0.4 : 1,
+                }}
+                disabled={safePage <= 1}
+                onClick={() => setCurrentPage(safePage - 1)}
               >
                 <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium">
-                {page} / {totalPages || 1}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage(page + 1)}
+              </button>
+
+              {pageNumbers.map((p, idx) =>
+                p === '...' ? (
+                  <span
+                    key={`ellipsis-${idx}`}
+                    className="flex h-8 w-8 items-center justify-center text-xs"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    className="flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors"
+                    style={
+                      safePage === p
+                        ? {
+                            background: 'var(--admin-primary-soft)',
+                            color: 'var(--admin-primary)',
+                          }
+                        : { color: 'var(--admin-text-muted)' }
+                    }
+                    onClick={() => setCurrentPage(p)}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+                style={{
+                  color: 'var(--admin-text-muted)',
+                  opacity: safePage >= totalPages ? 0.4 : 1,
+                }}
+                disabled={safePage >= totalPages}
+                onClick={() => setCurrentPage(safePage + 1)}
               >
                 <ChevronRight className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
           </div>
         )}
-      </div>
+      </PreOneCard>
 
       {/* ── Dialogs ── */}
       <AddStudentDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-        onStudentCreated={fetchStudents}
+        onStudentCreated={() => {}}
       />
       {selectedStudent && (
         <TransferStudentDialog
           open={transferDialogOpen}
           onOpenChange={setTransferDialogOpen}
-          student={selectedStudent}
-          onTransferred={fetchStudents}
+          student={{
+            id: selectedStudent.id,
+            firstName: selectedStudent.name.split(' ')[0],
+            lastName: selectedStudent.name.split(' ')[1] || '',
+            dob: '',
+            gender: '',
+            status: selectedStudent.status.toUpperCase() as 'ACTIVE' | 'INACTIVE' | 'GRADUATED' | 'TRANSFERRED',
+            admissionDate: '',
+            class: null,
+            primaryParent: null,
+          }}
+          onTransferred={() => {}}
         />
       )}
     </div>
