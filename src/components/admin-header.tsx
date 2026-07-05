@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Search,
@@ -114,15 +114,16 @@ export function AdminHeader() {
   const router = useRouter();
   const { theme: currentTheme, setTheme } = useTheme();
 
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('preone_user');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) setUser(JSON.parse(saved));
     } catch {
-      return null;
+      // ignore
     }
-  });
+  }, []);
 
   // Build breadcrumb segments from pathname
   const segments = pathname.split('/').filter(Boolean);

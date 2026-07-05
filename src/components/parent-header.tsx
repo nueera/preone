@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -61,15 +61,16 @@ export function ParentHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { parent, selectedChild, children, selectChild } = useParentAuth();
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('preone_user');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) setUser(JSON.parse(saved));
     } catch {
-      return null;
+      // ignore
     }
-  });
+  }, []);
 
   // Build breadcrumb segments from pathname
   const segments = pathname.split('/').filter(Boolean);
