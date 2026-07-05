@@ -243,6 +243,24 @@
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
+
+  /* ── Login color mappings ── */
+  --color-login-card: var(--login-card);
+  --color-login-card-border: var(--login-card-border);
+  --color-login-input: var(--login-input);
+  --color-login-input-border: var(--login-input-border);
+  --color-login-text: var(--login-text);
+  --color-login-muted: var(--login-muted);
+  --color-login-subtle: var(--login-subtle);
+  --color-login-label: var(--login-label);
+  --color-login-link: var(--login-link);
+  --color-login-divider: var(--login-divider);
+  --color-login-focus: var(--login-focus);
+  --color-login-error: var(--login-error);
+  --color-login-tab-bg: var(--login-tab-bg);
+  --color-login-tab-active: var(--login-tab-active);
+  --color-login-icon: var(--login-icon);
+  --color-login-icon-muted: var(--login-icon-muted);
 }
 
 /* ============================================================
@@ -300,6 +318,24 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: rgba(255,255,255,0.1);
   --sidebar-ring: #7C3AED;
+
+  /* ── Login Page Tokens ── */
+  --login-card: rgba(255, 255, 255, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.6);
+  --login-input: rgba(255, 255, 255, 0.7);
+  --login-input-border: #E5E7EB;
+  --login-text: #1F2937;
+  --login-muted: #6B7280;
+  --login-subtle: #9CA3AF;
+  --login-label: #374151;
+  --login-link: #7C3AED;
+  --login-divider: #E5E7EB;
+  --login-focus: #6366F1;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.5);
+  --login-tab-active: #6366F1;
+  --login-icon: #6366F1;
+  --login-icon-muted: #6B7280;
 
   /* ── Portal-scoped defaults (Admin = Purple/Violet) ── */
   --portal: #7C3AED;
@@ -468,6 +504,24 @@
 
   --portal: #A78BFA;
   --portal-foreground: #0F172A;
+
+  /* ── Login Page Tokens (dark mode) ── */
+  --login-card: rgba(26, 26, 62, 0.65);
+  --login-card-border: rgba(139, 92, 246, 0.15);
+  --login-input: rgba(34, 34, 68, 0.6);
+  --login-input-border: #33335A;
+  --login-text: #F0F0FF;
+  --login-muted: #A3A3C2;
+  --login-subtle: #8888AA;
+  --login-label: #C4C4E0;
+  --login-link: #818CF8;
+  --login-divider: #33335A;
+  --login-focus: #8B5CF6;
+  --login-error: #FB7185;
+  --login-tab-bg: #252548;
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #A3A3C2;
 }
 
 .dark [data-portal="teacher"] {
@@ -610,7 +664,138 @@
   background: linear-gradient(135deg, #EDE9FE 0%, #E0F2FE 50%, #F0FDF4 100%);
 }
 
-/* ── Brand Text Gradient ── */
+/* ── Login Page Glass Card ── */
+.login-card-glass {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+.dark .login-card-glass {
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ── Login Toggle Pill ── */
+.login-toggle-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+:is(.dark) .login-toggle-pill {
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.login-toggle-pill-btn {
+  color: #B0B0B0;
+}
+.login-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* ── Login Theme Transition ── */
+.login-theme-transition,
+.login-theme-transition * {
+  transition: background var(--transition-theme, 300ms ease),
+              border-color var(--transition-theme, 300ms ease),
+              color var(--transition-theme, 300ms ease),
+              box-shadow var(--transition-theme, 300ms ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-theme-transition,
+  .login-theme-transition * { transition: none; }
+}
+
+/* ── Login Page Shell ── */
+.login-page-shell {
+  min-height: 100dvh;
+}
+@media (max-width: 767px) {
+  .login-page-shell { overflow-y: auto; overflow-x: hidden; }
+}
+
+/* ── Login Text Colors ── */
+.text-login-text { color: var(--login-text); }
+.text-login-muted { color: var(--login-muted); }
+.text-login-subtle { color: var(--login-subtle); }
+.text-login-label { color: var(--login-label); }
+.text-login-link { color: var(--login-link); }
+.text-login-error { color: var(--login-error); }
+
+/* ── Login Backgrounds ── */
+.bg-login-tab-bg { background: #F1F5F9; }
+.bg-login-tab-active { background: #6366F1; }
+.bg-login-input { background: #F8FAFC; }
+.bg-login-divider { background: #E5E7EB; }
+
+.dark .bg-login-tab-bg { background: #252548; }
+.dark .bg-login-tab-active { background: #818CF8; }
+.dark .bg-login-input { background: rgba(34, 34, 68, 0.6); }
+.dark .bg-login-divider { background: #33335A; }
+
+/* ── Login Borders ── */
+.border-login-input-border { border-color: var(--login-input-border); }
+
+/* ── Login Icons ── */
+.text-login-icon { color: var(--login-icon); }
+.text-login-icon-muted { color: var(--login-icon-muted); }
+
+/* ── Login Input Focus ── */
+.login-input-focus:focus-within {
+  border-color: var(--login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
+}
+
+/* ── Login Checkbox Checked ── */
+.login-checkbox-checked {
+  background: var(--login-focus) !important;
+  border-color: var(--login-focus) !important;
+}
+
+/* ── Login Demo Cell ── */
+.login-demo-cell {
+  border-radius: 12px;
+}
+@media (max-width: 767px) {
+  .login-demo-cell { min-height: 56px; }
+}
+
+/* ── Login Wallpaper Overlays ── */
+.login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(108,92,231,0.12) 0%, rgba(0,0,0,0.15) 100%);
+}
+.dark .login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(108,92,231,0.2) 0%, rgba(0,0,0,0.35) 100%);
+}
+.login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.25) 100%);
+}
+:is(.dark) .login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.45) 100%);
+}
+
+/* ── Login Brand Wordmark ── */
+.login-brand-wordmark { color: #FFFFFF; }
+:is(.light) .login-brand-wordmark { color: #FFFFFF; }
+
+/* ── Login Launch Button ── */
+.btn-launch {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+}
+.btn-launch:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+}
+.btn-launch:active:not(:disabled) { transform: scale(0.99); }
+.btn-launch:disabled { cursor: not-allowed; opacity: 0.85; }
+
+/* ── Login Brand Text Gradient ── */
 .text-brand-gradient {
   background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
   -webkit-background-clip: text;
@@ -858,6 +1043,15 @@
   .input-mobile-full {
     width: 100%;
   }
+
+  /* Login card mobile overrides */
+  .login-card-glass { padding: 16px !important; border-radius: 16px !important; }
+  .login-card-glass .btn-launch { height: 44px !important; }
+  .login-card-glass input[type="text"],
+  .login-card-glass input[type="email"],
+  .login-card-glass input[type="password"],
+  .login-card-glass input[type="tel"],
+  .login-card-glass input:not([type]) { font-size: 16px !important; }
 
   /* Reduce heading sizes on mobile */
   h1 { font-size: 1.5rem; }
