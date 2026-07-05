@@ -354,6 +354,28 @@
   --portal-700: #047857;
   --portal-800: #065f46;
   --portal-900: #064e3b;
+
+  /* ── Teacher Portal Semantic Tokens (--teacher-*) ── */
+  --teacher-bg: #F8FAFC;
+  --teacher-surface: #FFFFFF;
+  --teacher-surface-2: #F1F5F9;
+  --teacher-border: #E2E8F0;
+  --teacher-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --teacher-text: #0F172A;
+  --teacher-text-muted: #64748B;
+  --teacher-text-subtle: #94A3B8;
+  --teacher-primary: #10B981;
+  --teacher-primary-soft: #D1FAE5;
+  --teacher-primary-foreground: #FFFFFF;
+  --teacher-success: #10B981;
+  --teacher-success-soft: #D1FAE5;
+  --teacher-warning: #F59E0B;
+  --teacher-warning-soft: #FEF3C7;
+  --teacher-info: #6366F1;
+  --teacher-info-soft: #EEF2FF;
+  --teacher-error: #EF4444;
+  --teacher-error-soft: #FEE2E2;
+  --teacher-accent: #10B981;
 }
 
 /* ── Parent Portal: Sky / Blue ── */
@@ -370,6 +392,34 @@
   --portal-700: #0369a1;
   --portal-800: #075985;
   --portal-900: #0c4a6e;
+
+  /* ── Parent Portal Semantic Tokens (--parent-*) ── */
+  --parent-bg: #F8FAFC;
+  --parent-surface: #FFFFFF;
+  --parent-surface-2: #F1F5F9;
+  --parent-border: #E2E8F0;
+  --parent-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --parent-text: #0F172A;
+  --parent-text-muted: #64748B;
+  --parent-text-subtle: #94A3B8;
+  --parent-primary: #0EA5E9;
+  --parent-primary-soft: #E0F2FE;
+  --parent-primary-foreground: #FFFFFF;
+  --parent-success: #10B981;
+  --parent-success-soft: #D1FAE5;
+  --parent-warning: #F59E0B;
+  --parent-warning-soft: #FEF3C7;
+  --parent-info: #6366F1;
+  --parent-info-soft: #EEF2FF;
+  --parent-error: #EF4444;
+  --parent-error-soft: #FEE2E2;
+  --parent-accent: #0EA5E9;
+
+  /* ── Parent Portal Extended Tokens ── */
+  --parent-pink: #EC4899;
+  --parent-pink-soft: #FCE7F3;
+  --parent-orange: #F97316;
+  --parent-orange-soft: #FFF7ED;
 }
 
 /* ============================================================
@@ -423,11 +473,61 @@
 .dark [data-portal="teacher"] {
   --portal: #34D399;
   --portal-foreground: #0F172A;
+
+  /* ── Dark Mode Teacher Semantic Tokens ── */
+  --teacher-bg: #0F172A;
+  --teacher-surface: #1E293B;
+  --teacher-surface-2: #334155;
+  --teacher-border: rgba(255,255,255,0.1);
+  --teacher-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --teacher-text: #F8FAFC;
+  --teacher-text-muted: #94A3B8;
+  --teacher-text-subtle: #64748B;
+  --teacher-primary: #34D399;
+  --teacher-primary-soft: rgba(52,211,153,0.15);
+  --teacher-primary-foreground: #0F172A;
+  --teacher-success: #34D399;
+  --teacher-success-soft: rgba(52,211,153,0.15);
+  --teacher-warning: #FBBF24;
+  --teacher-warning-soft: rgba(251,191,36,0.15);
+  --teacher-info: #818CF8;
+  --teacher-info-soft: rgba(129,140,248,0.15);
+  --teacher-error: #FCA5A5;
+  --teacher-error-soft: rgba(252,165,165,0.15);
+  --teacher-accent: #34D399;
 }
 
 .dark [data-portal="parent"] {
   --portal: #38BDF8;
   --portal-foreground: #0F172A;
+
+  /* ── Dark Mode Parent Semantic Tokens ── */
+  --parent-bg: #0F172A;
+  --parent-surface: #1E293B;
+  --parent-surface-2: #334155;
+  --parent-border: rgba(255,255,255,0.1);
+  --parent-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --parent-text: #F8FAFC;
+  --parent-text-muted: #94A3B8;
+  --parent-text-subtle: #64748B;
+  --parent-primary: #38BDF8;
+  --parent-primary-soft: rgba(56,189,248,0.15);
+  --parent-primary-foreground: #0F172A;
+  --parent-success: #34D399;
+  --parent-success-soft: rgba(52,211,153,0.15);
+  --parent-warning: #FBBF24;
+  --parent-warning-soft: rgba(251,191,36,0.15);
+  --parent-info: #818CF8;
+  --parent-info-soft: rgba(129,140,248,0.15);
+  --parent-error: #FCA5A5;
+  --parent-error-soft: rgba(252,165,165,0.15);
+  --parent-accent: #38BDF8;
+
+  /* ── Dark Mode Parent Extended Tokens ── */
+  --parent-pink: #F472B6;
+  --parent-pink-soft: rgba(244,114,182,0.15);
+  --parent-orange: #FB923C;
+  --parent-orange-soft: rgba(251,146,60,0.15);
 }
 
 /* ============================================================

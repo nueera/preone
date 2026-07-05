@@ -51,8 +51,8 @@ import { motion } from 'framer-motion';
 const ROLE_DASHBOARD: Record<string, string> = {
   ADMIN: '/admin/dashboard',
   TASK_MASTER: '/admin/crm',
-  TEACHER: '/teacher/dashboard',
-  PARENT: '/parent/dashboard',
+  TEACHER: '/teacher',
+  PARENT: '/parent',
 };
 
 const TOKEN_KEY = 'preone_token';
