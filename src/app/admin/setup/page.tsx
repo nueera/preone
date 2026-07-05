@@ -1,302 +1,375 @@
 'use client';
 
-import React, { useState } from 'react';
+// ============================================================
+// PreOne — Admin Setup Landing (/admin/setup)
+//
+// 6 illustrated module cards in a 3×2 grid.
+// Clicking a card navigates to its sub-page.
+//
+// Sections:
+//   1. Page header with PreO character + speech bubble
+//   2. Card grid (3×2) with illustrations, status badges, arrows
+//
+// Color rules:
+//   ALL colors use var(--admin-*) CSS variables — no hardcoded
+//   hex or Tailwind color classes in JSX.
+//
+// Accessibility:
+//   - aria-labels on all interactive elements
+//   - focus-visible ring on card links
+//   - prefers-reduced-motion: disables transforms, keeps opacity
+// ============================================================
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { PageTransition } from '@/components/ui/page-transition';
+import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard } from '@/components/ui/preone-card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import {
   Building2,
-  School,
   Calendar,
   GraduationCap,
   IndianRupee,
   Users,
-  Puzzle,
-  CheckCircle2,
-  Circle,
+  UserCog,
   ArrowRight,
-  Rocket,
-  Sparkles,
+  Settings,
 } from 'lucide-react';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-import { cn } from '@/lib/utils';
 
-const theme = PORTAL_THEMES.admin;
+// ── prefers-reduced-motion hook ───────────────────────────────
 
-interface SetupStep {
-  id: string;
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return reduced;
+}
+
+// ── Mock data (replace with API calls later) ──────────────────
+
+interface SetupModule {
+  key: string;
   title: string;
   description: string;
   href: string;
-  icon: React.ReactNode;
-  completed: boolean;
-  progress: number;
-  color: string;
-  bgColor: string;
+  icon: React.ElementType;
+  statusIcon: React.ElementType;
+  statusText: string;
+  imageSrc: string;
 }
 
-const SETUP_STEPS: SetupStep[] = [
+const SETUP_MODULES: SetupModule[] = [
   {
-    id: 'school',
-    title: 'School Profile',
-    description: 'Basic school information, logo, and contact details',
+    key: 'school',
+    title: 'School',
+    description: 'Manage school details, branches, contacts and settings.',
     href: '/admin/setup/school',
-    icon: <School className="h-5 w-5" />,
-    completed: true,
-    progress: 100,
-    color: 'text-violet-600',
-    bgColor: 'bg-violet-50',
+    icon: Building2,
+    statusIcon: Building2,
+    statusText: '2 Campuses',
+    imageSrc: '/icons/admin/setup/school.webp',
   },
   {
-    id: 'branches',
-    title: 'Branches',
-    description: 'Manage campuses and branch locations',
-    href: '/admin/setup/branches',
-    icon: <Building2 className="h-5 w-5" />,
-    completed: true,
-    progress: 100,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-  },
-  {
-    id: 'academic-year',
+    key: 'academic-year',
     title: 'Academic Year',
-    description: 'Configure academic years, terms, and holidays',
+    description: 'Create and manage academic years and important dates.',
     href: '/admin/setup/academic-year',
-    icon: <Calendar className="h-5 w-5" />,
-    completed: true,
-    progress: 100,
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50',
+    icon: Calendar,
+    statusIcon: Calendar,
+    statusText: '2025-26 (Current)',
+    imageSrc: '/icons/admin/setup/academic-year.webp',
   },
   {
-    id: 'classes',
-    title: 'Classes & Programs',
-    description: 'Set up programs, classes, sections, and capacity',
+    key: 'group',
+    title: 'Group',
+    description: 'Manage groups for different age categories in your school.',
+    href: '/admin/setup/group',
+    icon: Users,
+    statusIcon: Users,
+    statusText: '5 Groups',
+    imageSrc: '/icons/admin/setup/group.webp',
+  },
+  {
+    key: 'classes',
+    title: 'Classes & Program',
+    description: 'Manage classes, programs and curriculum structure efficiently.',
     href: '/admin/setup/classes',
-    icon: <GraduationCap className="h-5 w-5" />,
-    completed: false,
-    progress: 60,
-    color: 'text-sky-600',
-    bgColor: 'bg-sky-50',
+    icon: GraduationCap,
+    statusIcon: GraduationCap,
+    statusText: '12 Classes',
+    imageSrc: '/icons/admin/setup/classes.webp',
   },
   {
-    id: 'fee-structure',
+    key: 'fee-structure',
     title: 'Fee Structure',
-    description: 'Define fee types, amounts, and payment schedules',
+    description: 'Create and manage fee structures, heads and discounts.',
     href: '/admin/setup/fee-structure',
-    icon: <IndianRupee className="h-5 w-5" />,
-    completed: false,
-    progress: 40,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
+    icon: IndianRupee,
+    statusIcon: IndianRupee,
+    statusText: '8 Fee Structures',
+    imageSrc: '/icons/admin/setup/fee-structure.webp',
   },
   {
-    id: 'staff',
-    title: 'Staff Setup',
-    description: 'Add staff, assign roles, and manage onboarding',
+    key: 'staff',
+    title: 'Staff',
+    description: 'Manage all staff members, roles, departments and permissions.',
     href: '/admin/setup/staff',
-    icon: <Users className="h-5 w-5" />,
-    completed: false,
-    progress: 25,
-    color: 'text-pink-600',
-    bgColor: 'bg-pink-50',
-  },
-  {
-    id: 'integrations',
-    title: 'Integrations',
-    description: 'Connect WhatsApp, payments, SMS, and other services',
-    href: '/admin/setup/integrations',
-    icon: <Puzzle className="h-5 w-5" />,
-    completed: false,
-    progress: 0,
-    color: 'text-teal-600',
-    bgColor: 'bg-teal-50',
+    icon: UserCog,
+    statusIcon: UserCog,
+    statusText: '36 Staff Members',
+    imageSrc: '/icons/admin/setup/staff.webp',
   },
 ];
 
-const completedCount = SETUP_STEPS.filter((s) => s.completed).length;
-const overallProgress = Math.round(
-  SETUP_STEPS.reduce((sum, s) => sum + s.progress, 0) / SETUP_STEPS.length
-);
+// ── Setup module card ─────────────────────────────────────────
 
-export default function SetupLandingPage() {
-  const [hoveredStep, setHoveredStep] = useState<string | null>(null);
+function SetupModuleCard({ module }: { module: SetupModule }) {
+  const [hasIllustration, setHasIllustration] = useState(true);
+  const reducedMotion = usePrefersReducedMotion();
+  const Icon = module.icon;
+  const StatusIcon = module.statusIcon;
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Rocket className="h-6 w-6 text-violet-600" />
-              Setup & Onboarding
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Complete these steps to get your school up and running on PreOne
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className="text-xs px-3 py-1 border-violet-200 bg-violet-50 text-violet-700"
-            >
-              <Sparkles className="h-3 w-3 mr-1" />
-              {completedCount} of {SETUP_STEPS.length} completed
-            </Badge>
-          </div>
-        </div>
-
-        {/* Overall Progress Card */}
-        <PreOneCard variant="default">
-          <div className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Overall Setup Progress
-                </h2>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  You&apos;re almost there! Complete the remaining steps to unlock all features.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-sky-500 bg-clip-text text-transparent">
-                  {overallProgress}%
-                </span>
-              </div>
+    <Link
+      href={module.href}
+      aria-label={`${module.title} — ${module.statusText}`}
+      className={`
+        group block
+        focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2
+        rounded-3xl
+      `}
+    >
+      <PreOneCard
+        variant="default"
+        hover
+        className="h-full"
+      >
+        <div className="flex min-h-[180px] flex-col justify-between p-5 sm:min-h-[200px] sm:p-6">
+          {/* ── Top row: illustration + icon badge ── */}
+          <div className="mb-3 flex items-start justify-between sm:mb-4">
+            {/* Left: custom illustration (responsive sizing, always visible) */}
+            <div className="relative h-14 w-20 sm:h-[72px] sm:w-[96px]">
+              {hasIllustration ? (
+                <Image
+                  src={module.imageSrc}
+                  alt=""
+                  fill
+                  className={`
+                    object-contain
+                    ${reducedMotion ? '' : 'transition-transform duration-200 group-hover:scale-105'}
+                  `}
+                  onError={() => setHasIllustration(false)}
+                />
+              ) : (
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl sm:h-16 sm:w-16"
+                  style={{ background: 'var(--admin-primary-soft)' }}
+                >
+                  <Icon className="h-8 w-8 sm:h-12 sm:w-12" style={{ color: 'var(--admin-primary)' }} />
+                </div>
+              )}
             </div>
-            <Progress value={overallProgress} className="h-3" />
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span>{completedCount} sections complete</span>
-              <span>
-                {SETUP_STEPS.length - completedCount} remaining
+
+            {/* Right: circular icon badge */}
+            <div
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8"
+              style={{ background: 'var(--admin-primary)' }}
+            >
+              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: 'var(--admin-primary-foreground, #FFFFFF)' }} />
+            </div>
+          </div>
+
+          {/* ── Title ── */}
+          <h3
+            className="mb-1 text-[16px] font-bold transition-colors duration-200 sm:text-[18px]"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            <span className="group-hover:text-[var(--admin-primary)]">
+              {module.title}
+            </span>
+          </h3>
+
+          {/* ── Description ── */}
+          <p
+            className="mb-3 line-clamp-2 text-[12px] font-normal sm:mb-4 sm:text-[13px]"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
+            {module.description}
+          </p>
+
+          {/* ── Footer: status badge + arrow ── */}
+          <div
+            className="flex items-center justify-between pt-2.5 sm:pt-3"
+            style={{ borderTop: '1px solid var(--admin-border)' }}
+          >
+            {/* Status badge */}
+            <div
+              className="flex items-center gap-1.5"
+              aria-label={`Status: ${module.statusText}`}
+            >
+              <StatusIcon
+                className="h-3 w-3 sm:h-3.5 sm:w-3.5"
+                style={{ color: 'var(--admin-primary)' }}
+              />
+              <span
+                className="text-[11px] font-medium sm:text-[12px]"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                {module.statusText}
               </span>
             </div>
-          </div>
-        </PreOneCard>
 
-        {/* Setup Steps Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {SETUP_STEPS.map((step) => (
-            <Link key={step.id} href={step.href} className="block group">
-              <PreOneCard
-                variant="default"
-                hover
-                className={cn(
-                  'h-full transition-all duration-200',
-                  hoveredStep === step.id && 'ring-2 ring-violet-200'
-                )}
-                onMouseEnter={() => setHoveredStep(step.id)}
-                onMouseLeave={() => setHoveredStep(null)}
-              >
-                <div className="p-5 space-y-4">
-                  {/* Top: Icon + Status */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={cn(
-                        'h-10 w-10 rounded-xl flex items-center justify-center',
-                        step.bgColor,
-                        step.color
-                      )}
-                    >
-                      {step.icon}
-                    </div>
-                    {step.completed ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
-                    ) : (
-                      <Circle
-                        className={cn(
-                          'h-5 w-5 flex-shrink-0',
-                          step.progress > 0 ? 'text-amber-400' : 'text-gray-300'
-                        )}
-                      />
-                    )}
-                  </div>
-
-                  {/* Title & Description */}
-                  <div>
-                    <h3 className="font-semibold text-sm text-gray-900 group-hover:text-violet-700 transition-colors">
-                      {step.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
-                      {step.description}
-                    </p>
-                  </div>
-
-                  {/* Progress Bar */}
-                  {!step.completed && (
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Progress</span>
-                        <span className="font-medium text-gray-700">
-                          {step.progress}%
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-400 transition-all duration-500"
-                          style={{ width: `${step.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Completed Badge */}
-                  {step.completed && (
-                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Completed
-                    </Badge>
-                  )}
-
-                  {/* Footer */}
-                  <div className="flex items-center text-xs font-medium text-violet-600 group-hover:text-violet-700 pt-1 border-t">
-                    {step.completed ? 'Edit settings' : 'Continue setup'}
-                    <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              </PreOneCard>
-            </Link>
-          ))}
-        </div>
-
-        {/* Quick Tips Section */}
-        <PreOneCard variant="cosmic">
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-sky-500 flex items-center justify-center flex-shrink-0">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
-                  Quick Setup Tips
-                </h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <span className="text-violet-500 mt-0.5">•</span>
-                    Start with School Profile and Branches — these are required before other steps
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-violet-500 mt-0.5">•</span>
-                    Set up Academic Year before creating Classes — classes are organized by academic year
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-violet-500 mt-0.5">•</span>
-                    Fee Structure and Integrations can be configured in parallel
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-violet-500 mt-0.5">•</span>
-                    You can always come back and modify settings later from the Settings page
-                  </li>
-                </ul>
-              </div>
+            {/* Arrow button */}
+            <div
+              className={`
+                flex h-7 w-7 items-center justify-center rounded-full
+                transition-all duration-200
+                sm:h-8 sm:w-8
+                group-hover:bg-[var(--admin-primary-soft)]
+              `}
+              style={{ background: 'var(--admin-surface-2)' }}
+            >
+              <ArrowRight
+                className={`
+                  h-3.5 w-3.5 transition-transform duration-200
+                  sm:h-4 sm:w-4
+                  ${reducedMotion ? '' : 'group-hover:translate-x-0.5'}
+                `}
+                style={{ color: 'var(--admin-primary)' }}
+                aria-hidden="true"
+              />
             </div>
           </div>
-        </PreOneCard>
+        </div>
+      </PreOneCard>
+    </Link>
+  );
+}
+
+// ── Speech bubble for PreO character ──────────────────────────
+
+function SpeechBubble() {
+  return (
+    <div className="relative hidden md:block">
+      {/* Bubble */}
+      <div
+        className="rounded-xl px-4 py-2 shadow-sm"
+        style={{
+          background: 'var(--admin-surface)',
+          border: '1px solid var(--admin-border)',
+          maxWidth: 220,
+        }}
+        aria-label="PreOne says: Let's set everything up the right way!"
+      >
+        <p
+          className="text-[13px] font-medium"
+          style={{ color: 'var(--admin-text)' }}
+        >
+          Let&apos;s set everything up the right way!
+        </p>
+      </div>
+      {/* Tail (outer border) */}
+      <div
+        className="absolute -bottom-2 right-6 h-0 w-0"
+        style={{
+          borderLeft: '8px solid transparent',
+          borderRight: '8px solid transparent',
+          borderTop: '8px solid var(--admin-border)',
+        }}
+      />
+      {/* Tail (inner fill) */}
+      <div
+        className="absolute -bottom-[7px] right-[25px] h-0 w-0"
+        style={{
+          borderLeft: '7px solid transparent',
+          borderRight: '7px solid transparent',
+          borderTop: '7px solid var(--admin-surface)',
+        }}
+      />
+    </div>
+  );
+}
+
+// ── PreO character illustration ────────────────────────────────
+
+function PreOCharacter() {
+  const [hasAsset, setHasAsset] = useState(true);
+
+  if (!hasAsset) return null;
+
+  return (
+    <div className="hidden flex-col items-end gap-2 md:flex">
+      <SpeechBubble />
+      <Image
+        src="/characters/preo-setup.svg"
+        alt="PreOne character"
+        width={120}
+        height={120}
+        className="h-[120px] w-auto object-contain"
+        onError={() => setHasAsset(false)}
+      />
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────
+
+export default function SetupLandingPage() {
+  return (
+    <PageTransition>
+      <div>
+        {/* ── Page header ── */}
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-start gap-4">
+            {/* Gear icon */}
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-primary-soft)' }}
+            >
+              <Settings
+                className="h-7 w-7"
+                style={{ color: 'var(--admin-primary)' }}
+                aria-hidden="true"
+              />
+            </div>
+
+            {/* Title + subtitle */}
+            <div>
+              <h1
+                className="text-[28px] font-bold leading-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                Setup
+              </h1>
+              <p
+                className="mt-1 text-[14px]"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                Manage your school configuration and master data.
+              </p>
+            </div>
+          </div>
+
+          {/* PreO character + speech bubble (hidden on mobile) */}
+          <PreOCharacter />
+        </div>
+
+        {/* ── Module card grid with stagger entrance ── */}
+        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {SETUP_MODULES.map((mod) => (
+            <StaggerItem key={mod.key}>
+              <SetupModuleCard module={mod} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       </div>
     </PageTransition>
   );

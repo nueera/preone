@@ -112,9 +112,9 @@ function ListSkeleton({ items = 4 }: { items?: number }) {
   );
 }
 
-// ====== PAGE-LEVEL SKELETON ======
+// ====== PAGE-LEVEL SKELETONS ======
 
-function PageSkeleton({ type = 'dashboard' }: { type?: 'dashboard' | 'list' | 'form' | 'detail' }) {
+function PageSkeleton({ type = 'dashboard' }: { type?: 'dashboard' | 'list' | 'form' | 'detail' | 'setup' | 'data' }) {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -161,6 +161,32 @@ function PageSkeleton({ type = 'dashboard' }: { type?: 'dashboard' | 'list' | 'f
             <CardSkeleton lines={3} />
           </div>
         </div>
+      )}
+
+      {/* Setup page: sidebar + form sections */}
+      {type === 'setup' && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <CardSkeleton lines={8} />
+          </div>
+          <div className="lg:col-span-3 space-y-4">
+            <CardSkeleton lines={4} />
+            <CardSkeleton lines={6} />
+            <CardSkeleton lines={3} />
+          </div>
+        </div>
+      )}
+
+      {/* Data page: stats + toolbar + table */}
+      {type === 'data' && (
+        <>
+          <StatsSkeleton />
+          <div className="flex gap-3">
+            <Skeleton className="h-10 flex-1 rounded-xl" />
+            <Skeleton className="h-10 w-32 rounded-xl" />
+          </div>
+          <TableSkeleton />
+        </>
       )}
     </div>
   );

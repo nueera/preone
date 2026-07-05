@@ -78,11 +78,11 @@ export default function GrowthObservationsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Eye className="w-6 h-6" style={{ color: theme.primary }} />
                 Growth Observations
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Teacher observations and developmental tracking</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Teacher observations and developmental tracking</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md" onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2" /> Add Observation
@@ -95,7 +95,7 @@ export default function GrowthObservationsPage() {
           <StaggerItem>
             <PreOneCard variant="emotional" className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">New Growth Observation</h3>
+                <h3 className="font-semibold text-[var(--admin-text)]">New Growth Observation</h3>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowForm(false)}><X className="w-4 h-4" /></Button>
               </div>
               <div className="space-y-3">
@@ -141,16 +141,16 @@ export default function GrowthObservationsPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Observations Timeline</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Observations Timeline</h3>
               {loading ? (
-                <p className="text-sm text-gray-400 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading observations…</p>
+                <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading observations…</p>
               ) : error ? (
                 <p className="text-sm text-red-500 py-10 text-center">{error}</p>
               ) : filteredObs.length === 0 ? (
-                <p className="text-sm text-gray-400 py-10 text-center">No observations recorded yet.</p>
+                <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center">No observations recorded yet.</p>
               ) : (
                 <ScrollArea className="max-h-[600px]">
-                  <div className="relative pl-6 border-l-2 border-gray-100 space-y-6">
+                  <div className="relative pl-6 border-l-2 border-[var(--admin-border)] space-y-6">
                     {filteredObs.map((obs) => {
                       const cfg = OBSERVATION_COLORS[obs.category] || OBSERVATION_COLORS.COGNITIVE;
                       const Icon = CATEGORY_ICON[obs.category] || Brain;
@@ -161,14 +161,14 @@ export default function GrowthObservationsPage() {
                           </div>
                           <div className="ml-4 p-3 rounded-xl border hover:shadow-sm transition-shadow">
                             <div className="flex items-center justify-between mb-1">
-                              <p className="text-sm font-medium text-gray-900">{obs.student}</p>
+                              <p className="text-sm font-medium text-[var(--admin-text)]">{obs.student}</p>
                               <div className="flex items-center gap-1.5">
                                 {obs.photo && <Badge className="bg-sky-50 text-sky-700 text-[9px]"><Camera className="w-2.5 h-2.5 mr-0.5" /> Photo</Badge>}
                                 <Badge className={`${cfg.bg} ${cfg.text} text-[9px]`}>{obs.category}</Badge>
                               </div>
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">{obs.content}</p>
-                            <div className="flex items-center gap-3 text-xs text-gray-400">
+                            <p className="text-sm text-[var(--admin-text-muted)] mb-2">{obs.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
                               <span className="flex items-center gap-1"><User className="w-3 h-3" /> {obs.teacher}</span>
                               <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(obs.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                             </div>

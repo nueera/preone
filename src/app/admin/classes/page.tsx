@@ -133,7 +133,7 @@ export default function ClassesListPage() {
         {/* ── Top Bar ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
               Classes
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ export default function ClassesListPage() {
         </div>
 
         {/* ── Filters ── */}
-        <div className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-900 space-y-3">
+        <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Filter className="h-4 w-4" />
             Filters
@@ -212,13 +212,13 @@ export default function ClassesListPage() {
                 className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                   !programFilter
                     ? 'bg-portal-50 text-portal-700 border-portal-200'
-                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
                 }`}
               >
                 All Programs
               </button>
               {programNames.map((name) => {
-                const colors = PROGRAM_COLORS[name] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+                const colors = PROGRAM_COLORS[name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
                 return (
                   <button
                     key={name}
@@ -226,7 +226,7 @@ export default function ClassesListPage() {
                     className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                       programFilter === name
                         ? `${colors.bg} ${colors.text} ${colors.border}`
-                        : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                        : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
                     }`}
                   >
                     {PROGRAM_ICONS[name] || '📚'} {name}
@@ -282,13 +282,13 @@ export default function ClassesListPage() {
           </div>
         ) : (
           filteredPrograms.map((program) => {
-            const colors = PROGRAM_COLORS[program.name] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+            const colors = PROGRAM_COLORS[program.name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
             return (
               <div key={program.id} className="space-y-4">
                 {/* Program Header */}
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{PROGRAM_ICONS[program.name] || '📚'}</span>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
                     {program.name}
                   </h2>
                   <Badge variant="secondary" className="text-xs">
@@ -313,7 +313,7 @@ export default function ClassesListPage() {
                           {/* Card Header */}
                           <div className="flex items-start justify-between">
                             <div>
-                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                              <h3 className="font-semibold text-[var(--admin-text)]">
                                 {cls.name}
                               </h3>
                               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border mt-1 ${colors.bg} ${colors.text} ${colors.border}`}>

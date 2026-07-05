@@ -469,8 +469,8 @@ function GrowthContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Growth Data</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Growth Data</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={fetchClassData}
           className="bg-portal-600 hover:bg-portal-700 rounded-xl"
@@ -488,11 +488,11 @@ function GrowthContent() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-portal-500" />
                 Growth Assessment
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {data?.className || 'Class'} | {data?.assessedCount || 0}/{data?.totalStudents || 0} Assessed
               </p>
             </div>
@@ -520,7 +520,7 @@ function GrowthContent() {
 
       {/* ── Main Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-gray-100 rounded-xl">
+        <TabsList className="bg-muted rounded-xl">
           <TabsTrigger value="overview" className="rounded-lg text-xs">
             <BarChart3 className="h-3.5 w-3.5 mr-1" /> Class Overview
           </TabsTrigger>
@@ -568,7 +568,7 @@ function GrowthContent() {
                     </RadarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                  <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
                     No assessment data available for {selectedPeriod}
                   </div>
                 )}
@@ -592,7 +592,7 @@ function GrowthContent() {
                         {Math.round(data.classAverage.overall)}
                       </div>
                       <div>
-                        <div className="text-sm text-gray-600">Overall Score</div>
+                        <div className="text-sm text-muted-foreground">Overall Score</div>
                         <Badge className={`${getRating(data.classAverage.overall).bg} ${getRating(data.classAverage.overall).color} border-0 text-xs px-2 py-0.5`}>
                           {getRating(data.classAverage.overall).label}
                         </Badge>
@@ -603,7 +603,7 @@ function GrowthContent() {
                         const val = data.classAverage![dim.key];
                         return (
                           <div key={dim.key} className="text-center">
-                            <div className="text-xs text-gray-500 mb-0.5">{dim.icon} {dim.label.split(' ')[0]}</div>
+                            <div className="text-xs text-muted-foreground mb-0.5">{dim.icon} {dim.label.split(' ')[0]}</div>
                             <div className={`text-sm font-bold ${getScoreTextColor(val)}`}>{Math.round(val)}</div>
                           </div>
                         );
@@ -631,8 +631,8 @@ function GrowthContent() {
                               {getInitials(item.studentName)}
                             </div>
                             <div>
-                              <div className="text-xs font-medium text-gray-900">{item.studentName}</div>
-                              <div className="text-[10px] text-gray-500">{item.dimension}: <span className="text-red-600 font-semibold">{item.score}/100</span></div>
+                              <div className="text-xs font-medium text-foreground">{item.studentName}</div>
+                              <div className="text-[10px] text-muted-foreground">{item.dimension}: <span className="text-red-600 font-semibold">{item.score}/100</span></div>
                             </div>
                           </div>
                           <Button
@@ -671,8 +671,8 @@ function GrowthContent() {
                               {getInitials(item.studentName)}
                             </div>
                             <div>
-                              <div className="text-xs font-medium text-gray-900">{item.studentName}</div>
-                              <div className="text-[10px] text-gray-500">
+                              <div className="text-xs font-medium text-foreground">{item.studentName}</div>
+                              <div className="text-[10px] text-muted-foreground">
                                 {item.topDimension}: <span className="text-portal-600 font-semibold">{item.topScore}/100</span>
                               </div>
                             </div>
@@ -691,7 +691,7 @@ function GrowthContent() {
 
           {/* Search */}
           <div className="relative max-w-xs">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -717,8 +717,8 @@ function GrowthContent() {
                       )}
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">{student.studentName}</div>
-                      <div className="text-[10px] text-gray-500">
+                      <div className="text-sm font-semibold text-foreground truncate">{student.studentName}</div>
+                      <div className="text-[10px] text-muted-foreground">
                         {student.rollNumber ? `Roll: ${student.rollNumber}` : 'No roll number'}
                         {student.period && ` | ${student.period}`}
                       </div>
@@ -728,13 +728,13 @@ function GrowthContent() {
                   {student.scores ? (
                     <>
                       {/* Overall score */}
-                      <div className="flex items-center gap-3 mb-3 p-2.5 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3 mb-3 p-2.5 bg-muted rounded-lg">
                         <div className={`text-xl font-bold ${getScoreTextColor(student.scores.overall)}`}>
                           {Math.round(student.scores.overall)}
                         </div>
                         <div className="flex-1">
-                          <div className="text-xs text-gray-600 mb-1">Overall: {Math.round(student.scores.overall)}/100</div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="text-xs text-muted-foreground mb-1">Overall: {Math.round(student.scores.overall)}/100</div>
+                          <div className="w-full bg-muted rounded-full h-2">
                             <div
                               className={`h-2 rounded-full transition-all ${getScoreColor(student.scores.overall)}`}
                               style={{ width: `${student.scores.overall}%` }}
@@ -752,9 +752,9 @@ function GrowthContent() {
                           const val = student.scores![dim.key];
                           return (
                             <div key={dim.key} className="flex items-center gap-2 text-xs">
-                              <span className="w-[70px] text-gray-600 truncate">{dim.label.split(' ')[0]}</span>
+                              <span className="w-[70px] text-muted-foreground truncate">{dim.label.split(' ')[0]}</span>
                               <span className={`w-7 text-right font-semibold ${getScoreTextColor(val)}`}>{val}</span>
-                              <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                              <div className="flex-1 bg-muted rounded-full h-1.5">
                                 <div
                                   className="h-1.5 rounded-full transition-all"
                                   style={{ width: `${val}%`, backgroundColor: dim.color }}
@@ -766,13 +766,13 @@ function GrowthContent() {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center py-4 text-gray-400 text-xs">
+                    <div className="text-center py-4 text-muted-foreground text-xs">
                       No scores for {selectedPeriod}
                     </div>
                   )}
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-2 pt-2 border-t border-border">
                     <Button
                       variant="outline"
                       size="sm"
@@ -801,9 +801,9 @@ function GrowthContent() {
           {filteredStudents.length === 0 && (
             <Card className="border-0 shadow-md">
               <CardContent className="py-12 text-center">
-                <Users className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">No Students Found</h3>
-                <p className="text-xs text-gray-500">Try adjusting your search query</p>
+                <Users className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">No Students Found</h3>
+                <p className="text-xs text-muted-foreground">Try adjusting your search query</p>
               </CardContent>
             </Card>
           )}
@@ -821,7 +821,7 @@ function GrowthContent() {
                   <Users className="h-5 w-5 text-portal-600" />
                   Bulk Score Entry — {selectedPeriod}
                 </CardTitle>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Adjust scores for all students using the sliders. Click Save All when done.
                 </p>
               </CardHeader>
@@ -829,10 +829,10 @@ function GrowthContent() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 px-2 font-medium text-gray-600 sticky left-0 bg-white min-w-[120px]">Student</th>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 px-2 font-medium text-muted-foreground sticky left-0 bg-white min-w-[120px]">Student</th>
                         {DIMENSIONS.map((dim) => (
-                          <th key={dim.key} className="text-center py-2 px-2 font-medium text-gray-600 min-w-[130px]">
+                          <th key={dim.key} className="text-center py-2 px-2 font-medium text-muted-foreground min-w-[130px]">
                             {dim.icon} {dim.label.split(' ')[0]}
                           </th>
                         ))}
@@ -843,13 +843,13 @@ function GrowthContent() {
                         const scores = bulkScores[student.studentId];
                         if (!scores) return null;
                         return (
-                          <tr key={student.studentId} className="border-b border-gray-50 hover:bg-gray-50/50">
+                          <tr key={student.studentId} className="border-b border-border hover:bg-muted/50">
                             <td className="py-2 px-2 sticky left-0 bg-white">
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-full bg-portal-50 flex items-center justify-center text-[9px] font-semibold text-portal-700 shrink-0">
                                   {getInitials(student.studentName)}
                                 </div>
-                                <span className="font-medium text-gray-900 truncate max-w-[90px]">{student.studentName}</span>
+                                <span className="font-medium text-foreground truncate max-w-[90px]">{student.studentName}</span>
                               </div>
                             </td>
                             {DIMENSIONS.map((dim) => (
@@ -884,7 +884,7 @@ function GrowthContent() {
                   </table>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-200">
+                <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-border">
                   <Button
                     variant="outline"
                     className="rounded-xl"
@@ -922,14 +922,14 @@ function GrowthContent() {
                       <ClipboardEdit className="h-5 w-5 text-portal-600" />
                       Growth Assessment — {entryStudentName}
                     </CardTitle>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Period: {PERIODS.find(p => p.value === selectedPeriod)?.label || selectedPeriod}
                     </p>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs rounded-xl text-gray-500"
+                    className="text-xs rounded-xl text-muted-foreground"
                     onClick={() => {
                       setEntryStudentId(null);
                       setActiveTab('overview');
@@ -974,10 +974,10 @@ function GrowthContent() {
                   })}
 
                   {/* Overall */}
-                  <div className="p-4 bg-gray-50 rounded-xl flex items-center justify-between">
+                  <div className="p-4 bg-muted rounded-xl flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-gray-700">Overall Score</div>
-                      <div className="text-[10px] text-gray-500">Auto-calculated average of 6 dimensions</div>
+                      <div className="text-sm font-semibold text-muted-foreground">Overall Score</div>
+                      <div className="text-[10px] text-muted-foreground">Auto-calculated average of 6 dimensions</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-2xl font-bold ${getScoreTextColor(entryOverall)}`}>{entryOverall}</span>
@@ -1025,9 +1025,9 @@ function GrowthContent() {
             /* ── NO STUDENT SELECTED ── */
             <Card className="border-0 shadow-md">
               <CardContent className="py-16 text-center">
-                <ClipboardEdit className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">No Student Selected</h3>
-                <p className="text-xs text-gray-500 mb-4">
+                <ClipboardEdit className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">No Student Selected</h3>
+                <p className="text-xs text-muted-foreground mb-4">
                   Go to Class Overview and click &quot;Update Scores&quot; on a student card, or use Bulk Entry
                 </p>
                 <div className="flex items-center justify-center gap-3">
@@ -1107,7 +1107,7 @@ function GrowthContent() {
                           </RadarChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="flex items-center justify-center h-48 text-gray-400 text-xs">
+                        <div className="flex items-center justify-center h-48 text-muted-foreground text-xs">
                           Insufficient data for comparison
                         </div>
                       )}
@@ -1142,7 +1142,7 @@ function GrowthContent() {
                           </LineChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="flex items-center justify-center h-48 text-gray-400 text-xs">
+                        <div className="flex items-center justify-center h-48 text-muted-foreground text-xs">
                           Need at least 2 periods of data for trend
                         </div>
                       )}
@@ -1160,12 +1160,12 @@ function GrowthContent() {
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs">
                           <thead>
-                            <tr className="border-b border-gray-200">
-                              <th className="text-left py-2 px-3 font-medium text-gray-600">Dimension</th>
-                              <th className="text-center py-2 px-3 font-medium text-gray-600">Score</th>
-                              <th className="text-center py-2 px-3 font-medium text-gray-600">Class Avg</th>
-                              <th className="text-center py-2 px-3 font-medium text-gray-600">Difference</th>
-                              <th className="text-center py-2 px-3 font-medium text-gray-600">Rating</th>
+                            <tr className="border-b border-border">
+                              <th className="text-left py-2 px-3 font-medium text-muted-foreground">Dimension</th>
+                              <th className="text-center py-2 px-3 font-medium text-muted-foreground">Score</th>
+                              <th className="text-center py-2 px-3 font-medium text-muted-foreground">Class Avg</th>
+                              <th className="text-center py-2 px-3 font-medium text-muted-foreground">Difference</th>
+                              <th className="text-center py-2 px-3 font-medium text-muted-foreground">Rating</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1175,7 +1175,7 @@ function GrowthContent() {
                               const diff = score - Math.round(avg);
                               const rating = getRating(score);
                               return (
-                                <tr key={dim.key} className="border-b border-gray-50 hover:bg-gray-50/50">
+                                <tr key={dim.key} className="border-b border-border hover:bg-muted/50">
                                   <td className="py-2 px-3 font-medium">
                                     <span className="inline-flex items-center gap-1.5">
                                       <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: dim.color }} />
@@ -1183,9 +1183,9 @@ function GrowthContent() {
                                     </span>
                                   </td>
                                   <td className="text-center py-2 px-3 font-semibold">{score}</td>
-                                  <td className="text-center py-2 px-3 text-gray-500">{Math.round(avg)}</td>
+                                  <td className="text-center py-2 px-3 text-muted-foreground">{Math.round(avg)}</td>
                                   <td className="text-center py-2 px-3">
-                                    <span className={`inline-flex items-center gap-0.5 font-medium ${diff > 0 ? 'text-portal-600' : diff < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                                    <span className={`inline-flex items-center gap-0.5 font-medium ${diff > 0 ? 'text-portal-600' : diff < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
                                       {diff > 0 ? <ArrowUpRight className="h-3 w-3" /> : diff < 0 ? <ArrowDownRight className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
                                       {diff > 0 ? '+' : ''}{diff}
                                     </span>
@@ -1204,9 +1204,9 @@ function GrowthContent() {
 
                       {/* Comments */}
                       {detailData.currentPeriod.comments && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="text-[10px] font-medium text-gray-500 mb-1">Teacher Comments</div>
-                          <p className="text-xs text-gray-700">{detailData.currentPeriod.comments}</p>
+                        <div className="mt-3 p-3 bg-muted rounded-lg">
+                          <div className="text-[10px] font-medium text-muted-foreground mb-1">Teacher Comments</div>
+                          <p className="text-xs text-muted-foreground">{detailData.currentPeriod.comments}</p>
                         </div>
                       )}
                     </CardContent>
@@ -1237,7 +1237,7 @@ function GrowthContent() {
               </DialogFooter>
             </>
           ) : (
-            <div className="py-12 text-center text-gray-400 text-sm">
+            <div className="py-12 text-center text-muted-foreground text-sm">
               No data available
             </div>
           )}

@@ -401,7 +401,7 @@ export function CreateAnnouncementDialog({
           {/* Cover Image URL */}
           <div className="space-y-2">
             <Label htmlFor="ann-cover" className="text-sm font-medium flex items-center gap-1.5">
-              <ImageIcon className="h-3.5 w-3.5 text-gray-400" />
+              <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" />
               Cover Image URL
             </Label>
             <Input
@@ -416,7 +416,7 @@ export function CreateAnnouncementDialog({
           {/* Attachments */}
           <div className="space-y-2">
             <Label className="text-sm font-medium flex items-center gap-1.5">
-              <Paperclip className="h-3.5 w-3.5 text-gray-400" />
+              <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
               Attachments
             </Label>
             <div className="space-y-2">
@@ -489,10 +489,10 @@ export function CreateAnnouncementDialog({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-sm font-medium flex items-center gap-1.5">
-                <MessageSquare className="h-3.5 w-3.5 text-gray-400" />
+                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
                 Post in Class Chat
               </Label>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-muted-foreground">
                 Send this announcement as a chat message
               </p>
             </div>
@@ -505,7 +505,7 @@ export function CreateAnnouncementDialog({
               htmlFor="ann-schedule"
               className="text-sm font-medium flex items-center gap-1.5"
             >
-              <Calendar className="h-3.5 w-3.5 text-gray-400" />
+              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
               Schedule for Later
             </Label>
             <Input

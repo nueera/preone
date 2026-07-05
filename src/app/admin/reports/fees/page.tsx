@@ -126,7 +126,7 @@ export default function FeesReportPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]">
         <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading fee report…
       </div>
     );
@@ -141,11 +141,11 @@ export default function FeesReportPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <IndianRupee className="w-6 h-6" style={{ color: theme.primary }} />
                 Fee Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Collection summary, overdue analysis, and trends</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Collection summary, overdue analysis, and trends</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -155,19 +155,19 @@ export default function FeesReportPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Total Invoiced</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Total Invoiced</p>
               <p className="text-xl font-bold text-purple-700">₹{(totalExpected / 100000).toFixed(1)}L</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Collected</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Collected</p>
               <p className="text-xl font-bold text-emerald-700">₹{(totalCollected / 100000).toFixed(1)}L</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Overdue</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Overdue</p>
               <p className="text-xl font-bold text-red-700">₹{(totalOverdue / 100000).toFixed(1)}L</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Collection Rate</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Collection Rate</p>
               <p className="text-xl font-bold text-amber-700">{collectionRate}%</p>
               <Progress value={collectionRate} className="h-1.5 mt-2" />
             </PreOneCard>
@@ -176,7 +176,7 @@ export default function FeesReportPage() {
 
         {summary.invoiceCount === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+            <PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">
               No invoices yet.
             </PreOneCard>
           </StaggerItem>
@@ -186,7 +186,7 @@ export default function FeesReportPage() {
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Collection</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Monthly Collection</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={260}>
@@ -206,7 +206,7 @@ export default function FeesReportPage() {
             {/* Fee Breakdown Pie */}
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
-                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Fee Status Breakdown</h3></div>
+                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Fee Status Breakdown</h3></div>
                 <div className="px-6 pb-6 flex flex-col items-center">
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
@@ -219,7 +219,7 @@ export default function FeesReportPage() {
                   <div className="mt-3 space-y-2 w-full">
                     {feeBreakdown.map((d) => (
                       <div key={d.name} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-full" style={{ backgroundColor: d.color }} /><span className="text-gray-600">{d.name}</span></div>
+                        <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-full" style={{ backgroundColor: d.color }} /><span className="text-[var(--admin-text-muted)]">{d.name}</span></div>
                         <span className="font-medium">₹{(d.value / 100000).toFixed(1)}L</span>
                       </div>
                     ))}
@@ -232,13 +232,13 @@ export default function FeesReportPage() {
             <StaggerItem className="lg:col-span-2">
               <PreOneCard variant="default">
                 <PreOneCardContent>
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-500" /> Overdue Aging Analysis</h3>
+                  <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-500" /> Overdue Aging Analysis</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {overdueAging.map((a) => (
                       <div key={a.range} className="p-3 rounded-xl border">
-                        <p className="text-xs text-gray-500 mb-1">{a.range}</p>
+                        <p className="text-xs text-[var(--admin-text-muted)] mb-1">{a.range}</p>
                         <p className="text-lg font-bold text-red-700">₹{(a.amount / 1000).toFixed(0)}K</p>
-                        <p className="text-xs text-gray-400">{a.count} students</p>
+                        <p className="text-xs text-[var(--admin-text-subtle)]">{a.count} students</p>
                       </div>
                     ))}
                   </div>

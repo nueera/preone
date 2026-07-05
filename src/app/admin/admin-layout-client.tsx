@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AdminSidebar } from '@/components/admin-sidebar';
 import { AdminHeader } from '@/components/admin-header';
+import { QueryProvider } from '@/components/providers';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts';
 import { useChatInit } from '@/hooks/use-chat';
 
 // TASK_MASTER can only access these admin routes (with sub-paths)
 const TASK_MASTER_ALLOWED = [
   '/admin/dashboard',
   '/admin/admissions',
+  '/admin/admission',
   '/admin/communication/chat',
   '/admin/communication/announcements',
 ];
@@ -25,11 +27,14 @@ interface AdminLayoutClientProps {
 
 /**
  * Admin Layout Client — Client component wrapping the PreOne admin portal.
- * Provides the sidebar + header + main content structure with Aurora Background.
- * Supports ADMIN, SUPER_ADMIN, and TASK_MASTER roles.
- *   - SUPER_ADMIN: Full access including System section
- *   - ADMIN: Full access except System section
- *   - TASK_MASTER: Only Dashboard + Admissions + Communication (Chat, Announcements, Notifications)
+ *
+ * Provides:
+ * - QueryProvider (React Query) for data fetching
+ * - Header + Main content structure with Aurora Background
+ * - Command Palette (Ctrl+K) for quick navigation
+ * - Keyboard Shortcuts panel (press ?)
+ * - Role-based route guards
+ *
  * data-portal="admin" for CSS theme scoping.
  * data-role attribute for role-specific styling.
  */
@@ -52,42 +57,47 @@ export function AdminLayoutClient({
         (route) => pathname === route || pathname.startsWith(route + '/')
       );
       if (!isAllowed) {
-        router.replace('/admin/admissions');
+        router.replace('/admin/admission');
       }
     }
   }, [userRole, pathname, router]);
 
-  // SUPER_ADMIN / ADMIN system route guard — only SUPER_ADMIN can access /admin/system
+  // SUPER_ADMIN / ADMIN system route guard
   useEffect(() => {
     if (userRole === 'ADMIN' && pathname.startsWith('/admin/system')) {
-      router.replace('/admin/dashboard');
+      router.replace('/admin');
     }
   }, [userRole, pathname, router]);
 
-  // Onboarding redirect: if admin's school hasn't completed onboarding,
-  // redirect to the setup wizard (unless already there)
+  // Onboarding redirect
   useEffect(() => {
-    if ((userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && !onboardingComplete && !pathname.startsWith('/admin/onboarding') && !pathname.startsWith('/admin/setup')) {
+    if (
+      (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') &&
+      !onboardingComplete &&
+      !pathname.startsWith('/admin/onboarding') &&
+      !pathname.startsWith('/admin/setup')
+    ) {
       router.replace('/admin/setup');
     }
   }, [userRole, onboardingComplete, pathname, router]);
 
-  // Onboarding routes are standalone full-page — no sidebar/header
+  // Onboarding routes are standalone full-page — no topbar
   const isOnboarding = pathname.startsWith('/admin/onboarding');
 
   if (isOnboarding) {
     return (
-      <div data-portal="admin" data-role={userRole.toLowerCase()}>
-        {children}
-      </div>
+      <QueryProvider>
+        <div data-portal="admin" data-role={userRole.toLowerCase()}>
+          {children}
+        </div>
+      </QueryProvider>
     );
   }
 
   return (
-    <AuroraBackground intensity="subtle">
-      <SidebarProvider>
-        <AdminSidebar />
-        <div className="flex flex-1 flex-col min-h-screen">
+    <QueryProvider>
+      <AuroraBackground intensity="subtle">
+        <div className="flex flex-col min-h-screen">
           <AdminHeader />
           <main
             className="flex-1 bg-background/80 p-6 overflow-auto"
@@ -97,7 +107,11 @@ export function AdminLayoutClient({
             {children}
           </main>
         </div>
-      </SidebarProvider>
-    </AuroraBackground>
+
+        {/* Global overlays */}
+        <CommandPalette />
+        <KeyboardShortcuts />
+      </AuroraBackground>
+    </QueryProvider>
   );
 }

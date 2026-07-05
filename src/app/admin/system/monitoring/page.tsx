@@ -81,11 +81,11 @@ export default function SystemMonitoringPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Activity className="w-6 h-6" style={{ color: theme.primary }} />
                 System Monitoring
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Server health, performance metrics, and uptime</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Server health, performance metrics, and uptime</p>
             </div>
             <Button variant="outline" size="sm"><RefreshCw className="w-4 h-4 mr-2" /> Refresh</Button>
           </div>
@@ -95,19 +95,19 @@ export default function SystemMonitoringPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-gray-500">Overall Status</span></div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-[var(--admin-text-muted)]">Overall Status</span></div>
               <p className="text-lg font-bold text-emerald-700">Healthy</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-purple-600" /><span className="text-xs text-gray-500">Uptime (30d)</span></div>
+              <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-purple-600" /><span className="text-xs text-[var(--admin-text-muted)]">Uptime (30d)</span></div>
               <p className="text-lg font-bold text-purple-700">99.94%</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><ArrowDownUp className="w-4 h-4 text-blue-600" /><span className="text-xs text-gray-500">Avg Response</span></div>
+              <div className="flex items-center gap-2"><ArrowDownUp className="w-4 h-4 text-blue-600" /><span className="text-xs text-[var(--admin-text-muted)]">Avg Response</span></div>
               <p className="text-lg font-bold text-blue-700">127ms</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-600" /><span className="text-xs text-gray-500">Active Alerts</span></div>
+              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-600" /><span className="text-xs text-[var(--admin-text-muted)]">Active Alerts</span></div>
               <p className="text-lg font-bold text-amber-700">1</p>
             </PreOneCard>
           </div>
@@ -117,7 +117,7 @@ export default function SystemMonitoringPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4">Services</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4">Services</h3>
               <div className="space-y-2">
                 {SERVICES.map((s) => {
                   const statusCfg = STATUS_CONFIG[s.status];
@@ -125,21 +125,21 @@ export default function SystemMonitoringPage() {
                   return (
                     <div key={s.name} className="flex items-center justify-between p-3 rounded-xl border hover:shadow-sm transition-shadow">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-gray-500" />
+                        <div className="w-10 h-10 rounded-xl bg-[var(--admin-surface-2)] flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-[var(--admin-text-muted)]" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{s.name}</p>
-                          <p className="text-xs text-gray-400">Last check: {s.lastCheck}</p>
+                          <p className="text-sm font-medium text-[var(--admin-text)]">{s.name}</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)]">Last check: {s.lastCheck}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right hidden sm:block">
-                          <p className="text-xs text-gray-400">Response</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)]">Response</p>
                           <p className="text-sm font-medium">{s.responseTime}</p>
                         </div>
                         <div className="text-right hidden sm:block">
-                          <p className="text-xs text-gray-400">Uptime</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)]">Uptime</p>
                           <p className="text-sm font-medium">{s.uptime}</p>
                         </div>
                         <Badge className={`${statusCfg.bg} ${statusCfg.color} text-[10px]`}>{s.status}</Badge>
@@ -156,7 +156,7 @@ export default function SystemMonitoringPage() {
           {/* API Response Times */}
           <StaggerItem>
             <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">API Response Times (24h)</h3></div>
+              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">API Response Times (24h)</h3></div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={RESPONSE_TIME_DATA}>
@@ -177,7 +177,7 @@ export default function SystemMonitoringPage() {
           {/* Error Rate */}
           <StaggerItem>
             <PreOneCard variant="default" className="p-0">
-              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Error Rate (24h)</h3></div>
+              <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Error Rate (24h)</h3></div>
               <div className="px-6 pb-6">
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={ERROR_RATE_DATA}>
@@ -200,13 +200,13 @@ export default function SystemMonitoringPage() {
         <StaggerItem>
           <PreOneCard variant="default">
             <PreOneCardContent>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Database className="w-4 h-4 text-gray-500" /> Database Statistics</h3>
+              <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><Database className="w-4 h-4 text-[var(--admin-text-muted)]" /> Database Statistics</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="p-3 rounded-xl border"><p className="text-xs text-gray-400">Size</p><p className="text-lg font-bold text-purple-700">{DB_STATS.size}</p></div>
-                <div className="p-3 rounded-xl border"><p className="text-xs text-gray-400">Tables</p><p className="text-lg font-bold text-blue-700">{DB_STATS.tables}</p></div>
-                <div className="p-3 rounded-xl border"><p className="text-xs text-gray-400">Connections</p><p className="text-lg font-bold text-emerald-700">{DB_STATS.connections}/{DB_STATS.maxConnections}</p><Progress value={(DB_STATS.connections / DB_STATS.maxConnections) * 100} className="h-1 mt-1" /></div>
-                <div className="p-3 rounded-xl border"><p className="text-xs text-gray-400">Queries/sec</p><p className="text-lg font-bold text-amber-700">{DB_STATS.queriesPerSecond}</p></div>
-                <div className="p-3 rounded-xl border"><p className="text-xs text-gray-400">Slow Queries</p><p className="text-lg font-bold text-red-700">{DB_STATS.slowQueries}</p></div>
+                <div className="p-3 rounded-xl border"><p className="text-xs text-[var(--admin-text-subtle)]">Size</p><p className="text-lg font-bold text-purple-700">{DB_STATS.size}</p></div>
+                <div className="p-3 rounded-xl border"><p className="text-xs text-[var(--admin-text-subtle)]">Tables</p><p className="text-lg font-bold text-blue-700">{DB_STATS.tables}</p></div>
+                <div className="p-3 rounded-xl border"><p className="text-xs text-[var(--admin-text-subtle)]">Connections</p><p className="text-lg font-bold text-emerald-700">{DB_STATS.connections}/{DB_STATS.maxConnections}</p><Progress value={(DB_STATS.connections / DB_STATS.maxConnections) * 100} className="h-1 mt-1" /></div>
+                <div className="p-3 rounded-xl border"><p className="text-xs text-[var(--admin-text-subtle)]">Queries/sec</p><p className="text-lg font-bold text-amber-700">{DB_STATS.queriesPerSecond}</p></div>
+                <div className="p-3 rounded-xl border"><p className="text-xs text-[var(--admin-text-subtle)]">Slow Queries</p><p className="text-lg font-bold text-red-700">{DB_STATS.slowQueries}</p></div>
               </div>
             </PreOneCardContent>
           </PreOneCard>

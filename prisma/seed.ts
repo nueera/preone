@@ -6,20 +6,25 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Check if admin already exists
+  // Check if admin already exists (idempotency guard)
   const existingAdmin = await prisma.user.findUnique({
     where: { email: 'admin@blossom.edu' },
   });
 
   if (existingAdmin) {
     console.log('⚠️  Database already seeded. Skipping...');
+    console.log('');
+    console.log('🔑 Demo Accounts (password: demo123):');
+    console.log('  Admin:       admin@blossom.edu');
+    console.log('  Teacher:     teacher@blossom.edu');
+    console.log('  Parent:      parent@blossom.edu');
+    console.log('  Task Master: tasks@blossom.edu');
     return;
   }
 
-  // Hash passwords
-  const adminPassword = await bcrypt.hash('Admin@123', 12);
-  const teacherPassword = await bcrypt.hash('Teacher@123', 12);
-  const parentPassword = await bcrypt.hash('Parent@123', 12);
+  // Hash passwords — single shared demo password keeps the login page's
+  // demo-account buttons working out of the box.
+  const demoPassword = await bcrypt.hash('demo123', 12);
 
   // Create school
   const school = await prisma.school.create({
@@ -58,7 +63,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: 'admin@blossom.edu',
-      password: adminPassword,
+      password: demoPassword,
       name: 'Admin User',
       phone: '+91 98765 43211',
       role: 'ADMIN',
@@ -81,8 +86,8 @@ async function main() {
   // Create teacher user
   const teacherUser = await prisma.user.create({
     data: {
-      email: 'priya@blossom.edu',
-      password: teacherPassword,
+      email: 'teacher@blossom.edu',
+      password: demoPassword,
       name: 'Priya Sharma',
       phone: '+91 98765 43212',
       role: 'TEACHER',
@@ -97,7 +102,7 @@ async function main() {
       userId: teacherUser.id,
       firstName: 'Priya',
       lastName: 'Sharma',
-      email: 'priya@blossom.edu',
+      email: 'teacher@blossom.edu',
       phone: '+91 98765 43212',
       qualification: 'B.Ed',
       specialization: 'Early Childhood Education',
@@ -121,8 +126,8 @@ async function main() {
   // Create parent user
   const parentUser = await prisma.user.create({
     data: {
-      email: 'raj@family.com',
-      password: parentPassword,
+      email: 'parent@blossom.edu',
+      password: demoPassword,
       name: 'Raj Patel',
       phone: '+91 98765 43213',
       role: 'PARENT',
@@ -137,7 +142,7 @@ async function main() {
       firstName: 'Raj',
       lastName: 'Patel',
       phone: '+91 98765 43213',
-      email: 'raj@family.com',
+      email: 'parent@blossom.edu',
       occupation: 'Software Engineer',
       relation: 'father',
       isEmergencyContact: true,
@@ -168,6 +173,21 @@ async function main() {
     },
   });
 
+  // Create Task Master user (CRM/admissions-focused role — uses the /admin
+  // portal, restricted by middleware to /admin/dashboard, /admin/admissions,
+  // /admin/communication/* — see TASK_MASTER_ALLOWED_PREFIXES in middleware).
+  await prisma.user.create({
+    data: {
+      email: 'tasks@blossom.edu',
+      password: demoPassword,
+      name: 'Task Master',
+      phone: '+91 98765 43214',
+      role: 'TASK_MASTER',
+      schoolId: school.id,
+      branchId: branch.id,
+    },
+  });
+
   // Create DailyUpdateConfig
   await prisma.dailyUpdateConfig.create({
     data: {
@@ -188,10 +208,11 @@ async function main() {
 
   console.log('✅ Seed complete!');
   console.log('');
-  console.log('🔑 Demo Accounts:');
-  console.log('  Admin:   admin@blossom.edu  /  Admin@123');
-  console.log('  Teacher: priya@blossom.edu  /  Teacher@123');
-  console.log('  Parent:  raj@family.com     /  Parent@123');
+  console.log('🔑 Demo Accounts (password: demo123):');
+  console.log('  Admin:       admin@blossom.edu');
+  console.log('  Teacher:     teacher@blossom.edu');
+  console.log('  Parent:      parent@blossom.edu');
+  console.log('  Task Master: tasks@blossom.edu');
 }
 
 main()

@@ -36,20 +36,20 @@ function SummaryCard({ icon, title, step, children, onEdit, isComplete }: Summar
       <PreOneCardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--preone-primary-50)] flex items-center justify-center text-[var(--preone-primary)]">
+            <div className="w-8 h-8 rounded-lg bg-[var(--admin-primary-soft)] flex items-center justify-center text-[var(--admin-primary)]">
               {icon}
             </div>
-            <h4 className="font-semibold text-[var(--text-primary)] text-sm">{title}</h4>
+            <h4 className="font-semibold text-[var(--admin-text)] text-sm">{title}</h4>
             {isComplete ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--admin-success)' }} />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <AlertTriangle className="w-4 h-4" style={{ color: 'var(--admin-warning)' }} />
             )}
           </div>
 
           <button
             onClick={() => onEdit(step)}
-            className="flex items-center gap-1 text-xs font-medium text-[var(--preone-primary)] hover:text-[var(--preone-primary-dark)] transition-colors px-2 py-1.5 rounded-lg hover:bg-[var(--preone-primary-50)] min-h-[44px]"
+            className="flex items-center gap-1 text-xs font-medium text-[var(--admin-primary)] hover:text-[var(--admin-primary-hover)] transition-colors px-2 py-1.5 rounded-lg hover:bg-[var(--admin-primary-soft)] min-h-[44px]"
             aria-label={`Edit ${title}`}
           >
             <Pencil className="w-3 h-3" />
@@ -57,7 +57,7 @@ function SummaryCard({ icon, title, step, children, onEdit, isComplete }: Summar
           </button>
         </div>
 
-        <div className="text-sm text-[var(--text-secondary)]">{children}</div>
+        <div className="text-sm text-[var(--admin-text-muted)]">{children}</div>
       </PreOneCardContent>
     </PreOneCard>
   );
@@ -158,10 +158,10 @@ export function ReviewLaunchStep() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h2 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-primary)' }}>
+        <h2 className="text-2xl font-bold text-[var(--admin-text)]" style={{ fontFamily: 'var(--font-primary)' }}>
           🚀 Review & Launch
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-sm text-[var(--admin-text-muted)] mt-1">
           Review your setup and launch PreOne for your school
         </p>
       </motion.div>
@@ -184,27 +184,27 @@ export function ReviewLaunchStep() {
           >
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <div>
-                <span className="text-[var(--text-muted)] text-xs">Name:</span>{' '}
-                <span className="font-medium text-[var(--text-primary)]">
+                <span className="text-[var(--admin-text-subtle)] text-xs">Name:</span>{' '}
+                <span className="font-medium text-[var(--admin-text)]">
                   {draft.schoolName || 'Not set'}
                 </span>
               </div>
               {schoolCity && (
                 <div>
-                  <span className="text-[var(--text-muted)] text-xs">City:</span>{' '}
-                  <span className="font-medium text-[var(--text-primary)]">{schoolCity}</span>
+                  <span className="text-[var(--admin-text-subtle)] text-xs">City:</span>{' '}
+                  <span className="font-medium text-[var(--admin-text)]">{schoolCity}</span>
                 </div>
               )}
               {draft.schoolType && (
                 <div>
-                  <span className="text-[var(--text-muted)] text-xs">Type:</span>{' '}
-                  <span className="font-medium text-[var(--text-primary)]">{draft.schoolType}</span>
+                  <span className="text-[var(--admin-text-subtle)] text-xs">Type:</span>{' '}
+                  <span className="font-medium text-[var(--admin-text)]">{draft.schoolType}</span>
                 </div>
               )}
               {draft.schoolBoard && (
                 <div>
-                  <span className="text-[var(--text-muted)] text-xs">Board:</span>{' '}
-                  <span className="font-medium text-[var(--text-primary)]">{draft.schoolBoard}</span>
+                  <span className="text-[var(--admin-text-subtle)] text-xs">Board:</span>{' '}
+                  <span className="font-medium text-[var(--admin-text)]">{draft.schoolBoard}</span>
                 </div>
               )}
             </div>
@@ -225,7 +225,7 @@ export function ReviewLaunchStep() {
                 {draft.branches.map((branch) => (
                   <span
                     key={branch.id}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--bg-secondary)] text-xs font-medium text-[var(--text-primary)]"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--admin-surface)] text-xs font-medium text-[var(--admin-text)]"
                   >
                     {branch.isPrimary && (
                       <span className="text-amber-500" aria-label="Primary branch">⭐</span>
@@ -235,7 +235,7 @@ export function ReviewLaunchStep() {
                 ))}
               </div>
             ) : (
-              <p className="text-[var(--text-muted)] text-xs">No branches added</p>
+              <p className="text-[var(--admin-text-subtle)] text-xs">No branches added</p>
             )}
           </SummaryCard>
         </motion.div>
@@ -256,10 +256,11 @@ export function ReviewLaunchStep() {
                   return (
                     <span
                       key={cls.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300 text-xs font-medium"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium"
+                  style={{ background: 'var(--admin-info-soft)', color: 'var(--admin-info)' }}
                     >
                       {cls.name} {cls.section ? `- ${cls.section}` : ''}
-                      <span className="text-[var(--text-muted)]">
+                      <span className="text-[var(--admin-text-subtle)]">
                         ({cls.studentCount} students, {subjectCount} subjects)
                       </span>
                     </span>
@@ -267,7 +268,7 @@ export function ReviewLaunchStep() {
                 })}
               </div>
             ) : (
-              <p className="text-[var(--text-muted)] text-xs">No classes configured</p>
+              <p className="text-[var(--admin-text-subtle)] text-xs">No classes configured</p>
             )}
           </SummaryCard>
         </motion.div>
@@ -283,7 +284,7 @@ export function ReviewLaunchStep() {
           >
             {draft.teachers.length > 0 ? (
               <div className="space-y-1">
-                <p className="text-xs text-[var(--text-muted)]">
+                <p className="text-xs text-[var(--admin-text-subtle)]">
                   {draft.teachers.length} teacher{draft.teachers.length !== 1 ? 's' : ''} added
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -298,11 +299,12 @@ export function ReviewLaunchStep() {
                     return (
                       <span
                         key={teacher.id}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300 text-xs font-medium"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium"
+                        style={{ background: 'var(--admin-primary-soft)', color: 'var(--admin-primary)' }}
                       >
                         {teacher.name}
                         {(teacherClasses.length > 0 || teacherSubjects.length > 0) && (
-                          <span className="text-violet-400 dark:text-violet-500">
+                          <span style={{ color: 'var(--admin-primary)' }}>
                             ({[
                               ...teacherClasses.map((c) => c.name),
                               ...teacherSubjects.map((s) => s.name),
@@ -315,7 +317,7 @@ export function ReviewLaunchStep() {
                 </div>
               </div>
             ) : (
-              <p className="text-[var(--text-muted)] text-xs">No teachers added yet</p>
+              <p className="text-[var(--admin-text-subtle)] text-xs">No teachers added yet</p>
             )}
           </SummaryCard>
         </motion.div>
@@ -331,7 +333,7 @@ export function ReviewLaunchStep() {
           >
             {draft.students.length > 0 ? (
               <div className="space-y-1">
-                <p className="text-xs text-[var(--text-muted)]">
+                <p className="text-xs text-[var(--admin-text-subtle)]">
                   {draft.students.length} student{draft.students.length !== 1 ? 's' : ''} total
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -340,7 +342,8 @@ export function ReviewLaunchStep() {
                     .map((cls) => (
                       <span
                         key={cls.id}
-                        className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 text-xs font-medium"
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium"
+                      style={{ background: 'var(--admin-success-soft)', color: 'var(--admin-success)' }}
                       >
                         {cls.name} {cls.section ? `- ${cls.section}` : ''}: {cls.studentCount}
                       </span>
@@ -348,7 +351,7 @@ export function ReviewLaunchStep() {
                 </div>
               </div>
             ) : (
-              <p className="text-[var(--text-muted)] text-xs">No students added yet</p>
+              <p className="text-[var(--admin-text-subtle)] text-xs">No students added yet</p>
             )}
           </SummaryCard>
         </motion.div>
@@ -370,7 +373,7 @@ export function ReviewLaunchStep() {
                     return info ? (
                       <span
                         key={cat}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--preone-primary-50)] text-[var(--preone-primary)] text-xs font-medium"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--admin-primary-soft)] text-[var(--admin-primary)] text-xs font-medium"
                       >
                         {info.icon} {info.label}
                       </span>
@@ -378,7 +381,7 @@ export function ReviewLaunchStep() {
                   })}
                 </div>
                 {/* Channels */}
-                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                <div className="flex items-center gap-2 text-xs text-[var(--admin-text-subtle)]">
                   <span>Via:</span>
                   {Object.entries(CHANNEL_LABELS).map(([key, info]) => (
                     <span key={key} className="inline-flex items-center gap-0.5">
@@ -388,7 +391,7 @@ export function ReviewLaunchStep() {
                 </div>
               </div>
             ) : (
-              <p className="text-[var(--text-muted)] text-xs">Daily updates not configured</p>
+              <p className="text-[var(--admin-text-subtle)] text-xs">Daily updates not configured</p>
             )}
           </SummaryCard>
         </motion.div>
@@ -402,9 +405,10 @@ export function ReviewLaunchStep() {
         className="pt-4"
       >
         {/* Note */}
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30 mb-4">
-          <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-amber-700 dark:text-amber-300">
+        <div className="flex items-start gap-2 p-3 rounded-xl mb-4"
+          style={{ background: 'var(--admin-warning-soft)', border: '1px solid var(--admin-warning)' }}>
+          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--admin-warning)' }} />
+          <p className="text-xs" style={{ color: 'var(--admin-warning)' }}>
             This will send welcome emails/SMS to all added teachers and parents
           </p>
         </div>
@@ -419,8 +423,8 @@ export function ReviewLaunchStep() {
           className={cn(
             'w-full py-4 rounded-2xl text-white font-bold text-lg transition-all min-h-[56px] flex items-center justify-center gap-2',
             hasMinimumData && !isLaunching
-              ? 'bg-gradient-to-r from-[var(--preone-primary)] via-[var(--preone-primary-light)] to-emerald-400 shadow-lg shadow-[var(--preone-primary)]/25 cursor-pointer'
-              : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] cursor-not-allowed'
+              ? 'bg-gradient-to-r from-[var(--admin-primary)] via-[var(--admin-primary)] to-emerald-400 shadow-lg shadow-[var(--admin-primary)]/25 cursor-pointer'
+              : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-subtle)] cursor-not-allowed'
           )}
         >
           {isLaunching ? (
@@ -437,7 +441,7 @@ export function ReviewLaunchStep() {
         </motion.button>
 
         {!hasMinimumData && (
-          <p className="text-xs text-[var(--text-muted)] mt-2 text-center">
+          <p className="text-xs text-[var(--admin-text-subtle)] mt-2 text-center">
             Please complete the School and Branch steps before launching
           </p>
         )}

@@ -150,7 +150,7 @@ const FOLLOWUP_TYPES = ['Call', 'WhatsApp', 'Email', 'Visit', 'Note'];
 const FOLLOWUP_OUTCOMES = ['Interested', 'Not Interested', 'Callback', 'Visited', 'Enrolled'];
 
 const TASK_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  TODO: { label: 'To Do', color: 'text-gray-600', bg: 'bg-gray-100' },
+  TODO: { label: 'To Do', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]' },
   IN_PROGRESS: { label: 'In Progress', color: 'text-blue-600', bg: 'bg-blue-100' },
   DONE: { label: 'Done', color: 'text-green-600', bg: 'bg-green-100' },
 };
@@ -167,7 +167,7 @@ function FollowUpTypeIcon({ type }: { type: string }) {
     case 'WhatsApp': return <MessageSquare className="h-4 w-4 text-green-500" />;
     case 'Email': return <Mail className="h-4 w-4 text-orange-500" />;
     case 'Visit': return <Eye className="h-4 w-4 text-purple-500" />;
-    default: return <FileText className="h-4 w-4 text-gray-500" />;
+    default: return <FileText className="h-4 w-4 text-[var(--admin-text-muted)]" />;
   }
 }
 
@@ -319,7 +319,7 @@ function ConvertToStudentDialog({
         <div className="space-y-4">
           {/* Student Info */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Student Information</h3>
+            <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Student Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>First Name *</Label>
@@ -389,7 +389,7 @@ function ConvertToStudentDialog({
 
           {/* Father Info */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Father Information</h3>
+            <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Father Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>First Name *</Label>
@@ -449,7 +449,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                   'h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300',
                   isActive
                     ? 'border-transparent text-white'
-                    : 'border-gray-200 text-gray-400 bg-white',
+                    : 'border-[var(--admin-border)] text-[var(--admin-text-subtle)] bg-[var(--admin-surface)]',
                   isCurrent && 'ring-2 ring-offset-2'
                 )}
                 style={isActive ? {
@@ -466,7 +466,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
               <span
                 className={cn(
                   'text-[11px] mt-1.5 font-medium whitespace-nowrap',
-                  isCurrent ? 'text-gray-900' : isActive ? 'text-gray-600' : 'text-gray-400'
+                  isCurrent ? 'text-[var(--admin-text)]' : isActive ? 'text-[var(--admin-text-muted)]' : 'text-[var(--admin-text-subtle)]'
                 )}
               >
                 {cfg.label}
@@ -479,7 +479,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                 <div
                   className={cn(
                     'h-full w-full rounded-full transition-all duration-300',
-                    isActive && idx < currentIndex ? 'bg-gray-300' : 'bg-gray-200'
+                    isActive && idx < currentIndex ? 'bg-[var(--admin-text-subtle)]' : 'bg-[var(--admin-border)]'
                   )}
                   style={isActive && idx < currentIndex ? { backgroundColor: cfg.color, opacity: 0.5 } : undefined}
                 />
@@ -758,7 +758,7 @@ export default function LeadDetailPage() {
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-            <p className="text-sm text-gray-500">Loading lead details...</p>
+            <p className="text-sm text-[var(--admin-text-muted)]">Loading lead details...</p>
           </div>
         </div>
       </PageTransition>
@@ -770,7 +770,7 @@ export default function LeadDetailPage() {
       <PageTransition className="min-h-screen">
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-3">
-            <p className="text-gray-500">Lead not found</p>
+            <p className="text-[var(--admin-text-muted)]">Lead not found</p>
             <Link href="/admin/crm/leads">
               <Button variant="outline">Back to Leads</Button>
             </Link>
@@ -799,7 +799,7 @@ export default function LeadDetailPage() {
             </Link>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900">{lead.parentName}</h1>
+                <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">{lead.parentName}</h1>
                 <span
                   className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
                   style={{ backgroundColor: stageCfg.color + '15', color: stageCfg.color }}
@@ -821,7 +821,7 @@ export default function LeadDetailPage() {
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-[var(--admin-text-muted)] mt-0.5">
                 Child: {lead.childName}{lead.childAge ? ` (${lead.childAge})` : ''} &middot; Created {format(new Date(lead.createdAt), 'dd MMM yyyy')}
               </p>
             </div>
@@ -910,7 +910,7 @@ export default function LeadDetailPage() {
         <AnimatedCard delay={0.05} hover={false}>
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-700">Pipeline Stage</h3>
+              <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Pipeline Stage</h3>
               <Select value={editForm.stage} onValueChange={handleStageChange}>
                 <SelectTrigger
                   className="h-7 w-auto text-xs border-0"
@@ -946,7 +946,7 @@ export default function LeadDetailPage() {
             Tabs Section
         ══════════════════════════════════════════════════ */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full bg-gray-100/80">
+          <TabsList className="w-full bg-[var(--admin-surface-2)]/80">
             <TabsTrigger value="overview" className="flex-1 gap-1">
               <Eye className="h-3.5 w-3.5" />
               Overview
@@ -977,7 +977,7 @@ export default function LeadDetailPage() {
                     <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-violet-100">
                       <UserCircle className="h-4 w-4 text-violet-600" />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-700">Parent Information</h3>
+                    <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Parent Information</h3>
                   </div>
                   <div className="space-y-3">
                     {editing ? (
@@ -1010,12 +1010,12 @@ export default function LeadDetailPage() {
                     ) : (
                       <>
                         <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-gray-400" />
+                          <Phone className="h-4 w-4 text-[var(--admin-text-subtle)]" />
                           <span className="text-sm">{lead.parentPhone}</span>
                         </div>
                         {lead.parentEmail && (
                           <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-gray-400" />
+                            <Mail className="h-4 w-4 text-[var(--admin-text-subtle)]" />
                             <span className="text-sm">{lead.parentEmail}</span>
                           </div>
                         )}
@@ -1032,7 +1032,7 @@ export default function LeadDetailPage() {
                     <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-amber-100">
                       <Baby className="h-4 w-4 text-amber-600" />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-700">Child Information</h3>
+                    <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Child Information</h3>
                   </div>
                   <div className="space-y-3">
                     {editing ? (
@@ -1065,7 +1065,7 @@ export default function LeadDetailPage() {
                                   'rounded-full px-3 py-1.5 text-xs font-medium border transition-colors',
                                   editForm.programInterest.includes(program)
                                     ? cn(theme.selectedClass, 'border-violet-300')
-                                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
                                 )}
                               >
                                 {program}
@@ -1077,7 +1077,7 @@ export default function LeadDetailPage() {
                     ) : (
                       <>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-700">{lead.childName}</span>
+                          <span className="text-sm font-medium text-[var(--admin-text-muted)]">{lead.childName}</span>
                           {lead.childAge && (
                             <Badge variant="outline" className="text-xs">{lead.childAge}</Badge>
                           )}
@@ -1104,7 +1104,7 @@ export default function LeadDetailPage() {
                     <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-sky-100">
                       <Tag className="h-4 w-4 text-sky-600" />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-700">Lead Details</h3>
+                    <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Lead Details</h3>
                   </div>
                   <div className="space-y-3">
                     {editing ? (
@@ -1162,21 +1162,21 @@ export default function LeadDetailPage() {
                       <>
                         <div className="grid grid-cols-2 gap-y-3">
                           <div>
-                            <p className="text-xs text-gray-400">Source</p>
+                            <p className="text-xs text-[var(--admin-text-subtle)]">Source</p>
                             <p className="text-sm font-medium">{SOURCE_LABELS[lead.source] || lead.source}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-400">Priority</p>
+                            <p className="text-xs text-[var(--admin-text-subtle)]">Priority</p>
                             <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', priorityCfg.bg, priorityCfg.text)}>
                               {lead.priority === 'HIGH' ? 'High' : lead.priority === 'LOW' ? 'Low' : 'Medium'}
                             </span>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-400">Est. Fee</p>
+                            <p className="text-xs text-[var(--admin-text-subtle)]">Est. Fee</p>
                             <p className="text-sm font-medium">{lead.estimatedValue ? `₹${lead.estimatedValue.toLocaleString('en-IN')}` : '—'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-400">Assigned To</p>
+                            <p className="text-xs text-[var(--admin-text-subtle)]">Assigned To</p>
                             <p className="text-sm">{lead.assignedTo || 'Unassigned'}</p>
                           </div>
                         </div>
@@ -1193,7 +1193,7 @@ export default function LeadDetailPage() {
                     <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-emerald-100">
                       <StickyNote className="h-4 w-4 text-emerald-600" />
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-700">Notes & Follow-up</h3>
+                    <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Notes & Follow-up</h3>
                   </div>
                   <div className="space-y-3">
                     {editing ? (
@@ -1234,14 +1234,14 @@ export default function LeadDetailPage() {
                     ) : (
                       <>
                         <div>
-                          <p className="text-xs text-gray-400 mb-1">Notes</p>
-                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{lead.notes || 'No notes'}</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)] mb-1">Notes</p>
+                          <p className="text-sm text-[var(--admin-text-muted)] whitespace-pre-wrap">{lead.notes || 'No notes'}</p>
                         </div>
                         <Separator />
                         <div>
-                          <p className="text-xs text-gray-400 mb-1">Next Follow-up</p>
+                          <p className="text-xs text-[var(--admin-text-subtle)] mb-1">Next Follow-up</p>
                           <div className="flex items-center gap-1.5">
-                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <Calendar className="h-4 w-4 text-[var(--admin-text-subtle)]" />
                             <span className="text-sm font-medium">
                               {lead.nextFollowUp ? format(new Date(lead.nextFollowUp), 'dd MMM yyyy, hh:mm a') : 'Not scheduled'}
                             </span>
@@ -1262,7 +1262,7 @@ export default function LeadDetailPage() {
             <AnimatedCard delay={0.1} hover={false}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] flex items-center gap-1.5">
                     <Clock className="h-4 w-4 text-purple-500" />
                     Follow-up History ({lead.followUps.length})
                   </h3>
@@ -1278,7 +1278,7 @@ export default function LeadDetailPage() {
 
                 {/* Add Follow-up Form */}
                 {showFollowUpForm && (
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3 border mb-4">
+                  <div className="bg-[var(--admin-surface-2)] rounded-lg p-4 space-y-3 border mb-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Type *</Label>
@@ -1361,8 +1361,8 @@ export default function LeadDetailPage() {
 
                 {/* Follow-up Timeline */}
                 {lead.followUps.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400 text-sm">
-                    <Clock className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <div className="text-center py-10 text-[var(--admin-text-subtle)] text-sm">
+                    <Clock className="h-8 w-8 mx-auto mb-2 text-[var(--admin-text-subtle)]" />
                     No follow-ups yet. Add one above.
                   </div>
                 ) : (
@@ -1371,7 +1371,7 @@ export default function LeadDetailPage() {
                       <div key={fu.id} className="relative pl-7 pb-5">
                         {/* Timeline line */}
                         {idx < lead.followUps.length - 1 && (
-                          <div className="absolute left-[11px] top-6 bottom-0 w-px bg-gray-200" />
+                          <div className="absolute left-[11px] top-6 bottom-0 w-px bg-[var(--admin-border)]" />
                         )}
                         {/* Timeline dot */}
                         <div className="absolute left-0 top-1.5">
@@ -1379,7 +1379,7 @@ export default function LeadDetailPage() {
                         </div>
                         <div className="ml-2">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-medium text-gray-700">
+                            <span className="text-xs font-medium text-[var(--admin-text-muted)]">
                               {format(new Date(fu.dateTime), 'dd MMM yyyy, hh:mm a')}
                             </span>
                             <Badge variant="outline" className="text-[10px] h-5">
@@ -1399,15 +1399,15 @@ export default function LeadDetailPage() {
                               {fu.outcome}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                          <p className="text-sm text-[var(--admin-text-muted)] mt-1 leading-relaxed">
                             &quot;{fu.notes}&quot;
                           </p>
                           <div className="flex items-center gap-3 mt-1.5">
                             {fu.createdBy && (
-                              <span className="text-[11px] text-gray-400">— {fu.createdBy}</span>
+                              <span className="text-[11px] text-[var(--admin-text-subtle)]">— {fu.createdBy}</span>
                             )}
                             {fu.nextFollowUp && (
-                              <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                              <span className="text-[11px] text-[var(--admin-text-subtle)] flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
                                 Next: {format(new Date(fu.nextFollowUp), 'dd MMM yyyy')}
                               </span>
@@ -1428,14 +1428,14 @@ export default function LeadDetailPage() {
           <TabsContent value="tasks" className="mt-4">
             <AnimatedCard delay={0.1} hover={false}>
               <div className="p-6">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-4">
+                <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] flex items-center gap-1.5 mb-4">
                   <ListChecks className="h-4 w-4 text-purple-500" />
                   Linked Tasks ({tasks.length})
                 </h3>
 
                 {tasks.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400 text-sm">
-                    <ListChecks className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <div className="text-center py-10 text-[var(--admin-text-subtle)] text-sm">
+                    <ListChecks className="h-8 w-8 mx-auto mb-2 text-[var(--admin-text-subtle)]" />
                     No tasks linked to this lead
                   </div>
                 ) : (
@@ -1447,12 +1447,12 @@ export default function LeadDetailPage() {
                       return (
                         <div
                           key={task.id}
-                          className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                          className="flex items-start gap-3 p-3 rounded-lg border border-[var(--admin-border)] hover:border-[var(--admin-border)] transition-colors"
                         >
                           <div className={cn('h-2 w-2 rounded-full mt-1.5 shrink-0', taskStatus.bg)} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium text-gray-800 truncate">{task.title}</p>
+                              <p className="text-sm font-medium text-[var(--admin-text)] truncate">{task.title}</p>
                               <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full font-medium', taskStatus.bg, taskStatus.color)}>
                                 {taskStatus.label}
                               </span>
@@ -1461,17 +1461,17 @@ export default function LeadDetailPage() {
                               </span>
                             </div>
                             {task.description && (
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{task.description}</p>
+                              <p className="text-xs text-[var(--admin-text-muted)] mt-0.5 line-clamp-2">{task.description}</p>
                             )}
                             <div className="flex items-center gap-3 mt-1.5">
                               {task.dueDate && (
-                                <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                                <span className="text-[11px] text-[var(--admin-text-subtle)] flex items-center gap-1">
                                   <Calendar className="h-3 w-3" />
                                   Due: {format(new Date(task.dueDate), 'dd MMM yyyy')}
                                 </span>
                               )}
                               {task.assignee && (
-                                <span className="text-[11px] text-gray-400">
+                                <span className="text-[11px] text-[var(--admin-text-subtle)]">
                                   Assigned to: {task.assignee.name}
                                 </span>
                               )}
@@ -1492,14 +1492,14 @@ export default function LeadDetailPage() {
           <TabsContent value="activity" className="mt-4">
             <AnimatedCard delay={0.1} hover={false}>
               <div className="p-6">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-4">
+                <h3 className="text-sm font-semibold text-[var(--admin-text-muted)] flex items-center gap-1.5 mb-4">
                   <Activity className="h-4 w-4 text-purple-500" />
                   Activity Log
                 </h3>
-                <div className="text-center py-12 text-gray-400">
-                  <Activity className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm font-medium text-gray-500">Activity tracking coming soon</p>
-                  <p className="text-xs text-gray-400 mt-1">Audit logs and activity timeline will be available here</p>
+                <div className="text-center py-12 text-[var(--admin-text-subtle)]">
+                  <Activity className="h-10 w-10 mx-auto mb-3 text-[var(--admin-text-subtle)]" />
+                  <p className="text-sm font-medium text-[var(--admin-text-muted)]">Activity tracking coming soon</p>
+                  <p className="text-xs text-[var(--admin-text-subtle)] mt-1">Audit logs and activity timeline will be available here</p>
                 </div>
               </div>
             </AnimatedCard>

@@ -130,11 +130,11 @@ export default function PaymentsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <IndianRupee className="w-6 h-6" style={{ color: theme.primary }} />
                 Payment Tracking
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Record and track all fee payments</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Record and track all fee payments</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -156,7 +156,7 @@ export default function PaymentsPage() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Collected</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Collected</p>
                   <p className="text-lg font-bold text-emerald-700">₹{(totalCollected / 1000).toFixed(1)}K</p>
                 </div>
               </div>
@@ -167,7 +167,7 @@ export default function PaymentsPage() {
                   <Clock className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Pending</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Pending</p>
                   <p className="text-lg font-bold text-amber-700">₹{(pendingAmount / 1000).toFixed(1)}K</p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function PaymentsPage() {
                   <TrendingUp className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Transactions</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Transactions</p>
                   <p className="text-lg font-bold text-purple-700">{payments.length}</p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function PaymentsPage() {
                   <CreditCard className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Failed</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Failed</p>
                   <p className="text-lg font-bold text-red-700">{payments.filter((p) => p.status === 'FAILED').length}</p>
                 </div>
               </div>
@@ -201,7 +201,7 @@ export default function PaymentsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input
                 placeholder="Search by student or receipt number..."
                 value={searchQuery}
@@ -242,7 +242,7 @@ export default function PaymentsPage() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                      <TableCell colSpan={6} className="text-center py-10 text-[var(--admin-text-subtle)]">
                         <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading payments…
                       </TableCell>
                     </TableRow>
@@ -252,7 +252,7 @@ export default function PaymentsPage() {
                     </TableRow>
                   ) : filteredPayments.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 text-gray-400 text-sm">No payments recorded yet.</TableCell>
+                      <TableCell colSpan={6} className="text-center py-10 text-[var(--admin-text-subtle)] text-sm">No payments recorded yet.</TableCell>
                     </TableRow>
                   ) : (
                     filteredPayments.map((p) => {
@@ -264,11 +264,11 @@ export default function PaymentsPage() {
                           <TableCell className="text-sm font-medium">₹{p.amount.toLocaleString('en-IN')}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1.5 text-sm">
-                              <MethodIcon className="w-3.5 h-3.5 text-gray-400" />
+                              <MethodIcon className="w-3.5 h-3.5 text-[var(--admin-text-subtle)]" />
                               {p.method}
                             </div>
                           </TableCell>
-                          <TableCell className="text-sm text-gray-500">
+                          <TableCell className="text-sm text-[var(--admin-text-muted)]">
                             {new Date(p.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                           </TableCell>
                           <TableCell>

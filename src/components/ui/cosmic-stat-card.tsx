@@ -1,35 +1,24 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PreOneCard } from '@/components/ui/preone-card';
 
-/**
- * CosmicStatCard — Animated stat card with count-up number animation.
- *
- * Uses framer-motion's `useMotionValue` + `useTransform` for smooth
- * number interpolation from 0 → value on mount.
- */
-
 export interface CosmicStatCardProps {
-  /** Stat label */
   label: string;
-  /** Numeric value to display and animate to */
   value: number;
-  /** Optional prefix/suffix like '₹' or '%' */
   suffix?: string;
-  /** Icon element rendered in top-right */
+  displayOverride?: string;
   icon: React.ReactNode;
-  /** Tailwind bg class for the left color accent stripe (e.g. 'bg-purple-500') */
   color: string;
-  /** Trend indicator */
+  imageSrc?: string;
   trend?: {
     value: number;
     positive: boolean;
   };
-  /** Additional CSS classes */
   className?: string;
 }
 
@@ -37,8 +26,10 @@ export function CosmicStatCard({
   label,
   value,
   suffix,
+  displayOverride,
   icon,
   color,
+  imageSrc,
   trend,
   className,
 }: CosmicStatCardProps) {
@@ -77,7 +68,7 @@ export function CosmicStatCard({
       className={cn('relative overflow-hidden', className)}
       hover
     >
-      {/* Left color accent stripe (overrides the default gradient stripe) */}
+      {/* Left color accent stripe */}
       <div
         className={cn(
           'absolute left-0 top-0 bottom-0 w-1 rounded-l-[20px]',
@@ -85,52 +76,71 @@ export function CosmicStatCard({
         )}
       />
 
-      {/* Icon with gradient glow */}
-      <div className="flex items-start justify-between mb-3">
+      {/* Icon / Illustration area */}
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div />
-        <div
-          className={cn(
-            'flex items-center justify-center w-10 h-10 rounded-xl',
-            'bg-gradient-to-br from-[var(--preone-primary-50)] to-[var(--preone-primary-100)]',
-            'dark:from-[rgba(129,140,248,0.12)] dark:to-[rgba(129,140,248,0.06)]',
-            'shadow-sm'
-          )}
-        >
-          <span className="text-[var(--preone-primary)] dark:text-[var(--preone-primary-light)]">
-            {icon}
-          </span>
-        </div>
+        {imageSrc ? (
+          <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
+            <Image
+              src={imageSrc}
+              alt={label}
+              width={64}
+              height={64}
+              className="h-10 w-10 object-contain drop-shadow-sm sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+            />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'flex items-center justify-center w-10 h-10 rounded-xl sm:w-12 sm:h-12',
+              'bg-gradient-to-br from-[var(--preone-primary-50)] to-[var(--preone-primary-100)]',
+              'dark:from-[rgba(129,140,248,0.12)] dark:to-[rgba(129,140,248,0.06)]',
+              'shadow-sm'
+            )}
+          >
+            <span className="text-[var(--preone-primary)] dark:text-[var(--preone-primary-light)]">
+              {icon}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Value */}
-      <div className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-        {displayText}
+      <div className="text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">
+        {displayOverride ?? displayText}
       </div>
 
       {/* Label + Trend */}
-      <div className="flex items-center gap-2 mt-1">
-        <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:mt-2">
+        <span className="text-xs text-[var(--text-secondary)] sm:text-sm">{label}</span>
         {trend && (
           <span
             className={cn(
-              'inline-flex items-center gap-0.5 text-xs font-medium',
+              'inline-flex items-center gap-0.5 text-[10px] font-medium sm:text-xs',
               trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
             )}
           >
             {trend.positive ? (
-              <TrendingUp className="w-3 h-3" />
+              <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             ) : (
-              <TrendingDown className="w-3 h-3" />
+              <TrendingDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             )}
-            {trend.positive ? '+' : ''}
-            {trend.value}%
+            <span
+              className={cn(
+                'text-[11px] sm:text-xs font-semibold',
+                trend.positive ? 'text-[var(--preone-green)]' : 'text-[var(--preone-coral)]'
+              )}
+            >
+              {trend.positive ? '+' : ''}{trend.value}%
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[var(--text-tertiary)]">vs last month</span>
           </span>
         )}
       </div>
 
-      {/* Planet decoration (bottom-right, 5% opacity) */}
+      {/* Planet decoration */}
       <div
-        className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-[0.05]"
+        className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full opacity-[0.05] sm:-bottom-6 sm:-right-6 sm:h-24 sm:w-24"
         style={{
           background:
             'radial-gradient(circle, var(--preone-primary) 0%, transparent 70%)',

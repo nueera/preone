@@ -146,7 +146,7 @@ const CATEGORY_CONFIG: Record<ObservationCategory, { label: string; color: strin
 };
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  LOW:    { label: 'Low',    color: PRIORITY_COLORS.LOW.text,   bg: PRIORITY_COLORS.LOW.bg,   border: 'border-gray-300',   dot: PRIORITY_COLORS.LOW.hex },
+  LOW:    { label: 'Low',    color: PRIORITY_COLORS.LOW.text,   bg: PRIORITY_COLORS.LOW.bg,   border: 'border-border',   dot: PRIORITY_COLORS.LOW.hex },
   NORMAL: { label: 'Normal', color: PRIORITY_COLORS.MEDIUM.text, bg: PRIORITY_COLORS.MEDIUM.bg, border: 'border-blue-300',   dot: PRIORITY_COLORS.MEDIUM.hex },
   HIGH:   { label: 'High',   color: PRIORITY_COLORS.HIGH.text,  bg: PRIORITY_COLORS.HIGH.bg,  border: 'border-orange-300', dot: PRIORITY_COLORS.HIGH.hex },
   CONCERN:{ label: 'Concern',color: 'text-red-700',    bg: 'bg-red-100',    border: 'border-red-300',    dot: PRIORITY_COLORS.HIGH.hex },
@@ -479,8 +479,8 @@ function ObservationsContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Observations</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Observations</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={fetchObservations}
           className="bg-portal-600 hover:bg-portal-700 rounded-xl"
@@ -500,16 +500,16 @@ function ObservationsContent() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Eye className="h-5 w-5 text-portal-500" />
                 Observations
                 {activeStudentId && data?.observations[0] && (
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-sm font-normal text-muted-foreground">
                     — {data.observations[0].studentName}
                   </span>
                 )}
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {data?.className || 'Class'} | {data?.total || 0} Observations
               </p>
             </div>
@@ -524,7 +524,7 @@ function ObservationsContent() {
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3 mt-3">
             <div className="relative flex-1 min-w-[180px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -570,7 +570,7 @@ function ObservationsContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs rounded-xl text-gray-500 hover:text-gray-700 h-8"
+                className="text-xs rounded-xl text-muted-foreground hover:text-muted-foreground h-8"
                 onClick={() => {
                   setFilterCategory('all');
                   setFilterPriority('all');
@@ -590,9 +590,9 @@ function ObservationsContent() {
       {!data || data.observations.length === 0 ? (
         <Card className="border-0 shadow-md">
           <CardContent className="py-16 text-center">
-            <Eye className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No Observations Found</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <Eye className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-foreground mb-1">No Observations Found</h3>
+            <p className="text-sm text-muted-foreground mb-4">
               {hasActiveFilters
                 ? 'Try adjusting your filters to see more results'
                 : 'Create your first observation to get started'}
@@ -628,10 +628,10 @@ function ObservationsContent() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="text-sm font-semibold text-gray-900">{obs.studentName}</span>
-                        <span className="text-xs text-gray-400">Roll: {obs.studentRollNumber || '-'}</span>
-                        <span className="text-xs text-gray-400">|</span>
-                        <span className="text-xs text-gray-400">{obs.className}</span>
+                        <span className="text-sm font-semibold text-foreground">{obs.studentName}</span>
+                        <span className="text-xs text-muted-foreground">Roll: {obs.studentRollNumber || '-'}</span>
+                        <span className="text-xs text-muted-foreground">|</span>
+                        <span className="text-xs text-muted-foreground">{obs.className}</span>
                       </div>
 
                       {/* Category + Priority badges */}
@@ -645,13 +645,13 @@ function ObservationsContent() {
                           )}
                           {priConfig.label}
                         </Badge>
-                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" /> {formatDate(obs.createdAt)}
                         </span>
                       </div>
 
                       {/* Content preview */}
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {activeStudentId ? obs.content : truncate(obs.content, 150)}
                       </p>
 
@@ -668,7 +668,7 @@ function ObservationsContent() {
                             )}
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-xs text-gray-400">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <XCircle className="h-3.5 w-3.5" /> Not Shared
                           </span>
                         )}
@@ -685,7 +685,7 @@ function ObservationsContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-portal-600 hover:bg-portal-50"
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-portal-600 hover:bg-portal-50"
                         onClick={() => {
                           setSelectedObservation(obs);
                           setShowDetailDialog(true);
@@ -697,7 +697,7 @@ function ObservationsContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
                         onClick={() => openEdit(obs)}
                         title="Edit"
                       >
@@ -706,7 +706,7 @@ function ObservationsContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-amber-50"
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
                         onClick={() => {
                           setShareTarget(obs);
                           setShowShareDialog(true);
@@ -718,7 +718,7 @@ function ObservationsContent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50"
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50"
                         onClick={() => {
                           setDeleteTarget(obs);
                           setShowDeleteDialog(true);
@@ -793,7 +793,7 @@ function ObservationsContent() {
                 </SelectContent>
               </Select>
               {createForm.category && CATEGORY_CONFIG[createForm.category] && (
-                <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
+                <p className="text-xs text-muted-foreground bg-muted p-2 rounded-lg">
                   💡 {CATEGORY_CONFIG[createForm.category].guidance}
                 </p>
               )}
@@ -810,7 +810,7 @@ function ObservationsContent() {
                 placeholder="Describe your observation in detail..."
                 className="min-h-[140px] rounded-xl text-sm resize-none"
               />
-              <p className="text-[10px] text-gray-400 text-right">
+              <p className="text-[10px] text-muted-foreground text-right">
                 {createForm.content.length} characters (minimum 10)
               </p>
             </div>
@@ -829,7 +829,7 @@ function ObservationsContent() {
                       px-3 py-1.5 rounded-lg text-xs font-medium transition-all border
                       ${createForm.priority === key
                         ? `${cfg.bg} ${cfg.color} ${cfg.border} shadow-sm`
-                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                        : 'bg-muted text-muted-foreground border-border hover:bg-muted'
                       }
                     `}
                   >
@@ -841,10 +841,10 @@ function ObservationsContent() {
             </div>
 
             {/* Share with Parent */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-xl">
               <div>
                 <Label className="text-xs font-medium">Share with Parent</Label>
-                <p className="text-[10px] text-gray-500">Parent will be notified when shared</p>
+                <p className="text-[10px] text-muted-foreground">Parent will be notified when shared</p>
               </div>
               <Switch
                 checked={createForm.isShared}
@@ -902,15 +902,15 @@ function ObservationsContent() {
 
                 <div className="space-y-4 py-2">
                   {/* Content */}
-                  <div className="bg-gray-50 p-4 rounded-xl">
-                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-muted p-4 rounded-xl">
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                       {selectedObservation.content}
                     </p>
                   </div>
 
                   {/* Parent Visibility */}
-                  <div className="p-4 border border-gray-200 rounded-xl">
-                    <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                  <div className="p-4 border border-border rounded-xl">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
                       <Eye className="h-3.5 w-3.5" /> Parent Visibility
                     </h4>
                     {selectedObservation.isShared ? (
@@ -931,12 +931,12 @@ function ObservationsContent() {
                             )}
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-500">Not yet acknowledged by parent</p>
+                          <p className="text-xs text-muted-foreground">Not yet acknowledged by parent</p>
                         )}
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-500">Currently: Not Shared</p>
+                        <p className="text-sm text-muted-foreground">Currently: Not Shared</p>
                         <Button
                           variant="outline"
                           size="sm"
@@ -1049,7 +1049,7 @@ function ObservationsContent() {
                       px-3 py-1.5 rounded-lg text-xs font-medium transition-all border
                       ${editForm.priority === key
                         ? `${cfg.bg} ${cfg.color} ${cfg.border} shadow-sm`
-                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                        : 'bg-muted text-muted-foreground border-border hover:bg-muted'
                       }
                     `}
                   >

@@ -165,7 +165,7 @@ function getMoodEmoji(mood: string | null): string {
 }
 
 function getFoodStatus(food: string | null): { emoji: string; label: string; color: string } {
-  if (!food) return { emoji: '❓', label: 'Not Recorded', color: 'text-gray-500' };
+  if (!food) return { emoji: '❓', label: 'Not Recorded', color: 'text-muted-foreground' };
   const f = food.toLowerCase();
   if (f.includes('full') || f.includes('eaten') || f.includes('completed')) {
     return { emoji: '✅', label: food, color: 'text-emerald-600' };
@@ -767,7 +767,7 @@ export default function ParentDashboard() {
                 return (
                   <div
                     key={ann.id}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted dark:hover:bg-gray-900/30 transition-colors"
                   >
                     <span className="text-base shrink-0">{priority.label}</span>
                     <div className="flex-1 min-w-0">

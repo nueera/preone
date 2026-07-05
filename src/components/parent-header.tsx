@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
-  User, Settings, LogOut, ChevronDown,
+  User, Settings, LogOut, ChevronDown, Heart,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
-import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
+import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -62,15 +61,16 @@ export function ParentHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { parent, selectedChild, children, selectChild } = useParentAuth();
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('preone_user');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) setUser(JSON.parse(saved));
     } catch {
-      return null;
+      // ignore
     }
-  });
+  }, []);
 
   // Build breadcrumb segments from pathname
   const segments = pathname.split('/').filter(Boolean);
@@ -88,9 +88,25 @@ export function ParentHeader() {
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
-      {/* ── Left: Sidebar trigger + Breadcrumb ── */}
-      <SidebarTrigger className="shrink-0" />
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
+      {/* ── Left: PreOne Branding ── */}
+      <Link href="/parent" className="flex items-center gap-2 shrink-0">
+        <div
+          className="h-8 w-8 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--parent-primary-soft)' }}
+        >
+          <Heart
+            className="h-4 w-4"
+            style={{ color: 'var(--parent-primary)' }}
+          />
+        </div>
+        <span
+          className="text-sm font-bold hidden sm:inline"
+          style={{ color: 'var(--parent-primary)' }}
+        >
+          PreOne
+        </span>
+      </Link>
 
       <Breadcrumb>
         <BreadcrumbList>
@@ -117,7 +133,7 @@ export function ParentHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Child badge, Notifications, User Menu ── */}
+      {/* ── Right: Child badge, Theme Toggle, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Selected Child Badge */}
         {selectedChild && (
@@ -137,6 +153,9 @@ export function ParentHeader() {
             <span>{selectedChild.className || 'No class'}</span>
           </Badge>
         )}
+
+        {/* ── Global Theme Toggle ── */}
+        <GlobalThemeToggle variant="pill" />
 
         {/* Notification Bell */}
         <NotificationBell />

@@ -101,7 +101,7 @@ export default function StudentAttendancePage() {
     return days;
   }, [firstDay, daysInMonth]);
 
-  if (loading) return <div className="flex items-center justify-center py-24 text-gray-400"><Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading attendance…</div>;
+  if (loading) return <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]"><Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading attendance…</div>;
   if (error) return <div className="flex items-center justify-center py-24 text-red-500 text-sm">{error}</div>;
 
   return (
@@ -109,10 +109,10 @@ export default function StudentAttendancePage() {
       <StaggerContainer className="space-y-6">
         <StaggerItem>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <CalendarDays className="w-6 h-6" style={{ color: theme.primary }} /> Attendance Record
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Monthly attendance view</p>
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">Monthly attendance view</p>
           </div>
         </StaggerItem>
 
@@ -130,7 +130,7 @@ export default function StudentAttendancePage() {
                 <PreOneCard key={s.label} variant="strip" className="p-3">
                   <div className="flex items-center gap-2">
                     <div className={`w-8 h-8 rounded-lg ${s.color.split(' ')[1]} flex items-center justify-center`}><Icon className={`w-4 h-4 ${s.color.split(' ')[0]}`} /></div>
-                    <div><p className="text-[10px] text-gray-400">{s.label}</p><p className={`text-sm font-bold ${s.color.split(' ')[0]}`}>{s.value}</p></div>
+                    <div><p className="text-[10px] text-[var(--admin-text-subtle)]">{s.label}</p><p className={`text-sm font-bold ${s.color.split(' ')[0]}`}>{s.value}</p></div>
                   </div>
                 </PreOneCard>
               );
@@ -141,7 +141,7 @@ export default function StudentAttendancePage() {
         <StaggerItem>
           <PreOneCard variant="default" className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Attendance Rate ({MONTHS[month]})</span>
+              <span className="text-sm font-medium text-[var(--admin-text-muted)]">Attendance Rate ({MONTHS[month]})</span>
               <span className="text-lg font-bold" style={{ color: theme.primary }}>{stats.percentage}%</span>
             </div>
             <Progress value={stats.percentage} className="h-2" />
@@ -153,13 +153,13 @@ export default function StudentAttendancePage() {
             <PreOneCard variant="default">
               <PreOneCardContent>
                 <div className="flex items-center justify-center mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">{MONTHS[month]} {year}</h2>
+                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">{MONTHS[month]} {year}</h2>
                 </div>
                 {monthRecords.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center mb-3">No attendance marked this month.</p>
+                  <p className="text-xs text-[var(--admin-text-subtle)] text-center mb-3">No attendance marked this month.</p>
                 )}
                 <div className="grid grid-cols-7 gap-1 mb-2">
-                  {DAYS.map((d) => <div key={d} className="text-center text-xs font-semibold text-gray-400 py-2">{d}</div>)}
+                  {DAYS.map((d) => <div key={d} className="text-center text-xs font-semibold text-[var(--admin-text-subtle)] py-2">{d}</div>)}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                   {calendarDays.map((day, i) => {
@@ -167,9 +167,9 @@ export default function StudentAttendancePage() {
                     const status = dayStatus[day] || null;
                     const colorCfg = status ? ATTENDANCE_COLORS[status] : null;
                     return (
-                      <div key={`day-${day}`} className={`h-14 p-1.5 rounded-lg border text-sm transition-colors ${colorCfg ? `${colorCfg.bg} border-transparent` : 'border-transparent hover:bg-gray-50'}`}>
-                        <span className="text-xs font-medium text-gray-700">{day}</span>
-                        {status && <div className={`w-2 h-2 rounded-full ${STATUS_DOT[status] || 'bg-gray-300'} mt-1`} />}
+                      <div key={`day-${day}`} className={`h-14 p-1.5 rounded-lg border text-sm transition-colors ${colorCfg ? `${colorCfg.bg} border-transparent` : 'border-transparent hover:bg-[var(--admin-surface-2)]'}`}>
+                        <span className="text-xs font-medium text-[var(--admin-text-muted)]">{day}</span>
+                        {status && <div className={`w-2 h-2 rounded-full ${STATUS_DOT[status] || 'bg-[var(--admin-text-subtle)]'} mt-1`} />}
                       </div>
                     );
                   })}
@@ -181,12 +181,12 @@ export default function StudentAttendancePage() {
           <StaggerItem>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <div className="flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-gray-500" /><h3 className="font-semibold text-gray-900">Monthly Trend</h3></div>
+                <div className="flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-[var(--admin-text-muted)]" /><h3 className="font-semibold text-[var(--admin-text)]">Monthly Trend</h3></div>
                 <div className="space-y-3">
                   {monthlyTrend.map((m, idx) => (
                     <div key={`${m.month}-${idx}`} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">{m.month}</span>
+                        <span className="text-[var(--admin-text-muted)]">{m.month}</span>
                         <span className="font-medium" style={{ color: m.rate >= 85 ? '#22c55e' : '#f59e0b' }}>{m.rate}%</span>
                       </div>
                       <Progress value={m.rate} className="h-1.5" />

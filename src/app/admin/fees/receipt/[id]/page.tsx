@@ -106,7 +106,7 @@ export default function ReceiptPage() {
         </Button>
       </div>
 
-      <Card className="print:shadow-none print:border-gray-300">
+      <Card className="print:shadow-none print:border-[var(--admin-border)]">
         <CardContent className="p-8 space-y-6">
           {/* Header */}
           <div className="text-center">
@@ -177,7 +177,7 @@ export default function ReceiptPage() {
 
           {/* Signatory */}
           <div className="pt-8">
-            <div className="border-t border-gray-400 pt-2 w-48 ml-auto text-center">
+            <div className="border-t border-[var(--admin-border)] pt-2 w-48 ml-auto text-center">
               <p className="text-xs text-muted-foreground">Authorized Signatory</p>
             </div>
           </div>

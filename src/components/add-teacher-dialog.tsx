@@ -456,7 +456,7 @@ export function AddTeacherDialog({ open, onOpenChange, onTeacherCreated }: AddTe
                     'rounded-full px-3 py-1.5 text-xs font-medium border transition-colors',
                     form.specialization.includes(spec)
                       ? 'bg-purple-50 text-purple-700 border-purple-200'
-                      : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                      : 'bg-white text-muted-foreground border-border hover:border-border'
                   )}
                 >
                   {spec}

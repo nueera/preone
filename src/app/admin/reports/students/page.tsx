@@ -155,7 +155,7 @@ export default function StudentsReportPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[var(--admin-text-subtle)]">
         <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading student report…
       </div>
     );
@@ -173,11 +173,11 @@ export default function StudentsReportPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Users className="w-6 h-6" style={{ color: theme.primary }} />
                 Student Reports
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Demographics, enrollment trends, and class distribution</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Demographics, enrollment trends, and class distribution</p>
             </div>
             <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" /> Export</Button>
           </div>
@@ -187,19 +187,19 @@ export default function StudentsReportPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Total Students</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Total Students</p>
               <p className="text-xl font-bold text-purple-700">{agg.total}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">New This Month</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">New This Month</p>
               <p className="text-xl font-bold text-emerald-700">+{agg.newThisMonth}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Avg Class Size</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Avg Class Size</p>
               <p className="text-xl font-bold text-amber-700">{agg.avgClassSize}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <p className="text-xs text-gray-500">Gender Ratio</p>
+              <p className="text-xs text-[var(--admin-text-muted)]">Gender Ratio</p>
               <p className="text-xl font-bold text-purple-700">{agg.genderRatio}</p>
             </PreOneCard>
           </div>
@@ -207,7 +207,7 @@ export default function StudentsReportPage() {
 
         {agg.total === 0 ? (
           <StaggerItem>
-            <PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">
+            <PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">
               No student data yet.
             </PreOneCard>
           </StaggerItem>
@@ -217,7 +217,7 @@ export default function StudentsReportPage() {
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
                 <div className="p-6 pb-2">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Enrollment Trend</h3>
+                  <h3 className="text-base font-semibold text-[var(--admin-text)] flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Enrollment Trend</h3>
                 </div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>
@@ -237,7 +237,7 @@ export default function StudentsReportPage() {
             {/* Gender Pie */}
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
-                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Gender Distribution</h3></div>
+                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Gender Distribution</h3></div>
                 <div className="px-6 pb-6 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
@@ -252,7 +252,7 @@ export default function StudentsReportPage() {
                   {agg.genderData.map((g) => (
                     <div key={g.name} className="flex items-center gap-2 text-sm">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: g.color }} />
-                      <span className="text-gray-600">{g.name}: {g.value}</span>
+                      <span className="text-[var(--admin-text-muted)]">{g.name}: {g.value}</span>
                     </div>
                   ))}
                 </div>
@@ -262,7 +262,7 @@ export default function StudentsReportPage() {
             {/* Class Distribution */}
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
-                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Class Distribution</h3></div>
+                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Class Distribution</h3></div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={agg.classDistribution}>
@@ -282,7 +282,7 @@ export default function StudentsReportPage() {
             {/* Age Distribution */}
             <StaggerItem>
               <PreOneCard variant="default" className="p-0">
-                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-gray-900">Age Distribution</h3></div>
+                <div className="p-6 pb-2"><h3 className="text-base font-semibold text-[var(--admin-text)]">Age Distribution</h3></div>
                 <div className="px-6 pb-6">
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={agg.ageDistribution}>

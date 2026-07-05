@@ -35,7 +35,7 @@ const CATEGORY_CONFIG: Record<string, { color: string; bg: string; icon: React.E
   Social:    { color: 'text-green-700', bg: 'bg-green-50', icon: Users, hex: '#22c55e' },
   Language:  { color: 'text-sky-700', bg: 'bg-sky-50', icon: MessageSquare, hex: '#0ea5e9' },
 };
-const FALLBACK_CFG = { color: 'text-gray-700', bg: 'bg-gray-50', icon: Target, hex: '#6b7280' };
+const FALLBACK_CFG = { color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]', icon: Target, hex: '#6b7280' };
 const cfgFor = (cat: string) => CATEGORY_CONFIG[cat] || FALLBACK_CFG;
 
 export default function MilestonesPage() {
@@ -93,11 +93,11 @@ export default function MilestonesPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Target className="w-6 h-6" style={{ color: theme.primary }} />
                 Milestone Templates
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Developmental milestones by category</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Developmental milestones by category</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Plus className="w-4 h-4 mr-2" /> Add Milestone
@@ -124,7 +124,7 @@ export default function MilestonesPage() {
                       <Icon className={`w-5 h-5 ${cfg.color}`} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{cat}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">{cat}</p>
                       <p className="text-lg font-bold" style={{ color: cfg.hex }}>{count}</p>
                     </div>
                   </div>
@@ -137,18 +137,18 @@ export default function MilestonesPage() {
         {/* Search */}
         <StaggerItem>
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
             <Input placeholder="Search milestones..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
           </div>
         </StaggerItem>
 
         {/* Grid by Category */}
         {loading ? (
-          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-gray-400"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading milestones…</PreOneCard></StaggerItem>
+          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading milestones…</PreOneCard></StaggerItem>
         ) : error ? (
           <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-red-500 text-sm">{error}</PreOneCard></StaggerItem>
         ) : milestones.length === 0 ? (
-          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-gray-400 text-sm">No milestone templates defined yet.</PreOneCard></StaggerItem>
+          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)] text-sm">No milestone templates defined yet.</PreOneCard></StaggerItem>
         ) : (
           Object.entries(grouped).map(([category, list]) => {
             const cfg = cfgFor(category);
@@ -161,17 +161,17 @@ export default function MilestonesPage() {
                       <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center`}>
                         <Icon className={`w-4 h-4 ${cfg.color}`} />
                       </div>
-                      <h3 className="font-semibold text-gray-900">{category} Development</h3>
+                      <h3 className="font-semibold text-[var(--admin-text)]">{category} Development</h3>
                       <Badge className={`${cfg.bg} ${cfg.color} text-[10px]`}>{list.length} milestones</Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {list.map((m) => (
                         <div key={m.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-sm font-medium text-gray-900">{m.name}</h4>
+                            <h4 className="text-sm font-medium text-[var(--admin-text)]">{m.name}</h4>
                             <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                           </div>
-                          <p className="text-xs text-gray-500 mb-2">{m.description}</p>
+                          <p className="text-xs text-[var(--admin-text-muted)] mb-2">{m.description}</p>
                           <div className="flex items-center justify-between">
                             <Badge variant="outline" className="text-[9px]">{m.ageRange}</Badge>
                             <Button variant="ghost" size="sm" className="h-6 text-[10px]">Edit</Button>

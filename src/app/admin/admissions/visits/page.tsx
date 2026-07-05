@@ -538,11 +538,11 @@ export default function CampusVisitsPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <MapPin className="h-6 w-6" style={{ color: COSMIC_PURPLE[600] }} />
                 Campus Visits
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">
                 Schedule and manage campus visits for prospective families
               </p>
             </div>
@@ -580,8 +580,8 @@ export default function CampusVisitsPage() {
                   <CalendarCheck className="h-5 w-5" style={{ color: COSMIC_PURPLE[600] }} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-2xl font-bold text-gray-900 leading-tight">{totalVisits}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Total Visits</p>
+                  <p className="text-2xl font-bold font-heading text-[var(--admin-text)] leading-tight">{totalVisits}</p>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Total Visits</p>
                 </div>
               </div>
             </div>
@@ -595,7 +595,7 @@ export default function CampusVisitsPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-2xl font-bold text-amber-600 leading-tight">{scheduledToday}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Scheduled Today</p>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Scheduled Today</p>
                 </div>
               </div>
             </div>
@@ -609,7 +609,7 @@ export default function CampusVisitsPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-2xl font-bold text-emerald-600 leading-tight">{completedCount}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Completed</p>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Completed</p>
                 </div>
               </div>
             </div>
@@ -623,7 +623,7 @@ export default function CampusVisitsPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-2xl font-bold text-red-500 leading-tight">{cancelledCount}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Cancelled</p>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Cancelled</p>
                 </div>
               </div>
             </div>
@@ -633,7 +633,7 @@ export default function CampusVisitsPage() {
         {/* ── Search & Filters ── */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
             <Input
               placeholder="Search by parent, child, or phone..."
               value={searchQuery}
@@ -643,7 +643,7 @@ export default function CampusVisitsPage() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -676,15 +676,15 @@ export default function CampusVisitsPage() {
         {/* ── Visits Table ── */}
         <Card className="overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center h-48 text-gray-400">
+            <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading visits...
             </div>
           ) : filteredVisits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <MapPin className="h-12 w-12 mb-3" style={{ color: COSMIC_PURPLE[200] }} />
-              <p className="text-gray-500 font-medium">No visits found</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-[var(--admin-text-muted)] font-medium">No visits found</p>
+              <p className="text-sm text-[var(--admin-text-subtle)] mt-1">
                 {hasActiveFilters
                   ? 'Try adjusting your filters'
                   : 'Schedule a campus visit to get started'}
@@ -723,7 +723,7 @@ export default function CampusVisitsPage() {
                     <TableRow
                       key={visit.id}
                       className={cn(
-                        'cursor-pointer hover:bg-gray-50/80 transition-colors',
+                        'cursor-pointer hover:bg-[var(--admin-surface-2)]/80 transition-colors',
                         visit.status === 'CANCELLED' && 'opacity-60',
                         visit.status === 'COMPLETED' && 'opacity-70',
                       )}
@@ -742,7 +742,7 @@ export default function CampusVisitsPage() {
                           <div>
                             <p className="font-medium text-sm">{visit.parentName}</p>
                             {visit.parentPhone && (
-                              <p className="text-xs text-gray-400 flex items-center gap-1">
+                              <p className="text-xs text-[var(--admin-text-subtle)] flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
                                 {visit.parentPhone}
                               </p>
@@ -752,13 +752,13 @@ export default function CampusVisitsPage() {
                       </TableCell>
                       <TableCell className="text-sm">
                         <div className="flex items-center gap-1.5">
-                          <Baby className="h-3.5 w-3.5 text-gray-400" />
+                          <Baby className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
                           {visit.childName}
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">
                         <div className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                          <Calendar className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
                           <span className={cn(
                             isToday(visitDate) && 'text-amber-600 font-medium',
                             isTomorrow(visitDate) && 'text-blue-600',
@@ -768,7 +768,7 @@ export default function CampusVisitsPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
                         {visit.time || '—'}
                       </TableCell>
                       <TableCell>
@@ -780,14 +780,14 @@ export default function CampusVisitsPage() {
                           {statusCfg.label}
                         </span>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
                         {visit.assignedStaff ? (
                           <div className="flex items-center gap-1">
-                            <UserCircle className="h-3.5 w-3.5 text-gray-400" />
+                            <UserCircle className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
                             {visit.assignedStaff}
                           </div>
                         ) : (
-                          <span className="text-gray-300">Unassigned</span>
+                          <span className="text-[var(--admin-text-subtle)]">Unassigned</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">

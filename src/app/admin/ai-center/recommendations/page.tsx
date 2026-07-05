@@ -49,13 +49,13 @@ const CATEGORY_CONFIG: Record<string, { color: string; bg: string; icon: React.E
   STUDENT: { color: 'text-purple-700', bg: 'bg-purple-50', icon: Target },
   CLASS: { color: 'text-blue-700', bg: 'bg-blue-50', icon: Filter },
   TEACHER: { color: 'text-emerald-700', bg: 'bg-emerald-50', icon: Sparkles },
-  SYSTEM: { color: 'text-gray-700', bg: 'bg-gray-50', icon: Zap },
+  SYSTEM: { color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]', icon: Zap },
 };
 
 const STATUS_BADGE: Record<string, string> = {
   ACTIVE: 'bg-blue-50 text-blue-700',
   COMPLETED: 'bg-emerald-50 text-emerald-700',
-  DISMISSED: 'bg-gray-50 text-gray-700',
+  DISMISSED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
 };
 
 export default function RecommendationsPage() {
@@ -78,30 +78,30 @@ export default function RecommendationsPage() {
     <PageTransition>
       <StaggerContainer className="space-y-6">
         <StaggerItem>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <Lightbulb className="w-6 h-6" style={{ color: theme.primary }} />
             AI Recommendations
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Personalized recommendations with action items and priority levels</p>
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">Personalized recommendations with action items and priority levels</p>
         </StaggerItem>
 
         {/* Stats */}
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-blue-600" /><span className="text-xs text-gray-500">Active</span></div>
+              <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-blue-600" /><span className="text-xs text-[var(--admin-text-muted)]">Active</span></div>
               <p className="text-lg font-bold text-blue-700 mt-1">{activeCount}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-gray-500">Completed</span></div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-[var(--admin-text-muted)]">Completed</span></div>
               <p className="text-lg font-bold text-emerald-700 mt-1">{completedCount}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-600" /><span className="text-xs text-gray-500">High Priority</span></div>
+              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-600" /><span className="text-xs text-[var(--admin-text-muted)]">High Priority</span></div>
               <p className="text-lg font-bold text-red-700 mt-1">{highPriorityCount}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-600" /><span className="text-xs text-gray-500">Avg Effort</span></div>
+              <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-600" /><span className="text-xs text-[var(--admin-text-muted)]">Avg Effort</span></div>
               <p className="text-lg font-bold text-amber-700 mt-1">Medium</p>
             </PreOneCard>
           </div>
@@ -111,13 +111,13 @@ export default function RecommendationsPage() {
         <StaggerItem>
           <div className="flex flex-wrap gap-3">
             <div className="flex gap-1.5">
-              <span className="text-xs text-gray-400 self-center">Priority:</span>
+              <span className="text-xs text-[var(--admin-text-subtle)] self-center">Priority:</span>
               {['all', 'HIGH', 'MEDIUM', 'LOW'].map((p) => (
                 <Badge key={p} variant={priorityFilter === p ? 'default' : 'outline'} className="cursor-pointer text-[10px]" onClick={() => setPriorityFilter(p)}>{p === 'all' ? 'All' : p}</Badge>
               ))}
             </div>
             <div className="flex gap-1.5">
-              <span className="text-xs text-gray-400 self-center">Status:</span>
+              <span className="text-xs text-[var(--admin-text-subtle)] self-center">Status:</span>
               {['all', 'ACTIVE', 'COMPLETED', 'DISMISSED'].map((s) => (
                 <Badge key={s} variant={statusFilter === s ? 'default' : 'outline'} className="cursor-pointer text-[10px]" onClick={() => setStatusFilter(s)}>{s === 'all' ? 'All' : s}</Badge>
               ))}
@@ -141,25 +141,25 @@ export default function RecommendationsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="text-sm font-medium text-gray-900">{rec.title}</h4>
+                          <h4 className="text-sm font-medium text-[var(--admin-text)]">{rec.title}</h4>
                           <Badge className={`${priCfg.bg} ${priCfg.text} text-[9px]`}>{rec.priority}</Badge>
                           <Badge className={`${STATUS_BADGE[rec.status]} text-[9px]`}>{rec.status}</Badge>
                           <Badge className={`${catCfg.bg} ${catCfg.color} text-[9px]`}>{rec.category}</Badge>
                         </div>
-                        {rec.student && <p className="text-xs text-gray-500 mb-1">Student: {rec.student}</p>}
-                        <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                        {rec.student && <p className="text-xs text-[var(--admin-text-muted)] mb-1">Student: {rec.student}</p>}
+                        <p className="text-sm text-[var(--admin-text-muted)] mb-2">{rec.description}</p>
                         <div className="mb-2">
-                          <p className="text-xs font-medium text-gray-500 mb-1">Action Items:</p>
+                          <p className="text-xs font-medium text-[var(--admin-text-muted)] mb-1">Action Items:</p>
                           <ul className="space-y-0.5">
                             {rec.actionItems.map((item, i) => (
-                              <li key={i} className="text-xs text-gray-500 flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                              <li key={i} className="text-xs text-[var(--admin-text-muted)] flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--admin-text-subtle)]" />
                                 {item}
                               </li>
                             ))}
                           </ul>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
                           <span>Impact: {rec.impact}</span>
                           <span>Effort: {rec.effort}</span>
                           <span>{rec.createdAt}</span>

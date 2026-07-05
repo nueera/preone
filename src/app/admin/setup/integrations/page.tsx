@@ -247,11 +247,11 @@ export default function IntegrationsSetupPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Puzzle className="h-6 w-6 text-violet-600" />
               Third-Party Integrations
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Connect external services to extend PreOne&apos;s capabilities
             </p>
           </div>
@@ -271,20 +271,20 @@ export default function IntegrationsSetupPage() {
                 <p className="text-2xl font-bold text-emerald-600">
                   {connectedCount}
                 </p>
-                <p className="text-sm text-gray-500">Connected</p>
+                <p className="text-sm text-[var(--admin-text-muted)]">Connected</p>
               </div>
             </div>
           </PreOneCard>
           <PreOneCard variant="default">
             <div className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center">
-                <WifiOff className="h-6 w-6 text-gray-400" />
+              <div className="h-12 w-12 rounded-xl bg-[var(--admin-surface-2)] flex items-center justify-center">
+                <WifiOff className="h-6 w-6 text-[var(--admin-text-subtle)]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-600">
+                <p className="text-2xl font-bold text-[var(--admin-text-muted)]">
                   {integrations.filter((i) => i.status === 'disconnected').length}
                 </p>
-                <p className="text-sm text-gray-500">Available</p>
+                <p className="text-sm text-[var(--admin-text-muted)]">Available</p>
               </div>
             </div>
           </PreOneCard>
@@ -297,7 +297,7 @@ export default function IntegrationsSetupPage() {
                 <p className="text-2xl font-bold text-violet-600">
                   {integrations.length}
                 </p>
-                <p className="text-sm text-gray-500">Total Integrations</p>
+                <p className="text-sm text-[var(--admin-text-muted)]">Total Integrations</p>
               </div>
             </div>
           </PreOneCard>
@@ -325,14 +325,14 @@ export default function IntegrationsSetupPage() {
                       {intg.icon}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm text-gray-900">
+                      <h3 className="font-semibold text-sm text-[var(--admin-text)]">
                         {intg.name}
                       </h3>
                       <Badge
                         className={cn(
                           'text-[10px] mt-1',
                           categoryColors[intg.category] ||
-                            'bg-gray-50 text-gray-700'
+                            'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'
                         )}
                       >
                         {intg.category}
@@ -346,7 +346,7 @@ export default function IntegrationsSetupPage() {
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                         : intg.status === 'error'
                         ? 'bg-red-50 text-red-700 border-red-200'
-                        : 'bg-gray-100 text-gray-500 border-gray-200'
+                        : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                     )}
                   >
                     {intg.status === 'connected' && (
@@ -364,7 +364,7 @@ export default function IntegrationsSetupPage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-[var(--admin-text-muted)] leading-relaxed">
                   {intg.description}
                 </p>
 
@@ -373,14 +373,14 @@ export default function IntegrationsSetupPage() {
                   {intg.features.slice(0, 3).map((feature) => (
                     <div
                       key={feature}
-                      className="flex items-center gap-1.5 text-xs text-gray-600"
+                      className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]"
                     >
                       <div className="h-1 w-1 rounded-full bg-violet-400" />
                       {feature}
                     </div>
                   ))}
                   {intg.features.length > 3 && (
-                    <p className="text-xs text-gray-400 pl-2.5">
+                    <p className="text-xs text-[var(--admin-text-subtle)] pl-2.5">
                       +{intg.features.length - 3} more
                     </p>
                   )}
@@ -388,7 +388,7 @@ export default function IntegrationsSetupPage() {
 
                 {/* Last Sync */}
                 {intg.lastSync && (
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-[10px] text-[var(--admin-text-subtle)]">
                     Last synced: {intg.lastSync}
                   </p>
                 )}

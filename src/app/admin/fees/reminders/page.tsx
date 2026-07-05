@@ -170,11 +170,11 @@ export default function RemindersPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Bell className="w-6 h-6" style={{ color: theme.primary }} />
                 Fee Reminders
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Send reminders for overdue payments</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Send reminders for overdue payments</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Send className="w-4 h-4 mr-2" /> Send Bulk Reminder
@@ -191,7 +191,7 @@ export default function RemindersPage() {
                   <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Overdue Payments</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Overdue Payments</p>
                   <p className="text-lg font-bold text-red-700">{overdue.length}</p>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function RemindersPage() {
                   <IndianRupee className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Overdue</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Total Overdue</p>
                   <p className="text-lg font-bold text-amber-700">₹{(totalOverdue / 1000).toFixed(1)}K</p>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function RemindersPage() {
                   <History className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Reminders Sent</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">Reminders Sent</p>
                   <p className="text-lg font-bold text-purple-700">{history.length}</p>
                 </div>
               </div>
@@ -227,9 +227,9 @@ export default function RemindersPage() {
             <PreOneCard variant="default">
               <PreOneCardContent>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Overdue Payments</h3>
+                  <h3 className="font-semibold text-[var(--admin-text)]">Overdue Payments</h3>
                   <div className="relative w-56">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
                     <Input
                       placeholder="Search student..."
                       value={searchQuery}
@@ -252,7 +252,7 @@ export default function RemindersPage() {
                     <TableBody>
                       {loading ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-10 text-gray-400">
+                          <TableCell colSpan={5} className="text-center py-10 text-[var(--admin-text-subtle)]">
                             <Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading overdue payments…
                           </TableCell>
                         </TableRow>
@@ -262,7 +262,7 @@ export default function RemindersPage() {
                         </TableRow>
                       ) : filteredOverdue.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-10 text-gray-400 text-sm">No overdue payments 🎉</TableCell>
+                          <TableCell colSpan={5} className="text-center py-10 text-[var(--admin-text-subtle)] text-sm">No overdue payments 🎉</TableCell>
                         </TableRow>
                       ) : (
                         filteredOverdue.map((o) => (
@@ -270,7 +270,7 @@ export default function RemindersPage() {
                             <TableCell>
                               <div>
                                 <p className="text-sm font-medium">{o.student}</p>
-                                <p className="text-xs text-gray-400">{o.class}</p>
+                                <p className="text-xs text-[var(--admin-text-subtle)]">{o.class}</p>
                               </div>
                             </TableCell>
                             <TableCell className="text-sm font-medium text-red-700">₹{o.amount.toLocaleString('en-IN')}</TableCell>
@@ -279,7 +279,7 @@ export default function RemindersPage() {
                                 {o.daysOverdue}d
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-sm text-gray-500">{o.remindersSent}</TableCell>
+                            <TableCell className="text-sm text-[var(--admin-text-muted)]">{o.remindersSent}</TableCell>
                             <TableCell>
                               <Button size="sm" variant="outline" className="h-7 text-xs">
                                 <Send className="w-3 h-3 mr-1" /> Remind
@@ -302,7 +302,7 @@ export default function RemindersPage() {
               <PreOneCard variant="default">
                 <PreOneCardContent>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">Templates</h3>
+                    <h3 className="font-semibold text-[var(--admin-text)]">Templates</h3>
                     <Button variant="outline" size="sm" className="h-7 text-xs">
                       <Plus className="w-3 h-3 mr-1" /> New
                     </Button>
@@ -315,17 +315,17 @@ export default function RemindersPage() {
                           <div
                             key={t.id}
                             className={`p-3 rounded-xl border cursor-pointer transition-colors ${
-                              selectedTemplate?.id === t.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-gray-50'
+                              selectedTemplate?.id === t.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-[var(--admin-surface-2)]'
                             }`}
                             onClick={() => setSelectedTemplate(t)}
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">{t.name}</span>
-                              <div className="flex items-center gap-1 text-xs text-gray-400">
+                              <div className="flex items-center gap-1 text-xs text-[var(--admin-text-subtle)]">
                                 <Icon className="w-3 h-3" /> {t.channel}
                               </div>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{t.body}</p>
+                            <p className="text-xs text-[var(--admin-text-muted)] mt-1 line-clamp-2">{t.body}</p>
                           </div>
                         );
                       })}
@@ -339,28 +339,28 @@ export default function RemindersPage() {
             <StaggerItem>
               <PreOneCard variant="default">
                 <PreOneCardContent>
-                  <h3 className="font-semibold text-gray-900 mb-3">Recent History</h3>
+                  <h3 className="font-semibold text-[var(--admin-text)] mb-3">Recent History</h3>
                   <ScrollArea className="max-h-48">
                     {loading ? (
-                      <p className="text-xs text-gray-400 py-6 text-center">
+                      <p className="text-xs text-[var(--admin-text-subtle)] py-6 text-center">
                         <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" /> Loading…
                       </p>
                     ) : history.length === 0 ? (
-                      <p className="text-xs text-gray-400 py-6 text-center">No reminders sent yet.</p>
+                      <p className="text-xs text-[var(--admin-text-subtle)] py-6 text-center">No reminders sent yet.</p>
                     ) : (
                       <div className="space-y-2">
                         {history.map((h) => {
                           const Icon = CHANNEL_ICON[h.channel] || Mail;
                           return (
-                            <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50">
-                              <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                <Icon className="w-3.5 h-3.5 text-gray-500" />
+                            <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--admin-surface-2)]">
+                              <div className="w-7 h-7 rounded-full bg-[var(--admin-surface-2)] flex items-center justify-center shrink-0">
+                                <Icon className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-gray-900">{h.student}</p>
-                                <p className="text-[10px] text-gray-400">{h.template} • {h.sentAt}</p>
+                                <p className="text-xs font-medium text-[var(--admin-text)]">{h.student}</p>
+                                <p className="text-[10px] text-[var(--admin-text-subtle)]">{h.template} • {h.sentAt}</p>
                               </div>
-                              <Badge className={`${STATUS_BADGE[h.status] || 'bg-gray-50 text-gray-600'} text-[9px]`}>{h.status}</Badge>
+                              <Badge className={`${STATUS_BADGE[h.status] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{h.status}</Badge>
                             </div>
                           );
                         })}

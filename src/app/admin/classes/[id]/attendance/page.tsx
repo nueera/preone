@@ -217,7 +217,7 @@ export default function ClassAttendancePage() {
         {/* ── Header ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
               {className} — Attendance
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -295,7 +295,7 @@ export default function ClassAttendancePage() {
                   return (
                     <div
                       key={student.id}
-                      className="flex items-center gap-3 p-3 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] transition-colors"
                     >
                       {/* Student Info */}
                       <Avatar className="h-9 w-9">
@@ -304,7 +304,7 @@ export default function ClassAttendancePage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm font-medium text-[var(--admin-text)] truncate">
                           {student.firstName} {student.lastName}
                         </p>
                         {student.rollNumber && (
@@ -329,7 +329,7 @@ export default function ClassAttendancePage() {
                               key={opt.value}
                               onClick={() => handleMarkAttendance(student.id, opt.value)}
                               className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs transition-all ${
-                                isSelected ? opt.color : 'bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                isSelected ? opt.color : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-subtle)] hover:bg-[var(--admin-border)] dark:bg-[var(--admin-surface)] dark:hover:bg-[var(--admin-surface-2)]'
                               }`}
                               title={opt.label}
                             >

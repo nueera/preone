@@ -196,7 +196,7 @@ function getAttendanceColor(status: string): string {
   if (upper === 'PRESENT') return ATTENDANCE_COLORS.PRESENT?.dot || 'bg-emerald-500';
   if (upper === 'ABSENT') return ATTENDANCE_COLORS.ABSENT?.dot || 'bg-red-500';
   if (upper === 'LATE') return ATTENDANCE_COLORS.LATE?.dot || 'bg-amber-500';
-  return 'bg-gray-200';
+  return 'bg-muted';
 }
 
 // Mood icon
@@ -269,8 +269,8 @@ export default function StudentProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Student Not Found</h3>
-        <p className="text-gray-500 mb-4">{error || 'Could not load student details.'}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Student Not Found</h3>
+        <p className="text-muted-foreground mb-4">{error || 'Could not load student details.'}</p>
         <Button
           onClick={() => router.push('/teacher/my-class')}
           className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl`}
@@ -336,7 +336,7 @@ export default function StudentProfilePage() {
       <Button
         variant="ghost"
         size="sm"
-        className="text-gray-600 hover:text-gray-900 -ml-2 rounded-xl"
+        className="text-muted-foreground hover:text-foreground -ml-2 rounded-xl"
         onClick={() => router.push('/teacher/my-class')}
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
@@ -361,20 +361,20 @@ export default function StudentProfilePage() {
             </Avatar>
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-xl font-bold text-foreground">
                   {student.firstName} {student.lastName}
                 </h1>
                 <Badge
                   className={`w-fit rounded-md text-xs ${
                     student.status === 'ACTIVE'
                       ? `${theme.selectedClass} border-emerald-200`
-                      : 'bg-gray-100 text-gray-600 border-gray-200'
+                      : 'bg-muted text-muted-foreground border-border'
                   }`}
                 >
                   {student.status}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {student.class.name} &middot; Roll No: {student.rollNumber || 'N/A'} &middot; {student.class.program.name}
               </p>
             </div>
@@ -395,7 +395,7 @@ export default function StudentProfilePage() {
 
       {/* ── Tabs ── */}
       <Tabs defaultValue="personal" className="space-y-4">
-        <TabsList className="bg-gray-100 p-1 rounded-xl h-auto flex-wrap">
+        <TabsList className="bg-muted p-1 rounded-xl h-auto flex-wrap">
           <TabsTrigger value="personal" className="rounded-lg text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <FileText className="h-3.5 w-3.5 mr-1.5" /> Personal
           </TabsTrigger>
@@ -458,10 +458,10 @@ export default function StudentProfilePage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-foreground">
                           {p.firstName} {p.lastName}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {p.occupation || 'N/A'}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
@@ -487,12 +487,12 @@ export default function StudentProfilePage() {
 
                     {/* Contact details */}
                     <div className="space-y-2 text-sm mb-4">
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-muted-foreground">
                         <Phone className="h-3.5 w-3.5" />
                         <span>{p.phone}</span>
                       </div>
                       {p.email && (
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <Mail className="h-3.5 w-3.5" />
                           <span>{p.email}</span>
                         </div>
@@ -535,7 +535,7 @@ export default function StudentProfilePage() {
 
             {student.parents.length === 0 && (
               <Card className="border-0 shadow-md col-span-full">
-                <CardContent className="py-8 text-center text-gray-500">
+                <CardContent className="py-8 text-center text-muted-foreground">
                   No parent information available.
                 </CardContent>
               </Card>
@@ -609,7 +609,7 @@ export default function StudentProfilePage() {
                     {growthDimensions.map((dim) => (
                       <div key={dim.label} className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">{dim.label}</span>
+                          <span className="text-muted-foreground">{dim.label}</span>
                           <span className={`font-semibold ${getGrowthColor(dim.value)}`}>
                             {dim.value}
                           </span>
@@ -619,7 +619,7 @@ export default function StudentProfilePage() {
                     ))}
                     <Separator className="my-3" />
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-gray-900">Overall</span>
+                      <span className="font-semibold text-foreground">Overall</span>
                       <div className="flex items-center gap-2">
                         <span className={`text-lg font-bold ${getGrowthColor(overallScore)}`}>
                           {overallScore}
@@ -638,8 +638,8 @@ export default function StudentProfilePage() {
                       </div>
                     </div>
                     {activeGrowth.comments && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-xl text-sm text-gray-600">
-                        <span className="font-medium text-gray-700">Comments: </span>
+                      <div className="mt-3 p-3 bg-muted rounded-xl text-sm text-muted-foreground">
+                        <span className="font-medium text-muted-foreground">Comments: </span>
                         {activeGrowth.comments}
                       </div>
                     )}
@@ -647,9 +647,9 @@ export default function StudentProfilePage() {
                 </div>
               ) : (
                 <div className="py-12 text-center">
-                  <TrendingUp className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <h4 className="font-semibold text-gray-900 mb-1">No Growth Assessment Yet</h4>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <h4 className="font-semibold text-foreground mb-1">No Growth Assessment Yet</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
                     Start tracking this student&apos;s growth across 6 dimensions.
                   </p>
                   <Button
@@ -722,8 +722,8 @@ export default function StudentProfilePage() {
                         />
                       </div>
                       {record.notes && (
-                        <div className="p-3 bg-gray-50 rounded-xl text-sm text-gray-600">
-                          <span className="font-medium text-gray-700">Notes: </span>
+                        <div className="p-3 bg-muted rounded-xl text-sm text-muted-foreground">
+                          <span className="font-medium text-muted-foreground">Notes: </span>
                           {record.notes}
                         </div>
                       )}
@@ -731,9 +731,9 @@ export default function StudentProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center text-gray-500">
+                <div className="py-8 text-center text-muted-foreground">
                   <ShieldCheck className="h-10 w-10 text-emerald-300 mx-auto mb-2" />
-                  <p className="font-medium text-gray-700">No Medical Records</p>
+                  <p className="font-medium text-muted-foreground">No Medical Records</p>
                   <p className="text-sm">Medical records have not been added yet.</p>
                 </div>
               )}
@@ -776,7 +776,7 @@ export default function StudentProfilePage() {
                 {/* Day headers */}
                 <div className="grid grid-cols-7 gap-1 text-center">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                    <div key={d} className="text-xs font-medium text-gray-500 py-1">
+                    <div key={d} className="text-xs font-medium text-muted-foreground py-1">
                       {d}
                     </div>
                   ))}
@@ -803,7 +803,7 @@ export default function StudentProfilePage() {
                         className={`
                           h-9 flex flex-col items-center justify-center rounded-lg text-xs relative
                           ${isToday ? 'ring-2 ring-portal-500 ring-offset-1' : ''}
-                          ${isFuture ? 'text-gray-300' : 'text-gray-700'}
+                          ${isFuture ? 'text-muted-foreground' : 'text-muted-foreground'}
                         `}
                       >
                         <span className="font-medium">{day}</span>
@@ -816,7 +816,7 @@ export default function StudentProfilePage() {
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <div className={`h-2.5 w-2.5 rounded-full ${ATTENDANCE_COLORS.PRESENT?.dot || 'bg-emerald-500'}`} /> Present
                   </div>
@@ -847,10 +847,10 @@ export default function StudentProfilePage() {
                   {student.recentDailyUpdates.map((update) => (
                     <div
                       key={update.id}
-                      className="p-4 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors"
+                      className="p-4 border border-border rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-foreground">
                           {formatDate(update.date)}
                         </span>
                         <Badge
@@ -858,7 +858,7 @@ export default function StudentProfilePage() {
                           className={`text-[10px] rounded-md ${
                             update.status === 'PUBLISHED'
                               ? 'border-emerald-200 text-emerald-700'
-                              : 'border-gray-200 text-gray-500'
+                              : 'border-border text-muted-foreground'
                           }`}
                         >
                           {update.status}
@@ -870,8 +870,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Coffee className="h-3.5 w-3.5 text-amber-500" />
                           <div>
-                            <p className="text-gray-500">Breakfast</p>
-                            <p className="font-medium text-gray-700">{update.breakfast || '-'}</p>
+                            <p className="text-muted-foreground">Breakfast</p>
+                            <p className="font-medium text-muted-foreground">{update.breakfast || '-'}</p>
                           </div>
                         </div>
 
@@ -879,8 +879,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Utensils className="h-3.5 w-3.5 text-green-500" />
                           <div>
-                            <p className="text-gray-500">Lunch</p>
-                            <p className="font-medium text-gray-700">{update.lunch || '-'}</p>
+                            <p className="text-muted-foreground">Lunch</p>
+                            <p className="font-medium text-muted-foreground">{update.lunch || '-'}</p>
                           </div>
                         </div>
 
@@ -888,8 +888,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Cookie className="h-3.5 w-3.5 text-orange-500" />
                           <div>
-                            <p className="text-gray-500">Snacks</p>
-                            <p className="font-medium text-gray-700">{update.snacks || '-'}</p>
+                            <p className="text-muted-foreground">Snacks</p>
+                            <p className="font-medium text-muted-foreground">{update.snacks || '-'}</p>
                           </div>
                         </div>
 
@@ -897,8 +897,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Moon className="h-3.5 w-3.5 text-indigo-500" />
                           <div>
-                            <p className="text-gray-500">Sleep</p>
-                            <p className="font-medium text-gray-700">
+                            <p className="text-muted-foreground">Sleep</p>
+                            <p className="font-medium text-muted-foreground">
                               {update.sleepStart && update.sleepEnd
                                 ? `${update.sleepStart}-${update.sleepEnd}`
                                 : update.sleepQuality || '-'}
@@ -910,8 +910,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Smile className="h-3.5 w-3.5 text-yellow-500" />
                           <div>
-                            <p className="text-gray-500">Morning Mood</p>
-                            <p className="font-medium text-gray-700">
+                            <p className="text-muted-foreground">Morning Mood</p>
+                            <p className="font-medium text-muted-foreground">
                               {getMoodEmoji(update.moodMorning)} {update.moodMorning || '-'}
                             </p>
                           </div>
@@ -921,8 +921,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Smile className="h-3.5 w-3.5 text-yellow-500" />
                           <div>
-                            <p className="text-gray-500">Afternoon Mood</p>
-                            <p className="font-medium text-gray-700">
+                            <p className="text-muted-foreground">Afternoon Mood</p>
+                            <p className="font-medium text-muted-foreground">
                               {getMoodEmoji(update.moodAfternoon)} {update.moodAfternoon || '-'}
                             </p>
                           </div>
@@ -932,8 +932,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <Droplets className="h-3.5 w-3.5 text-blue-500" />
                           <div>
-                            <p className="text-gray-500">Water</p>
-                            <p className="font-medium text-gray-700">{update.waterGlasses} glasses</p>
+                            <p className="text-muted-foreground">Water</p>
+                            <p className="font-medium text-muted-foreground">{update.waterGlasses} glasses</p>
                           </div>
                         </div>
 
@@ -941,8 +941,8 @@ export default function StudentProfilePage() {
                         <div className="flex items-center gap-1.5">
                           <FileText className="h-3.5 w-3.5 text-purple-500" />
                           <div>
-                            <p className="text-gray-500">Highlights</p>
-                            <p className="font-medium text-gray-700 truncate max-w-[120px]" title={update.highlights || ''}>
+                            <p className="text-muted-foreground">Highlights</p>
+                            <p className="font-medium text-muted-foreground truncate max-w-[120px]" title={update.highlights || ''}>
                               {update.highlights || '-'}
                             </p>
                           </div>
@@ -960,9 +960,9 @@ export default function StudentProfilePage() {
                   </Button>
                 </div>
               ) : (
-                <div className="py-8 text-center text-gray-500">
-                  <Sun className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                  <p className="font-medium text-gray-700">No Daily Updates</p>
+                <div className="py-8 text-center text-muted-foreground">
+                  <Sun className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                  <p className="font-medium text-muted-foreground">No Daily Updates</p>
                   <p className="text-sm">Daily updates for this student will appear here.</p>
                 </div>
               )}
@@ -972,7 +972,7 @@ export default function StudentProfilePage() {
       </Tabs>
 
       {/* ── Sticky Quick Actions Bar ── */}
-      <div className="sticky bottom-0 z-20 -mx-6 px-6 py-3 bg-white/80 backdrop-blur-lg border-t border-gray-100">
+      <div className="sticky bottom-0 z-20 -mx-6 px-6 py-3 bg-white/80 backdrop-blur-lg border-t border-border">
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -1010,8 +1010,8 @@ export default function StudentProfilePage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
-      <p className="text-sm font-medium text-gray-900">{value}</p>
+      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+      <p className="text-sm font-medium text-foreground">{value}</p>
     </div>
   );
 }
@@ -1031,14 +1031,14 @@ function MedicalField({
   good?: boolean;
 }) {
   return (
-    <div className={`p-3 rounded-xl ${alert ? 'bg-red-50 border border-red-200' : good ? 'bg-emerald-50 border border-emerald-200' : 'bg-gray-50'}`}>
+    <div className={`p-3 rounded-xl ${alert ? 'bg-red-50 border border-red-200' : good ? 'bg-emerald-50 border border-emerald-200' : 'bg-muted'}`}>
       <div className="flex items-center gap-2 mb-1">
-        <span className={alert ? 'text-red-500' : good ? 'text-emerald-500' : 'text-gray-400'}>
+        <span className={alert ? 'text-red-500' : good ? 'text-emerald-500' : 'text-muted-foreground'}>
           {icon}
         </span>
-        <span className="text-xs text-gray-500">{label}</span>
+        <span className="text-xs text-muted-foreground">{label}</span>
       </div>
-      <p className={`text-sm font-medium ${alert ? 'text-red-700' : good ? 'text-emerald-700' : 'text-gray-700'}`}>
+      <p className={`text-sm font-medium ${alert ? 'text-red-700' : good ? 'text-emerald-700' : 'text-muted-foreground'}`}>
         {value}
         {good && <CheckCircle2 className="inline h-3.5 w-3.5 ml-1" />}
       </p>

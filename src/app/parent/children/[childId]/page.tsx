@@ -84,7 +84,7 @@ function getStatusBadge(status: string) {
     case 'ACTIVE':
       return <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">Active ✅</Badge>;
     case 'INACTIVE':
-      return <Badge className="bg-gray-100 text-gray-700 border-gray-200">Inactive</Badge>;
+      return <Badge className="bg-muted text-muted-foreground border-border">Inactive</Badge>;
     case 'GRADUATED':
       return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Graduated 🎓</Badge>;
     case 'TRANSFERRED':
@@ -418,7 +418,7 @@ function MedicalTab({ child }: { child: ChildDetail }) {
               {child.medicalRecords.map((record, idx) => (
                 <div
                   key={record.id}
-                  className="p-3 rounded-xl bg-gray-50 flex items-center justify-between"
+                  className="p-3 rounded-xl bg-muted flex items-center justify-between"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">
@@ -467,7 +467,7 @@ function SiblingsTab({ child }: { child: ChildDetail }) {
             {child.siblings.map((sibling) => (
               <div
                 key={sibling.id}
-                className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-4 p-4 rounded-xl bg-muted hover:bg-muted transition-colors"
               >
                 <Avatar className="h-12 w-12 border-2 border-portal-200">
                   <AvatarFallback className={`bg-gradient-to-br ${theme.avatarGradientClass} text-white text-sm font-bold`}>
