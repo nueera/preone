@@ -2,14 +2,12 @@
 
 import React, { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
-  User, Settings, LogOut, ChevronDown,
+  User, Settings, LogOut, ChevronDown, Heart,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { GlobalThemeToggle } from '@/components/ui/global-theme-toggle';
-import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -90,8 +88,24 @@ export function ParentHeader() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-card dark:border-border">
-      {/* ── Left: Sidebar trigger + Breadcrumb ── */}
-      <SidebarTrigger className="shrink-0" />
+      {/* ── Left: PreOne Branding ── */}
+      <Link href="/parent" className="flex items-center gap-2 shrink-0">
+        <div
+          className="h-8 w-8 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--parent-primary-soft)' }}
+        >
+          <Heart
+            className="h-4 w-4"
+            style={{ color: 'var(--parent-primary)' }}
+          />
+        </div>
+        <span
+          className="text-sm font-bold hidden sm:inline"
+          style={{ color: 'var(--parent-primary)' }}
+        >
+          PreOne
+        </span>
+      </Link>
 
       <Breadcrumb>
         <BreadcrumbList>
