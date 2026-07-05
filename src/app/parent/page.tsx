@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   Users,
@@ -29,6 +30,23 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { PreOneCard } from '@/components/ui/preone-card';
+
+// ============================================================
+// Custom icon map — module title → icon file path
+// Modules without an entry use their Lucide icon as fallback.
+// ============================================================
+const CUSTOM_ICONS: Record<string, string> = {
+  'My Children': '/icons/parent/my-children.webp',
+  Attendance: '/icons/parent/attendance.webp',
+  Fees: '/icons/parent/fees.webp',
+  Observation: '/icons/parent/observation.webp',
+  Growth: '/icons/parent/growth.webp',
+  Chat: '/icons/parent/chat.webp',
+  Announcements: '/icons/parent/announcement.webp',
+  'PreO Learning': '/icons/parent/preo_learning.webp',
+  Settings: '/icons/parent/setting.webp',
+  'PreO Gaming': '/icons/parent/preo_gaming.webp',
+};
 
 // ============================================================
 // Module Data
@@ -319,8 +337,18 @@ export default function ParentLandingPage() {
                 )}
 
                 {/* Icon */}
-                <div className="h-28 w-28 flex items-center justify-center mb-4">
-                  <Icon className="h-20 w-20" style={{ color: mod.iconColor }} />
+                <div className="h-36 w-36 flex items-center justify-center mb-4">
+                  {CUSTOM_ICONS[mod.title] ? (
+                    <Image
+                      src={CUSTOM_ICONS[mod.title]}
+                      alt={mod.title}
+                      width={200}
+                      height={200}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <Icon className="h-24 w-24" style={{ color: mod.iconColor }} />
+                  )}
                 </div>
 
                 {/* Card Title */}

@@ -182,16 +182,16 @@ interface StudentData {
 
 // ── Status badge ──
 const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  ACTIVE: 'bg-[var(--admin-success-soft)] text-[var(--admin-success)] border-[var(--admin-success)]',
   INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
-  GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
-  TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
+  GRADUATED: 'bg-[var(--admin-info-soft)] text-[var(--admin-info)] border-[var(--admin-info)]',
+  TRANSFERRED: 'bg-[var(--admin-warning-soft)] text-[var(--admin-warning)] border-[var(--admin-warning)]',
 };
 
 const INVOICE_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  PARTIAL: 'bg-sky-50 text-sky-700 border-sky-200',
-  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  PENDING: 'bg-[var(--admin-warning-soft)] text-[var(--admin-warning)] border-[var(--admin-warning)]',
+  PARTIAL: 'bg-[var(--admin-info-soft)] text-[var(--admin-info)] border-[var(--admin-info)]',
+  PAID: 'bg-[var(--admin-success-soft)] text-[var(--admin-success)] border-[var(--admin-success)]',
   OVERDUE: 'bg-red-50 text-red-700 border-red-200',
   CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
@@ -336,9 +336,9 @@ export default function StudentDetailPage() {
       const record = monthAttendance.find((a) => format(new Date(a.date), 'yyyy-MM-dd') === dateStr);
       let bgColor = 'bg-[var(--admin-surface-2)]';
       if (record) {
-        if (record.status === 'PRESENT') bgColor = 'bg-emerald-100 text-emerald-700';
-        else if (record.status === 'ABSENT') bgColor = 'bg-red-100 text-red-700';
-        else if (record.status === 'LATE') bgColor = 'bg-amber-100 text-amber-700';
+        if (record.status === 'PRESENT') bgColor = 'bg-[var(--admin-success-soft)] text-[var(--admin-success)]';
+        else if (record.status === 'ABSENT') bgColor = 'bg-red-50 text-[var(--admin-error)]';
+        else if (record.status === 'LATE') bgColor = 'bg-[var(--admin-warning-soft)] text-[var(--admin-warning)]';
       }
       days.push(
         <div
@@ -368,7 +368,7 @@ export default function StudentDetailPage() {
       <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
+            <AvatarFallback className="bg-[var(--admin-primary-soft)] text-[var(--admin-primary)] text-2xl font-bold">
               {student.firstName.charAt(0)}{student.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -426,7 +426,7 @@ export default function StudentDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5 text-portal-500" />
+                  <User className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                   Personal Information
                 </CardTitle>
               </CardHeader>
@@ -480,14 +480,14 @@ export default function StudentDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-pink-500" />
+                  <Heart className="h-5 w-5" style={{ color: 'var(--admin-pink)' }} />
                   Parent / Guardian
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {father && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold text-portal-700">Father</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--admin-primary)' }}>Father</p>
                     <p className="text-sm">{father.firstName} {father.lastName}</p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3" /> {father.phone}
@@ -504,7 +504,7 @@ export default function StudentDetailPage() {
                 )}
                 {mother && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold text-portal-700">Mother</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--admin-primary)' }}>Mother</p>
                     <p className="text-sm">{mother.firstName} {mother.lastName}</p>
                     {mother.phone && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -580,13 +580,13 @@ export default function StudentDetailPage() {
                 {/* Legend */}
                 <div className="flex gap-4 mt-4 text-xs">
                   <div className="flex items-center gap-1">
-                    <div className="h-3 w-3 rounded bg-emerald-100" /> Present
+                    <div className="h-3 w-3 rounded" style={{ backgroundColor: 'var(--admin-success-soft)' }} /> Present
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="h-3 w-3 rounded bg-red-100" /> Absent
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="h-3 w-3 rounded bg-amber-100" /> Late
+                    <div className="h-3 w-3 rounded" style={{ backgroundColor: 'var(--admin-warning-soft)' }} /> Late
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="h-3 w-3 rounded bg-[var(--admin-surface-2)]" /> No Data
@@ -600,25 +600,25 @@ export default function StudentDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Present Days</p>
-                  <p className="text-2xl font-bold text-emerald-600">{presentDays}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-success)' }}>{presentDays}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Absent Days</p>
-                  <p className="text-2xl font-bold text-red-600">{absentDays}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-error)' }}>{absentDays}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Late Days</p>
-                  <p className="text-2xl font-bold text-amber-600">{lateDays}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-warning)' }}>{lateDays}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Attendance Rate</p>
-                  <p className="text-2xl font-bold text-portal-600">{attendanceRate}%</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-primary)' }}>{attendanceRate}%</p>
                 </CardContent>
               </Card>
             </div>
@@ -639,13 +639,13 @@ export default function StudentDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Total Paid</p>
-                  <p className="text-2xl font-bold text-emerald-600">₹{totalPaid.toLocaleString('en-IN')}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-success)' }}>₹{totalPaid.toLocaleString('en-IN')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Pending</p>
-                  <p className="text-2xl font-bold text-red-600">₹{totalPending.toLocaleString('en-IN')}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-error)' }}>₹{totalPending.toLocaleString('en-IN')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -837,19 +837,19 @@ export default function StudentDetailPage() {
                 <Card key={med.id}>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-portal-500" />
+                      <Shield className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                       Medical Record
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Allergies */}
                     {med.allergies && (
-                      <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                      <div className="rounded-lg border border-red-200 p-3" style={{ backgroundColor: '#FEF2F2' }}>
                         <div className="flex items-center gap-2 mb-1">
-                          <AlertTriangle className="h-4 w-4 text-red-500" />
-                          <p className="text-sm font-semibold text-red-700">Allergies</p>
+                          <AlertTriangle className="h-4 w-4" style={{ color: 'var(--admin-error)' }} />
+                          <p className="text-sm font-semibold" style={{ color: 'var(--admin-error)' }}>Allergies</p>
                         </div>
-                        <p className="text-sm text-red-600">{med.allergies}</p>
+                        <p className="text-sm" style={{ color: 'var(--admin-error)' }}>{med.allergies}</p>
                       </div>
                     )}
 
