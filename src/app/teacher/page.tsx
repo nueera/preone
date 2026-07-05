@@ -33,6 +33,7 @@ interface ModuleCard {
   iconColor: string;
   description: string;
   slug: string;
+  iconSrc?: string;
   isAssistant?: boolean;
 }
 
@@ -48,6 +49,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-primary)',
     description: 'Overview & analytics',
     slug: 'dashboard',
+    iconSrc: '/icons/teacher/dashbaord.webp',
   },
   {
     title: 'My Class',
@@ -57,6 +59,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-info)',
     description: 'Students & class info',
     slug: 'my-class',
+    iconSrc: '/icons/teacher/myclass.webp',
   },
   {
     title: 'Attendance',
@@ -66,6 +69,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-success)',
     description: 'Mark & track attendance',
     slug: 'attendance',
+    iconSrc: '/icons/teacher/Attendance.webp',
   },
   {
     title: 'Daily Update',
@@ -75,6 +79,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-warning)',
     description: 'Share daily activities',
     slug: 'daily-updates',
+    iconSrc: '/icons/teacher/daily_update.webp',
   },
   {
     title: 'Observation',
@@ -84,6 +89,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-error)',
     description: 'Student observations',
     slug: 'observations',
+    iconSrc: '/icons/teacher/observation.webp',
   },
   {
     title: 'Activities',
@@ -102,6 +108,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-info)',
     description: 'Weekly & daily schedule',
     slug: 'schedule',
+    iconSrc: '/icons/teacher/schedule.webp',
   },
   {
     title: 'Growth Assessment',
@@ -111,6 +118,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-primary)',
     description: 'Track student growth',
     slug: 'growth',
+    iconSrc: '/icons/teacher/growth_assessment.webp',
   },
   {
     title: 'Chat',
@@ -120,6 +128,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-info)',
     description: 'Parent & staff messaging',
     slug: 'chat',
+    iconSrc: '/icons/teacher/chat.webp',
   },
   {
     title: 'Announcement',
@@ -129,6 +138,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-error)',
     description: 'School announcements',
     slug: 'announcements',
+    iconSrc: '/icons/teacher/announcement.webp',
   },
   {
     title: 'Reports',
@@ -138,6 +148,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-info)',
     description: 'Generate & view reports',
     slug: 'reports',
+    iconSrc: '/icons/teacher/reports.webp',
   },
   {
     title: 'Settings',
@@ -147,6 +158,7 @@ const modules: ModuleCard[] = [
     iconColor: 'var(--teacher-text-muted)',
     description: 'Profile & preferences',
     slug: 'settings',
+    iconSrc: '/icons/teacher/setting.webp',
   },
   {
     title: 'PreOne Assistant',
@@ -186,14 +198,14 @@ function getFormattedDate(): string {
 // ============================================================
 export default function TeacherLandingPage() {
   const [greeting, setGreeting] = useState('Good Morning');
-  const [hasIllustration, setHasIllustration] = useState<Record<string, boolean>>({});
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setGreeting(getGreeting());
   }, []);
 
   const handleImgError = (key: string) => {
-    setHasIllustration((prev) => ({ ...prev, [key]: false }));
+    setImgErrors((prev) => ({ ...prev, [key]: false }));
   };
 
   return (
@@ -323,7 +335,6 @@ export default function TeacherLandingPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {modules.map((mod) => {
           const Icon = mod.icon;
-          const illustrationAvailable = hasIllustration[mod.title] !== false;
 
           return (
             <Link key={mod.title} href={mod.route} className="group">
@@ -346,14 +357,14 @@ export default function TeacherLandingPage() {
                   />
                 )}
 
-                {/* Illustration / Icon Area */}
+                {/* Icon / Illustration Area */}
                 <div
                   className="h-20 w-20 rounded-2xl flex items-center justify-center mb-4 transition-all duration-200 group-hover:-translate-y-1"
                   style={{ background: mod.iconBg }}
                 >
-                  {illustrationAvailable ? (
+                  {mod.iconSrc && imgErrors[mod.title] !== false ? (
                     <img
-                      src={`/illustrations/teacher-${mod.slug}.svg`}
+                      src={mod.iconSrc}
                       alt={mod.title}
                       className="h-14 w-14 object-contain"
                       onError={() => handleImgError(mod.title)}
