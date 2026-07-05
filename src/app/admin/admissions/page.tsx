@@ -160,19 +160,19 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
   return (
     <Link href={module.href} className="block group h-full">
       <div
-        className="relative flex flex-col items-center rounded-2xl overflow-hidden h-full min-h-[280px] sm:min-h-[320px] transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-1 border border-black/5"
+        className="relative flex flex-col items-center rounded-2xl overflow-hidden h-full min-h-[340px] sm:min-h-[400px] transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-1 border border-black/5"
         style={{ backgroundColor: `var(${module.accentSoftVar}, ${module.accentSoftHex})` }}
       >
         {/* Top accent circle with icon */}
         <div className="pt-4 sm:pt-6 pb-2 flex flex-col items-center">
           <div
-            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center shadow-sm"
+            className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center shadow-sm"
             style={{
               backgroundColor: 'white',
               color: `var(${module.accentVar}, ${module.accentHex})`,
             }}
           >
-            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+            <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
           </div>
         </div>
 
@@ -191,7 +191,7 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
 
         {/* Illustration area — always visible, compact on mobile */}
         <div className="flex-1 w-full relative flex items-end justify-center overflow-hidden">
-          <div className="relative w-[80%] sm:w-[85%] h-full max-h-[140px] sm:max-h-[180px]">
+          <div className="relative w-[85%] sm:w-[90%] h-full max-h-[200px] sm:max-h-[260px]">
             <Image
               src={module.imageSrc}
               alt={module.title}
