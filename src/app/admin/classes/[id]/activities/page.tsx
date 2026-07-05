@@ -64,7 +64,7 @@ const ACTIVITY_STATUS_COLORS: Record<string, string> = {
   UPCOMING: 'bg-sky-50 text-sky-700 border-sky-200',
   IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
   CANCELLED: 'bg-red-50 text-red-700 border-red-200',
-  DRAFT: 'bg-gray-50 text-gray-600 border-gray-200',
+  DRAFT: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 // ── Calendar day type ──
@@ -190,7 +190,7 @@ export default function ClassActivitiesPage() {
         {/* ── Header ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
               {className} — Activities
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -277,10 +277,10 @@ export default function ClassActivitiesPage() {
                       key={i}
                       className={`min-h-[72px] rounded-lg border p-1 text-xs transition-colors ${
                         !day.isCurrentMonth
-                          ? 'bg-gray-50/50 text-muted-foreground/50'
+                          ? 'bg-[var(--admin-surface-2)]/50 text-muted-foreground/50'
                           : isToday(day.date)
                             ? 'bg-portal-50 border-portal-200'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                            : 'hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)]'
                       }`}
                     >
                       <div className={`text-right text-[11px] font-medium mb-0.5 ${
@@ -343,7 +343,7 @@ export default function ClassActivitiesPage() {
                                 {typeIcon}
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">
+                                <p className="text-sm font-medium text-[var(--admin-text)] leading-tight">
                                   {activity.title}
                                 </p>
                                 <p className="text-[11px] text-muted-foreground">

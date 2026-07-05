@@ -161,11 +161,11 @@ export default function BranchesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Building2 className="h-6 w-6 text-violet-600" />
               Branch Management
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Manage your school branches, campuses, and locations
             </p>
           </div>
@@ -285,7 +285,7 @@ export default function BranchesPage() {
                         'h-11 w-11 rounded-xl flex items-center justify-center',
                         branch.status === 'active'
                           ? 'bg-violet-50'
-                          : 'bg-gray-100'
+                          : 'bg-[var(--admin-surface-2)]'
                       )}
                     >
                       <Building2
@@ -293,12 +293,12 @@ export default function BranchesPage() {
                           'h-5 w-5',
                           branch.status === 'active'
                             ? 'text-violet-600'
-                            : 'text-gray-400'
+                            : 'text-[var(--admin-text-subtle)]'
                         )}
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">
+                      <h3 className="font-semibold text-[var(--admin-text)] text-sm">
                         {branch.name}
                       </h3>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -307,7 +307,7 @@ export default function BranchesPage() {
                             'text-[10px]',
                             branch.status === 'active'
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-gray-100 text-gray-500 border-gray-200'
+                              : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]'
                           )}
                         >
                           {branch.status === 'active' ? 'Active' : 'Inactive'}
@@ -342,13 +342,13 @@ export default function BranchesPage() {
 
                 {/* Details */}
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
                     <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                     <span className="truncate">
                       {branch.address}, {branch.city}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
                     <PhoneCall className="h-3.5 w-3.5" />
                     <span>{branch.phone}</span>
                   </div>
@@ -359,19 +359,19 @@ export default function BranchesPage() {
                   <div className="flex items-center gap-1.5 flex-1 bg-sky-50 rounded-lg px-3 py-2">
                     <Users className="h-3.5 w-3.5 text-sky-600" />
                     <div>
-                      <p className="text-sm font-bold text-gray-900">
+                      <p className="text-sm font-bold text-[var(--admin-text)]">
                         {branch.studentsCount}
                       </p>
-                      <p className="text-[10px] text-gray-500">Students</p>
+                      <p className="text-[10px] text-[var(--admin-text-muted)]">Students</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 flex-1 bg-amber-50 rounded-lg px-3 py-2">
                     <UserCheck className="h-3.5 w-3.5 text-amber-600" />
                     <div>
-                      <p className="text-sm font-bold text-gray-900">
+                      <p className="text-sm font-bold text-[var(--admin-text)]">
                         {branch.teachersCount}
                       </p>
-                      <p className="text-[10px] text-gray-500">Teachers</p>
+                      <p className="text-[10px] text-[var(--admin-text-muted)]">Teachers</p>
                     </div>
                   </div>
                 </div>
@@ -382,15 +382,15 @@ export default function BranchesPage() {
           {/* Add Branch Placeholder Card */}
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <div className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 hover:border-violet-300 hover:bg-violet-50/20 transition-all cursor-pointer min-h-[200px]">
-                <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                  <Plus className="h-6 w-6 text-gray-400" />
+              <div className="border-2 border-dashed border-[var(--admin-border)] rounded-3xl p-8 flex flex-col items-center justify-center gap-3 hover:border-violet-300 hover:bg-violet-50/20 transition-all cursor-pointer min-h-[200px]">
+                <div className="h-12 w-12 rounded-xl bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <Plus className="h-6 w-6 text-[var(--admin-text-subtle)]" />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-medium text-gray-700">
+                  <p className="text-sm font-medium text-[var(--admin-text-muted)]">
                     Add New Branch
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-[var(--admin-text-subtle)] mt-1">
                     Expand your school network
                   </p>
                 </div>

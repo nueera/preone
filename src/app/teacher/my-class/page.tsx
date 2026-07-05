@@ -250,7 +250,7 @@ export default function MyClassPage() {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="ml-1 h-3 w-3 text-gray-400" />;
+    if (sortField !== field) return <ArrowUpDown className="ml-1 h-3 w-3 text-muted-foreground" />;
     return sortDir === 'asc' ? (
       <ChevronUp className="ml-1 h-3 w-3 text-emerald-600" />
     ) : (
@@ -281,8 +281,8 @@ export default function MyClassPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertTriangle className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Class</h3>
-        <p className="text-gray-500 mb-4">{error}</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load Class</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={() => window.location.reload()}
           className={`bg-gradient-to-r ${theme.btnGradientClass} text-white rounded-xl`}
@@ -297,9 +297,9 @@ export default function MyClassPage() {
   if (!data?.classInfo) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <GraduationCap className="h-16 w-16 text-gray-300 mb-4" />
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Class Assigned</h3>
-        <p className="text-gray-500 max-w-md">
+        <GraduationCap className="h-16 w-16 text-muted-foreground mb-4" />
+        <h3 className="text-xl font-semibold text-foreground mb-2">No Class Assigned</h3>
+        <p className="text-muted-foreground max-w-md">
           You don&apos;t have a class assigned yet. Please contact the administrator for class assignment.
         </p>
       </div>
@@ -326,10 +326,10 @@ export default function MyClassPage() {
         <CardContent className="relative -mt-8 px-6 pb-5">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-foreground dark:text-white">
                 {classInfo.name}
               </h1>
-              <p className="text-gray-500 mt-0.5">{classInfo.program.name} Program</p>
+              <p className="text-muted-foreground mt-0.5">{classInfo.program.name} Program</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Badge
@@ -363,19 +363,19 @@ export default function MyClassPage() {
       {/* ── Controls Row: Search + View Toggle ── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search students..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 rounded-xl border-gray-200"
+            className="pl-9 rounded-xl border-border"
           />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 mr-1">
+          <span className="text-sm text-muted-foreground mr-1">
             {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''}
           </span>
-          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+          <div className="inline-flex rounded-xl border border-border overflow-hidden">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
@@ -383,7 +383,7 @@ export default function MyClassPage() {
               className={`rounded-none px-3 ${
                 viewMode === 'grid'
                   ? 'bg-portal-600 hover:bg-portal-700 text-white'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
@@ -395,7 +395,7 @@ export default function MyClassPage() {
               className={`rounded-none px-3 ${
                 viewMode === 'list'
                   ? 'bg-portal-600 hover:bg-portal-700 text-white'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               }`}
             >
               <List className="h-4 w-4" />
@@ -407,11 +407,11 @@ export default function MyClassPage() {
       {/* ── Empty state ── */}
       {filteredStudents.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Users className="h-12 w-12 text-gray-300 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+          <Users className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-1">
             {search ? 'No students match your search' : 'No Students Yet'}
           </h3>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-foreground text-sm">
             {search
               ? 'Try adjusting your search query.'
               : 'Students will appear here once they are enrolled in this class.'}
@@ -437,7 +437,7 @@ export default function MyClassPage() {
         <Card className="border-0 shadow-md overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+              <TableRow className="bg-muted/80 hover:bg-muted/80">
                 <TableHead className="w-10"></TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
@@ -517,28 +517,28 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
               </AvatarFallback>
             )}
           </Avatar>
-          <h3 className="font-semibold text-gray-900 text-sm">
+          <h3 className="font-semibold text-foreground text-sm">
             {student.firstName} {student.lastName}
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Roll: {student.rollNumber || '-'} | {student.gender}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">{formatDate(student.dob)}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{formatDate(student.dob)}</p>
         </div>
 
         {/* Details row */}
         <div className="mt-3 space-y-2">
           {/* Blood Group */}
           <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-gray-500">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <Droplets className="h-3 w-3" /> Blood
             </span>
-            <span className="font-medium text-gray-700">{student.bloodGroup || 'N/A'}</span>
+            <span className="font-medium text-muted-foreground">{student.bloodGroup || 'N/A'}</span>
           </div>
 
           {/* Medical alerts */}
           <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-gray-500">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <Heart className="h-3 w-3" /> Medical
             </span>
             {student.medicalAlerts ? (
@@ -554,7 +554,7 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
 
           {/* Growth score */}
           <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-gray-500">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <TrendingUp className="h-3 w-3" /> Growth
             </span>
             {student.growthScore ? (
@@ -562,13 +562,13 @@ function StudentCard({ student, onClick }: { student: Student; onClick: () => vo
                 {growthOverall}/100
               </span>
             ) : (
-              <span className="text-gray-400">N/A</span>
+              <span className="text-muted-foreground">N/A</span>
             )}
           </div>
 
           {/* Growth bar */}
           {student.growthScore && (
-            <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${growthColor}`}
                 style={{ width: `${Math.min(growthOverall, 100)}%` }}
@@ -618,7 +618,7 @@ function StudentRow({ student, onClick }: { student: Student; onClick: () => voi
       </TableCell>
       <TableCell>{student.rollNumber || '-'}</TableCell>
       <TableCell className="hidden md:table-cell">{student.gender}</TableCell>
-      <TableCell className="hidden lg:table-cell text-sm text-gray-600">
+      <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
         {formatDate(student.dob)}
       </TableCell>
       <TableCell className="hidden lg:table-cell">
@@ -645,7 +645,7 @@ function StudentRow({ student, onClick }: { student: Student; onClick: () => voi
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <span className="text-gray-400 text-sm">-</span>
+          <span className="text-muted-foreground text-sm">-</span>
         )}
       </TableCell>
       <TableCell className="hidden md:table-cell">

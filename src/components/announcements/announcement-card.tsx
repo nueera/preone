@@ -50,7 +50,7 @@ interface AnnouncementCardProps {
 
 // ── Badge Configs ──
 const TYPE_CONFIG: Record<string, { label: string; bg: string; color: string }> = {
-  GENERAL: { label: 'General', bg: 'bg-gray-100', color: 'text-gray-700' },
+  GENERAL: { label: 'General', bg: 'bg-muted', color: 'text-muted-foreground' },
   EVENT: { label: 'Event', bg: 'bg-amber-100', color: 'text-amber-700' },
   HOLIDAY: { label: 'Holiday', bg: 'bg-purple-100', color: 'text-purple-700' },
   FEE_REMINDER: { label: 'Fee', bg: 'bg-yellow-100', color: 'text-yellow-700' },
@@ -162,7 +162,7 @@ export function AnnouncementCard({
                 <h3
                   className={cn(
                     'text-sm font-semibold leading-snug',
-                    !isRead ? 'text-gray-900' : 'text-gray-700'
+                    !isRead ? 'text-foreground' : 'text-muted-foreground'
                   )}
                 >
                   {title}
@@ -189,7 +189,7 @@ export function AnnouncementCard({
                       className={cn(
                         'text-[10px] font-medium',
                         status === 'DRAFT'
-                          ? 'border-gray-300 text-gray-500'
+                          ? 'border-border text-muted-foreground'
                           : 'border-amber-300 text-amber-600'
                       )}
                     >
@@ -206,7 +206,7 @@ export function AnnouncementCard({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-gray-400 hover:text-portal-600"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-portal-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit();
@@ -219,7 +219,7 @@ export function AnnouncementCard({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-red-500"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete();
@@ -232,7 +232,7 @@ export function AnnouncementCard({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-gray-400 hover:text-green-600"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-green-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         onPublish();
@@ -259,7 +259,7 @@ export function AnnouncementCard({
         )}
 
         {/* Content */}
-        <div className="mt-3 text-sm text-gray-600 leading-relaxed">
+        <div className="mt-3 text-sm text-muted-foreground leading-relaxed">
           <p className="whitespace-pre-line">{displayContent}</p>
           {isLongContent && (
             <Button
@@ -306,7 +306,7 @@ export function AnnouncementCard({
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <Clock className="h-3 w-3" />
             <span>
               {publishedAt
@@ -314,13 +314,13 @@ export function AnnouncementCard({
                 : formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
             </span>
             {creator && (
-              <span className="text-gray-400">by {creator.name}</span>
+              <span className="text-muted-foreground">by {creator.name}</span>
             )}
           </div>
           {totalRecipients > 0 && (
             <div className="flex items-center gap-1.5">
-              <Eye className="h-3 w-3 text-gray-400" />
-              <span className="text-[11px] text-gray-500">
+              <Eye className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[11px] text-muted-foreground">
                 {readCount}/{totalRecipients}
               </span>
             </div>

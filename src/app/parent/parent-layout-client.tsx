@@ -1,9 +1,6 @@
 'use client';
 
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { ParentSidebar } from '@/components/parent-sidebar';
 import { ParentHeader } from '@/components/parent-header';
-import { ParentMobileNav } from '@/components/parent-mobile-nav';
 import { QueryProvider } from '@/components/providers';
 import { ParentAuthProvider } from '@/lib/parent-auth';
 import { AuroraBackground } from '@/components/cosmic/AuroraBackground';
@@ -11,8 +8,8 @@ import { useChatInit } from '@/hooks/use-chat';
 
 /**
  * Parent Layout Client — Wraps the PreOne parent portal.
- * Provides: React Query, Parent auth context (parent + children + selected
- * child), Aurora Background, Sidebar + Header + Main Content.
+ * Full-width single column layout (no sidebar).
+ * Provides: ParentHeader, React Query, Parent auth context, Aurora Background.
  * Auth guard is handled by the server layout (preone_token cookie).
  */
 export function ParentLayoutClient({
@@ -26,17 +23,19 @@ export function ParentLayoutClient({
   return (
     <QueryProvider>
       <ParentAuthProvider>
-        <AuroraBackground>
-          <SidebarProvider>
-            <ParentSidebar />
-            <div className="flex flex-1 flex-col min-h-screen">
-              <ParentHeader />
-              <main className="flex-1 bg-background/80 p-6 overflow-auto pb-24 md:pb-6" data-portal="parent">
+        <AuroraBackground intensity="subtle">
+          <div className="flex flex-col min-h-screen">
+            <ParentHeader />
+            <main
+              className="flex-1 p-6 overflow-auto"
+              data-portal="parent"
+              style={{ background: 'var(--parent-bg)' }}
+            >
+              <div className="mx-auto max-w-[1440px] flex flex-col gap-6">
                 {children}
-              </main>
-            </div>
-            <ParentMobileNav />
-          </SidebarProvider>
+              </div>
+            </main>
+          </div>
         </AuroraBackground>
       </ParentAuthProvider>
     </QueryProvider>

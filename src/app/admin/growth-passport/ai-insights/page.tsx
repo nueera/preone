@@ -111,11 +111,11 @@ export default function AIInsightsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Sparkles className="w-6 h-6" style={{ color: theme.primary }} />
                 AI Insights
               </h1>
-              <p className="text-sm text-gray-500 mt-1">AI-generated observations, recommendations, and alerts</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">AI-generated observations, recommendations, and alerts</p>
             </div>
             <Button variant="outline" size="sm">
               <RefreshCw className="w-4 h-4 mr-2" /> Refresh Insights
@@ -127,19 +127,19 @@ export default function AIInsightsPage() {
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><Brain className="w-4 h-4 text-purple-600" /><span className="text-xs text-gray-500">Total Insights</span></div>
+              <div className="flex items-center gap-2"><Brain className="w-4 h-4 text-purple-600" /><span className="text-xs text-[var(--admin-text-muted)]">Total Insights</span></div>
               <p className="text-lg font-bold text-purple-700 mt-1">{insights.length}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-600" /><span className="text-xs text-gray-500">Alerts</span></div>
+              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-600" /><span className="text-xs text-[var(--admin-text-muted)]">Alerts</span></div>
               <p className="text-lg font-bold text-red-700 mt-1">{alertCount}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-amber-600" /><span className="text-xs text-gray-500">Pending Action</span></div>
+              <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-amber-600" /><span className="text-xs text-[var(--admin-text-muted)]">Pending Action</span></div>
               <p className="text-lg font-bold text-amber-700 mt-1">{unactedCount}</p>
             </PreOneCard>
             <PreOneCard variant="strip" className="p-4">
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-gray-500">Acted On</span></div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /><span className="text-xs text-[var(--admin-text-muted)]">Acted On</span></div>
               <p className="text-lg font-bold text-emerald-700 mt-1">{insights.filter((i) => i.acted).length}</p>
             </PreOneCard>
           </div>
@@ -159,11 +159,11 @@ export default function AIInsightsPage() {
         {/* Insight Cards */}
         <StaggerItem>
           {loading ? (
-            <p className="text-sm text-gray-400 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading insights…</p>
+            <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading insights…</p>
           ) : error ? (
             <p className="text-sm text-red-500 py-10 text-center">{error}</p>
           ) : filtered.length === 0 ? (
-            <p className="text-sm text-gray-400 py-10 text-center">No AI insights yet.</p>
+            <p className="text-sm text-[var(--admin-text-subtle)] py-10 text-center">No AI insights yet.</p>
           ) : (
             <ScrollArea className="max-h-[600px]">
               <div className="space-y-3">
@@ -181,14 +181,14 @@ export default function AIInsightsPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-medium text-gray-900">{insight.title}</h4>
+                              <h4 className="text-sm font-medium text-[var(--admin-text)]">{insight.title}</h4>
                               <Badge className={`${priCfg.bg} ${priCfg.text} text-[9px]`}>{insight.priority}</Badge>
                             </div>
                             {insight.acted && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                           </div>
-                          <p className="text-xs text-gray-500 mb-1">{insight.student}</p>
-                          <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
-                          <div className="flex items-center gap-3 text-xs text-gray-400">
+                          <p className="text-xs text-[var(--admin-text-muted)] mb-1">{insight.student}</p>
+                          <p className="text-sm text-[var(--admin-text-muted)] mb-2">{insight.description}</p>
+                          <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
                             <Badge className={`${catCfg.bg} ${catCfg.text} text-[9px]`}>{insight.category}</Badge>
                             <span>{insight.createdAt}</span>
                           </div>

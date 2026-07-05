@@ -556,7 +556,7 @@ export default function TeacherDashboard() {
                       </div>
                       <Badge
                         variant="outline"
-                        className={`text-[9px] shrink-0 ${ACTIVITY_TYPE_CONFIG[activity.type]?.color || 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+                        className={`text-[9px] shrink-0 ${ACTIVITY_TYPE_CONFIG[activity.type]?.color || 'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground'}`}
                       >
                         {ACTIVITY_TYPE_CONFIG[activity.type]?.label || activity.type}
                       </Badge>

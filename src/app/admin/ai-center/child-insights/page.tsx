@@ -80,11 +80,11 @@ export default function ChildInsightsPage() {
       <StaggerContainer className="space-y-6">
         <StaggerItem>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <ChildIcon className="w-6 h-6" style={{ color: theme.primary }} />
               Child Insights
             </h1>
-            <p className="text-sm text-gray-500 mt-1">AI-generated behavioral, academic, and social insights</p>
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">AI-generated behavioral, academic, and social insights</p>
           </div>
         </StaggerItem>
 
@@ -92,7 +92,7 @@ export default function ChildInsightsPage() {
         <StaggerItem>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)]" />
               <Input placeholder="Search by student name or insight title..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -122,13 +122,13 @@ export default function ChildInsightsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-sm font-medium text-gray-900">{insight.title}</h4>
+                          <h4 className="text-sm font-medium text-[var(--admin-text)]">{insight.title}</h4>
                           <Badge className={`${priCfg.bg} ${priCfg.text} text-[9px]`}>{insight.priority}</Badge>
                           <TrendIcon className={`w-3.5 h-3.5 ${trendCfg.color}`} />
                         </div>
-                        <p className="text-xs text-gray-500 mb-1">{insight.student} • {insight.class}</p>
-                        <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
-                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <p className="text-xs text-[var(--admin-text-muted)] mb-1">{insight.student} • {insight.class}</p>
+                        <p className="text-sm text-[var(--admin-text-muted)] mb-2">{insight.description}</p>
+                        <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
                           <Badge className={`${catCfg.bg} ${catCfg.text} text-[9px]`}>{insight.category}</Badge>
                           <Badge variant="outline" className="text-[9px]">{insight.insightType}</Badge>
                           <span>Confidence: {insight.confidence}%</span>

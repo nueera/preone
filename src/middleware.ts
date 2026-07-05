@@ -291,8 +291,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // /admin routes: ADMIN, SUPER_ADMIN, and TASK_MASTER can access
   if (pathname.startsWith('/admin')) {
     if (payload.role !== 'ADMIN' && payload.role !== 'TASK_MASTER' && payload.role !== 'SUPER_ADMIN') {
-      const dashboardPath = payload.role === 'TEACHER' ? '/teacher/dashboard' :
-                           payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
+      const dashboardPath = payload.role === 'TEACHER' ? '/teacher' :
+                           payload.role === 'PARENT' ? '/parent' : '/login';
       return NextResponse.redirect(new URL(dashboardPath, request.url));
     }
 
@@ -324,7 +324,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname.startsWith('/teacher') && payload.role !== 'TEACHER') {
     const defaultRoute = payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN' ? '/admin/dashboard' :
                          payload.role === 'TASK_MASTER' ? '/admin/admissions' :
-                         payload.role === 'PARENT' ? '/parent/dashboard' : '/login';
+                         payload.role === 'PARENT' ? '/parent' : '/login';
     return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 
@@ -332,7 +332,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname.startsWith('/parent') && payload.role !== 'PARENT') {
     const defaultRoute = payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN' ? '/admin/dashboard' :
                          payload.role === 'TASK_MASTER' ? '/admin/admissions' :
-                         payload.role === 'TEACHER' ? '/teacher/dashboard' : '/login';
+                         payload.role === 'TEACHER' ? '/teacher' : '/login';
     return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 

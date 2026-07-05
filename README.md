@@ -168,11 +168,16 @@ The API is organized into the following route groups:
 
 ## Default Login Credentials
 
-| Role    | Email              | Password   |
-| ------- | ------------------ | ---------- |
-| Admin   | admin@preone.com   | admin123   |
-| Teacher | teacher@preone.com | teacher123 |
-| Parent  | parent@preone.com  | parent123  |
+All demo accounts share the password `demo123`.
+
+| Role        | Email               |
+| ----------- | ------------------- |
+| Admin       | admin@blossom.edu   |
+| Teacher     | teacher@blossom.edu |
+| Parent      | parent@blossom.edu  |
+| Task Master | tasks@blossom.edu   |
+
+Re-seed with `npm run db:seed` to provision these accounts.
 
 ---
 

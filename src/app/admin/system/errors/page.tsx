@@ -129,7 +129,7 @@ function getSourceColor(source: string): string {
     case 'AUTH': return 'text-rose-400 bg-rose-400/10';
     case 'EXTERNAL': return 'text-cyan-400 bg-cyan-400/10';
     case 'SOCKET': return 'text-teal-400 bg-teal-400/10';
-    default: return 'text-gray-400 bg-gray-400/10';
+    default: return 'text-[var(--admin-text-subtle)] bg-[var(--admin-text-subtle)]/10';
   }
 }
 
@@ -139,7 +139,7 @@ function getSeverityConfig(severity: string) {
     case 'HIGH': return { color: 'text-orange-400 bg-orange-400/10 border-orange-400/20', dot: 'bg-orange-400', label: 'High' };
     case 'MEDIUM': return { color: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20', dot: 'bg-yellow-400', label: 'Medium' };
     case 'LOW': return { color: 'text-green-400 bg-green-400/10 border-green-400/20', dot: 'bg-green-400', label: 'Low' };
-    default: return { color: 'text-gray-400 bg-gray-400/10 border-gray-400/20', dot: 'bg-gray-400', label: severity };
+    default: return { color: 'text-[var(--admin-text-subtle)] bg-[var(--admin-text-subtle)]/10 border-[var(--admin-text-subtle)]/20', dot: 'bg-[var(--admin-text-subtle)]', label: severity };
   }
 }
 
@@ -149,8 +149,8 @@ function getStatusConfig(status: string) {
     case 'ACKNOWLEDGED': return { color: 'text-amber-400 bg-amber-400/10', icon: <CheckCircle className="w-3 h-3" />, label: 'Acknowledged' };
     case 'INVESTIGATING': return { color: 'text-purple-400 bg-purple-400/10', icon: <Search className="w-3 h-3" />, label: 'Investigating' };
     case 'RESOLVED': return { color: 'text-green-400 bg-green-400/10', icon: <CheckCircle className="w-3 h-3" />, label: 'Resolved' };
-    case 'IGNORED': return { color: 'text-gray-400 bg-gray-400/10', icon: <XCircle className="w-3 h-3" />, label: 'Ignored' };
-    default: return { color: 'text-gray-400 bg-gray-400/10', icon: null, label: status };
+    case 'IGNORED': return { color: 'text-[var(--admin-text-subtle)] bg-[var(--admin-text-subtle)]/10', icon: <XCircle className="w-3 h-3" />, label: 'Ignored' };
+    default: return { color: 'text-[var(--admin-text-subtle)] bg-[var(--admin-text-subtle)]/10', icon: null, label: status };
   }
 }
 

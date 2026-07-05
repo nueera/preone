@@ -55,7 +55,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; bg: string; text: string;
 };
 
 const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  LOW:     { label: 'Low',     bg: 'bg-gray-100',  text: 'text-gray-600' },
+  LOW:     { label: 'Low',     bg: 'bg-muted',  text: 'text-muted-foreground' },
   NORMAL:  { label: 'Normal',  bg: 'bg-blue-100',  text: 'text-blue-600' },
   HIGH:    { label: 'High',    bg: 'bg-amber-100', text: 'text-amber-600' },
   CONCERN: { label: 'Concern', bg: 'bg-red-100',   text: 'text-red-600' },
@@ -99,11 +99,11 @@ function formatTime(dateStr: string): string {
 }
 
 function getCategoryConfig(category: string) {
-  return CATEGORY_CONFIG[category] || { label: category, bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' };
+  return CATEGORY_CONFIG[category] || { label: category, bg: 'bg-muted', text: 'text-muted-foreground', dot: 'bg-muted-foreground/30' };
 }
 
 function getPriorityConfig(priority: string) {
-  return PRIORITY_CONFIG[priority] || { label: priority, bg: 'bg-gray-100', text: 'text-gray-600' };
+  return PRIORITY_CONFIG[priority] || { label: priority, bg: 'bg-muted', text: 'text-muted-foreground' };
 }
 
 // ============================================================
@@ -238,7 +238,7 @@ function ObservationCard({
       {/* Timeline dot + line */}
       <div className="flex flex-col items-center shrink-0 pt-1">
         <div className={`h-3 w-3 rounded-full ${catConfig.dot} ring-2 ring-white shadow-sm`} />
-        <div className="w-px flex-1 bg-gray-200 mt-1 group-last:bg-transparent" />
+        <div className="w-px flex-1 bg-muted mt-1 group-last:bg-transparent" />
       </div>
 
       {/* Card content */}
@@ -262,7 +262,7 @@ function ObservationCard({
                 {priConfig.label}
               </Badge>
               {observation.media && (
-                <Badge className="bg-gray-100 text-gray-600 text-[10px] border-0 gap-1">
+                <Badge className="bg-muted text-muted-foreground text-[10px] border-0 gap-1">
                   <Camera className="h-3 w-3" />
                   Media
                 </Badge>

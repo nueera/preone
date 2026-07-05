@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Search,
@@ -9,12 +9,13 @@ import {
   LogOut,
   Zap,
   Shield,
+  Sun,
+  Moon,
+  Command,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { BranchSwitcher } from '@/components/ui/branch-switcher';
-import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,6 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PORTAL_THEMES, ROLE_THEMES, PREONE_COLORS } from '@/lib/theme-tokens';
 
 const theme = PORTAL_THEMES.admin;
@@ -54,6 +56,7 @@ const PATH_LABELS: Record<string, string> = {
   school: 'School',
   branches: 'Branches',
   'academic-year': 'Academic Year',
+  group: 'Groups',
   classes: 'Classes',
   'fee-structure': 'Fee Structure',
   staff: 'Staff',
@@ -87,7 +90,6 @@ const PATH_LABELS: Record<string, string> = {
   'audit-logs': 'Audit Logs',
   errors: 'Errors',
   monitoring: 'Monitoring',
-  // Legacy labels for backward compatibility
   crm: 'Admissions',
   growth: 'Growth Passport',
   onboarding: 'Setup',
@@ -95,20 +97,33 @@ const PATH_LABELS: Record<string, string> = {
 
 /**
  * AdminHeader — Top header bar for the PreOne admin portal.
- * Shows sidebar trigger, breadcrumb, search, notifications, and user menu.
+ *
+ * Features:
+ * - Role badges (Super Admin / Task Master)
+ * - Breadcrumb navigation
+ * - Command Palette trigger (Ctrl+K) with keyboard hint
+ * - Theme toggle (dark/light)
+ * - Notification bell
+ * - Branch switcher
+ * - User avatar dropdown
+ *
+ * No SidebarTrigger — sidebar has been removed for a cleaner layout.
  */
 export function AdminHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const { theme: currentTheme, setTheme } = useTheme();
+
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('preone_user');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) setUser(JSON.parse(saved));
     } catch {
-      return null;
+      // ignore
     }
-  });
+  }, []);
 
   // Build breadcrumb segments from pathname
   const segments = pathname.split('/').filter(Boolean);
@@ -119,13 +134,23 @@ export function AdminHeader() {
     router.push('/login');
   };
 
+  // Theme toggle
+  const toggleTheme = useCallback(() => {
+    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  }, [currentTheme, setTheme]);
+
+  // Open command palette
+  const openCommandPalette = useCallback(() => {
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
+    );
+  }, []);
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'A';
   const isTaskMaster = user?.role === 'TASK_MASTER';
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-  const roleTheme = isTaskMaster ? ROLE_THEMES.taskmaster : ROLE_THEMES.admin;
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white shadow-sm px-4 dark:bg-gray-900 dark:border-gray-800">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white/80 backdrop-blur-lg shadow-sm px-4 dark:bg-gray-900/80 dark:border-gray-800">
       {/* ── Role badge ── */}
       {isSuperAdmin && (
         <span
@@ -153,9 +178,7 @@ export function AdminHeader() {
           Task Master
         </span>
       )}
-      {/* ── Left: Sidebar trigger + Breadcrumb ── */}
-      <SidebarTrigger className="shrink-0" />
-
+      {/* ── Breadcrumb ── */}
       <Breadcrumb>
         <BreadcrumbList>
           {segments.map((seg, idx) => {
@@ -181,16 +204,61 @@ export function AdminHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* ── Right: Branch Switcher, Search, Notifications, User Menu ── */}
+      {/* ── Right: Branch Switcher, Search, Theme, Notifications, User Menu ── */}
       <div className="ml-auto flex items-center gap-2">
         {/* Branch Switcher */}
         <BranchSwitcher />
+        {/* Command Palette Trigger */}
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg px-2 hidden sm:flex"
+                onClick={openCommandPalette}
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span className="text-xs text-muted-foreground">Search</span>
+                <kbd className="ml-1 rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">
+                  ⌘K
+                </kbd>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Command Palette (Ctrl+K)</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-        {/* Search Button */}
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        {/* Mobile search button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 sm:hidden"
+          onClick={openCommandPalette}
+        >
           <Search className="h-4 w-4" />
-          <span className="sr-only">Search</span>
         </Button>
+
+        {/* Theme Toggle */}
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={toggleTheme}
+              >
+                {currentTheme === 'dark' ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Toggle theme (D)</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* Notification Bell */}
         <NotificationBell />
@@ -200,20 +268,39 @@ export function AdminHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 px-2 h-9"
+              className="flex items-center gap-2 px-2 h-9 rounded-lg"
             >
               <Avatar className="h-7 w-7">
-                <AvatarFallback className={`${theme.avatarFallbackClass} text-xs font-semibold`}>
+                <AvatarFallback
+                  className="text-xs font-semibold"
+                  style={{
+                    backgroundColor: 'var(--admin-primary-soft)',
+                    color: 'var(--admin-primary)',
+                  }}
+                >
                   {userInitial}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden sm:inline text-sm font-medium">
+              <span
+                className="hidden sm:inline text-sm font-medium"
+                style={{ color: 'var(--admin-text)' }}
+              >
                 {user?.name || 'Admin'}
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+          <DropdownMenuContent
+            align="end"
+            className="w-48"
+            style={{
+              backgroundColor: 'var(--admin-surface)',
+              borderColor: 'var(--admin-border)',
+            }}
+          >
+            <DropdownMenuLabel
+              className="text-xs"
+              style={{ color: 'var(--admin-text-muted)' }}
+            >
               {user?.email || 'admin@preone.com'}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -221,13 +308,17 @@ export function AdminHeader() {
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => router.push('/admin/settings')}
+            >
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="cursor-pointer text-red-600 focus:text-red-600"
+              className="cursor-pointer"
+              style={{ color: 'var(--admin-error)' }}
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />

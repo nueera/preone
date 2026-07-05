@@ -20,7 +20,7 @@ const cardVariants = {
   hero:
     'bg-gradient-to-br from-sky-500 via-blue-500 to-purple-600 text-white rounded-3xl shadow-xl border-0 overflow-hidden relative',
   glass:
-    'bg-white/60 dark:bg-gray-900/60 text-card-foreground rounded-3xl border border-white/30 shadow-lg backdrop-blur-xl',
+    'bg-white/60 dark:bg-[var(--admin-surface)]/60 text-card-foreground rounded-3xl border border-white/30 shadow-lg backdrop-blur-xl',
   cosmic:
     'bg-gradient-to-br from-purple-900/10 via-sky-900/10 to-pink-900/10 text-card-foreground rounded-3xl border border-purple-200/30 shadow-md backdrop-blur-md',
   emotional:
@@ -62,7 +62,7 @@ export function PreOneCardContent({
   return (
     <div
       data-slot="preone-card-content"
-      className={cn('p-6', className)}
+      className={cn('p-4 sm:p-6', className)}
       {...props}
     >
       {children}

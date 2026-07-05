@@ -136,11 +136,11 @@ export default function PermissionsSettingsPage() {
         <StaggerItem>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
                 <Key className="w-6 h-6" style={{ color: theme.primary }} />
                 Permission Management
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Toggle permissions by role</p>
+              <p className="text-sm text-[var(--admin-text-muted)] mt-1">Toggle permissions by role</p>
             </div>
             <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
               <Save className="w-4 h-4 mr-2" /> Save All
@@ -155,9 +155,9 @@ export default function PermissionsSettingsPage() {
               const { granted, total } = countPermissions(role);
               return (
                 <PreOneCard key={role} variant="strip" className="p-4">
-                  <p className="text-xs text-gray-500">{role}</p>
+                  <p className="text-xs text-[var(--admin-text-muted)]">{role}</p>
                   <p className="text-lg font-bold" style={{ color: theme.primary }}>{granted}/{total}</p>
-                  <p className="text-[10px] text-gray-400">permissions granted</p>
+                  <p className="text-[10px] text-[var(--admin-text-subtle)]">permissions granted</p>
                 </PreOneCard>
               );
             })}
@@ -169,16 +169,16 @@ export default function PermissionsSettingsPage() {
           <StaggerItem key={module.group}>
             <PreOneCard variant="default">
               <PreOneCardContent>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-gray-500" /> {module.group}
+                <h3 className="font-semibold text-[var(--admin-text)] mb-3 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[var(--admin-text-muted)]" /> {module.group}
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left text-xs font-medium text-gray-500 pb-2 w-48">Permission</th>
+                        <th className="text-left text-xs font-medium text-[var(--admin-text-muted)] pb-2 w-48">Permission</th>
                         {ROLES.map((role) => (
-                          <th key={role} className="text-center text-xs font-medium text-gray-500 pb-2 px-2 min-w-[100px]">
+                          <th key={role} className="text-center text-xs font-medium text-[var(--admin-text-muted)] pb-2 px-2 min-w-[100px]">
                             <div>{role}</div>
                           </th>
                         ))}
@@ -186,8 +186,8 @@ export default function PermissionsSettingsPage() {
                     </thead>
                     <tbody>
                       {module.permissions.map((perm) => (
-                        <tr key={perm.key} className="border-b border-gray-50 hover:bg-gray-50/50">
-                          <td className="py-2 text-sm text-gray-700">{perm.label}</td>
+                        <tr key={perm.key} className="border-b border-[var(--admin-border)] hover:bg-[var(--admin-surface-2)]/50">
+                          <td className="py-2 text-sm text-[var(--admin-text-muted)]">{perm.label}</td>
                           {ROLES.map((role) => {
                             const checked = permissions[role]?.[perm.key] || false;
                             return (

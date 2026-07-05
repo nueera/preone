@@ -107,7 +107,7 @@ export function CosmicThemeToggle() {
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   theme === value
                     ? "bg-preone-primary-50 dark:bg-preone-primary/10 text-preone-primary dark:text-preone-primary-light"
-                    : "text-cosmic-text-secondary dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5"
+                    : "text-cosmic-text-secondary dark:text-muted-foreground hover:bg-muted dark:hover:bg-white/5"
                 )}
               >
                 <Icon className="w-4 h-4" style={{ color }} />

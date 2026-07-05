@@ -65,7 +65,7 @@ export function EmotionalTimeline({
               <div
                 className={cn(
                   'rounded-full flex items-center justify-center',
-                  'bg-white dark:bg-gray-900',
+                  'bg-card',
                   moment.photo ? 'h-16 w-16' : 'h-16 w-16'
                 )}
               >

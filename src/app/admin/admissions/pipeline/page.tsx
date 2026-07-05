@@ -126,7 +126,7 @@ interface PipelineStage {
 
 // ── Constants ──
 const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string; textColor: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#3b82f6', cardBg: 'bg-white', textColor: 'text-gray-600' },
+  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#3b82f6', cardBg: 'bg-white', textColor: 'text-[var(--admin-text-muted)]' },
   CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6', cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
   VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b', cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
   APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f97316', cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
@@ -152,7 +152,7 @@ const SOURCE_LABELS: Record<string, string> = {
 const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50' },
   NORMAL: { label: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50' },
+  LOW: { label: 'Low', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]' },
 };
 
 const STAGE_KEYS = ['NEW', 'CONTACTED', 'VISITED', 'APPLIED', 'ENROLLED', 'LOST'] as const;
@@ -168,7 +168,7 @@ function PipelineSkeleton() {
     <div className="flex gap-4 overflow-x-auto pb-4">
       {STAGE_KEYS.map((key) => (
         <div key={key} className="flex flex-col min-w-[280px] w-[280px]">
-          <div className="flex items-center justify-between p-3 rounded-t-xl bg-gray-100">
+          <div className="flex items-center justify-between p-3 rounded-t-xl bg-[var(--admin-surface-2)]">
             <div className="flex items-center gap-2">
               <Skeleton className="h-3 w-3 rounded-full" />
               <Skeleton className="h-4 w-20" />
@@ -176,7 +176,7 @@ function PipelineSkeleton() {
             </div>
             <Skeleton className="h-3 w-16" />
           </div>
-          <div className="flex flex-col gap-2 p-2 bg-gray-50/50 rounded-b-xl min-h-[200px] border border-t-0 border-gray-100">
+          <div className="flex flex-col gap-2 p-2 bg-[var(--admin-surface-2)]/50 rounded-b-xl min-h-[200px] border border-t-0 border-[var(--admin-border)]">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-32 w-full rounded-lg" />
             ))}
@@ -240,7 +240,7 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-sm flex-shrink-0">🧒</span>
-              <span className="font-semibold text-gray-900 text-sm leading-tight truncate">
+              <span className="font-semibold text-[var(--admin-text)] text-sm leading-tight truncate">
                 {lead.childName}
               </span>
             </div>
@@ -255,25 +255,25 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
             <UserCircle className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{lead.parentName}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
             <Phone className="h-3 w-3 flex-shrink-0" />
             <span>{lead.parentPhone}</span>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1 text-gray-500">
+            <span className="flex items-center gap-1 text-[var(--admin-text-muted)]">
               <Tag className="h-3 w-3 flex-shrink-0" />
               {SOURCE_LABELS[lead.source] || lead.source}
             </span>
           </div>
 
           {lead.estimatedValue && (
-            <div className="text-xs font-medium text-gray-700">
+            <div className="text-xs font-medium text-[var(--admin-text-muted)]">
               💰 Est: ₹{lead.estimatedValue.toLocaleString('en-IN')}
             </div>
           )}
@@ -282,7 +282,7 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
             <div
               className={cn(
                 'text-[11px] flex items-center gap-1',
-                isFollowUpSoon ? 'text-orange-600 font-medium' : 'text-gray-500'
+                isFollowUpSoon ? 'text-orange-600 font-medium' : 'text-[var(--admin-text-muted)]'
               )}
             >
               <Calendar className="h-3 w-3 flex-shrink-0" />
@@ -342,7 +342,7 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
     >
       <div className="space-y-1.5">
         <div className="flex items-start justify-between">
-          <span className="font-semibold text-gray-900 text-sm truncate">
+          <span className="font-semibold text-[var(--admin-text)] text-sm truncate">
             🧒 {lead.childName}
           </span>
           <span
@@ -355,11 +355,11 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
             {priorityConfig.label}
           </span>
         </div>
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-[var(--admin-text-muted)]">
           <UserCircle className="h-3 w-3 inline mr-1" />
           {lead.parentName}
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-[var(--admin-text-muted)]">
           <Phone className="h-3 w-3 inline mr-1" />
           {lead.parentPhone}
         </div>
@@ -390,12 +390,12 @@ function KanbanColumn({
             className="h-3 w-3 rounded-full ring-2 ring-white shadow-sm"
             style={{ backgroundColor: stage.color }}
           />
-          <span className="font-semibold text-sm text-gray-800">{stage.label}</span>
-          <span className="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">
+          <span className="font-semibold text-sm text-[var(--admin-text)]">{stage.label}</span>
+          <span className="bg-[var(--admin-border)] text-[var(--admin-text-muted)] text-xs font-bold px-2 py-0.5 rounded-full">
             {stage.count}
           </span>
         </div>
-        <span className="text-xs text-gray-500 font-medium">
+        <span className="text-xs text-[var(--admin-text-muted)] font-medium">
           ₹{stage.totalValue.toLocaleString('en-IN')}
         </span>
       </div>
@@ -403,15 +403,15 @@ function KanbanColumn({
       {/* Cards Container */}
       <SortableContext items={leads.map((l) => l.id)} strategy={verticalListSortingStrategy}>
         <div
-          className="flex flex-col gap-2 p-2 bg-gray-50/50 rounded-b-xl min-h-[200px] border border-t-0 border-gray-100 max-h-[calc(100vh-340px)] overflow-y-auto"
+          className="flex flex-col gap-2 p-2 bg-[var(--admin-surface-2)]/50 rounded-b-xl min-h-[200px] border border-t-0 border-[var(--admin-border)] max-h-[calc(100vh-340px)] overflow-y-auto"
           style={{ borderTopColor: stage.color }}
         >
           {leads.map((lead) => (
             <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
           ))}
           {leads.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-24 text-xs text-gray-400 gap-1">
-              <CircleDot className="h-5 w-5 text-gray-300" />
+            <div className="flex flex-col items-center justify-center h-24 text-xs text-[var(--admin-text-subtle)] gap-1">
+              <CircleDot className="h-5 w-5 text-[var(--admin-text-subtle)]" />
               No leads in this stage
             </div>
           )}
@@ -443,7 +443,7 @@ function StatsBar({
       label: 'Total Leads',
       iconBg: 'bg-purple-50',
       iconColor: 'text-purple-600',
-      valueColor: 'text-gray-900',
+      valueColor: 'text-[var(--admin-text)]',
     },
     {
       icon: TrendingUp,
@@ -497,7 +497,7 @@ function StatsBar({
             </div>
             <div>
               <p className={`text-lg font-bold ${stat.valueColor}`}>{stat.value}</p>
-              <p className="text-[11px] text-gray-500">{stat.label}</p>
+              <p className="text-[11px] text-[var(--admin-text-muted)]">{stat.label}</p>
             </div>
           </div>
         </AnimatedCard>
@@ -782,11 +782,11 @@ export default function PipelinePage() {
         {/* ── Page Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
               <Megaphone className="h-6 w-6 text-portal-600" />
               Admission Pipeline
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
               Drag & drop leads across stages to track your admission funnel
             </p>
           </div>
@@ -816,7 +816,7 @@ export default function PipelinePage() {
         {/* ── Main Tabs: Pipeline / List / Analytics ── */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <TabsList className="bg-gray-100">
+            <TabsList className="bg-[var(--admin-surface-2)]">
               <TabsTrigger value="pipeline" className="gap-1.5">
                 <LayoutGrid className="h-3.5 w-3.5" />
                 Pipeline
@@ -834,7 +834,7 @@ export default function PipelinePage() {
             {activeTab !== 'analytics' && (
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
                   <Input
                     placeholder="Search leads..."
                     value={searchQuery}
@@ -844,7 +844,7 @@ export default function PipelinePage() {
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -932,7 +932,7 @@ export default function PipelinePage() {
                     variant="ghost"
                     size="sm"
                     onClick={clearFilters}
-                    className="text-xs gap-1 text-gray-500 hover:text-gray-700"
+                    className="text-xs gap-1 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-muted)]"
                   >
                     <X className="h-3 w-3" />
                     Clear filters
@@ -947,9 +947,9 @@ export default function PipelinePage() {
             {loading ? (
               <PipelineSkeleton />
             ) : pipeline.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-                <Megaphone className="h-12 w-12 mb-4 text-gray-300" />
-                <p className="text-lg font-medium text-gray-500">No pipeline data</p>
+              <div className="flex flex-col items-center justify-center py-16 text-[var(--admin-text-subtle)]">
+                <Megaphone className="h-12 w-12 mb-4 text-[var(--admin-text-subtle)]" />
+                <p className="text-lg font-medium text-[var(--admin-text-muted)]">No pipeline data</p>
                 <p className="text-sm mt-1">
                   Click &quot;Add Lead&quot; to create your first lead.
                 </p>
@@ -1012,7 +1012,7 @@ export default function PipelinePage() {
                       <TableRow>
                         <TableCell
                           colSpan={10}
-                          className="text-center py-8 text-gray-400"
+                          className="text-center py-8 text-[var(--admin-text-subtle)]"
                         >
                           {hasActiveFilters
                             ? 'No leads match your filters. Try adjusting them.'
@@ -1028,7 +1028,7 @@ export default function PipelinePage() {
                         return (
                           <TableRow
                             key={lead.id}
-                            className="cursor-pointer hover:bg-gray-50/80 transition-colors"
+                            className="cursor-pointer hover:bg-[var(--admin-surface-2)]/80 transition-colors"
                             onClick={() => handleLeadClick(lead)}
                           >
                             <TableCell className="font-medium text-sm">
@@ -1037,7 +1037,7 @@ export default function PipelinePage() {
                             <TableCell className="text-sm">
                               {lead.childName}
                             </TableCell>
-                            <TableCell className="text-sm text-gray-600">
+                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
                               {lead.parentPhone}
                             </TableCell>
                             <TableCell>
@@ -1070,7 +1070,7 @@ export default function PipelinePage() {
                                 {priorityCfg.label}
                               </span>
                             </TableCell>
-                            <TableCell className="text-sm text-gray-600">
+                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
                               {lead.programInterest || '—'}
                             </TableCell>
                             <TableCell className="text-sm font-medium">
@@ -1078,7 +1078,7 @@ export default function PipelinePage() {
                                 ? `₹${lead.estimatedValue.toLocaleString('en-IN')}`
                                 : '—'}
                             </TableCell>
-                            <TableCell className="text-sm text-gray-500">
+                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
                               {lead.nextFollowUp
                                 ? format(
                                     new Date(lead.nextFollowUp),

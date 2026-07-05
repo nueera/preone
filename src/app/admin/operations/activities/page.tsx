@@ -99,7 +99,7 @@ const TYPE_DOT_COLORS: Record<string, string> = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   UPCOMING: { label: 'Upcoming', color: 'text-blue-600', bg: 'bg-blue-50' },
   ONGOING: { label: 'Ongoing', color: 'text-green-600', bg: 'bg-green-50' },
-  COMPLETED: { label: 'Completed', color: 'text-gray-600', bg: 'bg-gray-50' },
+  COMPLETED: { label: 'Completed', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]' },
   CANCELLED: { label: 'Cancelled', color: 'text-red-600', bg: 'bg-red-50' },
 };
 
@@ -216,13 +216,13 @@ export default function ActivitiesPage() {
     }
 
     return (
-      <div className="bg-white rounded-xl border">
+      <div className="bg-[var(--admin-surface)] rounded-xl border">
         {/* Calendar header */}
         <div className="flex items-center justify-between p-4 border-b">
           <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h3 className="font-semibold text-gray-900">{format(calendarMonth, 'MMMM yyyy')}</h3>
+          <h3 className="font-semibold text-[var(--admin-text)]">{format(calendarMonth, 'MMMM yyyy')}</h3>
           <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1))}>
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -231,7 +231,7 @@ export default function ActivitiesPage() {
         {/* Day names */}
         <div className="grid grid-cols-7 border-b">
           {dayNames.map((day) => (
-            <div key={day} className="p-2 text-center text-xs font-medium text-gray-500">
+            <div key={day} className="p-2 text-center text-xs font-medium text-[var(--admin-text-muted)]">
               {day}
             </div>
           ))}
@@ -241,7 +241,7 @@ export default function ActivitiesPage() {
         <div className="grid grid-cols-7">
           {/* Empty cells for days before month start */}
           {Array.from({ length: startDay }).map((_, i) => (
-            <div key={`empty-${i}`} className="min-h-[100px] border-b border-r p-1 bg-gray-50/50" />
+            <div key={`empty-${i}`} className="min-h-[100px] border-b border-r p-1 bg-[var(--admin-surface-2)]/50" />
           ))}
 
           {days.map((day) => {
@@ -260,7 +260,7 @@ export default function ActivitiesPage() {
               >
                 <div className={cn(
                   'text-xs font-medium mb-1 h-6 w-6 flex items-center justify-center rounded-full',
-                  isToday ? 'bg-portal-600 text-white' : 'text-gray-600'
+                  isToday ? 'bg-portal-600 text-white' : 'text-[var(--admin-text-muted)]'
                 )}>
                   {format(day, 'd')}
                 </div>
@@ -279,7 +279,7 @@ export default function ActivitiesPage() {
                     );
                   })}
                   {dayActivities.length > 3 && (
-                    <div className="text-[10px] text-gray-400 px-1">+{dayActivities.length - 3} more</div>
+                    <div className="text-[10px] text-[var(--admin-text-subtle)] px-1">+{dayActivities.length - 3} more</div>
                   )}
                 </div>
               </div>
@@ -295,11 +295,11 @@ export default function ActivitiesPage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
             <Palette className="h-6 w-6 text-portal-600" />
             Activities
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Manage activities, events, and programs for your preschool</p>
+          <p className="text-sm text-[var(--admin-text-muted)] mt-1">Manage activities, events, and programs for your preschool</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => { setLoading(true); fetchActivities(); }} className="gap-1">
@@ -316,11 +316,11 @@ export default function ActivitiesPage() {
       {/* ── View Toggle + Search + Filters ── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+          <div className="flex items-center bg-[var(--admin-surface-2)] rounded-lg p-0.5">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="sm"
-              className={cn('h-8 text-xs gap-1', viewMode === 'list' && 'bg-white shadow-sm')}
+              className={cn('h-8 text-xs gap-1', viewMode === 'list' && 'bg-[var(--admin-surface)] shadow-sm')}
               onClick={() => setViewMode('list')}
             >
               <List className="h-3.5 w-3.5" />
@@ -329,7 +329,7 @@ export default function ActivitiesPage() {
             <Button
               variant={viewMode === 'calendar' ? 'default' : 'ghost'}
               size="sm"
-              className={cn('h-8 text-xs gap-1', viewMode === 'calendar' && 'bg-white shadow-sm')}
+              className={cn('h-8 text-xs gap-1', viewMode === 'calendar' && 'bg-[var(--admin-surface)] shadow-sm')}
               onClick={() => setViewMode('calendar')}
             >
               <CalendarIcon className="h-3.5 w-3.5" />
@@ -339,7 +339,7 @@ export default function ActivitiesPage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
             <Input placeholder="Search activities..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 w-64" />
           </div>
           <Button variant={showFilters ? 'default' : 'outline'} size="sm" onClick={() => setShowFilters(!showFilters)} className="gap-1">
@@ -351,7 +351,7 @@ export default function ActivitiesPage() {
 
       {/* ── Filters Row ── */}
       {showFilters && (
-        <div className="flex items-center gap-3 flex-wrap p-3 bg-white rounded-xl border">
+        <div className="flex items-center gap-3 flex-wrap p-3 bg-[var(--admin-surface)] rounded-xl border">
           <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v === 'ALL' ? '' : v)}>
             <SelectTrigger className="w-[130px] h-8 text-xs">
               <SelectValue placeholder="Type" />
@@ -408,7 +408,7 @@ export default function ActivitiesPage() {
 
       {/* ── Content ── */}
       {loading ? (
-        <div className="flex items-center justify-center h-64 text-gray-400">
+        <div className="flex items-center justify-center h-64 text-[var(--admin-text-subtle)]">
           <RefreshCw className="h-6 w-6 animate-spin mr-2" />
           Loading activities...
         </div>
@@ -430,7 +430,7 @@ export default function ActivitiesPage() {
             <TableBody>
               {activities.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-gray-400">
+                  <TableCell colSpan={8} className="text-center py-8 text-[var(--admin-text-subtle)]">
                     No activities found. Click &quot;Add Activity&quot; to create one.
                   </TableCell>
                 </TableRow>
@@ -439,18 +439,18 @@ export default function ActivitiesPage() {
                   const typeCfg = TYPE_CONFIG[activity.type] || TYPE_CONFIG.ART;
                   const statusCfg = STATUS_CONFIG[activity.status] || STATUS_CONFIG.UPCOMING;
                   return (
-                    <TableRow key={activity.id} className="cursor-pointer hover:bg-gray-50/80" onClick={() => handleActivityClick(activity)}>
+                    <TableRow key={activity.id} className="cursor-pointer hover:bg-[var(--admin-surface-2)]/80" onClick={() => handleActivityClick(activity)}>
                       <TableCell className="font-medium text-sm max-w-[200px] truncate">{activity.title}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={cn('text-[11px]', typeCfg.bg, typeCfg.color)}>
                           {typeCfg.label}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">{format(new Date(activity.date), 'dd MMM yyyy')}</TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">{format(new Date(activity.date), 'dd MMM yyyy')}</TableCell>
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
                         {activity.startTime && activity.endTime ? `${activity.startTime} - ${activity.endTime}` : '—'}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">{activity.class?.name || 'All Classes'}</TableCell>
+                      <TableCell className="text-sm text-[var(--admin-text-muted)]">{activity.class?.name || 'All Classes'}</TableCell>
                       <TableCell>
                         <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', statusCfg.bg, statusCfg.color)}>
                           {statusCfg.label}
@@ -460,7 +460,7 @@ export default function ActivitiesPage() {
                         {activity.isPublished ? (
                           <Badge className="bg-green-50 text-green-700 text-[10px] border-green-200">Yes</Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[10px] text-gray-400">No</Badge>
+                          <Badge variant="outline" className="text-[10px] text-[var(--admin-text-subtle)]">No</Badge>
                         )}
                       </TableCell>
                       <TableCell>

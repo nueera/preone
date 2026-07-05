@@ -105,7 +105,7 @@ export function CrmAnalytics() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-400">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         Loading analytics...
       </div>
     );
@@ -113,7 +113,7 @@ export function CrmAnalytics() {
 
   if (!data) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-muted-foreground">
         No analytics data available
       </div>
     );
@@ -130,8 +130,8 @@ export function CrmAnalytics() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-medium">Total Leads</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{data.totalLeads}</p>
+              <p className="text-xs text-muted-foreground font-medium">Total Leads</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{data.totalLeads}</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center">
               <Users className="h-5 w-5 text-purple-600" />
@@ -143,8 +143,8 @@ export function CrmAnalytics() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-medium">Conversion Rate</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{data.conversionRate}%</p>
+              <p className="text-xs text-muted-foreground font-medium">Conversion Rate</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{data.conversionRate}%</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-green-100 flex items-center justify-center">
               <Target className="h-5 w-5 text-green-600" />
@@ -162,8 +162,8 @@ export function CrmAnalytics() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-medium">Avg Days to Convert</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{data.avgDaysToConvert}</p>
+              <p className="text-xs text-muted-foreground font-medium">Avg Days to Convert</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{data.avgDaysToConvert}</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center">
               <Clock className="h-5 w-5 text-blue-600" />
@@ -175,8 +175,8 @@ export function CrmAnalytics() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-medium">Lost Leads</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{data.lostCount}</p>
+              <p className="text-xs text-muted-foreground font-medium">Lost Leads</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{data.lostCount}</p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-red-100 flex items-center justify-center">
               <ArrowDownRight className="h-5 w-5 text-red-600" />
@@ -189,7 +189,7 @@ export function CrmAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Trend - Line Chart */}
         <Card className="p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Monthly Trend — Leads vs Conversions</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Monthly Trend — Leads vs Conversions</h3>
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.monthlyTrend}>
@@ -221,7 +221,7 @@ export function CrmAnalytics() {
 
         {/* Source ROI - Horizontal Bar Chart */}
         <Card className="p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Source Conversion Rate (%)</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Source Conversion Rate (%)</h3>
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -248,9 +248,9 @@ export function CrmAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Lost Reasons - Pie Chart */}
         <Card className="p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Lost Reasons</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Lost Reasons</h3>
           {data.lostReasons.length === 0 ? (
-            <div className="flex items-center justify-center h-[280px] text-gray-400 text-sm">
+            <div className="flex items-center justify-center h-[280px] text-muted-foreground text-sm">
               No lost leads data available
             </div>
           ) : (
@@ -279,7 +279,7 @@ export function CrmAnalytics() {
 
         {/* Revenue Forecast - Stacked Bar Chart */}
         <Card className="p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Revenue Forecast by Stage</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Revenue Forecast by Stage</h3>
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
