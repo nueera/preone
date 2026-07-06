@@ -270,6 +270,36 @@
   /* ── Core Radius ── */
   --radius: 1rem;
 
+  /* ── Unified Radius Scale ── */
+  --radius-xs: 0.25rem;    /* 4px — badges, small elements */
+  --radius-sm: 0.5rem;     /* 8px — buttons, inputs */
+  --radius-md: 0.75rem;    /* 12px — cards, dropdowns */
+  --radius-lg: 1rem;       /* 16px — large cards */
+  --radius-xl: 1.25rem;    /* 20px — containers */
+  --radius-2xl: 1.5rem;    /* 24px — hero cards */
+  --radius-3xl: 2rem;      /* 32px — stat cards */
+  --radius-full: 9999px;   /* full round — avatars, pills */
+
+  /* ── Unified Shadow Scale ── */
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);             /* subtle lift */
+  --shadow-sm: 0 2px 4px rgba(15,23,42,0.06);             /* card default */
+  --shadow-md: 0 4px 8px rgba(15,23,42,0.08);             /* card hover */
+  --shadow-lg: 0 8px 16px rgba(15,23,42,0.10);            /* floating */
+  --shadow-xl: 0 16px 32px rgba(15,23,42,0.12);           /* modal/drawer */
+  --shadow-2xl: 0 24px 48px rgba(15,23,42,0.16);          /* hero element */
+  --shadow-inner: inset 0 2px 4px rgba(15,23,42,0.05);    /* pressed state */
+  --shadow-glow: 0 0 20px rgba(99,102,241,0.15);          /* portal glow */
+  --shadow-glow-dark: 0 0 20px rgba(167,139,250,0.25);    /* dark mode glow */
+
+  /* ── Unified Spacing Scale ── */
+  --space-xs: 0.25rem;     /* 4px */
+  --space-sm: 0.5rem;      /* 8px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 3rem;       /* 48px */
+  --space-3xl: 4rem;       /* 64px */
+
   /* ── Semantic Colors ── */
   --background: #F8FAFC;
   --foreground: #0F172A;
@@ -434,6 +464,12 @@
   --teacher-error: #EF4444;
   --teacher-error-soft: #FEE2E2;
   --teacher-accent: #10B981;
+
+  /* ── Teacher Portal Extended Tokens ── */
+  --teacher-orange: #F97316;
+  --teacher-orange-soft: #FFF7ED;
+  --teacher-pink: #EC4899;
+  --teacher-pink-soft: #FCE7F3;
 }
 
 /* ── Parent Portal: Sky / Blue ── */
@@ -594,6 +630,12 @@
   --teacher-error: #FCA5A5;
   --teacher-error-soft: rgba(252,165,165,0.15);
   --teacher-accent: #34D399;
+
+  /* ── Dark Mode Teacher Extended Tokens ── */
+  --teacher-orange: #FB923C;
+  --teacher-orange-soft: rgba(251,146,60,0.15);
+  --teacher-pink: #F472B6;
+  --teacher-pink-soft: rgba(244,114,182,0.15);
 }
 
 .dark [data-portal="parent"] {
@@ -1546,4 +1588,173 @@ body, p, span, div {
 .dark .preone-sidebar-item.active {
   background: rgba(108, 92, 231, 0.15);
   color: var(--preone-primary);
+}
+
+/* ============================================================
+   GPU-OPTIMIZED ANIMATION PRESETS
+   All animations use transform/opacity only for 60fps performance
+   ============================================================ */
+
+/* ── Keyframe Definitions ── */
+@keyframes animate-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes animate-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes animate-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-down {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes animate-bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes animate-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes animate-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes animate-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes animate-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes animate-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ── Animation Utility Classes ── */
+.animate-fade-in { animation: animate-fade-in 0.2s ease-out forwards; }
+.animate-fade-out { animation: animate-fade-out 0.15s ease-in forwards; }
+.animate-slide-up { animation: animate-slide-up 0.25s ease-out forwards; }
+.animate-slide-down { animation: animate-slide-down 0.25s ease-out forwards; }
+.animate-slide-left { animation: animate-slide-left 0.25s ease-out forwards; }
+.animate-slide-right { animation: animate-slide-right 0.25s ease-out forwards; }
+.animate-scale-in { animation: animate-scale-in 0.2s ease-out forwards; }
+.animate-scale-out { animation: animate-scale-out 0.15s ease-in forwards; }
+.animate-bounce-in { animation: animate-bounce-in 0.4s ease-out forwards; }
+.animate-pulse-slow { animation: animate-pulse 2s ease-in-out infinite; }
+.animate-spin-slow { animation: animate-spin 2s linear infinite; }
+.animate-float-slow { animation: animate-float 3s ease-in-out infinite; }
+.animate-shake { animation: animate-shake 0.5s ease-in-out; }
+.animate-wobble { animation: animate-wobble 0.5s ease-in-out; }
+.animate-glow { animation: animate-glow 2s ease-in-out infinite; }
+
+/* ── Stagger Animation for Lists ── */
+.animate-stagger > * {
+  opacity: 0;
+  animation: animate-slide-up 0.25s ease-out forwards;
+}
+
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+.animate-stagger > *:nth-child(9) { animation-delay: 400ms; }
+.animate-stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+/* ── Hover Interactions (GPU-accelerated) ── */
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.hover-scale { transition: transform 0.2s ease; }
+.hover-scale:hover { transform: scale(1.02); }
+
+.hover-glow { transition: box-shadow 0.2s ease; }
+.hover-glow:hover { box-shadow: var(--shadow-glow); }
+
+.hover-brightness { transition: filter 0.2s ease; }
+.hover-brightness:hover { filter: brightness(1.05); }
+
+/* ── Pressed State ── */
+.press-down:active { transform: scale(0.98); }
+.press-shadow:active { box-shadow: var(--shadow-inner); }
+
+/* ── Skeleton Shimmer (Portal-aware) ── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 0%,
+    var(--portal-surface, var(--surface, #FFFFFF)) 50%,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Portal-aware Skeleton Colors ── */
+[data-portal="admin"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--admin-surface-2) 0%, var(--admin-surface) 50%, var(--admin-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="teacher"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--teacher-surface-2) 0%, var(--teacher-surface) 50%, var(--teacher-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="parent"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--parent-surface-2) 0%, var(--parent-surface) 50%, var(--parent-surface-2) 100%);
+  background-size: 200% 100%;
 }
