@@ -2185,3 +2185,265 @@ body, p, span, div {
 .quick-success-icon {
   animation: quick-success-pop 0.3s ease-out forwards;
 }
+
+/* ============================================================
+   CSS CONTAINMENT UTILITIES
+   Performance optimization for rendering isolation
+   ============================================================ */
+
+/**
+ * CSS Containment isolates elements from the rest of the page,
+ * preventing expensive layout recalculations when content changes.
+ * 
+ * Usage levels:
+ * - content: Isolate element's contents from ancestors (safe for most cases)
+ * - layout: Element's layout doesn't affect ancestors (use for fixed-size containers)
+ * - style: Element's styles don't affect ancestors (use for styled containers)
+ * - paint: Element's painting doesn't affect ancestors (use for offscreen content)
+ * - strict: content + layout + style + paint (maximum isolation, use for virtual lists)
+ */
+
+/* ── Containment Levels ── */
+.contain-content {
+  contain: content;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.contain-style {
+  contain: style;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+.contain-none {
+  contain: none;
+}
+
+/* ── Combined Containment ── */
+.contain-layout-style {
+  contain: layout style;
+}
+
+.contain-content-layout {
+  contain: content layout;
+}
+
+.contain-layout-paint {
+  contain: layout paint;
+}
+
+/* ── Content Visibility (Lazy Rendering) ── */
+/**
+ * content-visibility: auto - Browser skips rendering content until needed
+ * Use for offscreen content to reduce initial render time
+ */
+.content-visible {
+  content-visibility: visible;
+}
+
+.content-hidden {
+  content-visibility: hidden;
+}
+
+.content-auto {
+  content-visibility: auto;
+}
+
+/* ── Performance Container ── */
+/**
+ * Virtual container for scrollable lists with many items.
+ * Combines containment with overflow handling.
+ */
+.virtual-container {
+  contain: strict content;
+  overflow: auto;
+  will-change: transform;
+}
+
+/* ── List Performance ── */
+/**
+ * Optimized list container with CSS containment.
+ * Prevents layout recalculations when items change.
+ */
+.list-container {
+  contain: content layout;
+}
+
+.list-item {
+  contain: content;
+  isolation: isolate;
+}
+
+/* ── Card Containment ── */
+/**
+ * Card container with style isolation.
+ * Prevents card styles affecting siblings.
+ */
+.card-container {
+  contain: content style;
+}
+
+/* ── Modal/Dropdown Containment ── */
+/**
+ * Modal and dropdown containers with paint isolation.
+ * Offscreen content doesn't affect main page.
+ */
+.modal-container {
+  contain: layout style paint;
+}
+
+.dropdown-container {
+  contain: layout style;
+}
+
+/* ── Table Containment ── */
+/**
+ * Table row containment for efficient updates.
+ * Row changes don't affect other rows.
+ */
+.table-container {
+  contain: content layout;
+}
+
+.table-row {
+  contain: content;
+  isolation: isolate;
+}
+
+.table-cell {
+  contain: style;
+}
+
+/* ── Image Containment ── */
+/**
+ * Image container with paint isolation.
+ * Prevents image loading from affecting layout.
+ */
+.image-container {
+  contain: layout paint;
+}
+
+.lazy-image {
+  contain: strict;
+  content-visibility: auto;
+}
+
+/* ── Animation Performance ── */
+/**
+ * Animation container with will-change optimization.
+ * GPU-optimized for smooth animations.
+ */
+.animate-container {
+  contain: layout style;
+  will-change: transform, opacity;
+}
+
+/* ── Scroll Performance ── */
+/**
+ * Scroll container with containment for smooth scrolling.
+ * Prevents scroll from triggering expensive recalculations.
+ */
+.scroll-container {
+  contain: strict;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ── Portal-Aware Containment ── */
+[data-portal="admin"] .portal-container {
+  contain: content layout;
+}
+
+[data-portal="teacher"] .portal-container {
+  contain: content layout;
+}
+
+[data-portal="parent"] .portal-container {
+  contain: content layout;
+}
+
+/* ── Size Reservation (Prevent Layout Shift) ── */
+.reserve-100 {
+  min-height: 100px;
+}
+
+.reserve-200 {
+  min-height: 200px;
+}
+
+.reserve-300 {
+  min-height: 300px;
+}
+
+.reserve-400 {
+  min-height: 400px;
+}
+
+.reserve-500 {
+  min-height: 500px;
+}
+
+.reserve-square {
+  aspect-ratio: 1;
+}
+
+.reserve-video {
+  aspect-ratio: 16 / 9;
+}
+
+.reserve-card {
+  aspect-ratio: 4 / 3;
+}
+
+/* ── Will-Change Optimization ── */
+/**
+ * Will-change hints for GPU optimization.
+ * Use sparingly - only on elements that will animate.
+ */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-scroll {
+  will-change: scroll-position;
+}
+
+/* ── GPU Layer Promotion ── */
+/**
+ * Promote element to GPU layer for smooth animations.
+ * Use transform hack to create compositing layer.
+ */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.gpu-layer-2d {
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Isolation Context ── */
+/**
+ * Create stacking context isolation.
+ * Prevents z-index leaks and style inheritance.
+ */
+.isolate {
+  isolation: isolate;
+}
+
+.isolate-auto {
+  isolation: auto;
+}
