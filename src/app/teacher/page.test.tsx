@@ -1,7 +1,8 @@
 // ============================================================
 // PreOne — Teacher Landing Page Tests
-// Tests cover: header bar, module cards, navigation, CSS variables,
+// Tests cover: page header, module cards, navigation, CSS variables,
 // layout, Coming Soon badges, illustration fallback
+// Header is now provided by TeacherHeader in teacher-layout-client.tsx
 // ============================================================
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -50,7 +51,7 @@ vi.mock('lucide-react', () => {
   const iconNames = [
     'LayoutDashboard', 'Users', 'ClipboardCheck', 'FileEdit', 'Eye',
     'Activity', 'CalendarDays', 'MessageCircle', 'Megaphone', 'FileBarChart',
-    'Bell', 'Settings', 'Bot', 'GraduationCap', 'Clock', 'ChevronDown',
+    'Bell', 'Settings', 'Bot', 'RefreshCw',
   ];
   iconNames.forEach((name) => {
     icons[name] = (props: { className?: string; style?: React.CSSProperties }) => (
@@ -65,32 +66,21 @@ describe('TeacherLandingPage', () => {
     vi.clearAllMocks();
   });
 
-  // ── Header Bar Tests ──
+  // ── Page Header Tests ──
 
-  it('renders PreOne brand name', () => {
+  it('renders Modules title', () => {
     render(<TeacherLandingPage />);
-    expect(screen.getByText('PreOne')).toBeInTheDocument();
+    expect(screen.getByText('Modules')).toBeInTheDocument();
   });
 
-  it('renders Teacher Portal subtitle', () => {
+  it('renders Quick access subtitle', () => {
     render(<TeacherLandingPage />);
-    expect(screen.getByText('Teacher Portal')).toBeInTheDocument();
+    expect(screen.getByText('Quick access to all your modules')).toBeInTheDocument();
   });
 
-  it('renders greeting with name', () => {
+  it('renders Refresh button', () => {
     render(<TeacherLandingPage />);
-    const greetingElements = screen.getAllByText(/Priya/);
-    expect(greetingElements.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders profile initials PS', () => {
-    render(<TeacherLandingPage />);
-    expect(screen.getByText('PS')).toBeInTheDocument();
-  });
-
-  it('renders profile name Priya Sharma', () => {
-    render(<TeacherLandingPage />);
-    expect(screen.getByText('Priya Sharma')).toBeInTheDocument();
+    expect(screen.getByText('Refresh')).toBeInTheDocument();
   });
 
   // ── Module Cards Tests ──
@@ -132,11 +122,18 @@ describe('TeacherLandingPage', () => {
 
   // ── CSS Variables Tests ──
 
-  it('uses var(--teacher-primary) for PreOne brand', () => {
+  it('Modules title uses var(--teacher-text)', () => {
     render(<TeacherLandingPage />);
-    const brandName = screen.getByText('PreOne');
-    const style = brandName.getAttribute('style');
-    expect(style).toContain('var(--teacher-primary)');
+    const modulesTitle = screen.getByText('Modules');
+    const style = modulesTitle.getAttribute('style');
+    expect(style).toContain('var(--teacher-text)');
+  });
+
+  it('subtitle uses var(--teacher-text-muted)', () => {
+    render(<TeacherLandingPage />);
+    const subtitle = screen.getByText('Quick access to all your modules');
+    const style = subtitle.getAttribute('style');
+    expect(style).toContain('var(--teacher-text-muted)');
   });
 
   it('uses var(--teacher-*) tokens for card titles', () => {
@@ -164,17 +161,22 @@ describe('TeacherLandingPage', () => {
 
   // ── Illustration Fallback Tests ──
 
-  it('renders illustration images for module cards', () => {
+  it('renders illustration images for modules with custom icons', () => {
     render(<TeacherLandingPage />);
     const images = document.querySelectorAll('img');
-    expect(images.length).toBe(14);
+    // Modules with custom icons: Dashboard, My Class, Attendance, Daily Updates,
+    // Observations, Growth, Schedule, Chat, Announcements, Reports, Settings (11)
+    expect(images.length).toBe(11);
   });
 
   it('illustration images have correct src pattern', () => {
     render(<TeacherLandingPage />);
     const images = document.querySelectorAll('img');
     images.forEach((img) => {
-      expect(img.getAttribute('src')).toMatch(/^\/illustrations\/teacher-.*\.svg$/);
+      // Next.js Image transforms URLs to /_next/image?url=... format
+      const src = img.getAttribute('src') || '';
+      expect(src).toContain('icons%2Fteacher');
+      expect(src).toContain('.webp');
     });
   });
 
