@@ -135,7 +135,7 @@ export async function logError(params: LogErrorParams) {
         method: params.method,
         apiRoute: params.apiRoute,
         lineNumber: params.lineNumber,
-        columnName: params.columnNumber,
+        columnName: params.columnName,
         fileName: params.fileName,
         userId: params.userId,
         userRole: params.userRole,
