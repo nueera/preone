@@ -270,6 +270,36 @@
   /* ── Core Radius ── */
   --radius: 1rem;
 
+  /* ── Unified Radius Scale ── */
+  --radius-xs: 0.25rem;    /* 4px — badges, small elements */
+  --radius-sm: 0.5rem;     /* 8px — buttons, inputs */
+  --radius-md: 0.75rem;    /* 12px — cards, dropdowns */
+  --radius-lg: 1rem;       /* 16px — large cards */
+  --radius-xl: 1.25rem;    /* 20px — containers */
+  --radius-2xl: 1.5rem;    /* 24px — hero cards */
+  --radius-3xl: 2rem;      /* 32px — stat cards */
+  --radius-full: 9999px;   /* full round — avatars, pills */
+
+  /* ── Unified Shadow Scale ── */
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);             /* subtle lift */
+  --shadow-sm: 0 2px 4px rgba(15,23,42,0.06);             /* card default */
+  --shadow-md: 0 4px 8px rgba(15,23,42,0.08);             /* card hover */
+  --shadow-lg: 0 8px 16px rgba(15,23,42,0.10);            /* floating */
+  --shadow-xl: 0 16px 32px rgba(15,23,42,0.12);           /* modal/drawer */
+  --shadow-2xl: 0 24px 48px rgba(15,23,42,0.16);          /* hero element */
+  --shadow-inner: inset 0 2px 4px rgba(15,23,42,0.05);    /* pressed state */
+  --shadow-glow: 0 0 20px rgba(99,102,241,0.15);          /* portal glow */
+  --shadow-glow-dark: 0 0 20px rgba(167,139,250,0.25);    /* dark mode glow */
+
+  /* ── Unified Spacing Scale ── */
+  --space-xs: 0.25rem;     /* 4px */
+  --space-sm: 0.5rem;      /* 8px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 3rem;       /* 48px */
+  --space-3xl: 4rem;       /* 64px */
+
   /* ── Semantic Colors ── */
   --background: #F8FAFC;
   --foreground: #0F172A;
@@ -434,6 +464,12 @@
   --teacher-error: #EF4444;
   --teacher-error-soft: #FEE2E2;
   --teacher-accent: #10B981;
+
+  /* ── Teacher Portal Extended Tokens ── */
+  --teacher-orange: #F97316;
+  --teacher-orange-soft: #FFF7ED;
+  --teacher-pink: #EC4899;
+  --teacher-pink-soft: #FCE7F3;
 }
 
 /* ── Parent Portal: Sky / Blue ── */
@@ -594,6 +630,12 @@
   --teacher-error: #FCA5A5;
   --teacher-error-soft: rgba(252,165,165,0.15);
   --teacher-accent: #34D399;
+
+  /* ── Dark Mode Teacher Extended Tokens ── */
+  --teacher-orange: #FB923C;
+  --teacher-orange-soft: rgba(251,146,60,0.15);
+  --teacher-pink: #F472B6;
+  --teacher-pink-soft: rgba(244,114,182,0.15);
 }
 
 .dark [data-portal="parent"] {
@@ -1546,4 +1588,600 @@ body, p, span, div {
 .dark .preone-sidebar-item.active {
   background: rgba(108, 92, 231, 0.15);
   color: var(--preone-primary);
+}
+
+/* ============================================================
+   GPU-OPTIMIZED ANIMATION PRESETS
+   All animations use transform/opacity only for 60fps performance
+   ============================================================ */
+
+/* ── Keyframe Definitions ── */
+@keyframes animate-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes animate-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes animate-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-down {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes animate-bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes animate-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes animate-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes animate-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes animate-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes animate-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ── Animation Utility Classes ── */
+.animate-fade-in { animation: animate-fade-in 0.2s ease-out forwards; }
+.animate-fade-out { animation: animate-fade-out 0.15s ease-in forwards; }
+.animate-slide-up { animation: animate-slide-up 0.25s ease-out forwards; }
+.animate-slide-down { animation: animate-slide-down 0.25s ease-out forwards; }
+.animate-slide-left { animation: animate-slide-left 0.25s ease-out forwards; }
+.animate-slide-right { animation: animate-slide-right 0.25s ease-out forwards; }
+.animate-scale-in { animation: animate-scale-in 0.2s ease-out forwards; }
+.animate-scale-out { animation: animate-scale-out 0.15s ease-in forwards; }
+.animate-bounce-in { animation: animate-bounce-in 0.4s ease-out forwards; }
+.animate-pulse-slow { animation: animate-pulse 2s ease-in-out infinite; }
+.animate-spin-slow { animation: animate-spin 2s linear infinite; }
+.animate-float-slow { animation: animate-float 3s ease-in-out infinite; }
+.animate-shake { animation: animate-shake 0.5s ease-in-out; }
+.animate-wobble { animation: animate-wobble 0.5s ease-in-out; }
+.animate-glow { animation: animate-glow 2s ease-in-out infinite; }
+
+/* ── Stagger Animation for Lists ── */
+.animate-stagger > * {
+  opacity: 0;
+  animation: animate-slide-up 0.25s ease-out forwards;
+}
+
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+.animate-stagger > *:nth-child(9) { animation-delay: 400ms; }
+.animate-stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+/* ── Hover Interactions (GPU-accelerated) ── */
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.hover-scale { transition: transform 0.2s ease; }
+.hover-scale:hover { transform: scale(1.02); }
+
+.hover-glow { transition: box-shadow 0.2s ease; }
+.hover-glow:hover { box-shadow: var(--shadow-glow); }
+
+.hover-brightness { transition: filter 0.2s ease; }
+.hover-brightness:hover { filter: brightness(1.05); }
+
+/* ── Pressed State ── */
+.press-down:active { transform: scale(0.98); }
+.press-shadow:active { box-shadow: var(--shadow-inner); }
+
+/* ── Skeleton Shimmer (Portal-aware) ── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 0%,
+    var(--portal-surface, var(--surface, #FFFFFF)) 50%,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Portal-aware Skeleton Colors ── */
+[data-portal="admin"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--admin-surface-2) 0%, var(--admin-surface) 50%, var(--admin-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="teacher"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--teacher-surface-2) 0%, var(--teacher-surface) 50%, var(--teacher-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="parent"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--parent-surface-2) 0%, var(--parent-surface) 50%, var(--parent-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+/* ============================================================
+   PORTAL AURORA ANIMATIONS
+   GPU-optimized: transform + opacity only
+   ============================================================ */
+@keyframes portal-aurora-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes portal-aurora-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-30px, 25px) scale(1.08); }
+  66% { transform: translate(25px, -15px) scale(0.93); }
+}
+
+@keyframes portal-aurora-float-3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  33% { transform: translate(calc(-50% + 20px), calc(-50% - 20px)) scale(1.1); }
+  66% { transform: translate(calc(-50% - 15px), calc(-50% + 15px)) scale(0.9); }
+}
+
+/* ============================================================
+   ANIMATED GRADIENT BORDER
+   Uses CSS @property for smooth gradient rotation
+   ============================================================ */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-gradient-border-bg {
+  animation: gradient-rotate var(--animation-duration, 4s) linear infinite;
+}
+
+@keyframes gradient-rotate {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+/* ── Gradient Border Portal Colors ── */
+[data-portal="admin"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #7C3AED, #8B5CF6, #A78BFA, #6D28D9, #7C3AED
+  );
+}
+
+.dark [data-portal="admin"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #A78BFA, #C4B5FD, #8B5CF6, #9333EA, #A78BFA
+  );
+}
+
+[data-portal="teacher"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #10B981, #34D399, #6EE7B7, #059669, #10B981
+  );
+}
+
+.dark [data-portal="teacher"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #34D399, #6EE7B7, #10B981, #047857, #34D399
+  );
+}
+
+[data-portal="parent"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #0EA5E9, #38BDF8, #7DD3FC, #0284C7, #0EA5E9
+  );
+}
+
+.dark [data-portal="parent"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #38BDF8, #7DD3FC, #0EA5E9, #0369A1, #38BDF8
+  );
+}
+
+/* ============================================================
+   PORTAL SPINNER ANIMATIONS
+   All variants: ring, dots, pulse, orbit, gradient
+   ============================================================ */
+
+/* ── Ring Spinner - Rotation ── */
+.portal-spinner-ring {
+  border-radius: 50%;
+  animation: portal-spinner-rotate linear infinite;
+}
+
+@keyframes portal-spinner-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Dots Spinner - Bounce ── */
+.portal-spinner-dots {
+  display: flex;
+  align-items: center;
+}
+
+.portal-spinner-dot {
+  border-radius: 50%;
+  animation: portal-spinner-bounce ease-in-out infinite;
+}
+
+@keyframes portal-spinner-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-8px); opacity: 0.7; }
+}
+
+/* ── Pulse Spinner - Expanding rings ── */
+.portal-spinner-pulse-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.portal-spinner-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+  animation: portal-spinner-pulse-expand ease-out infinite;
+  width: 100%;
+  height: 100%;
+}
+
+.portal-spinner-pulse-dot {
+  border-radius: 50%;
+  animation: portal-spinner-pulse-dot ease-in-out 1s infinite;
+}
+
+@keyframes portal-spinner-pulse-expand {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes portal-spinner-pulse-dot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ── Orbit Spinner - Circular orbit ── */
+.portal-spinner-orbit-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.portal-spinner-orbit-path {
+  position: absolute;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border-style: solid;
+  opacity: 0.3;
+}
+
+.portal-spinner-orbit-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: portal-spinner-orbit linear infinite;
+}
+
+.portal-spinner-orbit-center {
+  border-radius: 50%;
+}
+
+@keyframes portal-spinner-orbit {
+  from {
+    transform: rotate(0deg) translateX(calc(50% - 4px)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(calc(50% - 4px)) rotate(-360deg);
+  }
+}
+
+/* ── Gradient Spinner - Conic rotation ── */
+.portal-spinner-gradient {
+  border-radius: 50%;
+  animation: portal-spinner-gradient-rotate linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-spinner-gradient-inner {
+  border-radius: 50%;
+  background: white;
+}
+
+.dark .portal-spinner-gradient-inner {
+  background: rgb(15, 23, 42);
+}
+
+@keyframes portal-spinner-gradient-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Spinner Portal Colors ── */
+[data-portal="admin"] .portal-spinner-ring {
+  border-color: rgba(124, 58, 237, 0.1);
+  border-top-color: #7C3AED;
+  border-right-color: #8B5CF6;
+}
+
+.dark [data-portal="admin"] .portal-spinner-ring {
+  border-color: rgba(167, 139, 250, 0.15);
+  border-top-color: #A78BFA;
+  border-right-color: #C4B5FD;
+}
+
+[data-portal="teacher"] .portal-spinner-ring {
+  border-color: rgba(16, 185, 129, 0.1);
+  border-top-color: #10B981;
+  border-right-color: #34D399;
+}
+
+.dark [data-portal="teacher"] .portal-spinner-ring {
+  border-color: rgba(52, 211, 153, 0.15);
+  border-top-color: #34D399;
+  border-right-color: #6EE7B7;
+}
+
+[data-portal="parent"] .portal-spinner-ring {
+  border-color: rgba(14, 165, 233, 0.1);
+  border-top-color: #0EA5E9;
+  border-right-color: #38BDF8;
+}
+
+.dark [data-portal="parent"] .portal-spinner-ring {
+  border-color: rgba(56, 189, 248, 0.15);
+  border-top-color: #38BDF8;
+  border-right-color: #7DD3FC;
+}
+
+/* ============================================================
+   SUCCESS CELEBRATION ANIMATIONS
+   GPU-optimized: transform + opacity only
+   ============================================================ */
+
+/* ── Confetti Animation ── */
+.celebration-confetti-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.celebration-confetti-particle {
+  position: absolute;
+  border-radius: 2px;
+  animation: celebration-confetti-fall 2s ease-out forwards;
+}
+
+@keyframes celebration-confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ── Success Icon Pop ── */
+.celebration-success-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: celebration-icon-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes celebration-icon-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.celebration-check-path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: celebration-check-draw 0.5s ease-out forwards 0.3s;
+}
+
+@keyframes celebration-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.celebration-message {
+  opacity: 0;
+  animation: celebration-message-appear 0.3s ease-out forwards 0.5s;
+}
+
+@keyframes celebration-message-appear {
+  to { opacity: 1; }
+}
+
+/* ── Pop Animation ── */
+.celebration-pop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: celebration-pop-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes celebration-pop-bounce {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.3) rotate(5deg); }
+  70% { transform: scale(0.9) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.celebration-pop-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-pop-pulse 1s ease-in-out infinite 0.6s;
+}
+
+@keyframes celebration-pop-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+}
+
+/* ── Sparkle Animation ── */
+.celebration-sparkle-container {
+  position: absolute;
+  inset: -10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.celebration-sparkle {
+  animation: celebration-sparkle 1s ease-in-out infinite;
+  opacity: 0;
+  font-size: 12px;
+}
+
+@keyframes celebration-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Trophy Animation ── */
+.celebration-trophy-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-trophy-rise 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.celebration-trophy-glow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: celebration-glow-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes celebration-trophy-rise {
+  0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes celebration-glow-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+.celebration-trophy-icon {
+  animation: celebration-trophy-shine 0.5s ease-out forwards 0.3s;
+}
+
+@keyframes celebration-trophy-shine {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { filter: brightness(1); }
+}
+
+/* ── Wave Animation ── */
+.celebration-wave-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-wave-appear 0.5s ease-out forwards;
+}
+
+.celebration-wave-hand {
+  animation: celebration-wave-wave 1s ease-in-out infinite 0.5s;
+  transform-origin: bottom center;
+}
+
+@keyframes celebration-wave-appear {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes celebration-wave-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+/* ── Quick Success Animation ── */
+@keyframes quick-success-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.quick-success-icon {
+  animation: quick-success-pop 0.3s ease-out forwards;
 }
