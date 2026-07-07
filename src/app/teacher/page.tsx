@@ -2,7 +2,8 @@
 
 // ============================================================
 // PreOne — Teacher Portal Landing Page
-// Full-width single column layout with header bar and module cards
+// Full-width single column layout with module cards grid
+// Header is provided by TeacherHeader in teacher-layout-client.tsx
 // ============================================================
 
 import Link from 'next/link';
@@ -21,9 +22,7 @@ import {
   Bell,
   Settings,
   Bot,
-  GraduationCap,
-  Clock,
-  ChevronDown,
+  RefreshCw,
 } from 'lucide-react';
 import { PreOneCard } from '@/components/ui/preone-card';
 
@@ -204,88 +203,40 @@ const modules: ModuleCard[] = [
 ];
 
 // ============================================================
-// Helpers
-// ============================================================
-
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
-
-function getFormattedDate(): string {
-  return new Date().toLocaleDateString('en-IN', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-// ============================================================
 // Landing Page Component
 // ============================================================
 
 export default function TeacherLandingPage() {
   return (
-    <>
-      {/* ── Section 1: Top Header Bar ── */}
-      <PreOneCard className="p-5">
-        <div className="flex items-center justify-between">
-          {/* Left Zone — Branding */}
-          <div className="flex items-center gap-3">
-            <div
-              className="h-10 w-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'var(--teacher-primary-soft)' }}
-            >
-              <GraduationCap className="h-5 w-5" style={{ color: 'var(--teacher-primary)' }} />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold" style={{ color: 'var(--teacher-primary)' }}>
-                PreOne
-              </h1>
-              <p className="text-xs" style={{ color: 'var(--teacher-text-muted)' }}>
-                Teacher Portal
-              </p>
-            </div>
-          </div>
-
-          {/* Center Zone — Greeting (hidden on mobile) */}
-          <div className="hidden md:block text-center">
-            <p className="text-lg font-semibold" style={{ color: 'var(--teacher-text)' }}>
-              {getGreeting()}, Priya! 👋
-            </p>
-            <p className="text-xs" style={{ color: 'var(--teacher-text-muted)' }}>
-              {getFormattedDate()}
-            </p>
-          </div>
-
-          {/* Right Zone — Profile */}
-          <div className="flex items-center gap-2">
-            <div
-              className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{
-                background: 'var(--teacher-primary-soft)',
-                color: 'var(--teacher-primary)',
-              }}
-            >
-              PS
-            </div>
-            <div className="hidden md:block">
-              <p className="text-sm font-medium" style={{ color: 'var(--teacher-text)' }}>
-                Priya Sharma
-              </p>
-              <p className="text-[11px]" style={{ color: 'var(--teacher-text-muted)' }}>
-                Teacher
-              </p>
-            </div>
-            <ChevronDown className="h-4 w-4" style={{ color: 'var(--teacher-text-subtle)' }} />
-          </div>
+    <div>
+      {/* ── Page Header (simple, like admin portal) ── */}
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1
+            className="text-[20px] font-semibold"
+            style={{ color: 'var(--teacher-text)' }}
+          >
+            Modules
+          </h1>
+          <p
+            className="mt-1 text-[14px]"
+            style={{ color: 'var(--teacher-text-muted)' }}
+          >
+            Quick access to all your modules
+          </p>
         </div>
-      </PreOneCard>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors hover:bg-[var(--teacher-surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--teacher-primary)]"
+          style={{ color: 'var(--teacher-text-muted)' }}
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          Refresh
+        </button>
+      </div>
 
-      {/* ── Section 2: Module Cards Grid ── */}
+      {/* ── Module Cards Grid ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {modules.map((mod) => {
           const Icon = mod.icon;
@@ -358,6 +309,6 @@ export default function TeacherLandingPage() {
           );
         })}
       </div>
-    </>
+    </div>
   );
 }

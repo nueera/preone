@@ -1,7 +1,8 @@
 // ============================================================
 // PreOne — Parent Landing Page Tests
-// Tests cover: header bar, module cards, navigation, CSS variables,
+// Tests cover: page header, module cards, navigation, CSS variables,
 // responsive layout, Coming Soon badges, illustration fallback
+// Header is now provided by ParentHeader in parent-layout-client.tsx
 // ============================================================
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -50,7 +51,7 @@ vi.mock('lucide-react', () => {
   const iconNames = [
     'LayoutDashboard', 'Users', 'ClipboardCheck', 'IndianRupee', 'FileEdit',
     'Eye', 'BarChart3', 'MessageCircle', 'Megaphone', 'FileBarChart',
-    'BookOpen', 'Settings', 'Gamepad2', 'Star', 'Bell', 'Clock', 'ChevronDown',
+    'BookOpen', 'Settings', 'Gamepad2', 'RefreshCw',
   ];
   iconNames.forEach((name) => {
     icons[name] = (props: { className?: string; style?: React.CSSProperties }) => (
@@ -65,44 +66,21 @@ describe('ParentLandingPage', () => {
     vi.clearAllMocks();
   });
 
-  // ── Header Bar Tests ──
+  // ── Page Header Tests ──
 
-  it('renders PreOne brand name', () => {
+  it('renders Modules title', () => {
     render(<ParentLandingPage />);
-    expect(screen.getByText('PreOne')).toBeInTheDocument();
+    expect(screen.getByText('Modules')).toBeInTheDocument();
   });
 
-  it('renders Parent Portal subtitle', () => {
+  it('renders Quick access subtitle', () => {
     render(<ParentLandingPage />);
-    expect(screen.getByText('Parent Portal')).toBeInTheDocument();
+    expect(screen.getByText('Quick access to all your modules')).toBeInTheDocument();
   });
 
-  it('renders greeting with name', () => {
+  it('renders Refresh button', () => {
     render(<ParentLandingPage />);
-    // The greeting text contains the name "Rahul"
-    const greetingElements = screen.getAllByText(/Rahul/);
-    expect(greetingElements.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders profile initials RS', () => {
-    render(<ParentLandingPage />);
-    expect(screen.getByText('RS')).toBeInTheDocument();
-  });
-
-  it('renders profile name Rahul Sharma', () => {
-    render(<ParentLandingPage />);
-    expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
-  });
-
-  it('renders Parent role text', () => {
-    render(<ParentLandingPage />);
-    const parentTexts = screen.getAllByText('Parent');
-    expect(parentTexts.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders notification bell', () => {
-    render(<ParentLandingPage />);
-    expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Refresh')).toBeInTheDocument();
   });
 
   // ── Module Cards Tests ──
@@ -161,21 +139,18 @@ describe('ParentLandingPage', () => {
 
   // ── CSS Variables Tests ──
 
-  it('uses var(--parent-primary) for PreOne brand name', () => {
+  it('Modules title uses var(--parent-text)', () => {
     render(<ParentLandingPage />);
-    const brandName = screen.getByText('PreOne');
-    expect(brandName).toBeInTheDocument();
-    // Verify the style uses CSS variable
-    const parent = brandName.closest('div');
-    expect(parent).toBeInTheDocument();
+    const modulesTitle = screen.getByText('Modules');
+    const style = modulesTitle.getAttribute('style');
+    expect(style).toContain('var(--parent-text)');
   });
 
-  it('uses var(--parent-bg) on the main content area', () => {
+  it('subtitle uses var(--parent-text-muted)', () => {
     render(<ParentLandingPage />);
-    // The data-portal="parent" is set on the <main> in the layout,
-    // but the page itself doesn't render it. Verify the page content exists.
-    const brandName = screen.getByText('PreOne');
-    expect(brandName).toBeInTheDocument();
+    const subtitle = screen.getByText('Quick access to all your modules');
+    const style = subtitle.getAttribute('style');
+    expect(style).toContain('var(--parent-text-muted)');
   });
 
   it('card titles use themed colors (not hardcoded hex)', () => {
@@ -206,29 +181,23 @@ describe('ParentLandingPage', () => {
 
   // ── Illustration Fallback Tests ──
 
-  it('renders illustration images for module cards', () => {
+  it('renders illustration images for modules with custom icons', () => {
     render(<ParentLandingPage />);
     const images = document.querySelectorAll('img');
-    // All 13 module cards should have illustration images initially
-    expect(images.length).toBe(13);
+    // Modules with custom icons: My Children, Attendance, Fees, Observation,
+    // Growth, Chat, Announcements, PreO Learning, Settings, PreO Gaming (10)
+    expect(images.length).toBe(10);
   });
 
   it('illustration images have correct src pattern', () => {
     render(<ParentLandingPage />);
     const images = document.querySelectorAll('img');
     images.forEach((img) => {
-      expect(img.getAttribute('src')).toMatch(/^\/illustrations\/parent-.*\.svg$/);
+      // Next.js Image transforms URLs to /_next/image?url=... format
+      const src = img.getAttribute('src') || '';
+      expect(src).toContain('icons%2Fparent');
+      expect(src).toContain('.webp');
     });
-  });
-
-  // ── Responsive Layout Tests ──
-
-  it('greeting is hidden on mobile (hidden md:block class)', () => {
-    render(<ParentLandingPage />);
-    // The greeting text includes "Rahul" but there are multiple elements with that text
-    // Check that a hidden md:block container exists
-    const hiddenContainer = document.querySelector('.hidden.md\\:block');
-    expect(hiddenContainer).toBeInTheDocument();
   });
 
   // ── Extended Color Variables Tests ──
