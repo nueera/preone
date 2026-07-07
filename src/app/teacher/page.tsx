@@ -273,17 +273,17 @@ export default function TeacherLandingPage() {
                 )}
 
                 {/* Icon */}
-                <div className="h-28 w-28 flex items-center justify-center mb-4">
+                <div className="h-36 w-36 flex items-center justify-center mb-4">
                   {CUSTOM_ICONS[mod.title] ? (
                     <Image
                       src={CUSTOM_ICONS[mod.title]}
                       alt={mod.title}
-                      width={160}
-                      height={160}
+                      width={200}
+                      height={200}
                       className="object-contain"
                     />
                   ) : (
-                    <Icon className="h-20 w-20" style={{ color: mod.iconColor }} />
+                    <Icon className="h-24 w-24" style={{ color: mod.iconColor }} />
                   )}
                 </div>
 
