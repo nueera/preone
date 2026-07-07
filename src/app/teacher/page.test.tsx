@@ -26,24 +26,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-// ── Mock PreOneCard ──
-vi.mock('@/components/ui/preone-card', () => ({
-  PreOneCard: ({
-    children,
-    className,
-    hover,
-    ...props
-  }: {
-    children: React.ReactNode;
-    className?: string;
-    hover?: boolean;
-    [key: string]: unknown;
-  }) => (
-    <div className={className} data-hover={hover ? 'true' : undefined} {...props}>
-      {children}
-    </div>
-  ),
-}));
+
 
 // ── Mock lucide-react icons ──
 vi.mock('lucide-react', () => {
@@ -51,7 +34,7 @@ vi.mock('lucide-react', () => {
   const iconNames = [
     'LayoutDashboard', 'Users', 'ClipboardCheck', 'FileEdit', 'Eye',
     'Activity', 'CalendarDays', 'MessageCircle', 'Megaphone', 'FileBarChart',
-    'Bell', 'Settings', 'Bot', 'RefreshCw',
+    'Bell', 'Settings', 'Bot', 'RefreshCw', 'ChevronRight',
   ];
   iconNames.forEach((name) => {
     icons[name] = (props: { className?: string; style?: React.CSSProperties }) => (
@@ -153,10 +136,10 @@ describe('TeacherLandingPage', () => {
     expect(grid?.className).toContain('lg:grid-cols-4');
   });
 
-  it('renders all module cards with hover', () => {
+  it('renders all 14 module cards as grid links', () => {
     render(<TeacherLandingPage />);
-    const hoverCards = document.querySelectorAll('[data-hover="true"]');
-    expect(hoverCards.length).toBe(14);
+    const cards = document.querySelectorAll('.grid > a');
+    expect(cards.length).toBe(14);
   });
 
   // ── Illustration Fallback Tests ──
@@ -180,14 +163,14 @@ describe('TeacherLandingPage', () => {
     });
   });
 
-  // ── PreOne Assistant Special Card Tests ──
+  // ── PreOne Assistant Card Tests ──
 
-  it('PreOne Assistant card has special border styling', () => {
+  it('PreOne Assistant card renders without special border styling (consistent with other cards)', () => {
     render(<TeacherLandingPage />);
     const assistantTitle = screen.getByText('PreOne Assistant');
-    const card = assistantTitle.closest('[data-hover]');
+    const card = assistantTitle.closest('[class*="rounded-2xl"]');
     expect(card).toBeInTheDocument();
-    expect(card?.className).toContain('border-2');
+    expect(card?.className).not.toContain('border-2');
   });
 
   it('PreOne Assistant title uses var(--teacher-primary)', () => {

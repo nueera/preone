@@ -23,8 +23,8 @@ import {
   Settings,
   Gamepad2,
   RefreshCw,
+  ChevronRight,
 } from 'lucide-react';
-import { PreOneCard } from '@/components/ui/preone-card';
 
 // ============================================================
 // Custom icon map — module title → icon file path
@@ -231,15 +231,15 @@ export default function ParentLandingPage() {
           const Icon = mod.icon;
 
           return (
-            <Link key={mod.title} href={mod.route} className="group">
-              <PreOneCard
-                hover
-                className="relative flex flex-col items-center justify-center p-6 text-center"
+            <Link key={mod.title} href={mod.route} className="block group h-full">
+              <div
+                className="relative flex flex-col items-center rounded-2xl overflow-hidden h-full min-h-[260px] sm:min-h-[300px] transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-1 border border-black/5"
+                style={{ backgroundColor: mod.iconBg }}
               >
                 {/* Coming Soon Badge */}
                 {mod.comingSoon && (
                   <span
-                    className="absolute right-3 top-3 rounded-full px-2 py-0.5 font-semibold"
+                    className="absolute right-3 top-3 rounded-full px-2 py-0.5 font-semibold z-10"
                     style={{
                       fontSize: '10px',
                       background: 'var(--parent-warning-soft)',
@@ -250,37 +250,59 @@ export default function ParentLandingPage() {
                   </span>
                 )}
 
-                {/* Icon */}
-                <div className="h-36 w-36 flex items-center justify-center mb-4">
+                {/* Top accent circle with icon */}
+                <div className="pt-5 sm:pt-6 pb-1 flex flex-col items-center">
+                  <div
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center shadow-sm"
+                    style={{
+                      backgroundColor: 'white',
+                      color: mod.iconColor,
+                    }}
+                  >
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+                  </div>
+                </div>
+
+                {/* Illustration area */}
+                <div className="flex-1 w-full relative flex items-center justify-center overflow-hidden py-2">
                   {CUSTOM_ICONS[mod.title] ? (
                     <Image
                       src={CUSTOM_ICONS[mod.title]}
                       alt={mod.title}
-                      width={200}
-                      height={200}
+                      width={140}
+                      height={140}
                       className="object-contain"
                     />
                   ) : (
-                    <Icon className="h-24 w-24" style={{ color: mod.iconColor }} />
+                    <Icon
+                      className="h-16 w-16"
+                      style={{ color: mod.iconColor, opacity: 0.7 }}
+                    />
                   )}
                 </div>
 
-                {/* Card Title */}
-                <h3
-                  className="text-sm font-semibold"
-                  style={{ color: mod.titleColor }}
-                >
-                  {mod.title}
-                </h3>
-
-                {/* Card Description */}
-                <p
-                  className="text-[11px] mt-1"
-                  style={{ color: 'var(--parent-text-muted)' }}
-                >
-                  {mod.description}
-                </p>
-              </PreOneCard>
+                {/* Bottom: title + description + arrow */}
+                <div className="w-full px-3 sm:px-4 pt-2 pb-3 sm:pb-4 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <h3
+                      className="font-semibold text-[13px] sm:text-sm"
+                      style={{ color: mod.titleColor }}
+                    >
+                      {mod.title}
+                    </h3>
+                    <p
+                      className="text-[10px] sm:text-[11px] mt-0.5 leading-snug truncate"
+                      style={{ color: 'var(--parent-text-muted)' }}
+                    >
+                      {mod.description}
+                    </p>
+                  </div>
+                  <ChevronRight
+                    className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 group-hover:translate-x-0.5 transition-transform"
+                    style={{ color: mod.iconColor }}
+                  />
+                </div>
+              </div>
             </Link>
           );
         })}

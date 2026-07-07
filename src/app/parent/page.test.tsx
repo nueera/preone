@@ -26,32 +26,13 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-// ── Mock PreOneCard ──
-vi.mock('@/components/ui/preone-card', () => ({
-  PreOneCard: ({
-    children,
-    className,
-    hover,
-    ...props
-  }: {
-    children: React.ReactNode;
-    className?: string;
-    hover?: boolean;
-    [key: string]: unknown;
-  }) => (
-    <div className={className} data-hover={hover ? 'true' : undefined} {...props}>
-      {children}
-    </div>
-  ),
-}));
-
 // ── Mock lucide-react icons ──
 vi.mock('lucide-react', () => {
   const icons: Record<string, React.FC<{ className?: string; style?: React.CSSProperties }>> = {};
   const iconNames = [
     'LayoutDashboard', 'Users', 'ClipboardCheck', 'IndianRupee', 'FileEdit',
     'Eye', 'BarChart3', 'MessageCircle', 'Megaphone', 'FileBarChart',
-    'BookOpen', 'Settings', 'Gamepad2', 'RefreshCw',
+    'BookOpen', 'Settings', 'Gamepad2', 'RefreshCw', 'ChevronRight',
   ];
   iconNames.forEach((name) => {
     icons[name] = (props: { className?: string; style?: React.CSSProperties }) => (
@@ -172,11 +153,10 @@ describe('ParentLandingPage', () => {
     expect(grid?.className).toContain('lg:grid-cols-4');
   });
 
-  it('renders header card with hover-capable module cards', () => {
+  it('renders all 13 module cards as grid links', () => {
     render(<ParentLandingPage />);
-    const hoverCards = document.querySelectorAll('[data-hover="true"]');
-    // All 13 module cards should have hover
-    expect(hoverCards.length).toBe(13);
+    const cards = document.querySelectorAll('.grid > a');
+    expect(cards.length).toBe(13);
   });
 
   // ── Illustration Fallback Tests ──
