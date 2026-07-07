@@ -140,7 +140,7 @@ export function VirtualScrollTable({
 
     const handleCellClick = useCallback((columnKey: string) => {
       onCellClick?.(columnKey, row, index);
-    }, [columnKey, row, index, onCellClick]);
+    }, [row, index, onCellClick]);
 
     return (
       <div

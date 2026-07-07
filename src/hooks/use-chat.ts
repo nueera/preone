@@ -37,7 +37,7 @@ export function useChatInit() {
  */
 export function useTypingIndicator(threadId: string) {
   const setTyping = useChatStore((s) => s.setTyping);
-  const typingTimer = useRef<ReturnType<typeof setTimeout>>();
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleTyping = useCallback(() => {
     setTyping(threadId, true);
