@@ -106,6 +106,31 @@ interface TeacherData {
 }
 
 // ── Constants ──
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; dotColor: string; badgeBg: string; badgeText: string }
+> = {
+  ACTIVE: {
+    label: 'Active',
+    dotColor: 'var(--admin-success)',
+    badgeBg: 'var(--admin-success-soft)',
+    badgeText: 'var(--admin-success)',
+  },
+  ON_LEAVE: {
+    label: 'On Leave',
+    dotColor: 'var(--admin-orange)',
+    badgeBg: 'var(--admin-orange-soft)',
+    badgeText: 'var(--admin-orange)',
+  },
+  INACTIVE: {
+    label: 'Inactive',
+    dotColor: 'var(--admin-text-muted)',
+    badgeBg: 'var(--admin-surface-2)',
+    badgeText: 'var(--admin-text-muted)',
+  },
+};
+
+// Legacy maps kept for salary/leave tabs that still use Tailwind classes
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   ON_LEAVE: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -490,11 +515,12 @@ export default function TeacherDetailPage() {
   const calculatedNetPay = salaryForm.basicSalary + salaryForm.hra + salaryForm.da - salaryForm.pfDeduction - salaryForm.taxDeduction - salaryForm.otherDeductions + salaryForm.bonus;
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
       {/* ── Back Button ── */}
       <Button
         variant="ghost"
-        className="gap-1 text-muted-foreground"
+        className="w-fit gap-1"
+        style={{ color: 'var(--admin-text-muted)' }}
         onClick={() => router.push('/admin/teachers')}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -502,29 +528,63 @@ export default function TeacherDetailPage() {
       </Button>
 
       {/* ── Profile Header ── */}
-      <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
+      <div
+        className="rounded-xl border p-6 shadow-sm"
+        style={{
+          background: 'var(--admin-surface)',
+          borderColor: 'var(--admin-border)',
+        }}
+      >
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-portal-50 text-portal-700 text-2xl font-bold">
+            <AvatarFallback
+              className="text-2xl font-bold"
+              style={{
+                background: 'var(--admin-primary-soft)',
+                color: 'var(--admin-primary)',
+              }}
+            >
               {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
                 {teacher.firstName} {teacher.lastName}
               </h1>
               {teacher.qualification && (
-                <Badge variant="secondary" className="gap-1">
+                <span
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium"
+                  style={{
+                    background: 'var(--admin-info-soft)',
+                    color: 'var(--admin-info)',
+                  }}
+                >
                   <GraduationCap className="h-3 w-3" />
                   {teacher.qualification}
-                </Badge>
+                </span>
               )}
-              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${STATUS_COLORS[teacher.status]}`}>
-                {STATUS_LABELS[teacher.status]}
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                style={{
+                  background: STATUS_CONFIG[teacher.status]?.badgeBg ?? 'var(--admin-surface-2)',
+                  color: STATUS_CONFIG[teacher.status]?.badgeText ?? 'var(--admin-text-muted)',
+                }}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: STATUS_CONFIG[teacher.status]?.dotColor ?? 'var(--admin-text-muted)' }}
+                />
+                {STATUS_CONFIG[teacher.status]?.label ?? teacher.status}
               </span>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm text-muted-foreground">
+            <div
+              className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm"
+              style={{ color: 'var(--admin-text-muted)' }}
+            >
               <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {teacher.email}</span>
               <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {teacher.phone}</span>
               <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {teacher.experience} yrs experience</span>
@@ -538,7 +598,13 @@ export default function TeacherDetailPage() {
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </Button>
-            <Button variant="outline" size="sm" className="gap-1 text-red-600 hover:text-red-700" onClick={handleDelete}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              style={{ color: 'var(--admin-error)' }}
+              onClick={handleDelete}
+            >
               <Trash2 className="h-3.5 w-3.5" />
               Deactivate
             </Button>

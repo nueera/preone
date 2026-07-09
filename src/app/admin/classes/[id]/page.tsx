@@ -18,14 +18,19 @@ import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
+
+// ── Program CSS-var-based colors ──
+const PROGRAM_VARS: Record<string, { color: string; bg: string }> = {
+  Playgroup: { color: 'var(--admin-pink)', bg: 'var(--admin-pink-soft)' },
+  Nursery:   { color: 'var(--admin-orange)', bg: 'var(--admin-orange-soft)' },
+  LKG:       { color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
+  UKG:       { color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+};
 
 // ── Types ──
 interface TeacherInfo {
@@ -71,19 +76,7 @@ interface AttendanceRecord {
 }
 
 // ── Program badge colors ──
-const PROGRAM_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Playgroup: { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200' },
-  Nursery:   { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  LKG:       { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
-  UKG:       { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-};
-
-const ATTENDANCE_STATUS_COLORS: Record<string, string> = {
-  PRESENT: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  ABSENT: 'bg-red-50 text-red-700 border-red-200',
-  LATE: 'bg-amber-50 text-amber-700 border-amber-200',
-  EXCUSED: 'bg-sky-50 text-sky-700 border-sky-200',
-};
+// (replaced with PROGRAM_VARS above)
 
 // ── Auth helper ──
 function getToken(): string | null {
@@ -181,16 +174,20 @@ export default function ClassDetailPage() {
     );
   }
 
-  const programColors = PROGRAM_COLORS[classData.program.name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
+  const programVars = PROGRAM_VARS[classData.program.name] || {
+    color: 'var(--admin-text-muted)',
+    bg: 'var(--admin-surface-2)',
+  };
   const occupancy = classData.capacity > 0 ? Math.round((classData._count.students / classData.capacity) * 100) : 0;
 
   return (
     <PageTransition>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
         <Button
           variant="ghost"
-          className="gap-1 text-muted-foreground"
+          className="w-fit gap-1"
+          style={{ color: 'var(--admin-text-muted)' }}
           onClick={() => router.push('/admin/classes')}
         >
           <ArrowLeft className="h-4 w-4" />
@@ -198,24 +195,39 @@ export default function ClassDetailPage() {
         </Button>
 
         {/* ── Class Info Header ── */}
-        <PreOneCard variant="default">
+        <PreOneCard variant="default" className="!rounded-xl">
           <PreOneCardContent>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              {/* Class Icon */}
-              <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-100 to-sky-100 dark:from-violet-900/30 dark:to-sky-900/30">
-                <GraduationCap className="h-8 w-8 text-portal-600" />
+              {/* Class Icon Badge */}
+              <div
+                className="flex h-16 w-16 items-center justify-center rounded-2xl"
+                style={{ background: 'var(--admin-primary-soft)' }}
+              >
+                <GraduationCap
+                  className="h-8 w-8"
+                  style={{ color: 'var(--admin-primary)' }}
+                />
               </div>
 
               <div className="flex-1">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
+                  <h1
+                    className="text-2xl font-bold tracking-tight"
+                    style={{ color: 'var(--admin-text)' }}
+                  >
                     {classData.name}
                   </h1>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${programColors.bg} ${programColors.text} ${programColors.border}`}>
+                  <span
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    style={{ background: programVars.bg, color: programVars.color }}
+                  >
                     {classData.program.name}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm text-muted-foreground">
+                <div
+                  className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
                   {classData.teacher && (
                     <span className="flex items-center gap-1">
                       <UserCheck className="h-3.5 w-3.5" />
@@ -235,7 +247,7 @@ export default function ClassDetailPage() {
                 </div>
               </div>
 
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button variant="outline" size="sm" className="gap-1.5">
                 <Pencil className="h-3.5 w-3.5" />
                 Edit
               </Button>
@@ -275,17 +287,25 @@ export default function ClassDetailPage() {
         </div>
 
         {/* ── Capacity Bar ── */}
-        <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-[var(--admin-text-muted)]">
-              Class Capacity
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {classData._count.students} of {classData.capacity} seats filled
-            </span>
-          </div>
-          <Progress value={occupancy} className="h-2" />
-        </div>
+        <PreOneCard className="!rounded-xl">
+          <PreOneCardContent className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span
+                className="text-sm font-medium"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                Class Capacity
+              </span>
+              <span
+                className="text-sm"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                {classData._count.students} of {classData.capacity} seats filled
+              </span>
+            </div>
+            <Progress value={occupancy} className="h-2" />
+          </PreOneCardContent>
+        </PreOneCard>
 
         {/* ── Tabs ── */}
         <Tabs defaultValue="students" className="space-y-4">
@@ -334,24 +354,46 @@ export default function ClassDetailPage() {
                         onClick={() => router.push(`/admin/students/${student.id}`)}
                       >
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
+                          <AvatarFallback
+                            className="text-xs font-semibold"
+                            style={{
+                              background: 'var(--admin-primary-soft)',
+                              color: 'var(--admin-primary)',
+                            }}
+                          >
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--admin-text)] truncate">
+                          <p
+                            className="text-sm font-medium truncate"
+                            style={{ color: 'var(--admin-text)' }}
+                          >
                             {student.firstName} {student.lastName}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p
+                            className="text-xs"
+                            style={{ color: 'var(--admin-text-muted)' }}
+                          >
                             {student.rollNumber ? `#${student.rollNumber}` : 'No roll no.'}
                           </p>
                         </div>
-                        <Badge
-                          variant="secondary"
-                          className={`text-[10px] ${student.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'}`}
+                        <span
+                          className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
+                          style={
+                            student.status === 'ACTIVE'
+                              ? {
+                                  background: 'var(--admin-success-soft)',
+                                  color: 'var(--admin-success)',
+                                }
+                              : {
+                                  background: 'var(--admin-surface-2)',
+                                  color: 'var(--admin-text-muted)',
+                                }
+                          }
                         >
                           {student.status === 'ACTIVE' ? 'Active' : student.status}
-                        </Badge>
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -377,10 +419,23 @@ export default function ClassDetailPage() {
               <CardContent>
                 <div className="flex items-center gap-6 py-8">
                   {/* Attendance Rate Circle */}
-                  <div className="flex-shrink-0 w-32 h-32 rounded-full border-4 border-emerald-200 flex items-center justify-center">
+                  <div
+                    className="flex-shrink-0 w-32 h-32 rounded-full border-4 flex items-center justify-center"
+                    style={{ borderColor: 'var(--admin-success-soft)' }}
+                  >
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-emerald-600">{attendanceRate}%</p>
-                      <p className="text-xs text-muted-foreground">This month</p>
+                      <p
+                        className="text-3xl font-bold"
+                        style={{ color: 'var(--admin-success)' }}
+                      >
+                        {attendanceRate}%
+                      </p>
+                      <p
+                        className="text-xs"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
+                        This month
+                      </p>
                     </div>
                   </div>
                   {/* Legend */}
@@ -432,19 +487,40 @@ export default function ClassDetailPage() {
                         className="flex items-center justify-between p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] transition-colors"
                       >
                         <div>
-                          <p className="text-sm font-medium text-[var(--admin-text)]">
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: 'var(--admin-text)' }}
+                          >
                             {activity.title}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p
+                            className="text-xs"
+                            style={{ color: 'var(--admin-text-muted)' }}
+                          >
                             {activity.type} &middot; {new Date(activity.date).toLocaleDateString()}
                           </p>
                         </div>
-                        <Badge
-                          variant="secondary"
-                          className={`text-[10px] ${activity.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' : activity.status === 'UPCOMING' ? 'bg-sky-50 text-sky-700' : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'}`}
+                        <span
+                          className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
+                          style={
+                            activity.status === 'COMPLETED'
+                              ? {
+                                  background: 'var(--admin-success-soft)',
+                                  color: 'var(--admin-success)',
+                                }
+                              : activity.status === 'UPCOMING'
+                                ? {
+                                    background: 'var(--admin-info-soft)',
+                                    color: 'var(--admin-info)',
+                                  }
+                                : {
+                                    background: 'var(--admin-surface-2)',
+                                    color: 'var(--admin-text-muted)',
+                                  }
+                          }
                         >
                           {activity.status}
-                        </Badge>
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -458,7 +534,7 @@ export default function ClassDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-portal-500" />
+                  <Clock className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                   Weekly Schedule
                 </CardTitle>
               </CardHeader>
@@ -466,22 +542,30 @@ export default function ClassDetailPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b">
-                        <th className="py-2 px-3 text-left text-muted-foreground font-medium">Day</th>
-                        <th className="py-2 px-3 text-left text-muted-foreground font-medium">9:00 AM</th>
-                        <th className="py-2 px-3 text-left text-muted-foreground font-medium">10:00 AM</th>
-                        <th className="py-2 px-3 text-left text-muted-foreground font-medium">11:00 AM</th>
-                        <th className="py-2 px-3 text-left text-muted-foreground font-medium">12:00 PM</th>
+                      <tr className="border-b" style={{ borderColor: 'var(--admin-border)' }}>
+                        <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>Day</th>
+                        <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>9:00 AM</th>
+                        <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>10:00 AM</th>
+                        <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>11:00 AM</th>
+                        <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>12:00 PM</th>
                       </tr>
                     </thead>
                     <tbody>
                       {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
-                        <tr key={day} className="border-b last:border-0">
-                          <td className="py-3 px-3 font-medium">{day}</td>
-                          <td className="py-3 px-3"><span className="rounded-lg px-2 py-1 text-xs font-medium bg-violet-100 text-violet-700">Circle Time</span></td>
-                          <td className="py-3 px-3"><span className="rounded-lg px-2 py-1 text-xs font-medium bg-sky-100 text-sky-700">Learning</span></td>
-                          <td className="py-3 px-3"><span className="rounded-lg px-2 py-1 text-xs font-medium bg-pink-100 text-pink-700">Art & Craft</span></td>
-                          <td className="py-3 px-3"><span className="rounded-lg px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">Outdoor Play</span></td>
+                        <tr key={day} className="border-b last:border-0" style={{ borderColor: 'var(--admin-border)' }}>
+                          <td className="py-3 px-3 font-medium" style={{ color: 'var(--admin-text)' }}>{day}</td>
+                          <td className="py-3 px-3">
+                            <span className="rounded-lg px-2 py-1 text-xs font-medium" style={{ background: 'var(--admin-pink-soft)', color: 'var(--admin-pink)' }}>Circle Time</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="rounded-lg px-2 py-1 text-xs font-medium" style={{ background: 'var(--admin-info-soft)', color: 'var(--admin-info)' }}>Learning</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="rounded-lg px-2 py-1 text-xs font-medium" style={{ background: 'var(--admin-pink-soft)', color: 'var(--admin-pink)' }}>Art &amp; Craft</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="rounded-lg px-2 py-1 text-xs font-medium" style={{ background: 'var(--admin-success-soft)', color: 'var(--admin-success)' }}>Outdoor Play</span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
