@@ -50,6 +50,17 @@ import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { CRM_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface LeadInfo {
@@ -85,21 +96,21 @@ const PRIORITY_CONFIG: Record<
 > = {
   HIGH: {
     label: 'High',
-    color: 'var(--admin-error)',
+    color: 'var(--warm-rose-ink)',
     bg: 'rgba(239,68,68,0.1)',
-    border: 'var(--admin-error)',
+    border: 'var(--warm-rose-ink)',
   },
   MEDIUM: {
     label: 'Medium',
-    color: 'var(--admin-warning)',
-    bg: 'var(--admin-warning-soft)',
-    border: 'var(--admin-warning)',
+    color: 'var(--warm-honey-ink)',
+    bg: 'var(--warm-honey-soft)',
+    border: 'var(--warm-honey-ink)',
   },
   LOW: {
     label: 'Low',
-    color: 'var(--admin-text-muted)',
-    bg: 'var(--admin-surface-2)',
-    border: 'var(--admin-border)',
+    color: 'var(--warm-ink-muted)',
+    bg: 'var(--warm-bg-soft)',
+    border: 'var(--warm-border)',
   },
 };
 
@@ -117,26 +128,26 @@ const STATUS_CONFIG: Record<
   TODO: {
     label: 'To Do',
     icon: <Circle className="h-4 w-4" />,
-    color: 'var(--admin-text-muted)',
-    bg: 'var(--admin-surface-2)',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    color: 'var(--warm-ink-muted)',
+    bg: 'var(--warm-bg-soft)',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   IN_PROGRESS: {
     label: 'In Progress',
     icon: <Clock className="h-4 w-4" />,
-    color: 'var(--admin-info)',
-    bg: 'var(--admin-info-soft)',
-    softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    color: 'var(--warm-sky-ink)',
+    bg: 'var(--warm-sky-soft)',
+    softVar: 'var(--warm-sky-soft)',
+    varColor: 'var(--warm-sky-ink)',
   },
   DONE: {
     label: 'Done',
     icon: <CheckCircle2 className="h-4 w-4" />,
-    color: 'var(--admin-success)',
-    bg: 'var(--admin-success-soft)',
-    softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    color: 'var(--warm-sage)',
+    bg: 'var(--warm-sage-soft)',
+    softVar: 'var(--warm-sage-soft)',
+    varColor: 'var(--warm-sage)',
   },
 };
 
@@ -147,38 +158,38 @@ const STAGE_CONFIG: Record<
   NEW: {
     label: 'New',
     color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   CONTACTED: {
     label: 'Contacted',
     color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
-    softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    softVar: 'var(--warm-sky-soft)',
+    varColor: 'var(--warm-sky-ink)',
   },
   VISITED: {
     label: 'Visited',
     color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
-    softVar: 'var(--admin-primary-soft)',
-    varColor: 'var(--admin-primary)',
+    softVar: 'var(--warm-primary-soft)',
+    varColor: 'var(--warm-primary)',
   },
   APPLIED: {
     label: 'Applied',
     color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
-    softVar: 'var(--admin-warning-soft)',
-    varColor: 'var(--admin-warning)',
+    softVar: 'var(--warm-honey-soft)',
+    varColor: 'var(--warm-honey-ink)',
   },
   ENROLLED: {
     label: 'Enrolled',
     color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
-    softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    softVar: 'var(--warm-sage-soft)',
+    varColor: 'var(--warm-sage)',
   },
   LOST: {
     label: 'Lost',
     color: CRM_COLORS.LOST?.hex ?? '#9ca3af',
     softVar: 'rgba(239,68,68,0.1)',
-    varColor: 'var(--admin-error)',
+    varColor: 'var(--warm-rose-ink)',
   },
 };
 
@@ -337,20 +348,21 @@ function AddTaskDialog({
   };
 
   return (
+    <WarmPremium className="min-h-screen">
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle
             className="text-xl font-bold flex items-center gap-2"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             <div
               className="flex h-7 w-7 items-center justify-center rounded-lg"
-              style={{ background: 'var(--admin-primary-soft)' }}
+              style={{ background: 'var(--warm-primary-soft)' }}
             >
               <Plus
                 className="h-4 w-4"
-                style={{ color: 'var(--admin-primary)' }}
+                style={{ color: 'var(--warm-primary)' }}
               />
             </div>
             New Task
@@ -362,7 +374,7 @@ function AddTaskDialog({
             className="rounded-lg p-3 text-sm flex items-center gap-2"
             style={{
               background: 'rgba(239,68,68,0.08)',
-              color: 'var(--admin-error)',
+              color: 'var(--warm-rose-ink)',
             }}
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -373,7 +385,7 @@ function AddTaskDialog({
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label className="text-xs">
-              Task Title <span style={{ color: 'var(--admin-error)' }}>*</span>
+              Task Title <span style={{ color: 'var(--warm-rose-ink)' }}>*</span>
             </Label>
             <Input
               value={form.title}
@@ -493,7 +505,7 @@ function AddTaskDialog({
           <Button
             onClick={handleSubmit}
             disabled={submitting}
-            className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
           >
             {submitting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -505,6 +517,7 @@ function AddTaskDialog({
         </div>
       </DialogContent>
     </Dialog>
+    </WarmPremium>
   );
 }
 
@@ -523,7 +536,7 @@ function StatCard({
   accentSoftVar: string;
 }) {
   return (
-    <PreOneCard className="!rounded-xl">
+    <WarmCard fade>
       <div className="p-4 flex items-center gap-4">
         <div
           className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
@@ -534,19 +547,19 @@ function StatCard({
         <div className="min-w-0 flex-1">
           <div
             className="text-xs font-medium"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--warm-ink-muted)' }}
           >
             {label}
           </div>
           <div
             className="text-xl font-bold tabular-nums"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             {value}
           </div>
         </div>
       </div>
-    </PreOneCard>
+    </WarmCard>
   );
 }
 
@@ -574,8 +587,8 @@ function FilterPill({
         active
           ? { background: activeBg, color: activeColor }
           : {
-              background: 'var(--admin-surface-2)',
-              color: 'var(--admin-text-muted)',
+              background: 'var(--warm-bg-soft)',
+              color: 'var(--warm-ink-muted)',
             }
       }
     >
@@ -586,7 +599,7 @@ function FilterPill({
           style={
             active
               ? { background: activeColor, color: activeBg }
-              : { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)' }
+              : { background: 'var(--warm-surface)', color: 'var(--warm-ink-muted)' }
           }
         >
           {count}
@@ -627,14 +640,14 @@ function TaskCard({
 
   const borderColor =
     isOverdue && task.status !== 'DONE'
-      ? 'var(--admin-error)'
+      ? 'var(--warm-rose-ink)'
       : statusCfg.color;
 
   return (
     <div
       className="rounded-lg border-l-4 p-3 transition-all hover:shadow-sm"
       style={{
-        background: 'var(--admin-surface)',
+        background: 'var(--warm-surface)',
         borderLeftColor: borderColor,
         boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
         opacity: task.status === 'DONE' ? 0.6 : 1,
@@ -661,7 +674,7 @@ function TaskCard({
             <p
               className="text-sm font-medium truncate"
               style={{
-                color: 'var(--admin-text)',
+                color: 'var(--warm-ink)',
                 textDecoration: task.status === 'DONE' ? 'line-through' : 'none',
               }}
             >
@@ -684,7 +697,7 @@ function TaskCard({
           {task.description && (
             <p
               className="text-xs mt-1 line-clamp-2"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               {task.description}
             </p>
@@ -696,10 +709,10 @@ function TaskCard({
                 className="text-[11px] flex items-center gap-1 tabular-nums"
                 style={{
                   color: isOverdue
-                    ? 'var(--admin-error)'
+                    ? 'var(--warm-rose-ink)'
                     : isDueToday
-                      ? 'var(--admin-warning)'
-                      : 'var(--admin-text-subtle)',
+                      ? 'var(--warm-honey-ink)'
+                      : 'var(--warm-ink-faint)',
                   fontWeight: isOverdue || isDueToday ? 600 : 400,
                 }}
               >
@@ -717,7 +730,7 @@ function TaskCard({
               <Link
                 href={`/admin/admissions/leads/${task.lead.id}`}
                 className="text-[11px] flex items-center gap-1 hover:underline"
-                style={{ color: 'var(--admin-primary)' }}
+                style={{ color: 'var(--warm-primary)' }}
               >
                 <LinkIcon className="h-3 w-3" />
                 {task.lead.parentName}
@@ -727,10 +740,10 @@ function TaskCard({
                     style={{
                       background:
                         STAGE_CONFIG[task.lead.stage]?.softVar ??
-                        'var(--admin-surface-2)',
+                        'var(--warm-bg-soft)',
                       color:
                         STAGE_CONFIG[task.lead.stage]?.varColor ??
-                        'var(--admin-text-muted)',
+                        'var(--warm-ink-muted)',
                     }}
                   >
                     {STAGE_CONFIG[task.lead.stage]?.label ?? task.lead.stage}
@@ -742,7 +755,7 @@ function TaskCard({
             {task.assignee && (
               <span
                 className="text-[11px] flex items-center gap-1"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               >
                 <UserCircle className="h-3 w-3" />
                 {task.assignee.name}
@@ -754,14 +767,14 @@ function TaskCard({
         <button
           onClick={() => onDelete(task.id)}
           className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors flex-shrink-0"
-          style={{ color: 'var(--admin-text-subtle)' }}
+          style={{ color: 'var(--warm-ink-faint)' }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = 'rgba(239,68,68,0.08)';
-            e.currentTarget.style.color = 'var(--admin-error)';
+            e.currentTarget.style.color = 'var(--warm-rose-ink)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'var(--admin-text-subtle)';
+            e.currentTarget.style.color = 'var(--warm-ink-faint)';
           }}
           title="Delete task"
         >
@@ -893,16 +906,16 @@ export default function CrmTasksPage() {
   ).length;
 
   const FILTER_PILLS = [
-    { key: 'all' as const, label: 'All', color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
-    { key: 'TODO' as const, label: 'To Do', color: 'var(--admin-text-muted)', bg: 'var(--admin-surface-2)' },
-    { key: 'IN_PROGRESS' as const, label: 'In Progress', color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
-    { key: 'DONE' as const, label: 'Done', color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+    { key: 'all' as const, label: 'All', color: 'var(--warm-primary)', bg: 'var(--warm-primary-soft)' },
+    { key: 'TODO' as const, label: 'To Do', color: 'var(--warm-ink-muted)', bg: 'var(--warm-bg-soft)' },
+    { key: 'IN_PROGRESS' as const, label: 'In Progress', color: 'var(--warm-sky-ink)', bg: 'var(--warm-sky-soft)' },
+    { key: 'DONE' as const, label: 'Done', color: 'var(--warm-sage)', bg: 'var(--warm-sage-soft)' },
   ];
 
   const boardColumns = [
-    { key: 'TODO', label: 'To Do', icon: Circle, color: 'var(--admin-text-muted)', bg: 'var(--admin-surface-2)' },
-    { key: 'IN_PROGRESS', label: 'In Progress', icon: Clock, color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
-    { key: 'DONE', label: 'Done', icon: CheckCircle2, color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+    { key: 'TODO', label: 'To Do', icon: Circle, color: 'var(--warm-ink-muted)', bg: 'var(--warm-bg-soft)' },
+    { key: 'IN_PROGRESS', label: 'In Progress', icon: Clock, color: 'var(--warm-sky-ink)', bg: 'var(--warm-sky-soft)' },
+    { key: 'DONE', label: 'Done', icon: CheckCircle2, color: 'var(--warm-sage)', bg: 'var(--warm-sage-soft)' },
   ];
 
   return (
@@ -919,23 +932,23 @@ export default function CrmTasksPage() {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-warning-soft)' }}
+              style={{ background: 'var(--warm-honey-soft)' }}
             >
               <CheckSquare
                 className="h-5 w-5"
-                style={{ color: 'var(--admin-warning)' }}
+                style={{ color: 'var(--warm-honey-ink)' }}
               />
             </div>
             <div>
               <h1
                 className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--admin-text)' }}
+                style={{ color: 'var(--warm-ink)' }}
               >
                 CRM Tasks
               </h1>
               <p
                 className="text-sm"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Manage tasks and to-dos for your admissions team
               </p>
@@ -957,7 +970,7 @@ export default function CrmTasksPage() {
           </Button>
           <Button
             size="sm"
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
             onClick={() => setAddTaskOpen(true)}
           >
             <Plus className="h-4 w-4" />
@@ -999,7 +1012,7 @@ export default function CrmTasksPage() {
       </div>
 
       {/* ── SECTION 3: FILTER BAR ── */}
-      <PreOneCard className="!rounded-xl">
+      <WarmCard fade>
         <div className="p-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             {FILTER_PILLS.map((pill) => {
@@ -1043,15 +1056,15 @@ export default function CrmTasksPage() {
 
             <div
               className="flex items-center rounded-lg p-0.5"
-              style={{ background: 'var(--admin-surface-2)' }}
+              style={{ background: 'var(--warm-bg-soft)' }}
             >
               <button
                 onClick={() => setViewMode('board')}
                 className="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
                 style={
                   viewMode === 'board'
-                    ? { background: 'var(--admin-surface)', color: 'var(--admin-text)' }
-                    : { color: 'var(--admin-text-muted)' }
+                    ? { background: 'var(--warm-surface)', color: 'var(--warm-ink)' }
+                    : { color: 'var(--warm-ink-muted)' }
                 }
                 title="Board view"
               >
@@ -1062,8 +1075,8 @@ export default function CrmTasksPage() {
                 className="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
                 style={
                   viewMode === 'list'
-                    ? { background: 'var(--admin-surface)', color: 'var(--admin-text)' }
-                    : { color: 'var(--admin-text-muted)' }
+                    ? { background: 'var(--warm-surface)', color: 'var(--warm-ink)' }
+                    : { color: 'var(--warm-ink-muted)' }
                 }
                 title="List view"
               >
@@ -1072,48 +1085,48 @@ export default function CrmTasksPage() {
             </div>
           </div>
         </div>
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── SECTION 4: TASKS DISPLAY ── */}
       {loading ? (
-        <PreOneCard className="!rounded-xl">
+        <WarmCard fade>
           <div
             className="flex items-center justify-center h-48 text-sm"
-            style={{ color: 'var(--admin-text-subtle)' }}
+            style={{ color: 'var(--warm-ink-faint)' }}
           >
             <RefreshCw className="h-5 w-5 animate-spin mr-2" />
             Loading tasks...
           </div>
-        </PreOneCard>
+        </WarmCard>
       ) : tasks.length === 0 ? (
-        <PreOneCard className="!rounded-xl">
+        <WarmCard fade>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <CheckSquare
               className="h-10 w-10 mb-3 opacity-40"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             />
             <p
               className="text-sm font-medium"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               No tasks in this view
             </p>
             <p
               className="text-xs mt-1"
-              style={{ color: 'var(--admin-text-subtle)' }}
+              style={{ color: 'var(--warm-ink-faint)' }}
             >
               Create a new task to get started.
             </p>
             <Button
               size="sm"
-              className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="mt-4 gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
               onClick={() => setAddTaskOpen(true)}
             >
               <Plus className="h-4 w-4" />
               New Task
             </Button>
           </div>
-        </PreOneCard>
+        </WarmCard>
       ) : viewMode === 'board' ? (
         /* Board View */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1121,11 +1134,11 @@ export default function CrmTasksPage() {
             const Icon = col.icon;
             const colTasks = tasks.filter((t) => t.status === col.key);
             return (
-              <PreOneCard key={col.key} className="!rounded-xl overflow-hidden">
+              <WarmCard key={col.key} className="overflow-hidden" fade>
                 <div
                   className="border-b px-4 py-3 flex items-center justify-between"
                   style={{
-                    borderColor: 'var(--admin-border)',
+                    borderColor: 'var(--warm-border)',
                     background: col.bg,
                   }}
                 >
@@ -1133,16 +1146,16 @@ export default function CrmTasksPage() {
                     <Icon className="h-4 w-4" style={{ color: col.color }} />
                     <span
                       className="text-sm font-semibold"
-                      style={{ color: 'var(--admin-text)' }}
+                      style={{ color: 'var(--warm-ink)' }}
                     >
                       {col.label}
                     </span>
                     <span
                       className="text-xs font-bold px-2 py-0.5 rounded-full tabular-nums"
                       style={{
-                        background: 'var(--admin-surface)',
-                        color: 'var(--admin-text-muted)',
-                        border: '1px solid var(--admin-border)',
+                        background: 'var(--warm-surface)',
+                        color: 'var(--warm-ink-muted)',
+                        border: '1px solid var(--warm-border)',
                       }}
                     >
                       {colTasks.length}
@@ -1151,16 +1164,16 @@ export default function CrmTasksPage() {
                 </div>
                 <div
                   className="p-3 space-y-2 max-h-[calc(100vh-380px)] overflow-y-auto"
-                  style={{ background: 'var(--admin-surface-2)' }}
+                  style={{ background: 'var(--warm-bg-soft)' }}
                 >
                   {colTasks.length === 0 ? (
                     <div
                       className="flex flex-col items-center justify-center h-24 text-xs gap-1"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     >
                       <Circle
                         className="h-5 w-5 opacity-40"
-                        style={{ color: 'var(--admin-text-subtle)' }}
+                        style={{ color: 'var(--warm-ink-faint)' }}
                       />
                       No tasks
                     </div>
@@ -1176,13 +1189,13 @@ export default function CrmTasksPage() {
                     ))
                   )}
                 </div>
-              </PreOneCard>
+              </WarmCard>
             );
           })}
         </div>
       ) : (
         /* List View */
-        <PreOneCard className="!rounded-xl">
+        <WarmCard fade>
           <div className="p-4 space-y-2">
             {tasks.map((task) => (
               <TaskCard
@@ -1194,7 +1207,7 @@ export default function CrmTasksPage() {
               />
             ))}
           </div>
-        </PreOneCard>
+        </WarmCard>
       )}
 
       {/* ── Add Task Dialog ── */}

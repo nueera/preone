@@ -43,6 +43,17 @@ import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Constants ──
 const SOURCES = [
@@ -110,14 +121,14 @@ function SectionHeader({
           </span>
           <h2
             className="text-base font-semibold"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             {title}
           </h2>
         </div>
         <p
           className="text-xs mt-0.5"
-          style={{ color: 'var(--admin-text-muted)' }}
+          style={{ color: 'var(--warm-ink-muted)' }}
         >
           {subtitle}
         </p>
@@ -144,13 +155,13 @@ function Field({
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor} className="text-xs font-medium">
         {label}
-        {required && <span style={{ color: 'var(--admin-error)' }}> *</span>}
+        {required && <span style={{ color: 'var(--warm-rose-ink)' }}> *</span>}
       </Label>
       {children}
       {error && (
         <p
           className="text-xs flex items-center gap-1"
-          style={{ color: 'var(--admin-error)' }}
+          style={{ color: 'var(--warm-rose-ink)' }}
         >
           <AlertCircle className="h-3 w-3" />
           {error}
@@ -402,6 +413,7 @@ export default function NewLeadPage() {
 
   return (
     <PageTransition className="min-h-screen">
+      <WarmPremium className="min-h-screen">
       <div className="max-w-4xl mx-auto flex flex-col gap-6 pb-8">
         {/* ── SECTION 1: HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -415,23 +427,23 @@ export default function NewLeadPage() {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: 'var(--admin-primary-soft)' }}
+                style={{ background: 'var(--warm-primary-soft)' }}
               >
                 <Plus
                   className="h-5 w-5"
-                  style={{ color: 'var(--admin-primary)' }}
+                  style={{ color: 'var(--warm-primary)' }}
                 />
               </div>
               <div>
                 <h1
                   className="text-2xl font-bold tracking-tight"
-                  style={{ color: 'var(--admin-text)' }}
+                  style={{ color: 'var(--warm-ink)' }}
                 >
                   New Lead
                 </h1>
                 <p
                   className="text-sm"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   Create a new CRM lead entry
                 </p>
@@ -447,7 +459,7 @@ export default function NewLeadPage() {
               size="sm"
               onClick={() => handleSubmit(undefined, false)}
               disabled={submitting && !saveAndNew}
-              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
             >
               {submitting && !saveAndNew ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -461,25 +473,25 @@ export default function NewLeadPage() {
 
         {/* ── Duplicate Phone Warning ── */}
         {phoneDupCheck === 'dup' && (
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div
               className="p-4 flex items-center gap-3"
               style={{ background: 'rgba(245,158,11,0.08)' }}
             >
               <AlertCircle
                 className="h-5 w-5 flex-shrink-0"
-                style={{ color: 'var(--admin-warning)' }}
+                style={{ color: 'var(--warm-honey-ink)' }}
               />
               <div className="flex-1">
                 <div
                   className="text-sm font-semibold"
-                  style={{ color: 'var(--admin-text)' }}
+                  style={{ color: 'var(--warm-ink)' }}
                 >
                   A lead with this phone number already exists
                 </div>
                 <div
                   className="text-xs mt-0.5"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   Consider searching for the existing lead before creating a duplicate.
                 </div>
@@ -490,14 +502,14 @@ export default function NewLeadPage() {
                 </Button>
               </Link>
             </div>
-          </PreOneCard>
+          </WarmCard>
         )}
 
         <form onSubmit={(e) => handleSubmit(e, false)} className="flex flex-col gap-4">
           {/* ══════════════════════════════════════════════════
               Section 1: Parent Information
           ══════════════════════════════════════════════════ */}
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div className="p-6">
               <SectionHeader
                 icon={UserCircle}
@@ -534,7 +546,7 @@ export default function NewLeadPage() {
                   <div className="relative">
                     <Phone
                       className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <Input
                       id="parentPhone"
@@ -550,19 +562,19 @@ export default function NewLeadPage() {
                     {phoneDupCheck === 'checking' && (
                       <Loader2
                         className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin"
-                        style={{ color: 'var(--admin-text-subtle)' }}
+                        style={{ color: 'var(--warm-ink-faint)' }}
                       />
                     )}
                     {phoneDupCheck === 'clear' && (
                       <CheckCircle2
                         className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                        style={{ color: 'var(--admin-success)' }}
+                        style={{ color: 'var(--warm-sage)' }}
                       />
                     )}
                     {phoneDupCheck === 'dup' && (
                       <AlertCircle
                         className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                        style={{ color: 'var(--admin-warning)' }}
+                        style={{ color: 'var(--warm-honey-ink)' }}
                       />
                     )}
                   </div>
@@ -578,7 +590,7 @@ export default function NewLeadPage() {
                   <div className="relative">
                     <Mail
                       className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <Input
                       id="parentEmail"
@@ -595,12 +607,12 @@ export default function NewLeadPage() {
                 </Field>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
 
           {/* ══════════════════════════════════════════════════
               Section 2: Child Information
           ══════════════════════════════════════════════════ */}
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div className="p-6">
               <SectionHeader
                 icon={Baby}
@@ -653,14 +665,14 @@ export default function NewLeadPage() {
                         style={
                           selected
                             ? {
-                                background: 'var(--admin-primary-soft)',
-                                color: 'var(--admin-primary)',
-                                borderColor: 'var(--admin-primary)',
+                                background: 'var(--warm-primary-soft)',
+                                color: 'var(--warm-primary)',
+                                borderColor: 'var(--warm-primary)',
                               }
                             : {
-                                background: 'var(--admin-surface)',
-                                color: 'var(--admin-text-subtle)',
-                                borderColor: 'var(--admin-border)',
+                                background: 'var(--warm-surface)',
+                                color: 'var(--warm-ink-faint)',
+                                borderColor: 'var(--warm-border)',
                               }
                         }
                       >
@@ -671,12 +683,12 @@ export default function NewLeadPage() {
                 </div>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
 
           {/* ══════════════════════════════════════════════════
               Section 3: Lead Details
           ══════════════════════════════════════════════════ */}
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div className="p-6">
               <SectionHeader
                 icon={Tag}
@@ -729,7 +741,7 @@ export default function NewLeadPage() {
                   <div className="relative">
                     <IndianRupee
                       className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <Input
                       id="estimatedFee"
@@ -764,12 +776,12 @@ export default function NewLeadPage() {
                 </Field>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
 
           {/* ══════════════════════════════════════════════════
               Section 4: Notes & Follow-up
           ══════════════════════════════════════════════════ */}
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div className="p-6">
               <SectionHeader
                 icon={StickyNote}
@@ -820,14 +832,14 @@ export default function NewLeadPage() {
                 </Popover>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
 
           {/* ── Footer Actions ── */}
-          <PreOneCard className="!rounded-xl">
+          <WarmCard fade>
             <div className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+              <p className="text-xs" style={{ color: 'var(--warm-ink-faint)' }}>
                 Fields marked with{' '}
-                <span style={{ color: 'var(--admin-error)' }}>*</span> are required
+                <span style={{ color: 'var(--warm-rose-ink)' }}>*</span> are required
               </p>
               <div className="flex items-center gap-2">
                 <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
@@ -852,7 +864,7 @@ export default function NewLeadPage() {
                   type="submit"
                   size="sm"
                   disabled={submitting && !saveAndNew}
-                  className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover min-w-[120px]"
+                  className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)] min-w-[120px]"
                 >
                   {submitting && !saveAndNew ? (
                     <>
@@ -868,9 +880,10 @@ export default function NewLeadPage() {
                 </Button>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
         </form>
       </div>
-    </PageTransition>
+    
+      </WarmPremium></PageTransition>
   );
 }

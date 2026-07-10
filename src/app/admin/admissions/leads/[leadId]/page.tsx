@@ -61,6 +61,17 @@ import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { CRM_COLORS, PRIORITY_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface FollowUp {
@@ -117,38 +128,38 @@ const STAGE_CONFIG: Record<
   NEW: {
     label: 'New',
     color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   CONTACTED: {
     label: 'Contacted',
     color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
-    softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    softVar: 'var(--warm-sky-soft)',
+    varColor: 'var(--warm-sky-ink)',
   },
   VISITED: {
     label: 'Visited',
     color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
-    softVar: 'var(--admin-primary-soft)',
-    varColor: 'var(--admin-primary)',
+    softVar: 'var(--warm-primary-soft)',
+    varColor: 'var(--warm-primary)',
   },
   APPLIED: {
     label: 'Applied',
     color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
-    softVar: 'var(--admin-warning-soft)',
-    varColor: 'var(--admin-warning)',
+    softVar: 'var(--warm-honey-soft)',
+    varColor: 'var(--warm-honey-ink)',
   },
   ENROLLED: {
     label: 'Enrolled',
     color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
-    softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    softVar: 'var(--warm-sage-soft)',
+    varColor: 'var(--warm-sage)',
   },
   LOST: {
     label: 'Lost',
     color: CRM_COLORS.LOST?.hex ?? '#9ca3af',
     softVar: 'rgba(239,68,68,0.1)',
-    varColor: 'var(--admin-error)',
+    varColor: 'var(--warm-rose-ink)',
   },
 };
 
@@ -201,18 +212,18 @@ const TASK_STATUS_CONFIG: Record<
 > = {
   TODO: {
     label: 'To Do',
-    color: 'var(--admin-text-muted)',
-    bg: 'var(--admin-surface-2)',
+    color: 'var(--warm-ink-muted)',
+    bg: 'var(--warm-bg-soft)',
   },
   IN_PROGRESS: {
     label: 'In Progress',
-    color: 'var(--admin-info)',
-    bg: 'var(--admin-info-soft)',
+    color: 'var(--warm-sky-ink)',
+    bg: 'var(--warm-sky-soft)',
   },
   DONE: {
     label: 'Done',
-    color: 'var(--admin-success)',
-    bg: 'var(--admin-success-soft)',
+    color: 'var(--warm-sage)',
+    bg: 'var(--warm-sage-soft)',
   },
 };
 
@@ -225,27 +236,27 @@ function getToken(): string | null {
 function FollowUpTypeIcon({ type }: { type: string }) {
   switch (type) {
     case 'Call':
-      return <Phone className="h-4 w-4" style={{ color: 'var(--admin-info)' }} />;
+      return <Phone className="h-4 w-4" style={{ color: 'var(--warm-sky-ink)' }} />;
     case 'WhatsApp':
       return (
         <MessageSquare
           className="h-4 w-4"
-          style={{ color: 'var(--admin-success)' }}
+          style={{ color: 'var(--warm-sage)' }}
         />
       );
     case 'Email':
       return (
-        <Mail className="h-4 w-4" style={{ color: 'var(--admin-warning)' }} />
+        <Mail className="h-4 w-4" style={{ color: 'var(--warm-honey-ink)' }} />
       );
     case 'Visit':
       return (
-        <Eye className="h-4 w-4" style={{ color: 'var(--admin-primary)' }} />
+        <Eye className="h-4 w-4" style={{ color: 'var(--warm-primary)' }} />
       );
     default:
       return (
         <FileText
           className="h-4 w-4"
-          style={{ color: 'var(--admin-text-muted)' }}
+          style={{ color: 'var(--warm-ink-muted)' }}
         />
       );
   }
@@ -273,7 +284,7 @@ function SectionHeader({
       </div>
       <h3
         className="text-sm font-semibold"
-        style={{ color: 'var(--admin-text-muted)' }}
+        style={{ color: 'var(--warm-ink-muted)' }}
       >
         {title}
       </h3>
@@ -422,15 +433,15 @@ function ConvertToStudentDialog({
         <DialogHeader>
           <DialogTitle
             className="text-xl font-bold flex items-center gap-2"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             <div
               className="flex h-7 w-7 items-center justify-center rounded-lg"
-              style={{ background: 'var(--admin-success-soft)' }}
+              style={{ background: 'var(--warm-sage-soft)' }}
             >
               <ArrowRightLeft
                 className="h-4 w-4"
-                style={{ color: 'var(--admin-success)' }}
+                style={{ color: 'var(--warm-sage)' }}
               />
             </div>
             Convert Lead to Student
@@ -442,7 +453,7 @@ function ConvertToStudentDialog({
             className="rounded-lg p-3 text-sm flex items-center gap-2"
             style={{
               background: 'rgba(239,68,68,0.08)',
-              color: 'var(--admin-error)',
+              color: 'var(--warm-rose-ink)',
             }}
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -455,7 +466,7 @@ function ConvertToStudentDialog({
           <div className="space-y-3">
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               Student Information
             </h3>
@@ -547,7 +558,7 @@ function ConvertToStudentDialog({
           <div className="space-y-3">
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               Father Information
             </h3>
@@ -593,7 +604,7 @@ function ConvertToStudentDialog({
           <Button
             onClick={handleSubmit}
             disabled={submitting}
-            className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
           >
             {submitting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -639,9 +650,9 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                         outlineColor: cfg.color,
                       }
                     : {
-                        backgroundColor: 'var(--admin-surface)',
-                        borderColor: 'var(--admin-border)',
-                        color: 'var(--admin-text-subtle)',
+                        backgroundColor: 'var(--warm-surface)',
+                        borderColor: 'var(--warm-border)',
+                        color: 'var(--warm-ink-faint)',
                       }
                 }
               >
@@ -657,10 +668,10 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                 )}
                 style={{
                   color: isCurrent
-                    ? 'var(--admin-text)'
+                    ? 'var(--warm-ink)'
                     : isActive
-                      ? 'var(--admin-text-muted)'
-                      : 'var(--admin-text-subtle)',
+                      ? 'var(--warm-ink-muted)'
+                      : 'var(--warm-ink-faint)',
                 }}
               >
                 {cfg.label}
@@ -675,7 +686,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
                   style={
                     isActive && idx < currentIndex
                       ? { backgroundColor: cfg.color, opacity: 0.5 }
-                      : { backgroundColor: 'var(--admin-border)' }
+                      : { backgroundColor: 'var(--warm-border)' }
                   }
                 />
               </div>
@@ -688,7 +699,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
           <div
             className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
             style={{
-              backgroundColor: 'var(--admin-success)',
+              backgroundColor: 'var(--warm-sage)',
               color: 'white',
             }}
           >
@@ -696,7 +707,7 @@ function StageProgressBar({ currentStage }: { currentStage: string }) {
           </div>
           <span
             className="text-[11px] mt-1.5 font-medium whitespace-nowrap"
-            style={{ color: 'var(--admin-success)' }}
+            style={{ color: 'var(--warm-sage)' }}
           >
             Done
           </span>
@@ -729,8 +740,8 @@ function buildActivityTimeline(lead: Lead, tasks: CrmTask[]): ActivityEvent[] {
     title: 'Lead created',
     description: `Source: ${SOURCE_LABELS[lead.source] || lead.source}`,
     icon: UserPlus,
-    color: 'var(--admin-primary)',
-    bg: 'var(--admin-primary-soft)',
+    color: 'var(--warm-primary)',
+    bg: 'var(--warm-primary-soft)',
   });
 
   // Follow-up events
@@ -751,8 +762,8 @@ function buildActivityTimeline(lead: Lead, tasks: CrmTask[]): ActivityEvent[] {
               : fu.type === 'Visit'
                 ? Eye
                 : FileText,
-      color: 'var(--admin-info)',
-      bg: 'var(--admin-info-soft)',
+      color: 'var(--warm-sky-ink)',
+      bg: 'var(--warm-sky-soft)',
     });
   });
 
@@ -767,12 +778,12 @@ function buildActivityTimeline(lead: Lead, tasks: CrmTask[]): ActivityEvent[] {
       icon: ListChecks,
       color:
         task.status === 'DONE'
-          ? 'var(--admin-success)'
-          : 'var(--admin-warning)',
+          ? 'var(--warm-sage)'
+          : 'var(--warm-honey-ink)',
       bg:
         task.status === 'DONE'
-          ? 'var(--admin-success-soft)'
-          : 'var(--admin-warning-soft)',
+          ? 'var(--warm-sage-soft)'
+          : 'var(--warm-honey-soft)',
     });
   });
 
@@ -785,8 +796,8 @@ function buildActivityTimeline(lead: Lead, tasks: CrmTask[]): ActivityEvent[] {
       title: 'Converted to Student',
       description: `Student ID: ${lead.convertedStudentId}`,
       icon: ArrowRightLeft,
-      color: 'var(--admin-success)',
-      bg: 'var(--admin-success-soft)',
+      color: 'var(--warm-sage)',
+      bg: 'var(--warm-sage-soft)',
     });
   }
 
@@ -798,8 +809,8 @@ function buildActivityTimeline(lead: Lead, tasks: CrmTask[]): ActivityEvent[] {
       timestamp: lead.updatedAt,
       title: 'Lead details updated',
       icon: Edit3,
-      color: 'var(--admin-text-muted)',
-      bg: 'var(--admin-surface-2)',
+      color: 'var(--warm-ink-muted)',
+      bg: 'var(--warm-bg-soft)',
     });
   }
 
@@ -1099,11 +1110,11 @@ export default function LeadDetailPage() {
           <div className="flex flex-col items-center gap-3">
             <Loader2
               className="h-8 w-8 animate-spin"
-              style={{ color: 'var(--admin-primary)' }}
+              style={{ color: 'var(--warm-primary)' }}
             />
             <p
               className="text-sm"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               Loading lead details...
             </p>
@@ -1118,7 +1129,7 @@ export default function LeadDetailPage() {
       <PageTransition className="min-h-screen">
         <div className="flex items-center justify-center h-[60vh]">
           <div className="flex flex-col items-center gap-3">
-            <p style={{ color: 'var(--admin-text-muted)' }}>Lead not found</p>
+            <p style={{ color: 'var(--warm-ink-muted)' }}>Lead not found</p>
             <Link href="/admin/admissions/leads">
               <Button variant="outline">Back to Leads</Button>
             </Link>
@@ -1133,7 +1144,8 @@ export default function LeadDetailPage() {
 
   return (
     <PageTransition className="min-h-screen">
-      <div className="max-w-6xl mx-auto flex flex-col gap-6 pb-8">
+      <WarmPremium className="min-h-screen">
+      <div className="max-w-6xl mx-auto flex flex-col gap-6 pb-8 px-4 sm:px-6 lg:px-8 py-6">
         {/* ══════════════════════════════════════════════════
             Header Section
         ══════════════════════════════════════════════════ */}
@@ -1159,7 +1171,7 @@ export default function LeadDetailPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1
                     className="text-2xl font-bold tracking-tight"
-                    style={{ color: 'var(--admin-text)' }}
+                    style={{ color: 'var(--warm-ink)' }}
                   >
                     {lead.parentName}
                   </h1>
@@ -1192,8 +1204,8 @@ export default function LeadDetailPage() {
                     <Badge
                       className="text-xs gap-1"
                       style={{
-                        background: 'var(--admin-success-soft)',
-                        color: 'var(--admin-success)',
+                        background: 'var(--warm-sage-soft)',
+                        color: 'var(--warm-sage)',
                         border: 'none',
                       }}
                     >
@@ -1204,7 +1216,7 @@ export default function LeadDetailPage() {
                 </div>
                 <p
                   className="text-sm mt-0.5"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   Child: {lead.childName}
                   {lead.childAge ? ` (${lead.childAge})` : ''} · Created{' '}
@@ -1230,7 +1242,7 @@ export default function LeadDetailPage() {
                 {lead.stage === 'ENROLLED' && !lead.convertedStudentId && (
                   <Button
                     size="sm"
-                    className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                    className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                     onClick={() => setConvertOpen(true)}
                   >
                     <ArrowRightLeft className="h-3.5 w-3.5" />
@@ -1241,7 +1253,7 @@ export default function LeadDetailPage() {
                   variant="ghost"
                   size="sm"
                   className="gap-1.5"
-                  style={{ color: 'var(--admin-error)' }}
+                  style={{ color: 'var(--warm-rose-ink)' }}
                   onClick={handleDelete}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -1283,7 +1295,7 @@ export default function LeadDetailPage() {
                 </Button>
                 <Button
                   size="sm"
-                  className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                   onClick={handleSaveLead}
                   disabled={saving}
                 >
@@ -1302,12 +1314,12 @@ export default function LeadDetailPage() {
         {/* ══════════════════════════════════════════════════
             Stage Progress Bar
         ══════════════════════════════════════════════════ */}
-        <PreOneCard className="!rounded-xl">
+        <WarmCard fade>
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3
                 className="text-sm font-semibold"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Pipeline Stage
               </h3>
@@ -1345,7 +1357,7 @@ export default function LeadDetailPage() {
                 className="mt-3 p-2.5 rounded-lg text-sm flex items-start gap-2"
                 style={{
                   background: 'rgba(239,68,68,0.08)',
-                  color: 'var(--admin-error)',
+                  color: 'var(--warm-rose-ink)',
                 }}
               >
                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -1355,13 +1367,13 @@ export default function LeadDetailPage() {
               </div>
             )}
           </div>
-        </PreOneCard>
+        </WarmCard>
 
         {/* ══════════════════════════════════════════════════
             Tabs Section
         ══════════════════════════════════════════════════ */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full" style={{ background: 'var(--admin-surface-2)' }}>
+          <TabsList className="w-full" style={{ background: 'var(--warm-bg-soft)' }}>
             <TabsTrigger value="overview" className="flex-1 gap-1">
               <Eye className="h-3.5 w-3.5" />
               Overview
@@ -1372,8 +1384,8 @@ export default function LeadDetailPage() {
               <span
                 className="ml-1 rounded-full px-1.5 text-[10px] font-semibold"
                 style={{
-                  background: 'var(--admin-primary-soft)',
-                  color: 'var(--admin-primary)',
+                  background: 'var(--warm-primary-soft)',
+                  color: 'var(--warm-primary)',
                 }}
               >
                 {lead.followUps.length}
@@ -1385,8 +1397,8 @@ export default function LeadDetailPage() {
               <span
                 className="ml-1 rounded-full px-1.5 text-[10px] font-semibold"
                 style={{
-                  background: 'var(--admin-surface)',
-                  color: 'var(--admin-text-muted)',
+                  background: 'var(--warm-surface)',
+                  color: 'var(--warm-ink-muted)',
                 }}
               >
                 {tasks.length}
@@ -1404,7 +1416,7 @@ export default function LeadDetailPage() {
           <TabsContent value="overview" className="mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Parent Info Card */}
-              <PreOneCard className="!rounded-xl">
+              <WarmCard fade>
                 <div className="p-6">
                   <SectionHeader
                     icon={UserCircle}
@@ -1462,11 +1474,11 @@ export default function LeadDetailPage() {
                         <div className="flex items-center gap-2">
                           <Phone
                             className="h-4 w-4"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           />
                           <span
                             className="text-sm tabular-nums"
-                            style={{ color: 'var(--admin-text)' }}
+                            style={{ color: 'var(--warm-ink)' }}
                           >
                             {lead.parentPhone}
                           </span>
@@ -1475,11 +1487,11 @@ export default function LeadDetailPage() {
                           <div className="flex items-center gap-2">
                             <Mail
                               className="h-4 w-4"
-                              style={{ color: 'var(--admin-text-subtle)' }}
+                              style={{ color: 'var(--warm-ink-faint)' }}
                             />
                             <span
                               className="text-sm"
-                              style={{ color: 'var(--admin-text)' }}
+                              style={{ color: 'var(--warm-ink)' }}
                             >
                               {lead.parentEmail}
                             </span>
@@ -1489,10 +1501,10 @@ export default function LeadDetailPage() {
                     )}
                   </div>
                 </div>
-              </PreOneCard>
+              </WarmCard>
 
               {/* Child Info Card */}
-              <PreOneCard className="!rounded-xl">
+              <WarmCard fade>
                 <div className="p-6">
                   <SectionHeader
                     icon={Baby}
@@ -1545,14 +1557,14 @@ export default function LeadDetailPage() {
                                     selected
                                       ? {
                                           background:
-                                            'var(--admin-primary-soft)',
-                                          color: 'var(--admin-primary)',
-                                          borderColor: 'var(--admin-primary)',
+                                            'var(--warm-primary-soft)',
+                                          color: 'var(--warm-primary)',
+                                          borderColor: 'var(--warm-primary)',
                                         }
                                       : {
-                                          background: 'var(--admin-surface)',
-                                          color: 'var(--admin-text-subtle)',
-                                          borderColor: 'var(--admin-border)',
+                                          background: 'var(--warm-surface)',
+                                          color: 'var(--warm-ink-faint)',
+                                          borderColor: 'var(--warm-border)',
                                         }
                                   }
                                 >
@@ -1568,11 +1580,11 @@ export default function LeadDetailPage() {
                         <div className="flex items-center gap-2">
                           <Baby
                             className="h-4 w-4"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           />
                           <span
                             className="text-sm font-medium"
-                            style={{ color: 'var(--admin-text)' }}
+                            style={{ color: 'var(--warm-ink)' }}
                           >
                             {lead.childName}
                           </span>
@@ -1580,7 +1592,7 @@ export default function LeadDetailPage() {
                         {lead.childAge && (
                           <div
                             className="text-sm"
-                            style={{ color: 'var(--admin-text-muted)' }}
+                            style={{ color: 'var(--warm-ink-muted)' }}
                           >
                             Age / DOB: {lead.childAge}
                           </div>
@@ -1589,7 +1601,7 @@ export default function LeadDetailPage() {
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span
                               className="text-xs"
-                              style={{ color: 'var(--admin-text-subtle)' }}
+                              style={{ color: 'var(--warm-ink-faint)' }}
                             >
                               Programs:
                             </span>
@@ -1602,8 +1614,8 @@ export default function LeadDetailPage() {
                                   key={program}
                                   className="rounded-md px-2 py-0.5 text-xs font-medium"
                                   style={{
-                                    background: 'var(--admin-primary-soft)',
-                                    color: 'var(--admin-primary)',
+                                    background: 'var(--warm-primary-soft)',
+                                    color: 'var(--warm-primary)',
                                   }}
                                 >
                                   {program}
@@ -1615,10 +1627,10 @@ export default function LeadDetailPage() {
                     )}
                   </div>
                 </div>
-              </PreOneCard>
+              </WarmCard>
 
               {/* Lead Details Card */}
-              <PreOneCard className="!rounded-xl">
+              <WarmCard fade>
                 <div className="p-6">
                   <SectionHeader
                     icon={Tag}
@@ -1705,13 +1717,13 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Source
                           </p>
                           <p
                             className="text-sm font-medium"
-                            style={{ color: 'var(--admin-text)' }}
+                            style={{ color: 'var(--warm-ink)' }}
                           >
                             {SOURCE_LABELS[lead.source] || lead.source}
                           </p>
@@ -1719,7 +1731,7 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Priority
                           </p>
@@ -1740,13 +1752,13 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Est. Fee
                           </p>
                           <p
                             className="text-sm font-medium tabular-nums"
-                            style={{ color: 'var(--admin-text)' }}
+                            style={{ color: 'var(--warm-ink)' }}
                           >
                             {lead.estimatedValue
                               ? `₹${lead.estimatedValue.toLocaleString('en-IN')}`
@@ -1756,13 +1768,13 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Assigned To
                           </p>
                           <p
                             className="text-sm"
-                            style={{ color: 'var(--admin-text)' }}
+                            style={{ color: 'var(--warm-ink)' }}
                           >
                             {lead.assignedTo || 'Unassigned'}
                           </p>
@@ -1771,10 +1783,10 @@ export default function LeadDetailPage() {
                     )}
                   </div>
                 </div>
-              </PreOneCard>
+              </WarmCard>
 
               {/* Notes & Follow-up Card */}
-              <PreOneCard className="!rounded-xl">
+              <WarmCard fade>
                 <div className="p-6">
                   <SectionHeader
                     icon={StickyNote}
@@ -1835,13 +1847,13 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs mb-1"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Notes
                           </p>
                           <p
                             className="text-sm whitespace-pre-wrap"
-                            style={{ color: 'var(--admin-text-muted)' }}
+                            style={{ color: 'var(--warm-ink-muted)' }}
                           >
                             {lead.notes || 'No notes'}
                           </p>
@@ -1850,18 +1862,18 @@ export default function LeadDetailPage() {
                         <div>
                           <p
                             className="text-xs mb-1"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             Next Follow-up
                           </p>
                           <div className="flex items-center gap-1.5">
                             <Calendar
                               className="h-4 w-4"
-                              style={{ color: 'var(--admin-text-subtle)' }}
+                              style={{ color: 'var(--warm-ink-faint)' }}
                             />
                             <span
                               className="text-sm font-medium"
-                              style={{ color: 'var(--admin-text)' }}
+                              style={{ color: 'var(--warm-ink)' }}
                             >
                               {lead.nextFollowUp
                                 ? format(
@@ -1876,7 +1888,7 @@ export default function LeadDetailPage() {
                     )}
                   </div>
                 </div>
-              </PreOneCard>
+              </WarmCard>
             </div>
           </TabsContent>
 
@@ -1884,22 +1896,22 @@ export default function LeadDetailPage() {
               Tab 2: Follow-ups
           ───────────────────────────────────────────── */}
           <TabsContent value="followups" className="mt-4">
-            <PreOneCard className="!rounded-xl">
+            <WarmCard fade>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3
                     className="text-sm font-semibold flex items-center gap-1.5"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     <Clock
                       className="h-4 w-4"
-                      style={{ color: 'var(--admin-primary)' }}
+                      style={{ color: 'var(--warm-primary)' }}
                     />
                     Follow-up History ({lead.followUps.length})
                   </h3>
                   <Button
                     size="sm"
-                    className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                    className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                     onClick={() => setShowFollowUpForm(!showFollowUpForm)}
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -1912,8 +1924,8 @@ export default function LeadDetailPage() {
                   <div
                     className="rounded-lg p-4 space-y-3 border mb-4"
                     style={{
-                      background: 'var(--admin-surface-2)',
-                      borderColor: 'var(--admin-border)',
+                      background: 'var(--warm-bg-soft)',
+                      borderColor: 'var(--warm-border)',
                     }}
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2017,7 +2029,7 @@ export default function LeadDetailPage() {
                       </Button>
                       <Button
                         size="sm"
-                        className="text-xs bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                        className="text-xs bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                         onClick={handleAddFollowUp}
                         disabled={saving || !followUpForm.notes.trim()}
                       >
@@ -2031,21 +2043,21 @@ export default function LeadDetailPage() {
                 {lead.followUps.length === 0 ? (
                   <div
                     className="text-center py-10"
-                    style={{ color: 'var(--admin-text-subtle)' }}
+                    style={{ color: 'var(--warm-ink-faint)' }}
                   >
                     <Clock
                       className="h-8 w-8 mx-auto mb-2 opacity-40"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <p
                       className="text-sm font-medium"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       No follow-ups yet
                     </p>
                     <p
                       className="text-xs mt-1"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     >
                       Click &quot;Add Follow-up&quot; to log the first interaction.
                     </p>
@@ -2058,7 +2070,7 @@ export default function LeadDetailPage() {
                         {idx < lead.followUps.length - 1 && (
                           <div
                             className="absolute left-[11px] top-6 bottom-0 w-px"
-                            style={{ background: 'var(--admin-border)' }}
+                            style={{ background: 'var(--warm-border)' }}
                           />
                         )}
                         {/* Timeline dot */}
@@ -2069,7 +2081,7 @@ export default function LeadDetailPage() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <span
                               className="text-xs font-medium tabular-nums"
-                              style={{ color: 'var(--admin-text-muted)' }}
+                              style={{ color: 'var(--warm-ink-muted)' }}
                             >
                               {format(
                                 new Date(fu.dateTime),
@@ -2101,7 +2113,7 @@ export default function LeadDetailPage() {
                           </div>
                           <p
                             className="text-sm mt-1 leading-relaxed"
-                            style={{ color: 'var(--admin-text-muted)' }}
+                            style={{ color: 'var(--warm-ink-muted)' }}
                           >
                             &quot;{fu.notes}&quot;
                           </p>
@@ -2109,7 +2121,7 @@ export default function LeadDetailPage() {
                             {fu.createdBy && (
                               <span
                                 className="text-[11px]"
-                                style={{ color: 'var(--admin-text-subtle)' }}
+                                style={{ color: 'var(--warm-ink-faint)' }}
                               >
                                 — {fu.createdBy}
                               </span>
@@ -2117,7 +2129,7 @@ export default function LeadDetailPage() {
                             {fu.nextFollowUp && (
                               <span
                                 className="text-[11px] flex items-center gap-1"
-                                style={{ color: 'var(--admin-text-subtle)' }}
+                                style={{ color: 'var(--warm-ink-faint)' }}
                               >
                                 <Calendar className="h-3 w-3" />
                                 Next:{' '}
@@ -2131,22 +2143,22 @@ export default function LeadDetailPage() {
                   </div>
                 )}
               </div>
-            </PreOneCard>
+            </WarmCard>
           </TabsContent>
 
           {/* ─────────────────────────────────────────────
               Tab 3: Tasks
           ───────────────────────────────────────────── */}
           <TabsContent value="tasks" className="mt-4">
-            <PreOneCard className="!rounded-xl">
+            <WarmCard fade>
               <div className="p-6">
                 <h3
                   className="text-sm font-semibold flex items-center gap-1.5 mb-4"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   <ListChecks
                     className="h-4 w-4"
-                    style={{ color: 'var(--admin-primary)' }}
+                    style={{ color: 'var(--warm-primary)' }}
                   />
                   Linked Tasks ({tasks.length})
                 </h3>
@@ -2154,21 +2166,21 @@ export default function LeadDetailPage() {
                 {tasks.length === 0 ? (
                   <div
                     className="text-center py-10"
-                    style={{ color: 'var(--admin-text-subtle)' }}
+                    style={{ color: 'var(--warm-ink-faint)' }}
                   >
                     <ListChecks
                       className="h-8 w-8 mx-auto mb-2 opacity-40"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <p
                       className="text-sm font-medium"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       No tasks linked to this lead
                     </p>
                     <p
                       className="text-xs mt-1"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     >
                       Create tasks from the Tasks page and link them to this lead.
                     </p>
@@ -2186,7 +2198,7 @@ export default function LeadDetailPage() {
                           key={task.id}
                           className="flex items-start gap-3 p-3 rounded-lg border transition-colors"
                           style={{
-                            borderColor: 'var(--admin-border)',
+                            borderColor: 'var(--warm-border)',
                           }}
                         >
                           <div
@@ -2197,7 +2209,7 @@ export default function LeadDetailPage() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <p
                                 className="text-sm font-medium truncate"
-                                style={{ color: 'var(--admin-text)' }}
+                                style={{ color: 'var(--warm-ink)' }}
                               >
                                 {task.title}
                               </p>
@@ -2223,7 +2235,7 @@ export default function LeadDetailPage() {
                             {task.description && (
                               <p
                                 className="text-xs mt-0.5 line-clamp-2"
-                                style={{ color: 'var(--admin-text-muted)' }}
+                                style={{ color: 'var(--warm-ink-muted)' }}
                               >
                                 {task.description}
                               </p>
@@ -2232,7 +2244,7 @@ export default function LeadDetailPage() {
                               {task.dueDate && (
                                 <span
                                   className="text-[11px] flex items-center gap-1"
-                                  style={{ color: 'var(--admin-text-subtle)' }}
+                                  style={{ color: 'var(--warm-ink-faint)' }}
                                 >
                                   <Calendar className="h-3 w-3" />
                                   Due:{' '}
@@ -2242,7 +2254,7 @@ export default function LeadDetailPage() {
                               {task.assignee && (
                                 <span
                                   className="text-[11px]"
-                                  style={{ color: 'var(--admin-text-subtle)' }}
+                                  style={{ color: 'var(--warm-ink-faint)' }}
                                 >
                                   Assigned to: {task.assignee.name}
                                 </span>
@@ -2255,22 +2267,22 @@ export default function LeadDetailPage() {
                   </div>
                 )}
               </div>
-            </PreOneCard>
+            </WarmCard>
           </TabsContent>
 
           {/* ─────────────────────────────────────────────
               Tab 4: Activity (real derived timeline)
           ───────────────────────────────────────────── */}
           <TabsContent value="activity" className="mt-4">
-            <PreOneCard className="!rounded-xl">
+            <WarmCard fade>
               <div className="p-6">
                 <h3
                   className="text-sm font-semibold flex items-center gap-1.5 mb-4"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   <Activity
                     className="h-4 w-4"
-                    style={{ color: 'var(--admin-primary)' }}
+                    style={{ color: 'var(--warm-primary)' }}
                   />
                   Activity Log
                 </h3>
@@ -2278,15 +2290,15 @@ export default function LeadDetailPage() {
                 {activityEvents.length === 0 ? (
                   <div
                     className="text-center py-10"
-                    style={{ color: 'var(--admin-text-subtle)' }}
+                    style={{ color: 'var(--warm-ink-faint)' }}
                   >
                     <Activity
                       className="h-8 w-8 mx-auto mb-2 opacity-40"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                     <p
                       className="text-sm font-medium"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       No activity yet
                     </p>
@@ -2300,7 +2312,7 @@ export default function LeadDetailPage() {
                           {idx < activityEvents.length - 1 && (
                             <div
                               className="absolute left-[15px] top-8 bottom-0 w-px"
-                              style={{ background: 'var(--admin-border)' }}
+                              style={{ background: 'var(--warm-border)' }}
                             />
                           )}
                           <div
@@ -2316,13 +2328,13 @@ export default function LeadDetailPage() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <span
                                 className="text-sm font-medium"
-                                style={{ color: 'var(--admin-text)' }}
+                                style={{ color: 'var(--warm-ink)' }}
                               >
                                 {evt.title}
                               </span>
                               <span
                                 className="text-[11px] tabular-nums"
-                                style={{ color: 'var(--admin-text-subtle)' }}
+                                style={{ color: 'var(--warm-ink-faint)' }}
                               >
                                 {format(
                                   new Date(evt.timestamp),
@@ -2333,7 +2345,7 @@ export default function LeadDetailPage() {
                             {evt.description && (
                               <p
                                 className="text-xs mt-1"
-                                style={{ color: 'var(--admin-text-muted)' }}
+                                style={{ color: 'var(--warm-ink-muted)' }}
                               >
                                 {evt.description}
                               </p>
@@ -2345,7 +2357,7 @@ export default function LeadDetailPage() {
                   </div>
                 )}
               </div>
-            </PreOneCard>
+            </WarmCard>
           </TabsContent>
         </Tabs>
 
@@ -2359,6 +2371,7 @@ export default function LeadDetailPage() {
           }}
         />
       </div>
+      </WarmPremium>
     </PageTransition>
   );
 }

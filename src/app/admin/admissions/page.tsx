@@ -17,12 +17,30 @@ import {
   AlertTriangle,
   IndianRupee,
   Activity,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { PageTransition } from '@/components/ui/page-transition';
-import { PreOneCard } from '@/components/ui/preone-card';
 import { AddLeadDialog } from '@/components/add-lead-dialog';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmStatCard,
+  WarmEmptyState,
+  WarmSectionHeading,
+  WarmPill,
+  WarmStagePill,
+  WarmButton,
+  WarmSeedling,
+  WarmSparkle,
+  WarmChildren,
+  WarmScribble,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface StatsData {
@@ -55,21 +73,16 @@ interface StatsData {
   };
 }
 
-// ── CRM Module Definition ──
+// ── CRM Module Definition (warm-tinted) ──
+type WarmAccent = 'primary' | 'sage' | 'honey' | 'sky' | 'lavender' | 'rose';
+
 interface CrmModule {
   key: string;
   title: string;
   description: string;
   href: string;
   icon: React.ElementType;
-  /** CSS variable for the accent color, e.g. '--admin-primary' */
-  accentVar: string;
-  /** CSS variable for the soft/background color, e.g. '--admin-primary-soft' */
-  accentSoftVar: string;
-  /** Fallback hex for accent */
-  accentHex: string;
-  /** Fallback hex for soft bg */
-  accentSoftHex: string;
+  accent: WarmAccent;
   statLabel: string;
   getStatValue: (stats: StatsData | null) => number;
   imageSrc: string;
@@ -82,10 +95,7 @@ const CRM_MODULES: CrmModule[] = [
     description: 'Manage all admission leads and enquiries',
     href: '/admin/admissions/leads',
     icon: Users,
-    accentVar: '--admin-primary',
-    accentSoftVar: '--admin-primary-soft',
-    accentHex: '#7C3AED',
-    accentSoftHex: '#f5f3ff',
+    accent: 'primary',
     statLabel: 'Total Leads',
     getStatValue: (s) => s?.totalLeads ?? 0,
     imageSrc: '/icons/admin/crm/leads.webp',
@@ -96,10 +106,7 @@ const CRM_MODULES: CrmModule[] = [
     description: 'Visualize your admission pipeline stages',
     href: '/admin/admissions/pipeline',
     icon: LayoutGrid,
-    accentVar: '--admin-info',
-    accentSoftVar: '--admin-info-soft',
-    accentHex: '#3b82f6',
-    accentSoftHex: '#eff6ff',
+    accent: 'sky',
     statLabel: 'In Pipeline',
     getStatValue: (s) =>
       (s?.leadsByStage ?? [])
@@ -113,10 +120,7 @@ const CRM_MODULES: CrmModule[] = [
     description: 'Track follow-ups and scheduled calls',
     href: '/admin/admissions/followups',
     icon: PhoneCall,
-    accentVar: '--admin-success',
-    accentSoftVar: '--admin-success-soft',
-    accentHex: '#10b981',
-    accentSoftHex: '#ecfdf5',
+    accent: 'sage',
     statLabel: 'Due Today',
     getStatValue: (s) => s?.followUpsToday ?? 0,
     imageSrc: '/icons/admin/crm/followups.webp',
@@ -127,10 +131,7 @@ const CRM_MODULES: CrmModule[] = [
     description: 'Schedule and manage campus visits',
     href: '/admin/admissions/visits',
     icon: CalendarCheck,
-    accentVar: '--admin-warning',
-    accentSoftVar: '--admin-warning-soft',
-    accentHex: '#f59e0b',
-    accentSoftHex: '#fffbeb',
+    accent: 'honey',
     statLabel: 'Visits',
     getStatValue: (s) =>
       (s?.leadsByStage ?? []).find((ls) => ls.stage === 'VISITED')?.count ?? 0,
@@ -142,70 +143,14 @@ const CRM_MODULES: CrmModule[] = [
     description: 'Manage your tasks and to-dos',
     href: '/admin/admissions/tasks',
     icon: CheckSquare,
-    accentVar: '--admin-accent',
-    accentSoftVar: '--admin-warning-soft',
-    accentHex: '#f97316',
-    accentSoftHex: '#fff7ed',
+    accent: 'lavender',
     statLabel: 'Open Tasks',
     getStatValue: (s) => (s?.tasks?.todo ?? 0) + (s?.tasks?.inProgress ?? 0),
     imageSrc: '/icons/admin/crm/tasks.webp',
   },
 ];
 
-// ── KPI Card Config ──
-interface KpiCard {
-  key: string;
-  label: string;
-  icon: React.ElementType;
-  accentVar: string;
-  accentSoftVar: string;
-  getValue: (s: StatsData | null) => string | number;
-  sublabel?: (s: StatsData | null) => string;
-}
-
-const KPI_CARDS: KpiCard[] = [
-  {
-    key: 'conversion',
-    label: 'Conversion Rate',
-    icon: TrendingUp,
-    accentVar: '--admin-success',
-    accentSoftVar: '--admin-success-soft',
-    getValue: (s) => (s?.conversionRate != null ? `${s.conversionRate.toFixed(1)}%` : '0.0%'),
-    sublabel: (s) => `${s?.totalLeads ?? 0} total leads`,
-  },
-  {
-    key: 'newWeek',
-    label: 'New This Week',
-    icon: Users,
-    accentVar: '--admin-primary',
-    accentSoftVar: '--admin-primary-soft',
-    getValue: (s) => s?.newThisWeek ?? 0,
-    sublabel: () => 'Fresh enquiries',
-  },
-  {
-    key: 'followToday',
-    label: 'Follow-ups Today',
-    icon: Clock,
-    accentVar: '--admin-info',
-    accentSoftVar: '--admin-info-soft',
-    getValue: (s) => s?.followUpsToday ?? 0,
-    sublabel: (s) => `${s?.overdueFollowUps ?? 0} overdue`,
-  },
-  {
-    key: 'revenue',
-    label: 'Est. Revenue',
-    icon: IndianRupee,
-    accentVar: '--admin-warning',
-    accentSoftVar: '--admin-warning-soft',
-    getValue: (s) =>
-      s?.estimatedRevenue != null
-        ? `${s.estimatedRevenue.toLocaleString('en-IN')}`
-        : '0',
-    sublabel: () => 'From active pipeline',
-  },
-];
-
-// ── Stage Config ──
+// ── Stage Config (warm-tinted) ──
 const STAGE_LABELS: Record<string, string> = {
   NEW: 'New',
   CONTACTED: 'Contacted',
@@ -215,13 +160,13 @@ const STAGE_LABELS: Record<string, string> = {
   LOST: 'Lost',
 };
 
-const STAGE_COLORS: Record<string, { color: string; bg: string }> = {
-  NEW: { color: 'var(--admin-text-muted)', bg: 'var(--admin-surface-2)' },
-  CONTACTED: { color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
-  VISITED: { color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
-  APPLIED: { color: 'var(--admin-warning)', bg: 'var(--admin-warning-soft)' },
-  ENROLLED: { color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
-  LOST: { color: 'var(--admin-error)', bg: 'rgba(239,68,68,0.1)' },
+const STAGE_WARM: Record<string, { bar: string; track: string; pill: 'sky' | 'lavender' | 'honey' | 'primary' | 'sage' | 'rose' }> = {
+  NEW: { bar: 'bg-[var(--warm-sky)]', track: 'bg-[var(--warm-sky-soft)]', pill: 'sky' },
+  CONTACTED: { bar: 'bg-[var(--warm-lavender)]', track: 'bg-[var(--warm-lavender-soft)]', pill: 'lavender' },
+  VISITED: { bar: 'bg-[var(--warm-primary)]', track: 'bg-[var(--warm-primary-soft)]', pill: 'primary' },
+  APPLIED: { bar: 'bg-[var(--warm-honey)]', track: 'bg-[var(--warm-honey-soft)]', pill: 'honey' },
+  ENROLLED: { bar: 'bg-[var(--warm-sage)]', track: 'bg-[var(--warm-sage-soft)]', pill: 'sage' },
+  LOST: { bar: 'bg-[var(--warm-rose)]', track: 'bg-[var(--warm-rose-soft)]', pill: 'rose' },
 };
 
 // ── Helper: Get auth token ──
@@ -230,46 +175,56 @@ function getToken(): string | null {
   return localStorage.getItem('preone_token');
 }
 
-// ── Module Card Component ──
-function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData | null }) {
+// ── Module Card (warm restyle) ──
+function CrmModuleCard({ module, stats, loading }: { module: CrmModule; stats: StatsData | null; loading: boolean }) {
   const Icon = module.icon;
   const statValue = module.getStatValue(stats);
+
+  const accentBgMap: Record<WarmAccent, string> = {
+    primary: 'bg-[var(--warm-primary-soft)]',
+    sage: 'bg-[var(--warm-sage-soft)]',
+    honey: 'bg-[var(--warm-honey-soft)]',
+    sky: 'bg-[var(--warm-sky-soft)]',
+    lavender: 'bg-[var(--warm-lavender-soft)]',
+    rose: 'bg-[var(--warm-rose-soft)]',
+  };
+  const accentTextMap: Record<WarmAccent, string> = {
+    primary: 'text-[var(--warm-primary)]',
+    sage: 'text-[var(--warm-sage)]',
+    honey: 'text-[var(--warm-honey-ink)]',
+    sky: 'text-[var(--warm-sky-ink)]',
+    lavender: 'text-[var(--warm-lavender-ink)]',
+    rose: 'text-[var(--warm-rose-ink)]',
+  };
 
   return (
     <Link href={module.href} className="block group h-full">
       <div
-        className="relative flex flex-col items-center rounded-2xl overflow-hidden h-full min-h-[340px] sm:min-h-[400px] transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-1 border border-black/5"
-        style={{ backgroundColor: `var(${module.accentSoftVar}, ${module.accentSoftHex})` }}
+        className={`relative flex flex-col items-center rounded-[var(--warm-radius-xl)] overflow-hidden h-full min-h-[320px] sm:min-h-[380px] transition-all duration-300 ease-out border border-[var(--warm-border)] group-hover:-translate-y-1 group-hover:shadow-[var(--warm-shadow-lg)] ${accentBgMap[module.accent]}`}
       >
-        {/* Top accent circle with icon */}
-        <div className="pt-4 sm:pt-6 pb-2 flex flex-col items-center">
-          <div
-            className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center shadow-sm"
-            style={{
-              backgroundColor: 'white',
-              color: `var(${module.accentVar}, ${module.accentHex})`,
-            }}
-          >
-            <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+        {/* Decorative blob */}
+        <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/40 blur-2xl opacity-60" />
+
+        {/* Icon badge */}
+        <div className="relative pt-5 sm:pt-6 pb-2 flex flex-col items-center">
+          <div className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center bg-white shadow-[var(--warm-shadow-sm)] ${accentTextMap[module.accent]}`}>
+            <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2} />
           </div>
         </div>
 
         {/* Stat number */}
-        <div className="flex flex-col items-center px-3 sm:px-4 pb-2">
-          <span
-            className="text-2xl sm:text-3xl font-bold leading-tight tabular-nums"
-            style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
-          >
-            {statValue}
+        <div className="relative flex flex-col items-center px-3 sm:px-4 pb-2">
+          <span className={`warm-numeric warm-heading text-3xl sm:text-4xl font-semibold leading-none ${accentTextMap[module.accent]}`}>
+            {loading ? '—' : statValue}
           </span>
-          <span className="text-[11px] sm:text-xs font-medium text-[var(--admin-text-muted)] mt-0.5">
+          <span className="text-[11px] sm:text-xs font-medium text-[var(--warm-ink-muted)] mt-1.5 tracking-wide uppercase">
             {module.statLabel}
           </span>
         </div>
 
-        {/* Illustration area — always visible, compact on mobile */}
-        <div className="flex-1 w-full relative flex items-end justify-center overflow-hidden">
-          <div className="relative w-[85%] sm:w-[90%] h-full max-h-[200px] sm:max-h-[260px]">
+        {/* Illustration */}
+        <div className="relative flex-1 w-full flex items-end justify-center overflow-hidden">
+          <div className="relative w-[85%] sm:w-[90%] h-full max-h-[180px] sm:max-h-[240px]">
             <Image
               src={module.imageSrc}
               alt={module.title}
@@ -284,22 +239,19 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
           </div>
         </div>
 
-        {/* Bottom: title + description + arrow */}
-        <div className="w-full px-3 sm:px-4 pt-2 sm:pt-3 pb-3 sm:pb-4 flex items-center justify-between">
+        {/* Footer */}
+        <div className="relative w-full px-4 pt-3 pb-4 flex items-center justify-between bg-white/60 backdrop-blur-sm">
           <div className="min-w-0">
-            <h3
-              className="font-semibold text-[13px] sm:text-sm"
-              style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
-            >
+            <h3 className={`warm-heading font-semibold text-sm ${accentTextMap[module.accent]}`}>
               {module.title}
             </h3>
-            <p className="text-[10px] sm:text-[11px] text-[var(--admin-text-muted)] mt-0.5 leading-snug truncate">
+            <p className="text-[11px] text-[var(--warm-ink-muted)] mt-0.5 leading-snug truncate">
               {module.description}
             </p>
           </div>
           <ChevronRight
-            className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-[var(--admin-text-subtle)] group-hover:translate-x-0.5 transition-transform"
-            style={{ color: `var(${module.accentVar}, ${module.accentHex})` }}
+            className={`h-4 w-4 flex-shrink-0 ${accentTextMap[module.accent]} group-hover:translate-x-0.5 transition-transform`}
+            strokeWidth={2.5}
           />
         </div>
       </div>
@@ -307,48 +259,9 @@ function CrmModuleCard({ module, stats }: { module: CrmModule; stats: StatsData 
   );
 }
 
-// ── KPI Stat Card ──
-function KpiStatCard({ card, stats }: { card: KpiCard; stats: StatsData | null }) {
-  const Icon = card.icon;
-  return (
-    <PreOneCard className="!rounded-xl">
-      <div className="p-4 flex items-center gap-4">
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
-          style={{ background: `var(${card.accentSoftVar})` }}
-        >
-          <Icon className="h-5 w-5" style={{ color: `var(${card.accentVar})` }} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div
-            className="text-xs font-medium"
-            style={{ color: 'var(--admin-text-muted)' }}
-          >
-            {card.label}
-          </div>
-          <div
-            className="text-xl font-bold tabular-nums"
-            style={{ color: 'var(--admin-text)' }}
-          >
-            {card.getValue(stats)}
-          </div>
-          {card.sublabel && (
-            <div
-              className="text-[11px] mt-0.5"
-              style={{ color: 'var(--admin-text-subtle)' }}
-            >
-              {card.sublabel(stats)}
-            </div>
-          )}
-        </div>
-      </div>
-    </PreOneCard>
-  );
-}
-
-// ── Recent Lead Row ──
+// ── Recent Lead Row (warm restyle) ──
 function RecentLeadRow({ lead }: { lead: StatsData['recentLeads'][number] }) {
-  const stageCfg = STAGE_COLORS[lead.stage] || STAGE_COLORS.NEW;
+  const stageCfg = STAGE_WARM[lead.stage] || STAGE_WARM.NEW;
   const initials = lead.parentName
     .split(' ')
     .map((n) => n[0])
@@ -359,41 +272,20 @@ function RecentLeadRow({ lead }: { lead: StatsData['recentLeads'][number] }) {
   return (
     <Link
       href={`/admin/admissions/leads/${lead.id}`}
-      className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--admin-surface-2)]"
+      className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-[var(--warm-bg-soft)]"
     >
-      <div
-        className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold flex-shrink-0"
-        style={{
-          background: stageCfg.bg,
-          color: stageCfg.color,
-        }}
-      >
+      <div className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold flex-shrink-0 bg-[var(--warm-bg-soft)] text-[var(--warm-ink-soft)] border border-[var(--warm-border)]">
         {initials}
       </div>
       <div className="min-w-0 flex-1">
-        <div
-          className="truncate text-sm font-medium"
-          style={{ color: 'var(--admin-text)' }}
-        >
+        <div className="truncate text-sm font-medium text-[var(--warm-ink)]">
           {lead.parentName}
         </div>
-        <div
-          className="truncate text-xs"
-          style={{ color: 'var(--admin-text-subtle)' }}
-        >
+        <div className="truncate text-xs text-[var(--warm-ink-muted)] mt-0.5">
           {lead.childName}
         </div>
       </div>
-      <span
-        className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium flex-shrink-0"
-        style={{ background: stageCfg.bg, color: stageCfg.color }}
-      >
-        <span
-          className="h-1.5 w-1.5 rounded-full"
-          style={{ background: stageCfg.color }}
-        />
-        {STAGE_LABELS[lead.stage] || lead.stage}
-      </span>
+      <WarmStagePill stage={lead.stage} />
     </Link>
   );
 }
@@ -404,7 +296,6 @@ export default function CrmDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [addLeadOpen, setAddLeadOpen] = useState(false);
 
-  // ── Fetch stats data ──
   const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
@@ -429,7 +320,6 @@ export default function CrmDashboardPage() {
     fetchStats();
   }, [fetchStats]);
 
-  // ── Handle lead created ──
   const handleLeadCreated = () => {
     setAddLeadOpen(false);
     fetchStats();
@@ -442,312 +332,280 @@ export default function CrmDashboardPage() {
   );
   const totalInPipeline = pipelineStages.reduce((sum, s) => sum + s.count, 0);
 
+  // Sparkline data — derive from pipeline stages as a friendly visual
+  const pipelineSparkline = pipelineStages.map((s) => s.count);
+
   return (
     <PageTransition>
-      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
-        {/* ── SECTION 1: HEADER ── */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          {/* Left Side: Icon Badge + Title */}
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
-            >
-              <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
-            </div>
-            <div>
-              <h1
-                className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--admin-text)' }}
-              >
-                Admission CRM
-              </h1>
-              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
-                Track leads, manage follow-ups, and grow enrollments
-              </p>
-            </div>
-          </div>
-
-          {/* Right Side: Action Buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                fetchStats();
-                toast.success('Dashboard refreshed');
-              }}
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
-            <Button
-              size="sm"
-              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-              onClick={() => setAddLeadOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Lead</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* ── SECTION 2: KPI STAT CARDS ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {KPI_CARDS.map((card) => (
-            <KpiStatCard key={card.key} card={card} stats={loading ? null : stats} />
-          ))}
-        </div>
-
-        {/* ── SECTION 3: CRM MODULE CARDS GRID ── */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2
-              className="text-sm font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--admin-text-muted)' }}
-            >
-              CRM Modules
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            {CRM_MODULES.map((mod) => (
-              <CrmModuleCard key={mod.key} module={mod} stats={loading ? null : stats} />
-            ))}
-          </div>
-        </div>
-
-        {/* ── SECTION 4: PIPELINE BREAKDOWN + RECENT ACTIVITY ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Pipeline Funnel */}
-          <PreOneCard className="lg:col-span-2 !rounded-xl">
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Activity
-                    className="h-4 w-4"
-                    style={{ color: 'var(--admin-text-muted)' }}
-                  />
-                  <h3
-                    className="text-sm font-semibold"
-                    style={{ color: 'var(--admin-text)' }}
+      <WarmPremium className="min-h-screen">
+        <div className="flex flex-col gap-8 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* ── SECTION 1: HERO HEADER ── */}
+          <div className="warm-fade-in">
+            <WarmSectionHeading
+              kicker="Admission CRM"
+              title="Grow your preschool, one family at a time"
+              description="Track every enquiry from first hello to first day of school. Warm relationships, organized pipeline, happier enrollments."
+              accent="primary"
+              scribble
+              actions={
+                <>
+                  <WarmButton
+                    variant="outline"
+                    size="md"
+                    leftIcon={RefreshCw}
+                    onClick={() => {
+                      fetchStats();
+                      toast.success('Dashboard refreshed');
+                    }}
                   >
-                    Pipeline Breakdown
-                  </h3>
+                    <span className="hidden sm:inline">Refresh</span>
+                  </WarmButton>
+                  <WarmButton
+                    variant="primary"
+                    size="md"
+                    leftIcon={Plus}
+                    onClick={() => setAddLeadOpen(true)}
+                  >
+                    Add Lead
+                  </WarmButton>
+                </>
+              }
+            />
+          </div>
+
+          {/* ── SECTION 2: HERO STAT BENTO GRID ── */}
+          {/* Bento layout: first card spans 2 cols on lg, others single */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 warm-fade-in" style={{ animationDelay: '60ms' }}>
+            <div className="sm:col-span-2 lg:col-span-2">
+              <WarmStatCard
+                label="Total Leads"
+                value={stats?.totalLeads ?? 0}
+                delta={stats?.newThisWeek ? Math.round((stats.newThisWeek / Math.max(stats.totalLeads - stats.newThisWeek, 1)) * 100) : undefined}
+                caption={`${stats?.newThisWeek ?? 0} new this week`}
+                accent="primary"
+                icon={Users}
+                sparkline={pipelineSparkline.length >= 2 ? pipelineSparkline : undefined}
+                disableAnimation={loading}
+              />
+            </div>
+            <WarmStatCard
+              label="Conversion Rate"
+              value={stats?.conversionRate ?? 0}
+              suffix="%"
+              accent="sage"
+              icon={TrendingUp}
+              caption="Leads → Enrollments"
+              disableAnimation={loading}
+            />
+            <WarmStatCard
+              label="Follow-ups Due"
+              value={stats?.followUpsToday ?? 0}
+              accent="honey"
+              icon={PhoneCall}
+              caption={`${stats?.overdueFollowUps ?? 0} overdue`}
+              disableAnimation={loading}
+            />
+            <WarmStatCard
+              label="New This Week"
+              value={stats?.newThisWeek ?? 0}
+              accent="sky"
+              icon={Sparkles}
+              caption="Fresh enquiries"
+              disableAnimation={loading}
+            />
+            <WarmStatCard
+              label="Est. Revenue"
+              value={stats?.estimatedRevenue ?? 0}
+              prefix="₹"
+              accent="lavender"
+              icon={IndianRupee}
+              caption="From active pipeline"
+              disableAnimation={loading}
+            />
+            <div className="sm:col-span-2 lg:col-span-2">
+              <WarmStatCard
+                label="Open Tasks"
+                value={(stats?.tasks?.todo ?? 0) + (stats?.tasks?.inProgress ?? 0)}
+                accent="rose"
+                icon={CheckSquare}
+                caption={`${stats?.tasks?.overdue ?? 0} overdue · ${stats?.tasks?.done ?? 0} done`}
+                disableAnimation={loading}
+              />
+            </div>
+          </div>
+
+          {/* ── SECTION 3: CRM MODULE CARDS GRID ── */}
+          <div className="warm-fade-in" style={{ animationDelay: '120ms' }}>
+            <WarmSectionHeading
+              kicker="Modules"
+              title="Your admission toolkit"
+              description="Five focused workspaces, each designed to move families forward with warmth."
+              accent="honey"
+              className="mb-5"
+            />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              {CRM_MODULES.map((mod) => (
+                <CrmModuleCard key={mod.key} module={mod} stats={loading ? null : stats} loading={loading} />
+              ))}
+            </div>
+          </div>
+
+          {/* ── SECTION 4: PIPELINE BREAKDOWN + RECENT ACTIVITY ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 warm-fade-in" style={{ animationDelay: '180ms' }}>
+            {/* Pipeline Funnel — spans 2 cols */}
+            <WarmCard className="lg:col-span-2" accent="primary">
+              <WarmCardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <WarmCardTitle>Pipeline Breakdown</WarmCardTitle>
+                  <WarmCardDescription>Where every lead stands in their journey</WarmCardDescription>
                 </div>
                 <Link
                   href="/admin/admissions/pipeline"
-                  className="text-xs font-medium hover:underline"
-                  style={{ color: 'var(--admin-primary)' }}
+                  className="text-xs font-semibold text-[var(--warm-primary)] hover:underline whitespace-nowrap"
                 >
                   View Pipeline →
                 </Link>
-              </div>
-
-              {loading ? (
-                <div
-                  className="flex items-center justify-center py-10 text-sm"
-                  style={{ color: 'var(--admin-text-subtle)' }}
-                >
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                  Loading pipeline...
-                </div>
-              ) : totalInPipeline === 0 ? (
-                <div
-                  className="flex flex-col items-center justify-center py-10 text-center"
-                >
-                  <LayoutGrid
-                    className="h-8 w-8 mb-2 opacity-40"
-                    style={{ color: 'var(--admin-text-muted)' }}
+              </WarmCardHeader>
+              <WarmCardContent>
+                {loading ? (
+                  <div className="flex items-center justify-center py-12 text-sm text-[var(--warm-ink-muted)]">
+                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                    Loading pipeline...
+                  </div>
+                ) : totalInPipeline === 0 ? (
+                  <WarmEmptyState
+                    illustration="puzzle"
+                    title="No leads in pipeline yet"
+                    description="Your first family is just around the corner. Add a lead and watch this come alive."
+                    compact
                   />
-                  <p
-                    className="text-sm font-medium"
-                    style={{ color: 'var(--admin-text-muted)' }}
-                  >
-                    No leads in pipeline yet
-                  </p>
-                  <p
-                    className="text-xs mt-1"
-                    style={{ color: 'var(--admin-text-subtle)' }}
-                  >
-                    Add your first lead to see the breakdown.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {pipelineStages.map((stage) => {
-                    const cfg = STAGE_COLORS[stage.stage] || STAGE_COLORS.NEW;
-                    const pct =
-                      totalInPipeline > 0
-                        ? Math.round((stage.count / totalInPipeline) * 100)
-                        : 0;
-                    return (
-                      <div key={stage.stage} className="flex items-center gap-3">
-                        <div
-                          className="w-20 text-xs font-medium flex-shrink-0"
-                          style={{ color: 'var(--admin-text-muted)' }}
-                        >
-                          {STAGE_LABELS[stage.stage] || stage.stage}
-                        </div>
-                        <div
-                          className="flex-1 h-7 rounded-md overflow-hidden relative"
-                          style={{ background: 'var(--admin-surface-2)' }}
-                        >
-                          <div
-                            className="h-full rounded-md transition-all duration-500"
-                            style={{
-                              width: `${pct}%`,
-                              background: cfg.color,
-                              minWidth: pct > 0 ? '8px' : '0',
-                            }}
-                          />
-                          <div
-                            className="absolute inset-0 flex items-center justify-between px-2 text-[11px] font-medium"
-                            style={{ color: 'var(--admin-text)' }}
-                          >
-                            <span />
-                            <span className="tabular-nums">
+                ) : (
+                  <div className="space-y-4">
+                    {pipelineStages.map((stage) => {
+                      const cfg = STAGE_WARM[stage.stage] || STAGE_WARM.NEW;
+                      const pct = totalInPipeline > 0 ? Math.round((stage.count / totalInPipeline) * 100) : 0;
+                      return (
+                        <div key={stage.stage} className="flex items-center gap-4">
+                          <div className="w-24 text-xs font-semibold text-[var(--warm-ink-soft)] flex-shrink-0 flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${cfg.bar}`} />
+                            {STAGE_LABELS[stage.stage] || stage.stage}
+                          </div>
+                          <div className={`flex-1 h-8 rounded-[var(--warm-radius-sm)] overflow-hidden relative ${cfg.track}`}>
+                            <div
+                              className={`h-full rounded-[var(--warm-radius-sm)] transition-all duration-700 ease-out ${cfg.bar}`}
+                              style={{
+                                width: `${pct}%`,
+                                minWidth: pct > 0 ? '12px' : '0',
+                              }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-end pr-3 text-xs font-semibold text-[var(--warm-ink)] warm-numeric">
                               {stage.count} · {pct}%
-                            </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                )}
+              </WarmCardContent>
+            </WarmCard>
+
+            {/* Recent Activity */}
+            <WarmCard className="overflow-hidden" fade>
+              <WarmCardHeader className="border-b border-[var(--warm-divider)] pb-3 mb-0">
+                <WarmCardTitle>Recent Leads</WarmCardTitle>
+                <WarmCardDescription>Families who just reached out</WarmCardDescription>
+              </WarmCardHeader>
+              {loading ? (
+                <div className="flex items-center justify-center py-12 text-sm text-[var(--warm-ink-muted)]">
+                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  Loading...
+                </div>
+              ) : recentLeads.length === 0 ? (
+                <WarmEmptyState
+                  illustration="children"
+                  title="No recent leads"
+                  description="When families enquire, they'll appear here."
+                  compact
+                />
+              ) : (
+                <div className="divide-y divide-[var(--warm-divider)]">
+                  {recentLeads.slice(0, 6).map((lead) => (
+                    <RecentLeadRow key={lead.id} lead={lead} />
+                  ))}
                 </div>
               )}
-            </div>
-          </PreOneCard>
+              <div className="border-t border-[var(--warm-divider)] px-5 py-3 text-center">
+                <Link
+                  href="/admin/admissions/leads"
+                  className="text-xs font-semibold text-[var(--warm-primary)] hover:underline"
+                >
+                  View All Leads →
+                </Link>
+              </div>
+            </WarmCard>
+          </div>
 
-          {/* Recent Activity */}
-          <PreOneCard className="!rounded-xl overflow-hidden">
-            <div className="border-b px-5 py-3" style={{ borderColor: 'var(--admin-border)' }}>
-              <h3
-                className="text-sm font-semibold"
-                style={{ color: 'var(--admin-text)' }}
-              >
-                Recent Leads
-              </h3>
-            </div>
-            {loading ? (
-              <div
-                className="flex items-center justify-center py-10 text-sm"
-                style={{ color: 'var(--admin-text-subtle)' }}
-              >
-                <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                Loading...
+          {/* ── SECTION 5: OVERDUE/ALERTS (conditional, warm restyle) ── */}
+          {!loading && stats && (stats.overdueFollowUps > 0 || stats.tasks.overdue > 0) && (
+            <WarmCard accent="rose" fade className="overflow-hidden">
+              <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-[var(--warm-radius-md)] bg-[var(--warm-rose-soft)] flex-shrink-0">
+                  <AlertTriangle className="h-5 w-5 text-[var(--warm-rose-ink)]" strokeWidth={2} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="warm-heading text-base font-semibold text-[var(--warm-ink)]">
+                    Attention needed
+                  </h3>
+                  <p className="text-sm text-[var(--warm-ink-muted)] mt-0.5">
+                    {stats.overdueFollowUps > 0 &&
+                      `${stats.overdueFollowUps} follow-up${stats.overdueFollowUps !== 1 ? 's' : ''} overdue`}
+                    {stats.overdueFollowUps > 0 && stats.tasks.overdue > 0 && ' · '}
+                    {stats.tasks.overdue > 0 &&
+                      `${stats.tasks.overdue} task${stats.tasks.overdue !== 1 ? 's' : ''} overdue`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {stats.overdueFollowUps > 0 && (
+                    <Link href="/admin/admissions/followups">
+                      <WarmButton variant="soft" size="sm" leftIcon={PhoneCall}>
+                        Review Follow-ups
+                      </WarmButton>
+                    </Link>
+                  )}
+                  {stats.tasks.overdue > 0 && (
+                    <Link href="/admin/admissions/tasks">
+                      <WarmButton variant="soft" size="sm" leftIcon={CheckSquare}>
+                        Review Tasks
+                      </WarmButton>
+                    </Link>
+                  )}
+                </div>
               </div>
-            ) : recentLeads.length === 0 ? (
-              <div
-                className="flex flex-col items-center justify-center py-10 text-center"
-              >
-                <Users
-                  className="h-8 w-8 mb-2 opacity-40"
-                  style={{ color: 'var(--admin-text-muted)' }}
-                />
-                <p
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--admin-text-muted)' }}
-                >
-                  No recent leads
-                </p>
-                <p
-                  className="text-xs mt-1"
-                  style={{ color: 'var(--admin-text-subtle)' }}
-                >
-                  New leads will appear here.
-                </p>
+            </WarmCard>
+          )}
+
+          {/* ── SECTION 6: ENCOURAGEMENT (when no overdue) ── */}
+          {!loading && stats && stats.overdueFollowUps === 0 && stats.tasks.overdue === 0 && (stats.totalLeads ?? 0) > 0 && (
+            <WarmCard accent="sage" fade className="overflow-hidden">
+              <div className="p-5 flex items-center gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-[var(--warm-radius-md)] bg-[var(--warm-sage-soft)] flex-shrink-0">
+                  <WarmSparkle className="h-6 w-6 text-[var(--warm-sage)]" strokeWidth={1.6} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="warm-heading text-base font-semibold text-[var(--warm-ink)]">
+                    You're all caught up
+                  </h3>
+                  <p className="text-sm text-[var(--warm-ink-muted)] mt-0.5">
+                    No overdue follow-ups or tasks. Take a breath — every family is being nurtured. 🌱
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="divide-y" style={{ borderColor: 'var(--admin-border)' }}>
-                {recentLeads.slice(0, 6).map((lead) => (
-                  <RecentLeadRow key={lead.id} lead={lead} />
-                ))}
-              </div>
-            )}
-            <div
-              className="border-t px-5 py-2.5 text-center"
-              style={{ borderColor: 'var(--admin-border)' }}
-            >
-              <Link
-                href="/admin/admissions/leads"
-                className="text-xs font-medium hover:underline"
-                style={{ color: 'var(--admin-primary)' }}
-              >
-                View All Leads →
-              </Link>
-            </div>
-          </PreOneCard>
+            </WarmCard>
+          )}
         </div>
+      </WarmPremium>
 
-        {/* ── SECTION 5: OVERDUE/ALERTS (conditional) ── */}
-        {!loading && stats && (stats.overdueFollowUps > 0 || stats.tasks.overdue > 0) && (
-          <PreOneCard className="!rounded-xl">
-            <div
-              className="p-4 flex flex-col sm:flex-row sm:items-center gap-3"
-              style={{ background: 'rgba(239,68,68,0.05)' }}
-            >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
-                style={{ background: 'rgba(239,68,68,0.1)' }}
-              >
-                <AlertTriangle
-                  className="h-5 w-5"
-                  style={{ color: 'var(--admin-error)' }}
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div
-                  className="text-sm font-semibold"
-                  style={{ color: 'var(--admin-text)' }}
-                >
-                  Attention needed
-                </div>
-                <div
-                  className="text-xs mt-0.5"
-                  style={{ color: 'var(--admin-text-muted)' }}
-                >
-                  {stats.overdueFollowUps > 0 &&
-                    `${stats.overdueFollowUps} follow-up${stats.overdueFollowUps !== 1 ? 's' : ''} overdue`}
-                  {stats.overdueFollowUps > 0 && stats.tasks.overdue > 0 && ' · '}
-                  {stats.tasks.overdue > 0 &&
-                    `${stats.tasks.overdue} task${stats.tasks.overdue !== 1 ? 's' : ''} overdue`}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {stats.overdueFollowUps > 0 && (
-                  <Link href="/admin/admissions/followups">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1.5"
-                      style={{ color: 'var(--admin-error)', borderColor: 'var(--admin-error)' }}
-                    >
-                      <PhoneCall className="h-3.5 w-3.5" />
-                      Review Follow-ups
-                    </Button>
-                  </Link>
-                )}
-                {stats.tasks.overdue > 0 && (
-                  <Link href="/admin/admissions/tasks">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1.5"
-                      style={{ color: 'var(--admin-error)', borderColor: 'var(--admin-error)' }}
-                    >
-                      <CheckSquare className="h-3.5 w-3.5" />
-                      Review Tasks
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </PreOneCard>
-        )}
-      </div>
-
-      {/* ── Add Lead Dialog ── */}
       <AddLeadDialog
         open={addLeadOpen}
         onOpenChange={setAddLeadOpen}

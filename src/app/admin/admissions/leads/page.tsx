@@ -38,6 +38,17 @@ import { PreOneCard } from '@/components/ui/preone-card';
 import { AddLeadDialog } from '@/components/add-lead-dialog';
 import { LeadDetailDrawer } from '@/components/lead-detail-drawer';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 const theme = PORTAL_THEMES.admin;
 
@@ -83,10 +94,10 @@ const STAGE_CONFIG: Record<
   NEW: {
     label: 'New',
     color: CRM_COLORS.NEW?.hex ?? '#9ca3af',
-    cardBg: 'bg-[var(--admin-surface-2)]',
-    textColor: 'text-[var(--admin-text-muted)]',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    cardBg: 'bg-[var(--warm-bg-soft)]',
+    textColor: 'text-[var(--warm-ink-muted)]',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   CONTACTED: {
     label: 'Contacted',
@@ -94,15 +105,15 @@ const STAGE_CONFIG: Record<
     cardBg: 'bg-blue-50',
     textColor: 'text-blue-600',
     softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    varColor: 'var(--warm-sky-ink)',
   },
   VISITED: {
     label: 'Visited',
     color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#8b5cf6',
     cardBg: 'bg-purple-50',
     textColor: 'text-purple-600',
-    softVar: 'var(--admin-primary-soft)',
-    varColor: 'var(--admin-primary)',
+    softVar: 'var(--warm-primary-soft)',
+    varColor: 'var(--warm-primary)',
   },
   APPLIED: {
     label: 'Applied',
@@ -110,7 +121,7 @@ const STAGE_CONFIG: Record<
     cardBg: 'bg-yellow-50',
     textColor: 'text-yellow-600',
     softVar: 'var(--admin-warning-soft)',
-    varColor: 'var(--admin-warning)',
+    varColor: 'var(--warm-honey-ink)',
   },
   ENROLLED: {
     label: 'Enrolled',
@@ -118,7 +129,7 @@ const STAGE_CONFIG: Record<
     cardBg: 'bg-green-50',
     textColor: 'text-green-600',
     softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    varColor: 'var(--warm-sage)',
   },
   LOST: {
     label: 'Lost',
@@ -126,7 +137,7 @@ const STAGE_CONFIG: Record<
     cardBg: 'bg-red-50',
     textColor: 'text-red-600',
     softVar: 'rgba(239,68,68,0.1)',
-    varColor: 'var(--admin-error)',
+    varColor: 'var(--warm-rose-ink)',
   },
 };
 
@@ -151,30 +162,30 @@ const PRIORITY_CONFIG: Record<
 > = {
   HIGH: {
     label: 'High',
-    color: 'var(--admin-error)',
+    color: 'var(--warm-rose-ink)',
     bg: 'rgba(239,68,68,0.1)',
   },
   NORMAL: {
     label: 'Medium',
-    color: 'var(--admin-warning)',
+    color: 'var(--warm-honey-ink)',
     bg: 'var(--admin-warning-soft)',
   },
   LOW: {
     label: 'Low',
-    color: 'var(--admin-text-muted)',
-    bg: 'var(--admin-surface-2)',
+    color: 'var(--warm-ink-muted)',
+    bg: 'var(--warm-bg-soft)',
   },
 };
 
 // Stage filter pills config (matching /admin/students design)
 const STAGE_PILLS = [
-  { key: '', label: 'All', color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
-  { key: 'NEW', label: 'New', color: 'var(--admin-text-muted)', bg: 'var(--admin-surface-2)' },
-  { key: 'CONTACTED', label: 'Contacted', color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
-  { key: 'VISITED', label: 'Visited', color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
-  { key: 'APPLIED', label: 'Applied', color: 'var(--admin-warning)', bg: 'var(--admin-warning-soft)' },
-  { key: 'ENROLLED', label: 'Enrolled', color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
-  { key: 'LOST', label: 'Lost', color: 'var(--admin-error)', bg: 'rgba(239,68,68,0.1)' },
+  { key: '', label: 'All', color: 'var(--warm-primary)', bg: 'var(--warm-primary-soft)' },
+  { key: 'NEW', label: 'New', color: 'var(--warm-ink-muted)', bg: 'var(--warm-bg-soft)' },
+  { key: 'CONTACTED', label: 'Contacted', color: 'var(--warm-sky-ink)', bg: 'var(--admin-info-soft)' },
+  { key: 'VISITED', label: 'Visited', color: 'var(--warm-primary)', bg: 'var(--warm-primary-soft)' },
+  { key: 'APPLIED', label: 'Applied', color: 'var(--warm-honey-ink)', bg: 'var(--admin-warning-soft)' },
+  { key: 'ENROLLED', label: 'Enrolled', color: 'var(--warm-sage)', bg: 'var(--admin-success-soft)' },
+  { key: 'LOST', label: 'Lost', color: 'var(--warm-rose-ink)', bg: 'rgba(239,68,68,0.1)' },
 ];
 
 function getToken(): string | null {
@@ -184,31 +195,11 @@ function getToken(): string | null {
 
 // ── Sub-components ──
 function StageBadge({ stage }: { stage: string }) {
-  const cfg = STAGE_CONFIG[stage] || STAGE_CONFIG.NEW;
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
-      style={{ background: cfg.softVar, color: cfg.varColor }}
-    >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ background: cfg.varColor }}
-      />
-      {cfg.label}
-    </span>
-  );
+  return <WarmStagePill stage={stage} />;
 }
 
 function PriorityBadge({ priority }: { priority: string }) {
-  const cfg = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.NORMAL;
-  return (
-    <span
-      className="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium"
-      style={{ background: cfg.bg, color: cfg.color }}
-    >
-      {cfg.label}
-    </span>
-  );
+  return <WarmPriorityPill priority={priority} />;
 }
 
 function FilterPill({
@@ -234,8 +225,8 @@ function FilterPill({
         active
           ? { background: activeBg, color: activeColor }
           : {
-              background: 'var(--admin-surface-2)',
-              color: 'var(--admin-text-muted)',
+              background: 'var(--warm-bg-soft)',
+              color: 'var(--warm-ink-muted)',
             }
       }
     >
@@ -246,7 +237,7 @@ function FilterPill({
           style={
             active
               ? { background: activeColor, color: activeBg }
-              : { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)' }
+              : { background: 'var(--warm-surface)', color: 'var(--warm-ink-muted)' }
           }
         >
           {count}
@@ -405,69 +396,52 @@ export default function CrmLeadsPage() {
   const endRow = Math.min(page * limit, total);
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+    <WarmPremium className="min-h-screen">
+    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* ── SECTION 1: HEADER ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between warm-fade-in">
+        <div className="flex items-center gap-4">
           <Link href="/admin/admissions">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ArrowLeft className="h-4 w-4" />
+            <WarmButton variant="ghost" size="sm" leftIcon={ArrowLeft}>
               Back
-            </Button>
+            </WarmButton>
           </Link>
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
-            >
-              <Users
-                className="h-5 w-5"
-                style={{ color: 'var(--admin-primary)' }}
-              />
-            </div>
-            <div>
-              <h1
-                className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--admin-text)' }}
-              >
-                Leads Management
-              </h1>
-              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
-                Manage all admission leads and enquiries
-              </p>
-            </div>
-          </div>
+          <WarmSectionHeading
+            kicker="Leads"
+            title="Every family, one place"
+            description="Manage all admission leads and enquiries — from first hello to enrolled."
+            accent="primary"
+            scribble
+          />
         </div>
         <div className="flex items-center gap-2">
-          <Button
+          <WarmButton
             variant="outline"
-            size="sm"
-            className="gap-2"
+            size="md"
+            leftIcon={RefreshCw}
             onClick={handleRefresh}
           >
-            <RefreshCw className="h-4 w-4" />
             <span className="hidden sm:inline">Refresh</span>
-          </Button>
-          <Button
-            size="sm"
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+          </WarmButton>
+          <WarmButton
+            variant="primary"
+            size="md"
+            leftIcon={Plus}
             onClick={() => setAddLeadOpen(true)}
           >
-            <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Lead</span>
-          </Button>
+          </WarmButton>
         </div>
       </div>
 
       {/* ── SECTION 2: FILTER BAR ── */}
-      <PreOneCard className="!rounded-xl">
-        <div className="p-4 space-y-3">
+      <WarmCard fade>
+        <div className="p-5 space-y-4">
           {/* Row 1: Search + Filters toggle */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--warm-ink-muted)]"
               />
               <input
                 type="text"
@@ -477,56 +451,34 @@ export default function CrmLeadsPage() {
                   setSearchQuery(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 w-full rounded-lg border px-3 pl-9 text-sm outline-none transition-colors"
-                style={{
-                  background: 'var(--admin-surface-2)',
-                  borderColor: 'var(--admin-border)',
-                  color: 'var(--admin-text)',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
-                  e.currentTarget.style.boxShadow =
-                    '0 0 0 2px var(--admin-primary-soft)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-border)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                className="h-10 w-full rounded-[var(--warm-radius-sm)] border px-3 pl-9 text-sm outline-none transition-all bg-[var(--warm-surface-tint)] border-[var(--warm-border)] text-[var(--warm-ink)] placeholder:text-[var(--warm-ink-faint)] focus:border-[var(--warm-primary)] focus:bg-[var(--warm-surface)]"
               />
             </div>
 
-            <Button
-              variant={showFilters ? 'default' : 'outline'}
-              size="sm"
-              className="gap-1.5"
+            <WarmButton
+              variant={showFilters ? 'primary' : 'outline'}
+              size="md"
+              leftIcon={Filter}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter className="h-3.5 w-3.5" />
               Filters
               {(sourceFilter || priorityFilter) && (
-                <span
-                  className="ml-1 h-4 min-w-[16px] rounded-full px-1 text-[10px] flex items-center justify-center"
-                  style={{
-                    background: 'var(--admin-primary)',
-                    color: 'white',
-                  }}
-                >
+                <span className="ml-1 h-5 min-w-[20px] rounded-full px-1.5 text-[10px] flex items-center justify-center bg-[var(--warm-primary)] text-white">
                   {[sourceFilter, priorityFilter].filter(Boolean).length}
                 </span>
               )}
-            </Button>
+            </WarmButton>
 
             {hasActiveFilters && (
-              <Button
+              <WarmButton
                 variant="ghost"
-                size="sm"
-                className="gap-1.5"
-                style={{ color: 'var(--admin-error)' }}
+                size="md"
+                leftIcon={X}
+                className="text-[var(--warm-rose-ink)]"
                 onClick={clearFilters}
               >
-                <X className="h-3.5 w-3.5" />
                 Clear Filters
-              </Button>
+              </WarmButton>
             )}
           </div>
 
@@ -550,10 +502,7 @@ export default function CrmLeadsPage() {
 
           {/* Row 3: Extended Filters (collapsible) */}
           {showFilters && (
-            <div
-              className="flex flex-wrap items-center gap-3 rounded-lg p-3"
-              style={{ background: 'var(--admin-surface-2)' }}
-            >
+            <div className="flex flex-wrap items-center gap-3 rounded-[var(--warm-radius-md)] p-4 bg-[var(--warm-bg-soft)]">
               <Select
                 value={sourceFilter || 'ALL'}
                 onValueChange={(v) => {
@@ -594,85 +543,51 @@ export default function CrmLeadsPage() {
             </div>
           )}
         </div>
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── SECTION 3: STATS BAR + DATA TABLE ── */}
-      <PreOneCard className="!rounded-xl overflow-hidden">
+      <WarmCard className="overflow-hidden" fade>
         {/* Stats Bar */}
-        <div
-          className="flex items-center justify-between border-b px-5 py-3"
-          style={{ borderColor: 'var(--admin-border)' }}
-        >
+        <div className="flex items-center justify-between border-b border-[var(--warm-divider)] px-5 py-3">
           <div className="flex items-center gap-2">
-            <span
-              className="text-sm"
-              style={{ color: 'var(--admin-text-muted)' }}
-            >
+            <span className="text-sm text-[var(--warm-ink-muted)]">
               Total Leads
             </span>
-            <span
-              className="rounded-md px-2 py-0.5 text-sm font-bold tabular-nums"
-              style={{
-                background: 'var(--admin-primary-soft)',
-                color: 'var(--admin-primary)',
-              }}
-            >
-              {total}
-            </span>
+            <WarmPill variant="primary" size="md">{total}</WarmPill>
           </div>
-          <Button variant="ghost" size="sm" className="gap-1.5">
-            <Columns3 className="h-3.5 w-3.5" />
+          <WarmButton variant="ghost" size="sm" leftIcon={Columns3}>
             Columns
-          </Button>
+          </WarmButton>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
           {loading ? (
-            <div
-              className="flex items-center justify-center h-48 text-sm"
-              style={{ color: 'var(--admin-text-subtle)' }}
-            >
+            <div className="flex items-center justify-center h-48 text-sm text-[var(--warm-ink-muted)]">
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading leads...
             </div>
           ) : leads.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Search
-                className="h-10 w-10 mb-3 opacity-40"
-                style={{ color: 'var(--admin-text-muted)' }}
-              />
-              <p
-                className="text-sm font-medium"
-                style={{ color: 'var(--admin-text-muted)' }}
-              >
-                No leads found
-              </p>
-              <p
-                className="text-xs mt-1"
-                style={{ color: 'var(--admin-text-subtle)' }}
-              >
-                Try adjusting your search or filters, or add a new lead.
-              </p>
-              <Button
-                size="sm"
-                className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-                onClick={() => setAddLeadOpen(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Add Lead
-              </Button>
-            </div>
+            <WarmEmptyState
+              illustration="search"
+              title="No leads found"
+              description="Try adjusting your search or filters, or add a new lead and watch your pipeline grow."
+              action={
+                <WarmButton variant="primary" size="md" leftIcon={Plus} onClick={() => setAddLeadOpen(true)}>
+                  Add Lead
+                </WarmButton>
+              }
+            />
           ) : (
             <table className="w-full">
               <thead>
                 <tr
                   className="border-b"
-                  style={{ borderColor: 'var(--admin-border)' }}
+                  style={{ borderColor: 'var(--warm-border)' }}
                 >
                   <th
                     className="min-w-[200px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     <span className="inline-flex items-center gap-1">
                       Parent / Child <ArrowUpDown className="h-3 w-3 opacity-40" />
@@ -680,19 +595,19 @@ export default function CrmLeadsPage() {
                   </th>
                   <th
                     className="min-w-[160px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Contact
                   </th>
                   <th
                     className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Source
                   </th>
                   <th
                     className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     <span className="inline-flex items-center gap-1">
                       Stage <ArrowUpDown className="h-3 w-3 opacity-40" />
@@ -700,25 +615,25 @@ export default function CrmLeadsPage() {
                   </th>
                   <th
                     className="w-[100px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Priority
                   </th>
                   <th
                     className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Est. Fee
                   </th>
                   <th
                     className="w-[140px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Next Follow-up
                   </th>
                   <th
                     className="w-[80px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     Actions
                   </th>
@@ -739,32 +654,25 @@ export default function CrmLeadsPage() {
                   return (
                     <tr
                       key={lead.id}
-                      className="cursor-pointer table-row-preone border-b"
-                      style={{ borderColor: 'var(--admin-border)' }}
+                      className="cursor-pointer table-row-preone border-b border-[var(--warm-divider)] hover:bg-[var(--warm-bg-soft)] transition-colors"
                       onClick={() => handleLeadClick(lead)}
                     >
                       {/* Parent / Child: Avatar + Names */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold flex-shrink-0"
-                            style={{
-                              background: stageCfg.softVar,
-                              color: stageCfg.varColor,
-                            }}
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold flex-shrink-0 bg-[var(--warm-bg-soft)] text-[var(--warm-ink-soft)] border border-[var(--warm-border)]"
                           >
                             {getInitials(lead.parentName)}
                           </div>
                           <div className="min-w-0">
                             <div
-                              className="truncate font-medium"
-                              style={{ color: 'var(--admin-text)' }}
+                              className="truncate font-medium text-[var(--warm-ink)]"
                             >
                               {lead.parentName}
                             </div>
                             <div
-                              className="text-xs"
-                              style={{ color: 'var(--admin-text-subtle)' }}
+                              className="text-xs text-[var(--warm-ink-muted)]"
                             >
                               {lead.childName}
                               {lead.childAge ? ` (${lead.childAge})` : ''}
@@ -776,21 +684,18 @@ export default function CrmLeadsPage() {
                       {/* Contact */}
                       <td className="px-4 py-3 text-xs">
                         <div
-                          className="flex items-center gap-1 whitespace-nowrap tabular-nums"
-                          style={{ color: 'var(--admin-text-muted)' }}
+                          className="flex items-center gap-1 whitespace-nowrap tabular-nums text-[var(--warm-ink-muted)]"
                         >
                           <Phone
-                            className="h-3 w-3"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            className="h-3 w-3 text-[var(--warm-ink-faint)]"
                           />
                           {lead.parentPhone}
                         </div>
                         {lead.parentEmail && (
                           <div
-                            className="flex items-center gap-1 whitespace-nowrap mt-0.5"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            className="flex items-center gap-1 whitespace-nowrap mt-0.5 text-[var(--warm-ink-muted)]"
                           >
-                            <Mail className="h-3 w-3" />
+                            <Mail className="h-3 w-3 text-[var(--warm-ink-faint)]" />
                             <span className="truncate max-w-[140px]">
                               {lead.parentEmail}
                             </span>
@@ -800,16 +705,7 @@ export default function CrmLeadsPage() {
 
                       {/* Source */}
                       <td className="px-4 py-3">
-                        <span
-                          className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium"
-                          style={{
-                            background: 'var(--admin-surface-2)',
-                            color: 'var(--admin-text-muted)',
-                          }}
-                        >
-                          <Tag className="h-3 w-3" />
-                          {SOURCE_LABELS[lead.source] || lead.source}
-                        </span>
+                        <WarmSourcePill source={lead.source} />
                       </td>
 
                       {/* Stage */}
@@ -825,7 +721,7 @@ export default function CrmLeadsPage() {
                       {/* Estimated Fee */}
                       <td
                         className="px-4 py-3 text-sm font-medium tabular-nums"
-                        style={{ color: 'var(--admin-text)' }}
+                        style={{ color: 'var(--warm-ink)' }}
                       >
                         {lead.estimatedValue
                           ? `₹${lead.estimatedValue.toLocaleString('en-IN')}`
@@ -839,12 +735,12 @@ export default function CrmLeadsPage() {
                             className="flex items-center gap-1 whitespace-nowrap"
                             style={{
                               color: isOverdue
-                                ? 'var(--admin-error)'
+                                ? 'var(--warm-rose-ink)'
                                 : isToday(followUpDate)
-                                  ? 'var(--admin-warning)'
+                                  ? 'var(--warm-honey-ink)'
                                   : isTomorrow(followUpDate)
-                                    ? 'var(--admin-info)'
-                                    : 'var(--admin-text-muted)',
+                                    ? 'var(--warm-sky-ink)'
+                                    : 'var(--warm-ink-muted)',
                               fontWeight:
                                 isOverdue || isToday(followUpDate)
                                   ? 600
@@ -859,7 +755,7 @@ export default function CrmLeadsPage() {
                                 : format(followUpDate, 'dd MMM')}
                           </span>
                         ) : (
-                          <span style={{ color: 'var(--admin-text-subtle)' }}>
+                          <span style={{ color: 'var(--warm-ink-faint)' }}>
                             —
                           </span>
                         )}
@@ -874,12 +770,12 @@ export default function CrmLeadsPage() {
                           <button
                             className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-80"
                             style={{
-                              color: 'var(--admin-text-muted)',
+                              color: 'var(--warm-ink-muted)',
                               background: 'transparent',
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.background =
-                                'var(--admin-surface-2)';
+                                'var(--warm-bg-soft)';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
@@ -891,12 +787,12 @@ export default function CrmLeadsPage() {
                           <button
                             className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-80"
                             style={{
-                              color: 'var(--admin-text-muted)',
+                              color: 'var(--warm-ink-muted)',
                               background: 'transparent',
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.background =
-                                'var(--admin-surface-2)';
+                                'var(--warm-bg-soft)';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
@@ -919,19 +815,19 @@ export default function CrmLeadsPage() {
         {!loading && leads.length > 0 && (
           <div
             className="flex flex-col gap-3 border-t px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <div className="flex items-center gap-4">
               <span
                 className="text-xs"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Showing {startRow} to {endRow} of {total} leads
               </span>
               <div className="flex items-center gap-2">
                 <span
                   className="text-xs"
-                  style={{ color: 'var(--admin-text-subtle)' }}
+                  style={{ color: 'var(--warm-ink-faint)' }}
                 >
                   Rows per page:
                 </span>
@@ -943,9 +839,9 @@ export default function CrmLeadsPage() {
                   }}
                   className="h-7 rounded border px-1.5 text-xs outline-none"
                   style={{
-                    background: 'var(--admin-surface)',
-                    borderColor: 'var(--admin-border)',
-                    color: 'var(--admin-text)',
+                    background: 'var(--warm-surface)',
+                    borderColor: 'var(--warm-border)',
+                    color: 'var(--warm-ink)',
                   }}
                 >
                   <option value={10}>10</option>
@@ -960,7 +856,7 @@ export default function CrmLeadsPage() {
               <button
                 className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
                 style={{
-                  color: 'var(--admin-text-muted)',
+                  color: 'var(--warm-ink-muted)',
                   opacity: page <= 1 ? 0.4 : 1,
                 }}
                 disabled={page <= 1}
@@ -974,7 +870,7 @@ export default function CrmLeadsPage() {
                   <span
                     key={`ellipsis-${idx}`}
                     className="flex h-8 w-8 items-center justify-center text-xs"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     ...
                   </span>
@@ -985,10 +881,10 @@ export default function CrmLeadsPage() {
                     style={
                       page === p
                         ? {
-                            background: 'var(--admin-primary-soft)',
-                            color: 'var(--admin-primary)',
+                            background: 'var(--warm-primary-soft)',
+                            color: 'var(--warm-primary)',
                           }
-                        : { color: 'var(--admin-text-muted)' }
+                        : { color: 'var(--warm-ink-muted)' }
                     }
                     onClick={() => setPage(p)}
                   >
@@ -1000,7 +896,7 @@ export default function CrmLeadsPage() {
               <button
                 className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
                 style={{
-                  color: 'var(--admin-text-muted)',
+                  color: 'var(--warm-ink-muted)',
                   opacity: page >= totalPages ? 0.4 : 1,
                 }}
                 disabled={page >= totalPages}
@@ -1011,7 +907,7 @@ export default function CrmLeadsPage() {
             </div>
           </div>
         )}
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── Dialogs ── */}
       <AddLeadDialog
@@ -1027,5 +923,6 @@ export default function CrmLeadsPage() {
         onLeadUpdated={handleLeadUpdated}
       />
     </div>
+    </WarmPremium>
   );
 }

@@ -33,6 +33,17 @@ import {
 import { PreOneCard } from '@/components/ui/preone-card';
 import { CRM_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface LeadInfo {
@@ -59,46 +70,46 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; softVar: stri
   NEW: {
     label: 'New',
     color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   CONTACTED: {
     label: 'Contacted',
     color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
-    softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    softVar: 'var(--warm-sky-soft)',
+    varColor: 'var(--warm-sky-ink)',
   },
   VISITED: {
     label: 'Visited',
     color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
-    softVar: 'var(--admin-primary-soft)',
-    varColor: 'var(--admin-primary)',
+    softVar: 'var(--warm-primary-soft)',
+    varColor: 'var(--warm-primary)',
   },
   APPLIED: {
     label: 'Applied',
     color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
-    softVar: 'var(--admin-warning-soft)',
-    varColor: 'var(--admin-warning)',
+    softVar: 'var(--warm-honey-soft)',
+    varColor: 'var(--warm-honey-ink)',
   },
   ENROLLED: {
     label: 'Enrolled',
     color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
-    softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    softVar: 'var(--warm-sage-soft)',
+    varColor: 'var(--warm-sage)',
   },
   LOST: {
     label: 'Lost',
     color: CRM_COLORS.LOST?.hex ?? '#9ca3af',
     softVar: 'rgba(239,68,68,0.1)',
-    varColor: 'var(--admin-error)',
+    varColor: 'var(--warm-rose-ink)',
   },
 };
 
 const FILTER_PILLS = [
-  { key: 'all', label: 'All', color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
-  { key: 'pending', label: 'Pending', color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
-  { key: 'overdue', label: 'Overdue', color: 'var(--admin-error)', bg: 'rgba(239,68,68,0.1)' },
-  { key: 'completed', label: 'Completed', color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+  { key: 'all', label: 'All', color: 'var(--warm-primary)', bg: 'var(--warm-primary-soft)' },
+  { key: 'pending', label: 'Pending', color: 'var(--warm-sky-ink)', bg: 'var(--warm-sky-soft)' },
+  { key: 'overdue', label: 'Overdue', color: 'var(--warm-rose-ink)', bg: 'rgba(239,68,68,0.1)' },
+  { key: 'completed', label: 'Completed', color: 'var(--warm-sage)', bg: 'var(--warm-sage-soft)' },
 ];
 
 const TYPE_OPTIONS = [
@@ -119,15 +130,15 @@ function getToken(): string | null {
 function FollowUpTypeIcon({ type, className }: { type: string; className?: string }) {
   switch (type) {
     case 'Call':
-      return <Phone className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-info)' }} />;
+      return <Phone className={className ?? 'h-4 w-4'} style={{ color: 'var(--warm-sky-ink)' }} />;
     case 'WhatsApp':
-      return <MessageSquare className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-success)' }} />;
+      return <MessageSquare className={className ?? 'h-4 w-4'} style={{ color: 'var(--warm-sage)' }} />;
     case 'Email':
-      return <Mail className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-warning)' }} />;
+      return <Mail className={className ?? 'h-4 w-4'} style={{ color: 'var(--warm-honey-ink)' }} />;
     case 'Visit':
-      return <Eye className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-primary)' }} />;
+      return <Eye className={className ?? 'h-4 w-4'} style={{ color: 'var(--warm-primary)' }} />;
     default:
-      return <FileText className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-text-muted)' }} />;
+      return <FileText className={className ?? 'h-4 w-4'} style={{ color: 'var(--warm-ink-muted)' }} />;
   }
 }
 
@@ -148,6 +159,7 @@ function FilterPill({
   onClick: () => void;
 }) {
   return (
+    <WarmPremium className="min-h-screen">
     <button
       onClick={onClick}
       className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
@@ -155,8 +167,8 @@ function FilterPill({
         active
           ? { background: activeBg, color: activeColor }
           : {
-              background: 'var(--admin-surface-2)',
-              color: 'var(--admin-text-muted)',
+              background: 'var(--warm-bg-soft)',
+              color: 'var(--warm-ink-muted)',
             }
       }
     >
@@ -167,13 +179,14 @@ function FilterPill({
           style={
             active
               ? { background: activeColor, color: activeBg }
-              : { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)' }
+              : { background: 'var(--warm-surface)', color: 'var(--warm-ink-muted)' }
           }
         >
           {count}
         </span>
       )}
     </button>
+    </WarmPremium>
   );
 }
 
@@ -194,7 +207,7 @@ function StatCard({
   sublabel?: string;
 }) {
   return (
-    <PreOneCard className="!rounded-xl">
+    <WarmCard fade>
       <div className="p-4 flex items-center gap-4">
         <div
           className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
@@ -205,27 +218,27 @@ function StatCard({
         <div className="min-w-0 flex-1">
           <div
             className="text-xs font-medium"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--warm-ink-muted)' }}
           >
             {label}
           </div>
           <div
             className="text-xl font-bold tabular-nums"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             {value}
           </div>
           {sublabel && (
             <div
               className="text-[11px] mt-0.5"
-              style={{ color: 'var(--admin-text-subtle)' }}
+              style={{ color: 'var(--warm-ink-faint)' }}
             >
               {sublabel}
             </div>
           )}
         </div>
       </div>
-    </PreOneCard>
+    </WarmCard>
   );
 }
 
@@ -353,21 +366,21 @@ export default function CrmFollowupsPage() {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-success-soft)' }}
+              style={{ background: 'var(--warm-sage-soft)' }}
             >
               <PhoneCall
                 className="h-5 w-5"
-                style={{ color: 'var(--admin-success)' }}
+                style={{ color: 'var(--warm-sage)' }}
               />
             </div>
             <div>
               <h1
                 className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--admin-text)' }}
+                style={{ color: 'var(--warm-ink)' }}
               >
                 Follow-up Queue
               </h1>
-              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+              <p className="text-sm" style={{ color: 'var(--warm-ink-muted)' }}>
                 Track scheduled calls, messages, and visits
               </p>
             </div>
@@ -421,7 +434,7 @@ export default function CrmFollowupsPage() {
       </div>
 
       {/* ── SECTION 3: FILTER BAR ── */}
-      <PreOneCard className="!rounded-xl">
+      <WarmCard fade>
         <div className="p-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             {FILTER_PILLS.map((pill) => {
@@ -462,19 +475,19 @@ export default function CrmFollowupsPage() {
             </SelectContent>
           </Select>
         </div>
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── SECTION 4: TWO-COLUMN LAYOUT ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Main: Follow-up list */}
-        <PreOneCard className="lg:col-span-2 !rounded-xl overflow-hidden">
+        <WarmCard className="lg:col-span-2 overflow-hidden" fade>
           <div
             className="border-b px-5 py-3 flex items-center justify-between"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <h3
               className="text-sm font-semibold"
-              style={{ color: 'var(--admin-text)' }}
+              style={{ color: 'var(--warm-ink)' }}
             >
               Follow-ups ({followUps.length})
             </h3>
@@ -483,7 +496,7 @@ export default function CrmFollowupsPage() {
           {loading ? (
             <div
               className="flex items-center justify-center h-48 text-sm"
-              style={{ color: 'var(--admin-text-subtle)' }}
+              style={{ color: 'var(--warm-ink-faint)' }}
             >
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading follow-ups...
@@ -492,17 +505,17 @@ export default function CrmFollowupsPage() {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <PhoneCall
                 className="h-10 w-10 mb-3 opacity-40"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               />
               <p
                 className="text-sm font-medium"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 No follow-ups in this view
               </p>
               <p
                 className="text-xs mt-1"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               >
                 Try a different filter or schedule a new follow-up from a lead.
               </p>
@@ -510,7 +523,7 @@ export default function CrmFollowupsPage() {
           ) : (
             <div
               className="divide-y"
-              style={{ borderColor: 'var(--admin-border)' }}
+              style={{ borderColor: 'var(--warm-border)' }}
             >
               {followUps.map((fu) => {
                 const fuDate = new Date(fu.dateTime);
@@ -523,19 +536,19 @@ export default function CrmFollowupsPage() {
                 const isTomorrowFU = isTomorrow(fuDate);
 
                 const borderColor = isCompleted
-                  ? 'var(--admin-success)'
+                  ? 'var(--warm-sage)'
                   : isOverdue
-                    ? 'var(--admin-error)'
+                    ? 'var(--warm-rose-ink)'
                     : isTodayFU
-                      ? 'var(--admin-warning)'
-                      : 'var(--admin-info)';
+                      ? 'var(--warm-honey-ink)'
+                      : 'var(--warm-sky-ink)';
 
                 const stageCfg = STAGE_CONFIG[fu.lead.stage] || STAGE_CONFIG.NEW;
 
                 return (
                   <div
                     key={fu.id}
-                    className="flex items-start gap-3 px-5 py-3.5 border-l-4 transition-colors hover:bg-[var(--admin-surface-2)]"
+                    className="flex items-start gap-3 px-5 py-3.5 border-l-4 transition-colors hover:bg-[var(--warm-bg-soft)]"
                     style={{ borderColor }}
                   >
                     {/* Icon */}
@@ -544,18 +557,18 @@ export default function CrmFollowupsPage() {
                         <div
                           className="flex h-8 w-8 items-center justify-center rounded-lg"
                           style={{
-                            background: 'var(--admin-success-soft)',
+                            background: 'var(--warm-sage-soft)',
                           }}
                         >
                           <CheckCircle2
                             className="h-4 w-4"
-                            style={{ color: 'var(--admin-success)' }}
+                            style={{ color: 'var(--warm-sage)' }}
                           />
                         </div>
                       ) : (
                         <div
                           className="flex h-8 w-8 items-center justify-center rounded-lg"
-                          style={{ background: 'var(--admin-surface-2)' }}
+                          style={{ background: 'var(--warm-bg-soft)' }}
                         >
                           <FollowUpTypeIcon type={fu.type} />
                         </div>
@@ -568,13 +581,13 @@ export default function CrmFollowupsPage() {
                         <Link
                           href={`/admin/admissions/leads/${fu.lead.id}`}
                           className="text-sm font-medium hover:underline"
-                          style={{ color: 'var(--admin-text)' }}
+                          style={{ color: 'var(--warm-ink)' }}
                         >
                           {fu.lead.parentName}
                         </Link>
                         <span
                           className="text-xs"
-                          style={{ color: 'var(--admin-text-subtle)' }}
+                          style={{ color: 'var(--warm-ink-faint)' }}
                         >
                           · {fu.lead.childName}
                         </span>
@@ -590,8 +603,8 @@ export default function CrmFollowupsPage() {
                         <Badge
                           className="text-[10px] h-5 font-medium"
                           style={{
-                            background: 'var(--admin-surface-2)',
-                            color: 'var(--admin-text-muted)',
+                            background: 'var(--warm-bg-soft)',
+                            color: 'var(--warm-ink-muted)',
                             border: 'none',
                           }}
                         >
@@ -602,7 +615,7 @@ export default function CrmFollowupsPage() {
                       {fu.notes && (
                         <p
                           className="text-xs mt-1 line-clamp-2"
-                          style={{ color: 'var(--admin-text-muted)' }}
+                          style={{ color: 'var(--warm-ink-muted)' }}
                         >
                           {fu.notes}
                         </p>
@@ -613,12 +626,12 @@ export default function CrmFollowupsPage() {
                           className="text-[11px] flex items-center gap-1 tabular-nums"
                           style={{
                             color: isOverdue
-                              ? 'var(--admin-error)'
+                              ? 'var(--warm-rose-ink)'
                               : isTodayFU
-                                ? 'var(--admin-warning)'
+                                ? 'var(--warm-honey-ink)'
                                 : isTomorrowFU
-                                  ? 'var(--admin-info)'
-                                  : 'var(--admin-text-subtle)',
+                                  ? 'var(--warm-sky-ink)'
+                                  : 'var(--warm-ink-faint)',
                             fontWeight: isOverdue || isTodayFU ? 600 : 400,
                           }}
                         >
@@ -635,7 +648,7 @@ export default function CrmFollowupsPage() {
                             className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
                             style={{
                               background: 'rgba(239,68,68,0.1)',
-                              color: 'var(--admin-error)',
+                              color: 'var(--warm-rose-ink)',
                             }}
                           >
                             <AlertTriangle className="h-3 w-3" />
@@ -647,8 +660,8 @@ export default function CrmFollowupsPage() {
                           <span
                             className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
                             style={{
-                              background: 'var(--admin-success-soft)',
-                              color: 'var(--admin-success)',
+                              background: 'var(--warm-sage-soft)',
+                              color: 'var(--warm-sage)',
                             }}
                           >
                             <CheckCircle2 className="h-3 w-3" />
@@ -659,7 +672,7 @@ export default function CrmFollowupsPage() {
                         {fu.createdBy && (
                           <span
                             className="text-[11px]"
-                            style={{ color: 'var(--admin-text-subtle)' }}
+                            style={{ color: 'var(--warm-ink-faint)' }}
                           >
                             by {fu.createdBy}
                           </span>
@@ -689,21 +702,21 @@ export default function CrmFollowupsPage() {
               })}
             </div>
           )}
-        </PreOneCard>
+        </WarmCard>
 
         {/* Sidebar: Upcoming Follow-ups */}
-        <PreOneCard className="!rounded-xl overflow-hidden">
+        <WarmCard className="overflow-hidden" fade>
           <div
             className="border-b px-5 py-3 flex items-center gap-2"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <CalendarClock
               className="h-4 w-4"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             />
             <h3
               className="text-sm font-semibold"
-              style={{ color: 'var(--admin-text)' }}
+              style={{ color: 'var(--warm-ink)' }}
             >
               Upcoming Follow-ups
             </h3>
@@ -715,17 +728,17 @@ export default function CrmFollowupsPage() {
             >
               <CalendarClock
                 className="h-8 w-8 mb-2 opacity-40"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               />
               <p
                 className="text-sm font-medium"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Nothing scheduled
               </p>
               <p
                 className="text-xs mt-1"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               >
                 Schedule follow-ups from lead detail pages.
               </p>
@@ -733,7 +746,7 @@ export default function CrmFollowupsPage() {
           ) : (
             <div
               className="divide-y"
-              style={{ borderColor: 'var(--admin-border)' }}
+              style={{ borderColor: 'var(--warm-border)' }}
             >
               {upcomingLeads.map((lead) => {
                 const fuDate = new Date(lead.nextFollowUp!);
@@ -746,37 +759,37 @@ export default function CrmFollowupsPage() {
                   <Link
                     key={lead.id}
                     href={`/admin/admissions/leads/${lead.id}`}
-                    className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--admin-surface-2)]"
+                    className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--warm-bg-soft)]"
                   >
                     <div className="flex-1 min-w-0">
                       <div
                         className="truncate text-sm font-medium"
-                        style={{ color: 'var(--admin-text)' }}
+                        style={{ color: 'var(--warm-ink)' }}
                       >
                         {lead.parentName}
                       </div>
                       <div
                         className="truncate text-xs flex items-center gap-1.5"
-                        style={{ color: 'var(--admin-text-subtle)' }}
+                        style={{ color: 'var(--warm-ink-faint)' }}
                       >
                         <Calendar
                           className="h-3 w-3"
                           style={{
                             color: isOverdue
-                              ? 'var(--admin-error)'
+                              ? 'var(--warm-rose-ink)'
                               : isTodayFU
-                                ? 'var(--admin-warning)'
-                                : 'var(--admin-text-subtle)',
+                                ? 'var(--warm-honey-ink)'
+                                : 'var(--warm-ink-faint)',
                           }}
                         />
                         <span
                           className="tabular-nums"
                           style={{
                             color: isOverdue
-                              ? 'var(--admin-error)'
+                              ? 'var(--warm-rose-ink)'
                               : isTodayFU
-                                ? 'var(--admin-warning)'
-                                : 'var(--admin-text-subtle)',
+                                ? 'var(--warm-honey-ink)'
+                                : 'var(--warm-ink-faint)',
                             fontWeight: isOverdue || isTodayFU ? 600 : 400,
                           }}
                         >
@@ -796,14 +809,14 @@ export default function CrmFollowupsPage() {
                     </span>
                     <ChevronRight
                       className="h-3.5 w-3.5 flex-shrink-0"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     />
                   </Link>
                 );
               })}
             </div>
           )}
-        </PreOneCard>
+        </WarmCard>
       </div>
     </div>
   );

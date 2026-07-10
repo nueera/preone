@@ -75,6 +75,17 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface FollowUp {
@@ -136,41 +147,41 @@ const STAGE_CONFIG: Record<
     label: 'New',
     color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
     cardBg: 'bg-white',
-    textColor: 'text-[var(--admin-text-muted)]',
-    softVar: 'var(--admin-surface-2)',
-    varColor: 'var(--admin-text-muted)',
+    textColor: 'text-[var(--warm-ink-muted)]',
+    softVar: 'var(--warm-bg-soft)',
+    varColor: 'var(--warm-ink-muted)',
   },
   CONTACTED: {
     label: 'Contacted',
     color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
     cardBg: 'bg-blue-50',
     textColor: 'text-blue-600',
-    softVar: 'var(--admin-info-soft)',
-    varColor: 'var(--admin-info)',
+    softVar: 'var(--warm-sky-soft)',
+    varColor: 'var(--warm-sky-ink)',
   },
   VISITED: {
     label: 'Visited',
     color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
     cardBg: 'bg-purple-50',
     textColor: 'text-purple-600',
-    softVar: 'var(--admin-primary-soft)',
-    varColor: 'var(--admin-primary)',
+    softVar: 'var(--warm-primary-soft)',
+    varColor: 'var(--warm-primary)',
   },
   APPLIED: {
     label: 'Applied',
     color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
     cardBg: 'bg-yellow-50',
     textColor: 'text-yellow-600',
-    softVar: 'var(--admin-warning-soft)',
-    varColor: 'var(--admin-warning)',
+    softVar: 'var(--warm-honey-soft)',
+    varColor: 'var(--warm-honey-ink)',
   },
   ENROLLED: {
     label: 'Enrolled',
     color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
     cardBg: 'bg-green-50',
     textColor: 'text-green-600',
-    softVar: 'var(--admin-success-soft)',
-    varColor: 'var(--admin-success)',
+    softVar: 'var(--warm-sage-soft)',
+    varColor: 'var(--warm-sage)',
   },
   LOST: {
     label: 'Lost',
@@ -178,7 +189,7 @@ const STAGE_CONFIG: Record<
     cardBg: 'bg-red-50',
     textColor: 'text-red-600',
     softVar: 'rgba(239,68,68,0.1)',
-    varColor: 'var(--admin-error)',
+    varColor: 'var(--warm-rose-ink)',
   },
 };
 
@@ -203,18 +214,18 @@ const PRIORITY_CONFIG: Record<
 > = {
   HIGH: {
     label: 'High',
-    color: 'var(--admin-error)',
+    color: 'var(--warm-rose-ink)',
     bg: 'rgba(239,68,68,0.1)',
   },
   NORMAL: {
     label: 'Medium',
-    color: 'var(--admin-warning)',
-    bg: 'var(--admin-warning-soft)',
+    color: 'var(--warm-honey-ink)',
+    bg: 'var(--warm-honey-soft)',
   },
   LOW: {
     label: 'Low',
-    color: 'var(--admin-text-muted)',
-    bg: 'var(--admin-surface-2)',
+    color: 'var(--warm-ink-muted)',
+    bg: 'var(--warm-bg-soft)',
   },
 };
 
@@ -233,7 +244,7 @@ function PipelineSkeleton() {
         <div key={key} className="flex flex-col min-w-[280px] w-[280px]">
           <div
             className="flex items-center justify-between p-3 rounded-t-xl"
-            style={{ background: 'var(--admin-surface-2)' }}
+            style={{ background: 'var(--warm-bg-soft)' }}
           >
             <div className="flex items-center gap-2">
               <Skeleton className="h-3 w-3 rounded-full" />
@@ -244,7 +255,7 @@ function PipelineSkeleton() {
           </div>
           <div
             className="flex flex-col gap-2 p-2 rounded-b-xl min-h-[200px] border border-t-0"
-            style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)' }}
+            style={{ borderColor: 'var(--warm-border)', background: 'var(--warm-surface)' }}
           >
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-32 w-full rounded-lg" />
@@ -259,7 +270,7 @@ function PipelineSkeleton() {
 // ── Loading Skeleton for List View ──
 function ListSkeleton() {
   return (
-    <PreOneCard className="overflow-hidden !rounded-xl">
+    <WarmCard className="overflow-hidden" fade>
       <div className="p-4 space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex items-center gap-4">
@@ -272,7 +283,7 @@ function ListSkeleton() {
           </div>
         ))}
       </div>
-    </PreOneCard>
+    </WarmCard>
   );
 }
 
@@ -299,7 +310,7 @@ function LeadCard({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.6 : 1,
   };
 
   const stageConfig = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
@@ -312,13 +323,14 @@ function LeadCard({
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div
         className={cn(
-          'p-3 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 group',
-          isDragging && 'shadow-lg rotate-2',
+          'p-3 rounded-[var(--warm-radius-md)] cursor-pointer transition-all duration-300 ease-out border-l-[3px] group hover:shadow-[var(--warm-shadow-md)] hover:-translate-y-0.5',
+          isDragging && 'shadow-[var(--warm-shadow-lg)] rotate-2 scale-105',
         )}
         style={{
-          background: 'var(--admin-surface)',
+          background: 'var(--warm-surface)',
+          border: '1px solid var(--warm-border)',
+          borderLeftWidth: '3px',
           borderLeftColor: stageConfig.color,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}
         onClick={() => onClick(lead)}
       >
@@ -327,26 +339,21 @@ function LeadCard({
             <div className="flex items-center gap-1.5 min-w-0">
               <GripVertical
                 className="h-3.5 w-3.5 flex-shrink-0 opacity-30"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               />
               <span
                 className="font-semibold text-sm leading-tight truncate"
-                style={{ color: 'var(--admin-text)' }}
+                style={{ color: 'var(--warm-ink)' }}
               >
                 {lead.childName}
               </span>
             </div>
-            <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
-              style={{ background: priorityConfig.bg, color: priorityConfig.color }}
-            >
-              {priorityConfig.label}
-            </span>
+            <WarmPriorityPill priority={lead.priority} />
           </div>
 
           <div
             className="flex items-center gap-1.5 text-xs"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--warm-ink-muted)' }}
           >
             <UserCircle className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{lead.parentName}</span>
@@ -354,7 +361,7 @@ function LeadCard({
 
           <div
             className="flex items-center gap-1.5 text-xs tabular-nums"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--warm-ink-muted)' }}
           >
             <Phone className="h-3 w-3 flex-shrink-0" />
             <span>{lead.parentPhone}</span>
@@ -363,7 +370,7 @@ function LeadCard({
           <div className="flex items-center gap-1.5 text-xs">
             <span
               className="flex items-center gap-1"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--warm-ink-muted)' }}
             >
               <Tag className="h-3 w-3 flex-shrink-0" />
               {SOURCE_LABELS[lead.source] || lead.source}
@@ -373,7 +380,7 @@ function LeadCard({
           {lead.estimatedValue != null && (
             <div
               className="text-xs font-medium flex items-center gap-1 tabular-nums"
-              style={{ color: 'var(--admin-text)' }}
+              style={{ color: 'var(--warm-ink)' }}
             >
               <IndianRupee className="h-3 w-3" />
               {lead.estimatedValue.toLocaleString('en-IN')}
@@ -387,8 +394,8 @@ function LeadCard({
               )}
               style={{
                 color: isFollowUpSoon
-                  ? 'var(--admin-warning)'
-                  : 'var(--admin-text-muted)',
+                  ? 'var(--warm-honey-ink)'
+                  : 'var(--warm-ink-muted)',
                 fontWeight: isFollowUpSoon ? 600 : 400,
               }}
             >
@@ -407,7 +414,7 @@ function LeadCard({
               variant="ghost"
               size="sm"
               className="h-6 text-[11px] px-2"
-              style={{ color: 'var(--admin-primary)' }}
+              style={{ color: 'var(--warm-primary)' }}
               onClick={(e) => {
                 e.stopPropagation();
                 onClick(lead);
@@ -420,7 +427,7 @@ function LeadCard({
                 variant="ghost"
                 size="sm"
                 className="h-6 text-[11px] px-2"
-                style={{ color: 'var(--admin-success)' }}
+                style={{ color: 'var(--warm-sage)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onClick(lead);
@@ -446,7 +453,7 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
     <div
       className="p-3 shadow-xl border-l-4 rotate-3 opacity-95 min-w-[260px] rounded-lg"
       style={{
-        background: 'var(--admin-surface)',
+        background: 'var(--warm-surface)',
         borderLeftColor: stageConfig.color,
       }}
     >
@@ -454,7 +461,7 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
         <div className="flex items-start justify-between">
           <span
             className="font-semibold text-sm truncate"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             {lead.childName}
           </span>
@@ -467,14 +474,14 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
         </div>
         <div
           className="text-xs"
-          style={{ color: 'var(--admin-text-muted)' }}
+          style={{ color: 'var(--warm-ink-muted)' }}
         >
           <UserCircle className="h-3 w-3 inline mr-1" />
           {lead.parentName}
         </div>
         <div
           className="text-xs tabular-nums"
-          style={{ color: 'var(--admin-text-muted)' }}
+          style={{ color: 'var(--warm-ink-muted)' }}
         >
           <Phone className="h-3 w-3 inline mr-1" />
           {lead.parentPhone}
@@ -494,12 +501,22 @@ function KanbanColumn({
   leads: Lead[];
   onLeadClick: (lead: Lead) => void;
 }) {
+  // Map stage key to warm pastel column gradient class
+  const stageColClass: Record<string, string> = {
+    NEW: 'warm-col-sky',
+    CONTACTED: 'warm-col-lavender',
+    VISITED: 'warm-col-primary',
+    APPLIED: 'warm-col-honey',
+    ENROLLED: 'warm-col-sage',
+    LOST: 'warm-col-rose',
+  };
+  const colClass = stageColClass[stage.key] || 'warm-col-sky';
+
   return (
-    <div className="flex flex-col min-w-[280px] w-[280px]">
-      {/* Column Header */}
+    <div className="flex flex-col min-w-[280px] w-[280px] rounded-[var(--warm-radius-lg)] overflow-hidden shadow-[var(--warm-shadow-sm)] border border-[var(--warm-border)]">
+      {/* Column Header — pastel gradient */}
       <div
-        className="flex items-center justify-between p-3 rounded-t-xl"
-        style={{ background: stage.color + '15' }}
+        className={`flex items-center justify-between p-3.5 ${colClass}`}
       >
         <div className="flex items-center gap-2">
           <div
@@ -507,56 +524,42 @@ function KanbanColumn({
             style={{ background: stage.color }}
           />
           <span
-            className="font-semibold text-sm"
-            style={{ color: 'var(--admin-text)' }}
+            className="warm-heading font-semibold text-sm text-[var(--warm-ink)]"
           >
             {stage.label}
           </span>
           <span
-            className="text-xs font-bold px-2 py-0.5 rounded-full tabular-nums"
-            style={{
-              background: 'var(--admin-surface)',
-              color: 'var(--admin-text-muted)',
-              border: '1px solid var(--admin-border)',
-            }}
+            className="warm-pill warm-pill-neutral !text-[11px] !px-2 !py-0.5 tabular-nums"
           >
             {stage.count}
           </span>
         </div>
         <span
-          className="text-xs font-medium tabular-nums"
-          style={{ color: 'var(--admin-text-muted)' }}
+          className="warm-numeric text-xs font-semibold tabular-nums text-[var(--warm-ink-soft)]"
         >
           ₹{stage.totalValue.toLocaleString('en-IN')}
         </span>
       </div>
 
-      {/* Cards Container */}
+      {/* Cards Container — soft pastel continuation */}
       <SortableContext
         items={leads.map((l) => l.id)}
         strategy={verticalListSortingStrategy}
       >
         <div
-          className="flex flex-col gap-2 p-2 rounded-b-xl min-h-[200px] border border-t-0 max-h-[calc(100vh-340px)] overflow-y-auto"
-          style={{
-            background: 'var(--admin-surface-2)',
-            borderColor: 'var(--admin-border)',
-            borderTopColor: stage.color,
-          }}
+          className={`flex flex-col gap-2 p-2.5 min-h-[200px] max-h-[calc(100vh-340px)] overflow-y-auto ${colClass}`}
         >
           {leads.map((lead) => (
             <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
           ))}
           {leads.length === 0 && (
             <div
-              className="flex flex-col items-center justify-center h-24 text-xs gap-1"
-              style={{ color: 'var(--admin-text-subtle)' }}
+              className="flex flex-col items-center justify-center h-24 text-xs gap-1.5 text-[var(--warm-ink-faint)]"
             >
               <CircleDot
                 className="h-5 w-5 opacity-40"
-                style={{ color: 'var(--admin-text-subtle)' }}
               />
-              No leads in this stage
+              <span className="font-medium">No leads here yet</span>
             </div>
           )}
         </div>
@@ -630,7 +633,7 @@ function StatsBar({
       {statItems.map((stat) => {
         const Icon = stat.icon;
         return (
-          <PreOneCard key={stat.label} className="!rounded-xl">
+          <WarmCard key={stat.label} fade>
             <div className="p-3 flex items-center gap-2.5">
               <div
                 className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -644,19 +647,19 @@ function StatsBar({
               <div className="min-w-0">
                 <p
                   className="text-lg font-bold tabular-nums leading-tight"
-                  style={{ color: 'var(--admin-text)' }}
+                  style={{ color: 'var(--warm-ink)' }}
                 >
                   {stat.value}
                 </p>
                 <p
                   className="text-[11px]"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   {stat.label}
                 </p>
               </div>
             </div>
-          </PreOneCard>
+          </WarmCard>
         );
       })}
     </div>
@@ -921,29 +924,30 @@ export default function PipelinePage() {
 
   return (
     <PageTransition>
+      <WarmPremium className="min-h-screen">
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── SECTION 1: HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-info-soft)' }}
+              style={{ background: 'var(--warm-sky-soft)' }}
             >
               <Megaphone
                 className="h-5 w-5"
-                style={{ color: 'var(--admin-info)' }}
+                style={{ color: 'var(--warm-sky-ink)' }}
               />
             </div>
             <div>
               <h1
                 className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--admin-text)' }}
+                style={{ color: 'var(--warm-ink)' }}
               >
                 Admission Pipeline
               </h1>
               <p
                 className="text-sm"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Drag &amp; drop leads across stages to track your admission funnel
               </p>
@@ -964,7 +968,7 @@ export default function PipelinePage() {
             <Button
               size="sm"
               onClick={() => setAddLeadOpen(true)}
-              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Lead</span>
@@ -978,7 +982,7 @@ export default function PipelinePage() {
         {/* ── SECTION 3: MAIN TABS ── */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <TabsList style={{ background: 'var(--admin-surface-2)' }}>
+            <TabsList style={{ background: 'var(--warm-bg-soft)' }}>
               <TabsTrigger value="pipeline" className="gap-1.5">
                 <LayoutGrid className="h-3.5 w-3.5" />
                 Pipeline
@@ -998,7 +1002,7 @@ export default function PipelinePage() {
                 <div className="relative">
                   <Search
                     className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                    style={{ color: 'var(--admin-text-subtle)' }}
+                    style={{ color: 'var(--warm-ink-faint)' }}
                   />
                   <Input
                     placeholder="Search leads..."
@@ -1010,7 +1014,7 @@ export default function PipelinePage() {
                     <button
                       onClick={() => setSearchQuery('')}
                       className="absolute right-3 top-1/2 -translate-y-1/2"
-                      style={{ color: 'var(--admin-text-subtle)' }}
+                      style={{ color: 'var(--warm-ink-faint)' }}
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -1028,7 +1032,7 @@ export default function PipelinePage() {
                     <span
                       className="ml-1 h-4 min-w-[16px] rounded-full px-1 text-[10px] flex items-center justify-center"
                       style={{
-                        background: 'var(--admin-primary)',
+                        background: 'var(--warm-primary)',
                         color: 'white',
                       }}
                     >
@@ -1042,7 +1046,7 @@ export default function PipelinePage() {
 
           {/* ── Filters Row ── */}
           {showFilters && activeTab !== 'analytics' && (
-            <PreOneCard className="mt-3 !rounded-xl">
+            <WarmCard className="mt-3 overflow-hidden" fade>
               <div className="p-3 flex items-center gap-3 flex-wrap">
                 <Select
                   value={stageFilter || 'ALL'}
@@ -1105,14 +1109,14 @@ export default function PipelinePage() {
                     size="sm"
                     onClick={clearFilters}
                     className="text-xs gap-1"
-                    style={{ color: 'var(--admin-error)' }}
+                    style={{ color: 'var(--warm-rose-ink)' }}
                   >
                     <X className="h-3 w-3" />
                     Clear filters
                   </Button>
                 )}
               </div>
-            </PreOneCard>
+            </WarmCard>
           )}
 
           {/* ── Pipeline View ── */}
@@ -1120,33 +1124,33 @@ export default function PipelinePage() {
             {loading ? (
               <PipelineSkeleton />
             ) : pipeline.length === 0 ? (
-              <PreOneCard className="!rounded-xl">
+              <WarmCard fade>
                 <div className="flex flex-col items-center justify-center py-16">
                   <Megaphone
                     className="h-12 w-12 mb-4 opacity-40"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   />
                   <p
                     className="text-lg font-medium"
-                    style={{ color: 'var(--admin-text-muted)' }}
+                    style={{ color: 'var(--warm-ink-muted)' }}
                   >
                     No pipeline data
                   </p>
                   <p
                     className="text-sm mt-1"
-                    style={{ color: 'var(--admin-text-subtle)' }}
+                    style={{ color: 'var(--warm-ink-faint)' }}
                   >
                     Click &quot;Add Lead&quot; to create your first lead.
                   </p>
                   <Button
                     onClick={() => setAddLeadOpen(true)}
-                    className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                    className="mt-4 gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                   >
                     <Plus className="h-4 w-4" />
                     Add Lead
                   </Button>
                 </div>
-              </PreOneCard>
+              </WarmCard>
             ) : (
               <DndContext
                 sensors={sensors}
@@ -1177,7 +1181,7 @@ export default function PipelinePage() {
             {loading ? (
               <ListSkeleton />
             ) : (
-              <PreOneCard className="overflow-hidden !rounded-xl">
+              <WarmCard className="overflow-hidden" fade>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1199,7 +1203,7 @@ export default function PipelinePage() {
                         <TableCell
                           colSpan={10}
                           className="text-center py-8"
-                          style={{ color: 'var(--admin-text-subtle)' }}
+                          style={{ color: 'var(--warm-ink-faint)' }}
                         >
                           {hasActiveFilters
                             ? 'No leads match your filters. Try adjusting them.'
@@ -1216,24 +1220,24 @@ export default function PipelinePage() {
                         return (
                           <TableRow
                             key={lead.id}
-                            className="cursor-pointer hover:bg-[var(--admin-surface-2)]/80 transition-colors"
+                            className="cursor-pointer hover:bg-[var(--warm-bg-soft)]/80 transition-colors"
                             onClick={() => handleLeadClick(lead)}
                           >
                             <TableCell
                               className="font-medium text-sm"
-                              style={{ color: 'var(--admin-text)' }}
+                              style={{ color: 'var(--warm-ink)' }}
                             >
                               {lead.parentName}
                             </TableCell>
                             <TableCell
                               className="text-sm"
-                              style={{ color: 'var(--admin-text-muted)' }}
+                              style={{ color: 'var(--warm-ink-muted)' }}
                             >
                               {lead.childName}
                             </TableCell>
                             <TableCell
                               className="text-sm tabular-nums"
-                              style={{ color: 'var(--admin-text-muted)' }}
+                              style={{ color: 'var(--warm-ink-muted)' }}
                             >
                               {lead.parentPhone}
                             </TableCell>
@@ -1273,13 +1277,13 @@ export default function PipelinePage() {
                             </TableCell>
                             <TableCell
                               className="text-sm"
-                              style={{ color: 'var(--admin-text-muted)' }}
+                              style={{ color: 'var(--warm-ink-muted)' }}
                             >
                               {lead.programInterest || '—'}
                             </TableCell>
                             <TableCell
                               className="text-sm font-medium tabular-nums"
-                              style={{ color: 'var(--admin-text)' }}
+                              style={{ color: 'var(--warm-ink)' }}
                             >
                               {lead.estimatedValue
                                 ? `₹${lead.estimatedValue.toLocaleString('en-IN')}`
@@ -1287,7 +1291,7 @@ export default function PipelinePage() {
                             </TableCell>
                             <TableCell
                               className="text-sm tabular-nums"
-                              style={{ color: 'var(--admin-text-muted)' }}
+                              style={{ color: 'var(--warm-ink-muted)' }}
                             >
                               {lead.nextFollowUp
                                 ? format(
@@ -1301,7 +1305,7 @@ export default function PipelinePage() {
                                 variant="ghost"
                                 size="sm"
                                 className="h-7 text-xs"
-                                style={{ color: 'var(--admin-primary)' }}
+                                style={{ color: 'var(--warm-primary)' }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleLeadClick(lead);
@@ -1316,7 +1320,7 @@ export default function PipelinePage() {
                     )}
                   </TableBody>
                 </Table>
-              </PreOneCard>
+              </WarmCard>
             )}
           </TabsContent>
 
@@ -1341,6 +1345,7 @@ export default function PipelinePage() {
           onLeadUpdated={handleLeadUpdated}
         />
       </div>
-    </PageTransition>
+    
+      </WarmPremium></PageTransition>
   );
 }

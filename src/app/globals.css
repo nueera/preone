@@ -2447,3 +2447,234 @@ body, p, span, div {
 .isolate-auto {
   isolation: auto;
 }
+
+/* ============================================================
+   WARM PREMIUM DESIGN SYSTEM — Preschool-Optimized
+   Style: Warm cream + terracotta + sage/honey + colored shadows
+   Opt-in: wrap any subtree in [data-warm="premium"] to activate.
+   Existing portal themes are NOT affected.
+   ============================================================ */
+
+[data-warm="premium"] {
+  /* ── Warm Surface Palette ── */
+  --warm-bg: #FBF7F2;             /* warm cream — main background */
+  --warm-bg-soft: #F5EFE6;        /* slightly deeper cream — alternating sections */
+  --warm-surface: #FFFFFF;        /* pure white card — pops on cream */
+  --warm-surface-tint: #FDFAF5;   /* tinted card — softer alternative */
+  --warm-surface-elevated: #FFFFFF; /* modals, popovers */
+
+  /* ── Warm Ink (text) ── */
+  --warm-ink: #2A1F1A;            /* deep warm brown-black, NOT pure black */
+  --warm-ink-soft: #5C4A3F;       /* secondary text */
+  --warm-ink-muted: #8B7A6E;      /* tertiary / captions */
+  --warm-ink-faint: #B8A99B;      /* placeholders */
+
+  /* ── Warm Borders ── */
+  --warm-border: #F0E8DE;         /* beige border, not gray */
+  --warm-border-strong: #E5D9C7;  /* hover / focus border */
+  --warm-divider: #F5EEE3;        /* subtle dividers */
+
+  /* ── Brand Accents ── */
+  --warm-primary: #E07856;        /* terracotta — main CTA, brand */
+  --warm-primary-hover: #D16644;  /* darker on hover */
+  --warm-primary-soft: #FBE8DE;   /* tinted bg */
+  --warm-primary-ink: #8C3A1E;    /* text on light tint */
+
+  --warm-sage: #7BA05B;           /* organic green — success/growth */
+  --warm-sage-soft: #E8F0DD;
+  --warm-sage-ink: #3F5530;
+
+  --warm-honey: #F4B860;          /* warm amber — warning/attention */
+  --warm-honey-soft: #FDEDD0;
+  --warm-honey-ink: #7A5320;
+
+  --warm-sky: #7CB7E0;            /* soft sky — info */
+  --warm-sky-soft: #DDEDF7;
+  --warm-sky-ink: #2C557A;
+
+  --warm-lavender: #B5A8D3;       /* gentle lavender — secondary accent */
+  --warm-lavender-soft: #EDE7F6;
+  --warm-lavender-ink: #4A3D6E;
+
+  --warm-rose: #E8A4A4;           /* soft rose — gentle danger */
+  --warm-rose-soft: #FBE0E0;
+  --warm-rose-ink: #7A2E2E;
+
+  /* ── Colored Shadows (the premium signal) ── */
+  --warm-shadow-xs: 0 1px 2px rgba(160, 120, 90, 0.05);
+  --warm-shadow-sm: 0 2px 6px rgba(160, 120, 90, 0.07), 0 1px 2px rgba(160, 120, 90, 0.04);
+  --warm-shadow-md: 0 6px 16px rgba(160, 120, 90, 0.08), 0 2px 4px rgba(160, 120, 90, 0.05);
+  --warm-shadow-lg: 0 12px 28px rgba(160, 120, 90, 0.10), 0 4px 8px rgba(160, 120, 90, 0.06);
+  --warm-shadow-xl: 0 20px 48px rgba(160, 120, 90, 0.12), 0 8px 16px rgba(160, 120, 90, 0.08);
+  --warm-shadow-2xl: 0 32px 64px rgba(160, 120, 90, 0.16), 0 12px 24px rgba(160, 120, 90, 0.10);
+  --warm-shadow-primary: 0 12px 28px rgba(224, 120, 86, 0.18), 0 4px 8px rgba(224, 120, 86, 0.10);
+  --warm-shadow-sage: 0 12px 28px rgba(123, 160, 91, 0.18), 0 4px 8px rgba(123, 160, 91, 0.10);
+  --warm-shadow-honey: 0 12px 28px rgba(244, 184, 96, 0.22), 0 4px 8px rgba(244, 184, 96, 0.12);
+  --warm-shadow-sky: 0 12px 28px rgba(124, 183, 224, 0.18), 0 4px 8px rgba(124, 183, 224, 0.10);
+  --warm-shadow-lavender: 0 12px 28px rgba(181, 168, 211, 0.20), 0 4px 8px rgba(181, 168, 211, 0.12);
+  --warm-shadow-rose: 0 12px 28px rgba(232, 164, 164, 0.20), 0 4px 8px rgba(232, 164, 164, 0.12);
+  --warm-shadow-inner: inset 0 2px 4px rgba(160, 120, 90, 0.06);
+
+  /* ── Warm Radius (slightly rounder for friendliness) ── */
+  --warm-radius-sm: 10px;
+  --warm-radius-md: 14px;
+  --warm-radius-lg: 18px;
+  --warm-radius-xl: 24px;
+  --warm-radius-2xl: 32px;
+  --warm-radius-pill: 9999px;
+
+  /* ── Fonts ── */
+  --warm-font-heading: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --warm-font-body: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  --warm-font-numeric: var(--font-jakarta), 'SF Pro Display', system-ui, sans-serif;
+}
+
+/* ── Warm Premium Base — apply to wrapper ── */
+[data-warm="premium"] {
+  background: var(--warm-bg);
+  color: var(--warm-ink);
+  font-family: var(--warm-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-warm="premium"] * {
+  border-color: var(--warm-border);
+}
+
+/* ── Warm Headings (Fraunces serif) ── */
+[data-warm="premium"] .warm-heading,
+[data-warm="premium"] h1.warm,
+[data-warm="premium"] h2.warm,
+[data-warm="premium"] h3.warm {
+  font-family: var(--warm-font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--warm-ink);
+}
+
+/* ── Warm numeric (tabular figures for stats) ── */
+[data-warm="premium"] .warm-numeric {
+  font-family: var(--warm-font-numeric);
+  font-feature-settings: 'tnum' 1, 'ss01' 1;
+  letter-spacing: -0.025em;
+}
+
+/* ── Warm card surfaces ── */
+[data-warm="premium"] .warm-surface {
+  background: var(--warm-surface);
+  border: 1px solid var(--warm-border);
+  box-shadow: var(--warm-shadow-sm);
+  border-radius: var(--warm-radius-lg);
+}
+
+[data-warm="premium"] .warm-surface-tint {
+  background: var(--warm-surface-tint);
+  border: 1px solid var(--warm-border);
+  border-radius: var(--warm-radius-lg);
+}
+
+/* ── Warm pastel column backgrounds (for Kanban) ── */
+[data-warm="premium"] .warm-col-rose { background: linear-gradient(180deg, #FBE0E0 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-honey { background: linear-gradient(180deg, #FDEDD0 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-sage { background: linear-gradient(180deg, #E8F0DD 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-sky { background: linear-gradient(180deg, #DDEDF7 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-lavender { background: linear-gradient(180deg, #EDE7F6 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-primary { background: linear-gradient(180deg, #FBE8DE 0%, #FDFAF5 100%); }
+
+/* ── Warm subtle hover lift ── */
+[data-warm="premium"] .warm-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-warm="premium"] .warm-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--warm-shadow-lg);
+}
+
+/* ── Warm fade-in on mount ── */
+@keyframes warm-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+[data-warm="premium"] .warm-fade-in {
+  animation: warm-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Warm count-up shimmer (for stat cards before number loads) ── */
+@keyframes warm-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+[data-warm="premium"] .warm-shimmer {
+  background: linear-gradient(90deg, var(--warm-bg-soft) 25%, var(--warm-border) 50%, var(--warm-bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: warm-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Warm scrollbar (subtle, themed) ── */
+[data-warm="premium"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-warm="premium"] ::-webkit-scrollbar-track {
+  background: var(--warm-bg-soft);
+}
+[data-warm="premium"] ::-webkit-scrollbar-thumb {
+  background: var(--warm-border-strong);
+  border-radius: var(--warm-radius-pill);
+  border: 2px solid var(--warm-bg-soft);
+}
+[data-warm="premium"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--warm-ink-faint);
+}
+
+/* ── Warm focus ring ── */
+[data-warm="premium"] *:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(224, 120, 86, 0.25);
+  border-color: var(--warm-primary);
+}
+
+/* ── Warm utility classes (one-off helpers) ── */
+[data-warm="premium"] .warm-divider {
+  height: 1px;
+  background: var(--warm-divider);
+  border: 0;
+}
+
+[data-warm="premium"] .warm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--warm-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-warm="premium"] .warm-pill-primary { background: var(--warm-primary-soft); color: var(--warm-primary-ink); }
+[data-warm="premium"] .warm-pill-sage { background: var(--warm-sage-soft); color: var(--warm-sage-ink); }
+[data-warm="premium"] .warm-pill-honey { background: var(--warm-honey-soft); color: var(--warm-honey-ink); }
+[data-warm="premium"] .warm-pill-sky { background: var(--warm-sky-soft); color: var(--warm-sky-ink); }
+[data-warm="premium"] .warm-pill-lavender { background: var(--warm-lavender-soft); color: var(--warm-lavender-ink); }
+[data-warm="premium"] .warm-pill-rose { background: var(--warm-rose-soft); color: var(--warm-rose-ink); }
+[data-warm="premium"] .warm-pill-neutral { background: var(--warm-bg-soft); color: var(--warm-ink-soft); }
+
+/* ── Warm text gradient (for hero numbers) ── */
+[data-warm="premium"] .warm-text-gradient {
+  background: linear-gradient(135deg, var(--warm-primary) 0%, var(--warm-honey) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Warm "soft glow" — for celebratory moments (lead converted!) ── */
+@keyframes warm-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(123, 160, 91, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(123, 160, 91, 0.15); }
+}
+[data-warm="premium"] .warm-glow-success {
+  animation: warm-glow-pulse 1.8s ease-in-out infinite;
+}

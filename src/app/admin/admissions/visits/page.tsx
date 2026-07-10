@@ -60,6 +60,17 @@ import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmPill,
+  WarmStagePill,
+  WarmPriorityPill,
+  WarmSourcePill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface Visit {
@@ -84,26 +95,26 @@ const STATUS_CONFIG: Record<
 > = {
   SCHEDULED: {
     label: 'Scheduled',
-    color: 'var(--admin-primary)',
-    bg: 'var(--admin-primary-soft)',
+    color: 'var(--warm-primary)',
+    bg: 'var(--warm-primary-soft)',
     icon: <Calendar className="h-3.5 w-3.5" />,
   },
   COMPLETED: {
     label: 'Completed',
-    color: 'var(--admin-success)',
-    bg: 'var(--admin-success-soft)',
+    color: 'var(--warm-sage)',
+    bg: 'var(--warm-sage-soft)',
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
   },
   CANCELLED: {
     label: 'Cancelled',
-    color: 'var(--admin-error)',
+    color: 'var(--warm-rose-ink)',
     bg: 'rgba(239,68,68,0.1)',
     icon: <XCircle className="h-3.5 w-3.5" />,
   },
   NO_SHOW: {
     label: 'No Show',
-    color: 'var(--admin-warning)',
-    bg: 'var(--admin-warning-soft)',
+    color: 'var(--warm-honey-ink)',
+    bg: 'var(--warm-honey-soft)',
     icon: <AlertCircle className="h-3.5 w-3.5" />,
   },
 };
@@ -290,15 +301,15 @@ function ScheduleVisitDialog({
         <DialogHeader>
           <DialogTitle
             className="text-xl font-bold flex items-center gap-2"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             <div
               className="flex h-7 w-7 items-center justify-center rounded-lg"
-              style={{ background: 'var(--admin-warning-soft)' }}
+              style={{ background: 'var(--warm-honey-soft)' }}
             >
               <CalendarCheck
                 className="h-4 w-4"
-                style={{ color: 'var(--admin-warning)' }}
+                style={{ color: 'var(--warm-honey-ink)' }}
               />
             </div>
             Schedule Campus Visit
@@ -310,7 +321,7 @@ function ScheduleVisitDialog({
             className="rounded-lg p-3 text-sm flex items-center gap-2"
             style={{
               background: 'rgba(239,68,68,0.08)',
-              color: 'var(--admin-error)',
+              color: 'var(--warm-rose-ink)',
             }}
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -334,7 +345,7 @@ function ScheduleVisitDialog({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[11px]" style={{ color: 'var(--admin-text-subtle)' }}>
+            <p className="text-[11px]" style={{ color: 'var(--warm-ink-faint)' }}>
               Selecting a lead auto-fills parent &amp; child details.
             </p>
           </div>
@@ -342,7 +353,7 @@ function ScheduleVisitDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs">
-                Parent Name <span style={{ color: 'var(--admin-error)' }}>*</span>
+                Parent Name <span style={{ color: 'var(--warm-rose-ink)' }}>*</span>
               </Label>
               <Input
                 value={form.parentName}
@@ -380,7 +391,7 @@ function ScheduleVisitDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs">
-                Date <span style={{ color: 'var(--admin-error)' }}>*</span>
+                Date <span style={{ color: 'var(--warm-rose-ink)' }}>*</span>
               </Label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -458,7 +469,7 @@ function ScheduleVisitDialog({
           <Button
             onClick={handleSubmit}
             disabled={submitting}
-            className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-1.5 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
           >
             {submitting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -488,7 +499,7 @@ function StatCard({
   accentSoftVar: string;
 }) {
   return (
-    <PreOneCard className="!rounded-xl">
+    <WarmCard fade>
       <div className="p-4 flex items-center gap-4">
         <div
           className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
@@ -499,19 +510,19 @@ function StatCard({
         <div className="min-w-0 flex-1">
           <div
             className="text-xs font-medium"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--warm-ink-muted)' }}
           >
             {label}
           </div>
           <div
             className="text-xl font-bold tabular-nums"
-            style={{ color: 'var(--admin-text)' }}
+            style={{ color: 'var(--warm-ink)' }}
           >
             {value}
           </div>
         </div>
       </div>
-    </PreOneCard>
+    </WarmCard>
   );
 }
 
@@ -627,6 +638,7 @@ export default function CampusVisitsPage() {
 
   return (
     <PageTransition>
+      <WarmPremium className="min-h-screen">
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── SECTION 1: HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -640,23 +652,23 @@ export default function CampusVisitsPage() {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: 'var(--admin-warning-soft)' }}
+                style={{ background: 'var(--warm-honey-soft)' }}
               >
                 <CalendarCheck
                   className="h-5 w-5"
-                  style={{ color: 'var(--admin-warning)' }}
+                  style={{ color: 'var(--warm-honey-ink)' }}
                 />
               </div>
               <div>
                 <h1
                   className="text-2xl font-bold tracking-tight"
-                  style={{ color: 'var(--admin-text)' }}
+                  style={{ color: 'var(--warm-ink)' }}
                 >
                   Campus Visits
                 </h1>
                 <p
                   className="text-sm"
-                  style={{ color: 'var(--admin-text-muted)' }}
+                  style={{ color: 'var(--warm-ink-muted)' }}
                 >
                   Schedule and manage campus visits for prospective families
                 </p>
@@ -679,7 +691,7 @@ export default function CampusVisitsPage() {
             </Button>
             <Button
               size="sm"
-              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
               onClick={() => setScheduleOpen(true)}
             >
               <Plus className="h-4 w-4" />
@@ -721,12 +733,12 @@ export default function CampusVisitsPage() {
         </div>
 
         {/* ── SECTION 3: FILTER BAR ── */}
-        <PreOneCard className="!rounded-xl">
+        <WarmCard fade>
           <div className="p-4 flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search
                 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               />
               <input
                 type="text"
@@ -735,17 +747,17 @@ export default function CampusVisitsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-10 w-full rounded-lg border px-3 pl-9 text-sm outline-none transition-colors"
                 style={{
-                  background: 'var(--admin-surface-2)',
-                  borderColor: 'var(--admin-border)',
-                  color: 'var(--admin-text)',
+                  background: 'var(--warm-bg-soft)',
+                  borderColor: 'var(--warm-border)',
+                  color: 'var(--warm-ink)',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                  e.currentTarget.style.borderColor = 'var(--warm-primary)';
                   e.currentTarget.style.boxShadow =
-                    '0 0 0 2px var(--admin-primary-soft)';
+                    '0 0 0 2px var(--warm-primary-soft)';
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-border)';
+                  e.currentTarget.style.borderColor = 'var(--warm-border)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               />
@@ -753,7 +765,7 @@ export default function CampusVisitsPage() {
                 <button
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
-                  style={{ color: 'var(--admin-text-subtle)' }}
+                  style={{ color: 'var(--warm-ink-faint)' }}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -782,7 +794,7 @@ export default function CampusVisitsPage() {
                 variant="ghost"
                 size="sm"
                 className="gap-1.5"
-                style={{ color: 'var(--admin-error)' }}
+                style={{ color: 'var(--warm-rose-ink)' }}
                 onClick={clearFilters}
               >
                 <X className="h-3.5 w-3.5" />
@@ -790,27 +802,27 @@ export default function CampusVisitsPage() {
               </Button>
             )}
           </div>
-        </PreOneCard>
+        </WarmCard>
 
         {/* ── SECTION 4: VISITS TABLE ── */}
-        <PreOneCard className="!rounded-xl overflow-hidden">
+        <WarmCard className="overflow-hidden" fade>
           {/* Stats bar */}
           <div
             className="flex items-center justify-between border-b px-5 py-3"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <div className="flex items-center gap-2">
               <span
                 className="text-sm"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 Total Visits
               </span>
               <span
                 className="rounded-md px-2 py-0.5 text-sm font-bold tabular-nums"
                 style={{
-                  background: 'var(--admin-primary-soft)',
-                  color: 'var(--admin-primary)',
+                  background: 'var(--warm-primary-soft)',
+                  color: 'var(--warm-primary)',
                 }}
               >
                 {filteredVisits.length}
@@ -821,7 +833,7 @@ export default function CampusVisitsPage() {
           {loading ? (
             <div
               className="flex items-center justify-center h-48 text-sm"
-              style={{ color: 'var(--admin-text-subtle)' }}
+              style={{ color: 'var(--warm-ink-faint)' }}
             >
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading visits...
@@ -830,11 +842,11 @@ export default function CampusVisitsPage() {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <CalendarCheck
                 className="h-10 w-10 mb-3 opacity-40"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               />
               <p
                 className="text-sm font-medium"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: 'var(--warm-ink-muted)' }}
               >
                 {hasActiveFilters
                   ? 'No visits match your filters'
@@ -842,7 +854,7 @@ export default function CampusVisitsPage() {
               </p>
               <p
                 className="text-xs mt-1"
-                style={{ color: 'var(--admin-text-subtle)' }}
+                style={{ color: 'var(--warm-ink-faint)' }}
               >
                 {hasActiveFilters
                   ? 'Try adjusting your search or filters.'
@@ -851,7 +863,7 @@ export default function CampusVisitsPage() {
               {!hasActiveFilters && (
                 <Button
                   size="sm"
-                  className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  className="mt-4 gap-2 bg-[var(--warm-primary)] text-white border-0 hover:bg-[var(--warm-primary-hover)] shadow-[var(--warm-shadow-primary)]"
                   onClick={() => setScheduleOpen(true)}
                 >
                   <Plus className="h-4 w-4" />
@@ -865,41 +877,41 @@ export default function CampusVisitsPage() {
                 <thead>
                   <tr
                     className="border-b"
-                    style={{ borderColor: 'var(--admin-border)' }}
+                    style={{ borderColor: 'var(--warm-border)' }}
                   >
                     <th
                       className="min-w-[180px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Parent / Child
                     </th>
                     <th
                       className="w-[140px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Date
                     </th>
                     <th
                       className="w-[80px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Time
                     </th>
                     <th
                       className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Status
                     </th>
                     <th
                       className="w-[150px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Assigned Staff
                     </th>
                     <th
                       className="w-[180px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--admin-text-muted)' }}
+                      style={{ color: 'var(--warm-ink-muted)' }}
                     >
                       Actions
                     </th>
@@ -915,14 +927,14 @@ export default function CampusVisitsPage() {
                     const isScheduled = visit.status === 'SCHEDULED';
 
                     const dateColor = !isScheduled
-                      ? 'var(--admin-text-subtle)'
+                      ? 'var(--warm-ink-faint)'
                       : isPastVisit
-                        ? 'var(--admin-error)'
+                        ? 'var(--warm-rose-ink)'
                         : isTodayVisit
-                          ? 'var(--admin-warning)'
+                          ? 'var(--warm-honey-ink)'
                           : isTomorrowVisit
-                            ? 'var(--admin-info)'
-                            : 'var(--admin-text)';
+                            ? 'var(--warm-sky-ink)'
+                            : 'var(--warm-ink)';
 
                     const rowOpacity =
                       visit.status === 'CANCELLED'
@@ -936,9 +948,9 @@ export default function CampusVisitsPage() {
                     return (
                       <tr
                         key={visit.id}
-                        className="border-b transition-colors hover:bg-[var(--admin-surface-2)]"
+                        className="border-b transition-colors hover:bg-[var(--warm-bg-soft)]"
                         style={{
-                          borderColor: 'var(--admin-border)',
+                          borderColor: 'var(--warm-border)',
                           opacity: rowOpacity,
                         }}
                       >
@@ -957,13 +969,13 @@ export default function CampusVisitsPage() {
                             <div className="min-w-0">
                               <div
                                 className="truncate font-medium"
-                                style={{ color: 'var(--admin-text)' }}
+                                style={{ color: 'var(--warm-ink)' }}
                               >
                                 {visit.parentName}
                               </div>
                               <div
                                 className="text-xs flex items-center gap-1"
-                                style={{ color: 'var(--admin-text-subtle)' }}
+                                style={{ color: 'var(--warm-ink-faint)' }}
                               >
                                 <Baby className="h-3 w-3" />
                                 {visit.childName || '—'}
@@ -997,7 +1009,7 @@ export default function CampusVisitsPage() {
                           {isPastVisit && isScheduled && (
                             <span
                               className="block text-[10px] mt-0.5"
-                              style={{ color: 'var(--admin-error)' }}
+                              style={{ color: 'var(--warm-rose-ink)' }}
                             >
                               Past due
                             </span>
@@ -1007,7 +1019,7 @@ export default function CampusVisitsPage() {
                         {/* Time */}
                         <td
                           className="px-4 py-3 text-xs tabular-nums"
-                          style={{ color: 'var(--admin-text-muted)' }}
+                          style={{ color: 'var(--warm-ink-muted)' }}
                         >
                           {visit.time}
                         </td>
@@ -1031,16 +1043,16 @@ export default function CampusVisitsPage() {
                           {visit.assignee ? (
                             <span
                               className="flex items-center gap-1.5"
-                              style={{ color: 'var(--admin-text)' }}
+                              style={{ color: 'var(--warm-ink)' }}
                             >
                               <UserCircle
                                 className="h-3.5 w-3.5"
-                                style={{ color: 'var(--admin-text-subtle)' }}
+                                style={{ color: 'var(--warm-ink-faint)' }}
                               />
                               {visit.assignee.name}
                             </span>
                           ) : (
-                            <span style={{ color: 'var(--admin-text-subtle)' }}>
+                            <span style={{ color: 'var(--warm-ink-faint)' }}>
                               Unassigned
                             </span>
                           )}
@@ -1056,8 +1068,8 @@ export default function CampusVisitsPage() {
                                   size="sm"
                                   className="h-7 text-xs gap-1"
                                   style={{
-                                    color: 'var(--admin-success)',
-                                    borderColor: 'var(--admin-success)',
+                                    color: 'var(--warm-sage)',
+                                    borderColor: 'var(--warm-sage)',
                                   }}
                                   onClick={() => handleMarkCompleted(visit.id)}
                                 >
@@ -1068,7 +1080,7 @@ export default function CampusVisitsPage() {
                                   variant="ghost"
                                   size="sm"
                                   className="h-7 text-xs gap-1"
-                                  style={{ color: 'var(--admin-error)' }}
+                                  style={{ color: 'var(--warm-rose-ink)' }}
                                   onClick={() => handleCancel(visit.id)}
                                 >
                                   <XCircle className="h-3 w-3" />
@@ -1084,7 +1096,7 @@ export default function CampusVisitsPage() {
                                   variant="ghost"
                                   size="sm"
                                   className="h-7 text-xs gap-1"
-                                  style={{ color: 'var(--admin-primary)' }}
+                                  style={{ color: 'var(--warm-primary)' }}
                                 >
                                   <Eye className="h-3 w-3" />
                                   View Lead
@@ -1100,7 +1112,7 @@ export default function CampusVisitsPage() {
               </table>
             </div>
           )}
-        </PreOneCard>
+        </WarmCard>
 
         {/* ── Schedule Visit Dialog ── */}
         <ScheduleVisitDialog
@@ -1112,6 +1124,7 @@ export default function CampusVisitsPage() {
           }}
         />
       </div>
-    </PageTransition>
+    
+      </WarmPremium></PageTransition>
   );
 }
