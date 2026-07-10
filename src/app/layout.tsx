@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Inter, Outfit, JetBrains_Mono } from "next/font/google";
+import { Poppins, Inter, Outfit, JetBrains_Mono, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -47,6 +47,28 @@ const jetbrainsMono = JetBrains_Mono({
   preload: false, // Monospace fonts are less critical, can lazy-load
 });
 
+// ── Warm Premium fonts ──
+// Fraunces — warm modern serif for headings (premium + friendly)
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+});
+
+// Plus Jakarta Sans — softer body font for Warm Premium surfaces
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+});
+
 export const metadata: Metadata = {
   title: "PreOne - Operating System for Modern Preschools",
   description: "All-in-one preschool ERP system for managing students, teachers, attendance, fees, admissions, growth tracking, and communication. Built for modern preschools.",
@@ -78,7 +100,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${poppins.variable} ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
+        className={`${poppins.variable} ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${jakarta.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
