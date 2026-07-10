@@ -10,9 +10,13 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  FileUp,
+  FileCheck2,
+  FileWarning,
+  Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -22,7 +26,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
+import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+
 const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
@@ -59,6 +66,54 @@ const CSV_HEADERS = [
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('preone_token');
+}
+
+// ── KPI Card for Import Summary ──
+function ImportStatCard({
+  label,
+  value,
+  icon: Icon,
+  accent,
+  bg,
+  ring,
+  loading,
+}: {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  accent: string;
+  bg: string;
+  ring: string;
+  loading?: boolean;
+}) {
+  return (
+    <PreOneCard variant="strip" className="p-4 relative overflow-hidden">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-medium" style={{ color: 'var(--admin-text-muted)' }}>
+            {label}
+          </p>
+          {loading ? (
+            <div className="mt-2 h-7 w-12 animate-pulse rounded-md" style={{ background: 'var(--admin-surface-2)' }} />
+          ) : (
+            <p className="mt-1 text-2xl font-bold tracking-tight" style={{ color: accent }}>
+              {value}
+            </p>
+          )}
+        </div>
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+          style={{ background: bg, boxShadow: `inset 0 0 0 1px ${ring}` }}
+        >
+          <Icon className="h-4 w-4" style={{ color: accent }} />
+        </div>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 h-0.5 w-full opacity-60"
+        style={{ background: `linear-gradient(to right, ${accent}, transparent)` }}
+      />
+    </PreOneCard>
+  );
 }
 
 export default function ImportStudentsPage() {
@@ -121,7 +176,7 @@ export default function ImportStudentsPage() {
           case 'gender':
             row.gender = val;
             if (!val) errors.push('Gender required');
-            else if (!['Male', 'Female'].includes(val)) errors.push('Gender must be Male/Female');
+            else if (!['Male', 'Female', 'Other'].includes(val)) errors.push('Gender must be Male/Female/Other');
             break;
           case 'bloodGroup':
             row.bloodGroup = val;
@@ -214,226 +269,326 @@ export default function ImportStudentsPage() {
   const errorRows = parsedData.filter((r) => r._errors.length > 0);
 
   return (
-    <div className="space-y-6">
-      {/* ── Back Button ── */}
-      <Button
-        variant="ghost"
-        className="gap-1 text-muted-foreground"
-        onClick={() => router.push('/admin/students')}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Students
-      </Button>
-
-      {/* ── Header ── */}
-      <div>
-        <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-          Import Students
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Upload a CSV file to bulk import students
-        </p>
-      </div>
-
-      {/* ── Upload Area ── */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-portal-500" />
-            Upload CSV File
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="outline" className="gap-2" onClick={downloadTemplate}>
-            <Download className="h-4 w-4" />
-            Download Template
-          </Button>
-
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
-              dragOver
-                ? 'border-portal-400 bg-portal-50'
-                : 'border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-            }`}
+    <PageTransition>
+      <StaggerContainer className="space-y-6 max-w-[1440px] mx-auto">
+        {/* ── Back Button ── */}
+        <StaggerItem>
+          <Button
+            variant="ghost"
+            className="gap-1.5"
+            style={{ color: 'var(--admin-text-muted)' }}
+            onClick={() => router.push('/admin/students')}
           >
-            <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm font-medium mb-1">
-              Drag & drop your CSV file here
-            </p>
-            <p className="text-xs text-muted-foreground mb-4">
-              or click to browse
-            </p>
-            <input
-              type="file"
-              accept=".csv"
-              className="hidden"
-              id="csv-upload"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFile(f);
-              }}
-            />
+            <ArrowLeft className="h-4 w-4" />
+            Back to Students
+          </Button>
+        </StaggerItem>
+
+        {/* ── Header ── */}
+        <StaggerItem>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-xl"
+                style={{ background: 'var(--admin-primary-soft)' }}
+              >
+                <Upload className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--admin-text)' }}>
+                  Import Students
+                </h1>
+                <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                  Upload a CSV file to bulk import students
+                </p>
+              </div>
+            </div>
             <Button
               variant="outline"
-              onClick={() => document.getElementById('csv-upload')?.click()}
+              size="sm"
+              className="gap-2"
+              onClick={downloadTemplate}
             >
-              Browse Files
+              <Download className="h-4 w-4" />
+              Download Template
             </Button>
-            {file && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Selected: <span className="font-medium text-foreground">{file.name}</span>
-              </p>
-            )}
           </div>
-        </CardContent>
-      </Card>
+        </StaggerItem>
 
-      {/* ── Preview Table ── */}
-      {parsedData.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              Preview
-              <Badge variant="secondary">{parsedData.length} rows</Badge>
-              {validRows.length > 0 && (
-                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                  {validRows.length} valid
-                </Badge>
-              )}
-              {errorRows.length > 0 && (
-                <Badge className="bg-red-50 text-red-700 border-red-200">
-                  {errorRows.length} errors
-                </Badge>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto max-h-96 overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-8">#</TableHead>
-                    <TableHead>First Name</TableHead>
-                    <TableHead>Last Name</TableHead>
-                    <TableHead>DOB</TableHead>
-                    <TableHead>Gender</TableHead>
-                    <TableHead>Blood Group</TableHead>
-                    <TableHead>Class</TableHead>
-                    <TableHead>Errors</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {parsedData.map((row, idx) => (
-                    <TableRow
-                      key={idx}
-                      className={row._errors.length > 0 ? 'bg-red-50' : ''}
-                    >
-                      <TableCell className="text-xs text-muted-foreground">
-                        {idx + 1}
-                      </TableCell>
-                      <TableCell>{row.firstName || '—'}</TableCell>
-                      <TableCell>{row.lastName || '—'}</TableCell>
-                      <TableCell>{row.dob || '—'}</TableCell>
-                      <TableCell>{row.gender || '—'}</TableCell>
-                      <TableCell>{row.bloodGroup || '—'}</TableCell>
-                      <TableCell>{row.className || '—'}</TableCell>
-                      <TableCell>
-                        {row._errors.length > 0 ? (
-                          <div className="flex items-center gap-1 text-red-600">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span className="text-xs">{row._errors.join(', ')}</span>
-                          </div>
-                        ) : (
-                          <CheckCircle className="h-4 w-4 text-emerald-500" />
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        {/* ── KPI Summary (only after parsing) ── */}
+        {parsedData.length > 0 && !importResult && (
+          <StaggerItem>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <ImportStatCard
+                label="Total Rows"
+                value={parsedData.length}
+                icon={FileUp}
+                accent="var(--admin-primary)"
+                bg="var(--admin-primary-soft)"
+                ring="var(--admin-primary)"
+              />
+              <ImportStatCard
+                label="Valid"
+                value={validRows.length}
+                icon={FileCheck2}
+                accent="var(--admin-success)"
+                bg="var(--admin-success-soft)"
+                ring="var(--admin-success)"
+              />
+              <ImportStatCard
+                label="Errors"
+                value={errorRows.length}
+                icon={FileWarning}
+                accent="var(--admin-error)"
+                bg="var(--admin-error-soft)"
+                ring="var(--admin-error)"
+              />
             </div>
+          </StaggerItem>
+        )}
 
-            {/* Import Button */}
-            {!importResult && (
-              <div className="mt-4 flex justify-end">
-                <Button
-                  onClick={handleImport}
-                  disabled={importing || validRows.length === 0}
-                  className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+        {/* ── Upload Area ── */}
+        {!importResult && (
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="h-4 w-4" style={{ color: theme.primary }} />
+                  <h3 className="font-semibold" style={{ color: 'var(--admin-text)' }}>
+                    {parsedData.length > 0 ? 'Replace File' : 'Upload CSV File'}
+                  </h3>
+                </div>
+
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  className="rounded-2xl border-2 border-dashed p-10 sm:p-14 text-center transition-all"
+                  style={{
+                    borderColor: dragOver ? 'var(--admin-primary)' : 'var(--admin-border)',
+                    background: dragOver ? 'var(--admin-primary-soft)' : 'var(--admin-surface-2)',
+                  }}
                 >
-                  {importing ? (
-                    'Importing...'
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4" />
-                      Import {validRows.length} Students
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* ── Result Summary ── */}
-      {importResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Import Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-center">
-                <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-emerald-700">{importResult.created}</p>
-                <p className="text-xs text-emerald-600">Created</p>
-              </div>
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
-                <AlertCircle className="h-6 w-6 text-amber-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-amber-700">{importResult.skipped}</p>
-                <p className="text-xs text-amber-600">Skipped</p>
-              </div>
-              <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-center">
-                <XCircle className="h-6 w-6 text-red-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold text-red-700">{importResult.errors.length}</p>
-                <p className="text-xs text-red-600">Errors</p>
-              </div>
-            </div>
-
-            {importResult.errors.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Error Details:</p>
-                {importResult.errors.map((err, idx) => (
-                  <div key={idx} className="text-xs text-red-600 flex items-center gap-2">
-                    <XCircle className="h-3.5 w-3.5" />
-                    Row {err.row}: {err.message}
+                  <div
+                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+                    style={{ background: 'var(--admin-surface)' }}
+                  >
+                    {parsing ? (
+                      <Loader2 className="h-6 w-6 animate-spin" style={{ color: theme.primary }} />
+                    ) : (
+                      <Upload className="h-6 w-6" style={{ color: 'var(--admin-text-muted)' }} />
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                  <p className="text-sm font-medium mb-1" style={{ color: 'var(--admin-text)' }}>
+                    {parsing ? 'Parsing file…' : 'Drag & drop your CSV file here'}
+                  </p>
+                  <p className="text-xs mb-4" style={{ color: 'var(--admin-text-subtle)' }}>
+                    or click to browse
+                  </p>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="hidden"
+                    id="csv-upload"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleFile(f);
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById('csv-upload')?.click()}
+                    className="gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Browse Files
+                  </Button>
+                  {file && (
+                    <p className="mt-3 text-xs" style={{ color: 'var(--admin-text-muted)' }}>
+                      Selected: <span className="font-medium" style={{ color: 'var(--admin-text)' }}>{file.name}</span>
+                    </p>
+                  )}
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        )}
 
-            <div className="mt-4 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => router.push('/admin/students')}>
-                View Students
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setFile(null);
-                  setParsedData([]);
-                  setImportResult(null);
-                }}
-              >
-                Import More
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+        {/* ── Preview Table ── */}
+        {parsedData.length > 0 && !importResult && (
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold flex items-center gap-2" style={{ color: 'var(--admin-text)' }}>
+                    <FileSpreadsheet className="h-4 w-4" style={{ color: theme.primary }} />
+                    Preview
+                  </h3>
+                  <div className="flex gap-1.5">
+                    <Badge variant="secondary">{parsedData.length} rows</Badge>
+                    {validRows.length > 0 && (
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                        {validRows.length} valid
+                      </Badge>
+                    )}
+                    {errorRows.length > 0 && (
+                      <Badge className="bg-red-50 text-red-700 border-red-200">
+                        {errorRows.length} errors
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--admin-border)' }}>
+                  <Table>
+                    <TableHeader>
+                      <TableRow style={{ background: 'var(--admin-surface-2)' }}>
+                        <TableHead className="w-8">#</TableHead>
+                        <TableHead>First Name</TableHead>
+                        <TableHead>Last Name</TableHead>
+                        <TableHead>DOB</TableHead>
+                        <TableHead>Gender</TableHead>
+                        <TableHead>Blood Group</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {parsedData.map((row, idx) => (
+                        <TableRow
+                          key={idx}
+                          className={row._errors.length > 0 ? 'bg-red-50/50 dark:bg-red-950/20' : ''}
+                        >
+                          <TableCell className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                            {idx + 1}
+                          </TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.firstName || '—'}</TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.lastName || '—'}</TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.dob || '—'}</TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.gender || '—'}</TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.bloodGroup || '—'}</TableCell>
+                          <TableCell className="text-sm" style={{ color: 'var(--admin-text)' }}>{row.className || '—'}</TableCell>
+                          <TableCell>
+                            {row._errors.length > 0 ? (
+                              <div className="flex items-center gap-1.5" style={{ color: 'var(--admin-error)' }}>
+                                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                <span className="text-xs">{row._errors.join(', ')}</span>
+                              </div>
+                            ) : (
+                              <CheckCircle className="h-4 w-4" style={{ color: 'var(--admin-success)' }} />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    onClick={handleImport}
+                    disabled={importing || validRows.length === 0}
+                    className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  >
+                    {importing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Importing…
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4" />
+                        Import {validRows.length} Students
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        )}
+
+        {/* ── Result Summary ── */}
+        {importResult && (
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-4 w-4" style={{ color: 'var(--admin-success)' }} />
+                  <h3 className="font-semibold" style={{ color: 'var(--admin-text)' }}>Import Results</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <ImportStatCard
+                    label="Created"
+                    value={importResult.created}
+                    icon={CheckCircle}
+                    accent="var(--admin-success)"
+                    bg="var(--admin-success-soft)"
+                    ring="var(--admin-success)"
+                  />
+                  <ImportStatCard
+                    label="Skipped"
+                    value={importResult.skipped}
+                    icon={AlertCircle}
+                    accent="var(--admin-orange)"
+                    bg="var(--admin-orange-soft)"
+                    ring="var(--admin-orange)"
+                  />
+                  <ImportStatCard
+                    label="Errors"
+                    value={importResult.errors.length}
+                    icon={XCircle}
+                    accent="var(--admin-error)"
+                    bg="var(--admin-error-soft)"
+                    ring="var(--admin-error)"
+                  />
+                </div>
+
+                {importResult.errors.length > 0 && (
+                  <div
+                    className="space-y-2 rounded-xl p-3"
+                    style={{ background: 'var(--admin-error-soft)' }}
+                  >
+                    <p className="text-sm font-medium" style={{ color: 'var(--admin-error)' }}>
+                      Error Details
+                    </p>
+                    {importResult.errors.map((err, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs" style={{ color: 'var(--admin-error)' }}>
+                        <XCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span>Row {err.row}: {err.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setFile(null);
+                      setParsedData([]);
+                      setImportResult(null);
+                    }}
+                    className="gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Import More
+                  </Button>
+                  <Button
+                    onClick={() => router.push('/admin/students')}
+                    className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  >
+                    View Students
+                  </Button>
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        )}
+      </StaggerContainer>
+    </PageTransition>
   );
 }

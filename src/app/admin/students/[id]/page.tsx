@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import {
   ArrowLeft,
   Pencil,
@@ -353,8 +354,10 @@ export default function StudentDetailPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+    <StaggerContainer className="space-y-6 max-w-[1440px] mx-auto">
       {/* ── Back Button ── */}
+      <StaggerItem>
       <Button
         variant="ghost"
         className="gap-1 text-muted-foreground"
@@ -363,6 +366,7 @@ export default function StudentDetailPage() {
         <ArrowLeft className="h-4 w-4" />
         Back to Students
       </Button>
+      </StaggerItem>
 
       {/* ── Profile Header ── */}
       <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
@@ -1025,6 +1029,7 @@ export default function StudentDetailPage() {
         student={student}
         onTransferred={fetchStudent}
       />
-    </div>
+    </StaggerContainer>
+    </PageTransition>
   );
 }
