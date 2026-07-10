@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Shield,
   Save,
-  CheckCircle2,
-  XCircle,
-  Users,
   Key,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -107,28 +107,133 @@ const PERMISSION_MODULES = [
   },
 ];
 
-const DEFAULT_PERMISSIONS: Record<string, Record<string, boolean>> = {
-  'Super Admin': Object.fromEntries(PERMISSION_MODULES.flatMap((m) => m.permissions.map((p) => [p.key, true]))),
-  'Admin': Object.fromEntries(PERMISSION_MODULES.flatMap((m) => m.permissions.map((p) => [p.key, !p.key.startsWith('system.')]))),
-  'Task Master': Object.fromEntries(PERMISSION_MODULES.flatMap((m) => m.permissions.map((p) => [p.key, p.key.startsWith('dashboard.') || p.key.startsWith('crm.') || p.key === 'comm.view' || p.key === 'comm.send']))),
-  'Teacher': Object.fromEntries(PERMISSION_MODULES.flatMap((m) => m.permissions.map((p) => [p.key, p.key.startsWith('dashboard.') || p.key.startsWith('students.view') || p.key.startsWith('attendance.') || p.key.startsWith('growth.') || p.key === 'comm.view' || p.key === 'comm.send' || p.key === 'fees.view']))),
-};
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('preone_token');
+}
 
 export default function PermissionsSettingsPage() {
-  const [permissions, setPermissions] = useState<Record<string, Record<string, boolean>>>(DEFAULT_PERMISSIONS);
+  const [permissions, setPermissions] = useState<Record<string, Record<string, boolean>> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchPermissions = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/permissions', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to load permissions');
+      }
+      const json = await res.json();
+      setPermissions(json);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPermissions();
+  }, [fetchPermissions]);
 
   const togglePermission = (role: string, key: string) => {
-    setPermissions((prev) => ({
-      ...prev,
-      [role]: { ...prev[role], [key]: !prev[role][key] },
-    }));
+    setPermissions((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [role]: { ...prev[role], [key]: !prev[role][key] },
+      };
+    });
+  };
+
+  const handleSave = async () => {
+    if (!permissions) return;
+    setSaving(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/permissions', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(permissions),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to save permissions');
+      }
+      const json = await res.json();
+      setPermissions(json);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const countPermissions = (role: string) => {
     const total = PERMISSION_MODULES.reduce((s, m) => s + m.permissions.length, 0);
-    const granted = Object.values(permissions[role] || {}).filter(Boolean).length;
+    const granted = Object.values(permissions?.[role] || {}).filter(Boolean).length;
     return { granted, total };
   };
+
+  if (loading) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-xl" />
+              <div>
+                <Skeleton className="h-6 w-56" />
+                <Skeleton className="h-4 w-72 mt-1" />
+              </div>
+            </div>
+          </StaggerItem>
+          <StaggerItem>
+            <Skeleton className="h-40 w-full rounded-3xl" />
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (error && !permissions) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
+              <Key className="w-6 h-6" style={{ color: theme.primary }} />
+              Permission Management
+            </h1>
+          </StaggerItem>
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-rose-400 mb-4" />
+                  <p className="text-[var(--admin-text)] font-medium mb-1">Failed to load permissions</p>
+                  <p className="text-sm text-[var(--admin-text-muted)] mb-4">{error}</p>
+                  <Button onClick={fetchPermissions} variant="outline" className="rounded-xl">
+                    <RefreshCw className="w-4 h-4 mr-2" /> Retry
+                  </Button>
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (!permissions) return null;
 
   return (
     <PageTransition>
@@ -142,10 +247,12 @@ export default function PermissionsSettingsPage() {
               </h1>
               <p className="text-sm text-[var(--admin-text-muted)] mt-1">Toggle permissions by role</p>
             </div>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
-              <Save className="w-4 h-4 mr-2" /> Save All
+            <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              Save All
             </Button>
           </div>
+          {error && <p className="text-sm text-rose-500 mt-2">{error}</p>}
         </StaggerItem>
 
         {/* Role Stats */}

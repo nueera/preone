@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import { Switch } from '@/components/ui/switch';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Shield,
   Plus,
@@ -16,6 +16,10 @@ import {
   XCircle,
   Edit,
   Trash2,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  Save,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -43,16 +47,130 @@ const PERMISSION_CATEGORIES = [
   { key: 'system', label: 'System' },
 ];
 
-const MOCK_ROLES: Role[] = [
-  { id: '1', name: 'Super Admin', description: 'Full system access with all permissions', userCount: 1, isSystem: true, permissions: Object.fromEntries(PERMISSION_CATEGORIES.map((p) => [p.key, true])) },
-  { id: '2', name: 'Admin', description: 'Full access except system settings', userCount: 2, isSystem: true, permissions: { dashboard: true, students: true, teachers: true, attendance: true, fees: true, crm: true, growth: true, communication: true, reports: true, settings: true, system: false } },
-  { id: '3', name: 'Task Master', description: 'CRM and dashboard access only', userCount: 1, isSystem: false, permissions: { dashboard: true, students: false, teachers: false, attendance: false, fees: false, crm: true, growth: false, communication: true, reports: false, settings: false, system: false } },
-  { id: '4', name: 'Teacher', description: 'Class and student management', userCount: 4, isSystem: false, permissions: { dashboard: true, students: true, teachers: false, attendance: true, fees: false, crm: false, growth: true, communication: true, reports: true, settings: false, system: false } },
-];
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('preone_token');
+}
 
 export default function RolesSettingsPage() {
-  const [roles] = useState<Role[]>(MOCK_ROLES);
-  const [selectedRole, setSelectedRole] = useState<Role>(MOCK_ROLES[0]);
+  const [roles, setRoles] = useState<Role[] | null>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchRoles = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/roles', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to load roles');
+      }
+      const json = await res.json();
+      setRoles(json.roles);
+      setSelectedRoleId((prev) => prev ?? json.roles[0]?.id ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
+
+  const togglePermission = (roleId: string, key: string) => {
+    setRoles((prev) =>
+      prev
+        ? prev.map((r) =>
+            r.id === roleId ? { ...r, permissions: { ...r.permissions, [key]: !r.permissions[key] } } : r
+          )
+        : prev
+    );
+  };
+
+  const handleSave = async () => {
+    if (!roles) return;
+    setSaving(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/roles', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ roles }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to save roles');
+      }
+      const json = await res.json();
+      setRoles(json.roles);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-xl" />
+              <div>
+                <Skeleton className="h-6 w-56" />
+                <Skeleton className="h-4 w-72 mt-1" />
+              </div>
+            </div>
+          </StaggerItem>
+          <StaggerItem>
+            <Skeleton className="h-64 w-full rounded-3xl" />
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (error && !roles) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
+              <Shield className="w-6 h-6" style={{ color: theme.primary }} />
+              Role Management
+            </h1>
+          </StaggerItem>
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-rose-400 mb-4" />
+                  <p className="text-[var(--admin-text)] font-medium mb-1">Failed to load roles</p>
+                  <p className="text-sm text-[var(--admin-text-muted)] mb-4">{error}</p>
+                  <Button onClick={fetchRoles} variant="outline" className="rounded-xl">
+                    <RefreshCw className="w-4 h-4 mr-2" /> Retry
+                  </Button>
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (!roles) return null;
+  const selectedRole = roles.find((r) => r.id === selectedRoleId) || roles[0];
 
   return (
     <PageTransition>
@@ -70,6 +188,7 @@ export default function RolesSettingsPage() {
               <Plus className="w-4 h-4 mr-2" /> Add Role
             </Button>
           </div>
+          {error && <p className="text-sm text-rose-500 mt-2">{error}</p>}
         </StaggerItem>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -85,7 +204,7 @@ export default function RolesSettingsPage() {
                       className={`p-3 rounded-xl border cursor-pointer transition-colors ${
                         selectedRole.id === role.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-[var(--admin-surface-2)]'
                       }`}
-                      onClick={() => setSelectedRole(role)}
+                      onClick={() => setSelectedRoleId(role.id)}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="text-sm font-medium text-[var(--admin-text)]">{role.name}</h4>
@@ -129,14 +248,21 @@ export default function RolesSettingsPage() {
                           )}
                           <span className="text-sm text-[var(--admin-text-muted)]">{cat.label}</span>
                         </div>
-                        <Switch checked={hasPermission} disabled={selectedRole.isSystem} />
+                        <Switch
+                          checked={hasPermission}
+                          disabled={selectedRole.isSystem}
+                          onCheckedChange={() => togglePermission(selectedRole.id, cat.key)}
+                        />
                       </div>
                     );
                   })}
                 </div>
                 {!selectedRole.isSystem && (
                   <div className="mt-4 flex justify-end">
-                    <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white">Save Permissions</Button>
+                    <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white">
+                      {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                      Save Permissions
+                    </Button>
                   </div>
                 )}
               </PreOneCardContent>
