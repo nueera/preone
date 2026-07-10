@@ -12,12 +12,7 @@ import {
   Plus,
   RefreshCw,
   ChevronRight,
-  TrendingUp,
-  Clock,
   AlertTriangle,
-  IndianRupee,
-  Activity,
-  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -332,9 +327,6 @@ export default function CrmDashboardPage() {
   );
   const totalInPipeline = pipelineStages.reduce((sum, s) => sum + s.count, 0);
 
-  // Sparkline data — derive from pipeline stages as a friendly visual
-  const pipelineSparkline = pipelineStages.map((s) => s.count);
-
   return (
     <PageTransition>
       <WarmPremium className="min-h-screen">
@@ -371,67 +363,6 @@ export default function CrmDashboardPage() {
                 </>
               }
             />
-          </div>
-
-          {/* ── SECTION 2: HERO STAT BENTO GRID ── */}
-          {/* Bento layout: first card spans 2 cols on lg, others single */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 warm-fade-in" style={{ animationDelay: '60ms' }}>
-            <div className="sm:col-span-2 lg:col-span-2">
-              <WarmStatCard
-                label="Total Leads"
-                value={stats?.totalLeads ?? 0}
-                delta={stats?.newThisWeek ? Math.round((stats.newThisWeek / Math.max(stats.totalLeads - stats.newThisWeek, 1)) * 100) : undefined}
-                caption={`${stats?.newThisWeek ?? 0} new this week`}
-                accent="primary"
-                icon={Users}
-                sparkline={pipelineSparkline.length >= 2 ? pipelineSparkline : undefined}
-                disableAnimation={loading}
-              />
-            </div>
-            <WarmStatCard
-              label="Conversion Rate"
-              value={stats?.conversionRate ?? 0}
-              suffix="%"
-              accent="sage"
-              icon={TrendingUp}
-              caption="Leads → Enrollments"
-              disableAnimation={loading}
-            />
-            <WarmStatCard
-              label="Follow-ups Due"
-              value={stats?.followUpsToday ?? 0}
-              accent="honey"
-              icon={PhoneCall}
-              caption={`${stats?.overdueFollowUps ?? 0} overdue`}
-              disableAnimation={loading}
-            />
-            <WarmStatCard
-              label="New This Week"
-              value={stats?.newThisWeek ?? 0}
-              accent="sky"
-              icon={Sparkles}
-              caption="Fresh enquiries"
-              disableAnimation={loading}
-            />
-            <WarmStatCard
-              label="Est. Revenue"
-              value={stats?.estimatedRevenue ?? 0}
-              prefix="₹"
-              accent="lavender"
-              icon={IndianRupee}
-              caption="From active pipeline"
-              disableAnimation={loading}
-            />
-            <div className="sm:col-span-2 lg:col-span-2">
-              <WarmStatCard
-                label="Open Tasks"
-                value={(stats?.tasks?.todo ?? 0) + (stats?.tasks?.inProgress ?? 0)}
-                accent="rose"
-                icon={CheckSquare}
-                caption={`${stats?.tasks?.overdue ?? 0} overdue · ${stats?.tasks?.done ?? 0} done`}
-                disableAnimation={loading}
-              />
-            </div>
           </div>
 
           {/* ── SECTION 3: CRM MODULE CARDS GRID ── */}
