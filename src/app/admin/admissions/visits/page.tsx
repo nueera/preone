@@ -15,18 +15,20 @@ import {
   UserCircle,
   Baby,
   Calendar,
-  Filter,
   Search,
   X,
   Eye,
   Phone,
   Users,
   AlertCircle,
+  Loader2,
+  Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -48,8 +50,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Popover,
   PopoverContent,
@@ -57,68 +57,54 @@ import {
 } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { PageTransition } from '@/components/ui/page-transition';
-import { AnimatedCard } from '@/components/ui/animated-card';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
-const theme = PORTAL_THEMES.admin;
-
-// ── Cosmic Purple Theme Colors ──
-const COSMIC_PURPLE = {
-  50: '#faf5ff',
-  100: '#f3e8ff',
-  200: '#e9d5ff',
-  300: '#d8b4fe',
-  400: '#c084fc',
-  500: '#a855f7',
-  600: '#9333ea',
-  700: '#7e22ce',
-  800: '#6b21a8',
-  900: '#581c87',
-};
 
 // ── Types ──
 interface Visit {
   id: string;
+  leadId: string | null;
   parentName: string;
   childName: string;
-  childAge: string | null;
-  parentPhone: string;
+  parentPhone: string | null;
   date: string;
   time: string;
   status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-  assignedStaff: string | null;
   notes: string | null;
-  leadId: string | null;
+  assignedTo: string | null;
+  assignee: { id: string; name: string } | null;
   createdAt: string;
 }
 
-// ── Status Config ──
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
+// ── Constants ──
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; bg: string; icon: React.ReactNode }
+> = {
   SCHEDULED: {
     label: 'Scheduled',
-    color: COSMIC_PURPLE[600],
-    bg: COSMIC_PURPLE[50],
-    icon: <Clock className="h-4 w-4" style={{ color: COSMIC_PURPLE[600] }} />,
+    color: 'var(--admin-primary)',
+    bg: 'var(--admin-primary-soft)',
+    icon: <Calendar className="h-3.5 w-3.5" />,
   },
   COMPLETED: {
     label: 'Completed',
-    color: '#10b981',
-    bg: '#ecfdf5',
-    icon: <CheckCircle2 className="h-4 w-4 text-emerald-500" />,
+    color: 'var(--admin-success)',
+    bg: 'var(--admin-success-soft)',
+    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
   },
   CANCELLED: {
     label: 'Cancelled',
-    color: '#ef4444',
-    bg: '#fef2f2',
-    icon: <XCircle className="h-4 w-4 text-red-500" />,
+    color: 'var(--admin-error)',
+    bg: 'rgba(239,68,68,0.1)',
+    icon: <XCircle className="h-3.5 w-3.5" />,
   },
   NO_SHOW: {
     label: 'No Show',
-    color: '#f59e0b',
-    bg: '#fffbeb',
-    icon: <AlertCircle className="h-4 w-4 text-amber-500" />,
+    color: 'var(--admin-warning)',
+    bg: 'var(--admin-warning-soft)',
+    icon: <AlertCircle className="h-3.5 w-3.5" />,
   },
 };
 
@@ -139,9 +125,10 @@ function ScheduleVisitDialog({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [leads, setLeads] = useState<Array<{ id: string; parentName: string; childName: string; phone: string }>>([]);
+  const [leads, setLeads] = useState<
+    Array<{ id: string; parentName: string; childName: string; phone: string }>
+  >([]);
   const [staff, setStaff] = useState<Array<{ id: string; name: string }>>([]);
-
   const [form, setForm] = useState({
     leadId: '',
     parentName: '',
@@ -153,15 +140,22 @@ function ScheduleVisitDialog({
     notes: '',
   });
 
-  // Reset on open
   useEffect(() => {
     if (open) {
+      setForm({
+        leadId: '',
+        parentName: '',
+        childName: '',
+        parentPhone: '',
+        date: null,
+        time: '10:00',
+        assignedTo: '',
+        notes: '',
+      });
       setError('');
-      setForm({ leadId: '', parentName: '', childName: '', parentPhone: '', date: null, time: '10:00', assignedTo: '', notes: '' });
     }
   }, [open]);
 
-  // Fetch leads for linking
   useEffect(() => {
     if (!open) return;
     async function fetchLeads() {
@@ -173,12 +167,19 @@ function ScheduleVisitDialog({
         if (res.ok) {
           const data = await res.json();
           setLeads(
-            (data.leads || []).map((l: { id: string; parentName: string; childName: string; parentPhone: string }) => ({
-              id: l.id,
-              parentName: l.parentName,
-              childName: l.childName,
-              phone: l.parentPhone,
-            }))
+            (data.leads || []).map(
+              (l: {
+                id: string;
+                parentName: string;
+                childName: string;
+                parentPhone: string;
+              }) => ({
+                id: l.id,
+                parentName: l.parentName,
+                childName: l.childName,
+                phone: l.parentPhone,
+              }),
+            ),
           );
         }
       } catch (err) {
@@ -188,7 +189,6 @@ function ScheduleVisitDialog({
     fetchLeads();
   }, [open]);
 
-  // Fetch staff
   useEffect(() => {
     if (!open) return;
     async function fetchStaff() {
@@ -200,37 +200,45 @@ function ScheduleVisitDialog({
         if (res.ok) {
           const data = await res.json();
           setStaff(
-            (data.teachers || []).map((t: { id: string; firstName: string; lastName: string }) => ({
-              id: t.id,
-              name: `${t.firstName} ${t.lastName}`,
-            }))
+            (data.teachers || []).map(
+              (t: { id: string; firstName: string; lastName: string }) => ({
+                id: t.id,
+                name: `${t.firstName} ${t.lastName}`,
+              }),
+            ),
           );
         }
-      } catch {}
+      } catch (err) {
+        console.error('Failed to fetch staff:', err);
+      }
     }
     fetchStaff();
   }, [open]);
 
-  // Auto-fill from lead selection
   const handleLeadSelect = (leadId: string) => {
     if (leadId === 'NONE') {
-      setForm((p) => ({ ...p, leadId: '', parentName: '', childName: '', parentPhone: '' }));
-      return;
-    }
-    const lead = leads.find((l) => l.id === leadId);
-    if (lead) {
       setForm((p) => ({
         ...p,
-        leadId,
-        parentName: lead.parentName,
-        childName: lead.childName,
-        parentPhone: lead.phone,
+        leadId: '',
+        parentName: '',
+        childName: '',
+        parentPhone: '',
       }));
+    } else {
+      const lead = leads.find((l) => l.id === leadId);
+      if (lead) {
+        setForm((p) => ({
+          ...p,
+          leadId: lead.id,
+          parentName: lead.parentName,
+          childName: lead.childName,
+          parentPhone: lead.phone,
+        }));
+      }
     }
   };
 
   const handleSubmit = async () => {
-    setError('');
     if (!form.parentName.trim()) {
       setError('Parent name is required');
       return;
@@ -239,7 +247,6 @@ function ScheduleVisitDialog({
       setError('Visit date is required');
       return;
     }
-
     setSubmitting(true);
     try {
       const token = getToken();
@@ -253,7 +260,7 @@ function ScheduleVisitDialog({
           leadId: form.leadId || undefined,
           parentName: form.parentName.trim(),
           childName: form.childName.trim(),
-          parentPhone: form.parentPhone.trim(),
+          parentPhone: form.parentPhone.trim() || undefined,
           date: form.date.toISOString(),
           time: form.time,
           assignedTo: form.assignedTo || undefined,
@@ -261,17 +268,17 @@ function ScheduleVisitDialog({
           status: 'SCHEDULED',
         }),
       });
-
-      if (!res.ok) {
+      if (res.ok) {
+        toast.success('Visit scheduled successfully');
+        onOpenChange(false);
+        onVisitCreated();
+      } else {
         const data = await res.json();
-        throw new Error(data.error || 'Failed to schedule visit');
+        setError(data.error || 'Failed to schedule visit');
       }
-
-      toast.success('Visit scheduled successfully');
-      onOpenChange(false);
-      onVisitCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to schedule visit');
+      console.error('Failed to schedule visit:', err);
+      setError('Failed to schedule visit');
     } finally {
       setSubmitting(false);
     }
@@ -281,25 +288,45 @@ function ScheduleVisitDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold flex items-center gap-2">
-            <CalendarCheck className="h-5 w-5" style={{ color: COSMIC_PURPLE[600] }} />
+          <DialogTitle
+            className="text-xl font-bold flex items-center gap-2"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{ background: 'var(--admin-warning-soft)' }}
+            >
+              <CalendarCheck
+                className="h-4 w-4"
+                style={{ color: 'var(--admin-warning)' }}
+              />
+            </div>
             Schedule Campus Visit
           </DialogTitle>
         </DialogHeader>
 
         {error && (
-          <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>
+          <div
+            className="rounded-lg p-3 text-sm flex items-center gap-2"
+            style={{
+              background: 'rgba(239,68,68,0.08)',
+              color: 'var(--admin-error)',
+            }}
+          >
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {error}
+          </div>
         )}
 
         <div className="space-y-4">
-          <div>
-            <Label>Link to Lead (optional)</Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Select Lead (optional)</Label>
             <Select value={form.leadId || 'NONE'} onValueChange={handleLeadSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a lead" />
+              <SelectTrigger className="h-9 text-sm">
+                <SelectValue placeholder="Walk-in (no linked lead)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="NONE">No linked lead</SelectItem>
+                <SelectItem value="NONE">Walk-in (no linked lead)</SelectItem>
                 {leads.map((l) => (
                   <SelectItem key={l.id} value={l.id}>
                     {l.parentName} — {l.childName}
@@ -307,46 +334,65 @@ function ScheduleVisitDialog({
                 ))}
               </SelectContent>
             </Select>
+            <p className="text-[11px]" style={{ color: 'var(--admin-text-subtle)' }}>
+              Selecting a lead auto-fills parent &amp; child details.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Parent Name *</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">
+                Parent Name <span style={{ color: 'var(--admin-error)' }}>*</span>
+              </Label>
               <Input
                 value={form.parentName}
-                onChange={(e) => setForm((p) => ({ ...p, parentName: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, parentName: e.target.value }))
+                }
                 placeholder="Parent name"
               />
             </div>
-            <div>
-              <Label>Phone</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Child Name</Label>
               <Input
-                value={form.parentPhone}
-                onChange={(e) => setForm((p) => ({ ...p, parentPhone: e.target.value }))}
-                placeholder="Phone number"
+                value={form.childName}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, childName: e.target.value }))
+                }
+                placeholder="Child name"
               />
             </div>
           </div>
 
-          <div>
-            <Label>Child Name</Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Parent Phone</Label>
             <Input
-              value={form.childName}
-              onChange={(e) => setForm((p) => ({ ...p, childName: e.target.value }))}
-              placeholder="Child name"
+              value={form.parentPhone}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, parentPhone: e.target.value }))
+              }
+              placeholder="10-digit phone"
+              maxLength={10}
+              className="tabular-nums"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Visit Date *</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">
+                Date <span style={{ color: 'var(--admin-error)' }}>*</span>
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    type="button"
                     variant="outline"
-                    className={cn('w-full justify-start text-left font-normal', !form.date && 'text-muted-foreground')}
+                    className={cn(
+                      'w-full h-9 text-sm justify-start text-left font-normal',
+                      !form.date && 'text-muted-foreground',
+                    )}
                   >
-                    <Calendar className="mr-2 h-4 w-4" />
+                    <Calendar className="mr-2 h-3.5 w-3.5" />
                     {form.date ? format(form.date, 'dd MMM yyyy') : 'Pick a date'}
                   </Button>
                 </PopoverTrigger>
@@ -354,58 +400,72 @@ function ScheduleVisitDialog({
                   <CalendarComponent
                     mode="single"
                     selected={form.date || undefined}
-                    onSelect={(d) => setForm((p) => ({ ...p, date: d }))}
+                    onSelect={(d) => setForm((p) => ({ ...p, date: d ?? null }))}
                     disabled={(d) => d < new Date()}
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
             </div>
-            <div>
-              <Label>Time</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Time</Label>
               <Input
                 type="time"
                 value={form.time}
                 onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
+                className="h-9 text-sm tabular-nums"
               />
             </div>
           </div>
 
-          <div>
-            <Label>Assign Staff</Label>
-            <Select value={form.assignedTo || 'NONE'} onValueChange={(v) => setForm((p) => ({ ...p, assignedTo: v === 'NONE' ? '' : v }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select staff" />
+          <div className="space-y-1.5">
+            <Label className="text-xs">Assigned Staff</Label>
+            <Select
+              value={form.assignedTo || 'NONE'}
+              onValueChange={(v) =>
+                setForm((p) => ({ ...p, assignedTo: v === 'NONE' ? '' : v }))
+              }
+            >
+              <SelectTrigger className="h-9 text-sm">
+                <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="NONE">Unassigned</SelectItem>
                 {staff.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <Label>Notes</Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Notes</Label>
             <Textarea
               value={form.notes}
               onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-              placeholder="Any special instructions or notes..."
+              placeholder="Any special requests or context for this visit..."
               rows={2}
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end mt-4 pt-4 border-t gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+        <div className="flex items-center justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitting}
-            className="gap-1 text-white border-0"
-            style={{ background: `linear-gradient(135deg, ${COSMIC_PURPLE[600]}, ${COSMIC_PURPLE[400]})` }}
+            className="gap-1.5 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
           >
-            {submitting ? 'Scheduling...' : 'Schedule Visit'}
+            {submitting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            Schedule Visit
           </Button>
         </div>
       </DialogContent>
@@ -413,17 +473,58 @@ function ScheduleVisitDialog({
   );
 }
 
+// ── Stat Card ──
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  accentVar,
+  accentSoftVar,
+}: {
+  label: string;
+  value: number;
+  icon: React.ElementType;
+  accentVar: string;
+  accentSoftVar: string;
+}) {
+  return (
+    <PreOneCard className="!rounded-xl">
+      <div className="p-4 flex items-center gap-4">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
+          style={{ background: `var(${accentSoftVar})` }}
+        >
+          <Icon className="h-5 w-5" style={{ color: `var(${accentVar})` }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div
+            className="text-xs font-medium"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
+            {label}
+          </div>
+          <div
+            className="text-xl font-bold tabular-nums"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            {value}
+          </div>
+        </div>
+      </div>
+    </PreOneCard>
+  );
+}
+
 /**
- * Campus Visits Scheduling Page — Manage campus visit appointments for prospective families.
- * Route: /admin/admissions/visits
+ * Campus Visits page — Schedule and manage campus visits for prospective families.
  */
 export default function CampusVisitsPage() {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [dateFilter, setDateFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   const fetchVisits = useCallback(async () => {
     try {
@@ -431,7 +532,6 @@ export default function CampusVisitsPage() {
       const params = new URLSearchParams();
       if (statusFilter) params.set('status', statusFilter);
       if (dateFilter) params.set('date', dateFilter);
-
       const res = await fetch(`/api/crm/visits?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -441,6 +541,7 @@ export default function CampusVisitsPage() {
       }
     } catch (err) {
       console.error('Failed to fetch visits:', err);
+      toast.error('Failed to load visits');
     } finally {
       setLoading(false);
     }
@@ -450,7 +551,6 @@ export default function CampusVisitsPage() {
     fetchVisits();
   }, [fetchVisits]);
 
-  // Mark visit as completed
   const handleMarkCompleted = async (visitId: string) => {
     try {
       const token = getToken();
@@ -468,12 +568,12 @@ export default function CampusVisitsPage() {
       } else {
         toast.error('Failed to update visit');
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to mark visit complete:', err);
       toast.error('Failed to update visit');
     }
   };
 
-  // Cancel a visit
   const handleCancel = async (visitId: string) => {
     if (!confirm('Cancel this campus visit?')) return;
     try {
@@ -492,30 +592,11 @@ export default function CampusVisitsPage() {
       } else {
         toast.error('Failed to cancel visit');
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to cancel visit:', err);
       toast.error('Failed to cancel visit');
     }
   };
-
-  // Stats
-  const totalVisits = visits.length;
-  const scheduledToday = visits.filter((v) => v.status === 'SCHEDULED' && isToday(new Date(v.date))).length;
-  const completedCount = visits.filter((v) => v.status === 'COMPLETED').length;
-  const cancelledCount = visits.filter((v) => v.status === 'CANCELLED').length;
-
-  // Filtered visits
-  const filteredVisits = visits.filter((v) => {
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch =
-        v.parentName.toLowerCase().includes(q) ||
-        v.childName.toLowerCase().includes(q) ||
-        v.parentPhone.includes(q);
-      if (!matchesSearch) return false;
-    }
-    if (statusFilter && v.status !== statusFilter) return false;
-    return true;
-  });
 
   const hasActiveFilters = searchQuery || statusFilter || dateFilter;
 
@@ -525,175 +606,253 @@ export default function CampusVisitsPage() {
     setDateFilter('');
   };
 
+  // Filter by search query (client-side)
+  const filteredVisits = visits.filter((v) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      v.parentName.toLowerCase().includes(q) ||
+      v.childName.toLowerCase().includes(q) ||
+      (v.parentPhone && v.parentPhone.includes(q))
+    );
+  });
+
+  // Stats
+  const totalVisits = visits.length;
+  const scheduledToday = visits.filter(
+    (v) => v.status === 'SCHEDULED' && isToday(new Date(v.date)),
+  ).length;
+  const completedVisits = visits.filter((v) => v.status === 'COMPLETED').length;
+  const cancelledVisits = visits.filter((v) => v.status === 'CANCELLED').length;
+
   return (
     <PageTransition>
-      <div className="space-y-6">
-        {/* ── Page Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+        {/* ── SECTION 1: HEADER ── */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin/admissions">
               <Button variant="ghost" size="sm" className="gap-1">
                 <ArrowLeft className="h-4 w-4" />
-                Back to Admissions
+                Back
               </Button>
             </Link>
-            <div>
-              <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
-                <MapPin className="h-6 w-6" style={{ color: COSMIC_PURPLE[600] }} />
-                Campus Visits
-              </h1>
-              <p className="text-sm text-[var(--admin-text-muted)] mt-1">
-                Schedule and manage campus visits for prospective families
-              </p>
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-xl"
+                style={{ background: 'var(--admin-warning-soft)' }}
+              >
+                <CalendarCheck
+                  className="h-5 w-5"
+                  style={{ color: 'var(--admin-warning)' }}
+                />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl font-bold tracking-tight"
+                  style={{ color: 'var(--admin-text)' }}
+                >
+                  Campus Visits
+                </h1>
+                <p
+                  className="text-sm"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  Schedule and manage campus visits for prospective families
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => { setLoading(true); fetchVisits(); }}
-              className="gap-1"
+              className="gap-2"
+              onClick={() => {
+                setLoading(true);
+                fetchVisits();
+                toast.success('Refreshed');
+              }}
             >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Refresh
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
             <Button
+              size="sm"
+              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
               onClick={() => setScheduleOpen(true)}
-              className="gap-1 text-white border-0"
-              style={{ background: `linear-gradient(135deg, ${COSMIC_PURPLE[600]}, ${COSMIC_PURPLE[400]})` }}
             >
               <Plus className="h-4 w-4" />
-              Schedule Visit
+              <span className="hidden sm:inline">Schedule Visit</span>
             </Button>
           </div>
         </div>
 
-        {/* ── Stats Cards ── */}
+        {/* ── SECTION 2: STAT CARDS ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <AnimatedCard delay={0.05}>
-            <div className="p-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: COSMIC_PURPLE[50] }}
-                >
-                  <CalendarCheck className="h-5 w-5" style={{ color: COSMIC_PURPLE[600] }} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-bold font-heading text-[var(--admin-text)] leading-tight">{totalVisits}</p>
-                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Total Visits</p>
-                </div>
-              </div>
-            </div>
-          </AnimatedCard>
-
-          <AnimatedCard delay={0.1}>
-            <div className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-bold text-amber-600 leading-tight">{scheduledToday}</p>
-                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Scheduled Today</p>
-                </div>
-              </div>
-            </div>
-          </AnimatedCard>
-
-          <AnimatedCard delay={0.15}>
-            <div className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-bold text-emerald-600 leading-tight">{completedCount}</p>
-                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Completed</p>
-                </div>
-              </div>
-            </div>
-          </AnimatedCard>
-
-          <AnimatedCard delay={0.2}>
-            <div className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-red-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-bold text-red-500 leading-tight">{cancelledCount}</p>
-                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">Cancelled</p>
-                </div>
-              </div>
-            </div>
-          </AnimatedCard>
+          <StatCard
+            label="Total Visits"
+            value={totalVisits}
+            icon={CalendarCheck}
+            accentVar="--admin-primary"
+            accentSoftVar="--admin-primary-soft"
+          />
+          <StatCard
+            label="Scheduled Today"
+            value={scheduledToday}
+            icon={Clock}
+            accentVar="--admin-warning"
+            accentSoftVar="--admin-warning-soft"
+          />
+          <StatCard
+            label="Completed"
+            value={completedVisits}
+            icon={CheckCircle2}
+            accentVar="--admin-success"
+            accentSoftVar="--admin-success-soft"
+          />
+          <StatCard
+            label="Cancelled"
+            value={cancelledVisits}
+            icon={XCircle}
+            accentVar="--admin-error"
+            accentSoftVar="rgba(239,68,68,0.1)"
+          />
         </div>
 
-        {/* ── Search & Filters ── */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
-            <Input
-              placeholder="Search by parent, child, or phone..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]"
+        {/* ── SECTION 3: FILTER BAR ── */}
+        <PreOneCard className="!rounded-xl">
+          <div className="p-4 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              />
+              <input
+                type="text"
+                placeholder="Search by parent, child or phone..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-10 w-full rounded-lg border px-3 pl-9 text-sm outline-none transition-colors"
+                style={{
+                  background: 'var(--admin-surface-2)',
+                  borderColor: 'var(--admin-border)',
+                  color: 'var(--admin-text)',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                  e.currentTarget.style.boxShadow =
+                    '0 0 0 2px var(--admin-primary-soft)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'var(--admin-text-subtle)' }}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            <Select
+              value={statusFilter || 'ALL'}
+              onValueChange={(v) => setStatusFilter(v === 'ALL' ? '' : v)}
+            >
+              <SelectTrigger className="w-[140px] h-9 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Statuses</SelectItem>
+                {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                  <SelectItem key={key} value={key}>
+                    {cfg.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                style={{ color: 'var(--admin-error)' }}
+                onClick={clearFilters}
               >
                 <X className="h-3.5 w-3.5" />
-              </button>
+                Clear Filters
+              </Button>
             )}
           </div>
-          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v === 'ALL' ? '' : v)}>
-            <SelectTrigger className="w-[150px] h-9 text-xs">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Statuses</SelectItem>
-              {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                <SelectItem key={key} value={key}>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cfg.color }} />
-                    {cfg.label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs gap-1">
-              <X className="h-3 w-3" />
-              Clear filters
-            </Button>
-          )}
-        </div>
+        </PreOneCard>
 
-        {/* ── Visits Table ── */}
-        <Card className="overflow-hidden">
+        {/* ── SECTION 4: VISITS TABLE ── */}
+        <PreOneCard className="!rounded-xl overflow-hidden">
+          {/* Stats bar */}
+          <div
+            className="flex items-center justify-between border-b px-5 py-3"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className="text-sm"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                Total Visits
+              </span>
+              <span
+                className="rounded-md px-2 py-0.5 text-sm font-bold tabular-nums"
+                style={{
+                  background: 'var(--admin-primary-soft)',
+                  color: 'var(--admin-primary)',
+                }}
+              >
+                {filteredVisits.length}
+              </span>
+            </div>
+          </div>
+
           {loading ? (
-            <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
+            <div
+              className="flex items-center justify-center h-48 text-sm"
+              style={{ color: 'var(--admin-text-subtle)' }}
+            >
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
               Loading visits...
             </div>
           ) : filteredVisits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <MapPin className="h-12 w-12 mb-3" style={{ color: COSMIC_PURPLE[200] }} />
-              <p className="text-[var(--admin-text-muted)] font-medium">No visits found</p>
-              <p className="text-sm text-[var(--admin-text-subtle)] mt-1">
+              <CalendarCheck
+                className="h-10 w-10 mb-3 opacity-40"
+                style={{ color: 'var(--admin-text-muted)' }}
+              />
+              <p
+                className="text-sm font-medium"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
                 {hasActiveFilters
-                  ? 'Try adjusting your filters'
-                  : 'Schedule a campus visit to get started'}
+                  ? 'No visits match your filters'
+                  : 'No visits scheduled yet'}
+              </p>
+              <p
+                className="text-xs mt-1"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              >
+                {hasActiveFilters
+                  ? 'Try adjusting your search or filters.'
+                  : 'Schedule a campus visit for a prospective family.'}
               </p>
               {!hasActiveFilters && (
                 <Button
+                  size="sm"
+                  className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
                   onClick={() => setScheduleOpen(true)}
-                  className="mt-4 gap-1 text-white border-0"
-                  style={{ background: `linear-gradient(135deg, ${COSMIC_PURPLE[600]}, ${COSMIC_PURPLE[400]})` }}
                 >
                   <Plus className="h-4 w-4" />
                   Schedule Visit
@@ -701,147 +860,254 @@ export default function CampusVisitsPage() {
               )}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Parent Name</TableHead>
-                  <TableHead>Child Name</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Assigned Staff</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredVisits.map((visit) => {
-                  const statusCfg = STATUS_CONFIG[visit.status] || STATUS_CONFIG.SCHEDULED;
-                  const visitDate = new Date(visit.date);
-                  const isPastVisit = isPast(visitDate) && !isToday(visitDate);
-
-                  return (
-                    <TableRow
-                      key={visit.id}
-                      className={cn(
-                        'cursor-pointer hover:bg-[var(--admin-surface-2)]/80 transition-colors',
-                        visit.status === 'CANCELLED' && 'opacity-60',
-                        visit.status === 'COMPLETED' && 'opacity-70',
-                      )}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr
+                    className="border-b"
+                    style={{ borderColor: 'var(--admin-border)' }}
+                  >
+                    <th
+                      className="min-w-[180px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
                     >
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
+                      Parent / Child
+                    </th>
+                    <th
+                      className="w-[140px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
+                    >
+                      Date
+                    </th>
+                    <th
+                      className="w-[80px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
+                    >
+                      Time
+                    </th>
+                    <th
+                      className="w-[120px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      className="w-[150px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
+                    >
+                      Assigned Staff
+                    </th>
+                    <th
+                      className="w-[180px] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--admin-text-muted)' }}
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredVisits.map((visit) => {
+                    const statusCfg = STATUS_CONFIG[visit.status];
+                    const visitDate = new Date(visit.date);
+                    const isTodayVisit = isToday(visitDate);
+                    const isTomorrowVisit = isTomorrow(visitDate);
+                    const isPastVisit = isPast(visitDate) && !isTodayVisit;
+                    const isScheduled = visit.status === 'SCHEDULED';
+
+                    const dateColor = !isScheduled
+                      ? 'var(--admin-text-subtle)'
+                      : isPastVisit
+                        ? 'var(--admin-error)'
+                        : isTodayVisit
+                          ? 'var(--admin-warning)'
+                          : isTomorrowVisit
+                            ? 'var(--admin-info)'
+                            : 'var(--admin-text)';
+
+                    const rowOpacity =
+                      visit.status === 'CANCELLED'
+                        ? 0.6
+                        : visit.status === 'COMPLETED'
+                          ? 0.7
+                          : 1;
+
+                    const parentInitial = visit.parentName[0]?.toUpperCase() || '?';
+
+                    return (
+                      <tr
+                        key={visit.id}
+                        className="border-b transition-colors hover:bg-[var(--admin-surface-2)]"
+                        style={{
+                          borderColor: 'var(--admin-border)',
+                          opacity: rowOpacity,
+                        }}
+                      >
+                        {/* Parent / Child */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold flex-shrink-0"
+                              style={{
+                                background: statusCfg.bg,
+                                color: statusCfg.color,
+                              }}
+                            >
+                              {parentInitial}
+                            </div>
+                            <div className="min-w-0">
+                              <div
+                                className="truncate font-medium"
+                                style={{ color: 'var(--admin-text)' }}
+                              >
+                                {visit.parentName}
+                              </div>
+                              <div
+                                className="text-xs flex items-center gap-1"
+                                style={{ color: 'var(--admin-text-subtle)' }}
+                              >
+                                <Baby className="h-3 w-3" />
+                                {visit.childName || '—'}
+                                {visit.parentPhone && (
+                                  <>
+                                    <span className="mx-1">·</span>
+                                    <Phone className="h-3 w-3" />
+                                    <span className="tabular-nums">
+                                      {visit.parentPhone}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Date */}
+                        <td className="px-4 py-3 text-xs">
+                          <span
+                            className="flex items-center gap-1 whitespace-nowrap font-medium tabular-nums"
+                            style={{ color: dateColor }}
+                          >
+                            <Calendar className="h-3 w-3" />
+                            {isTodayVisit
+                              ? 'Today'
+                              : isTomorrowVisit
+                                ? 'Tomorrow'
+                                : format(visitDate, 'dd MMM yyyy')}
+                          </span>
+                          {isPastVisit && isScheduled && (
+                            <span
+                              className="block text-[10px] mt-0.5"
+                              style={{ color: 'var(--admin-error)' }}
+                            >
+                              Past due
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Time */}
+                        <td
+                          className="px-4 py-3 text-xs tabular-nums"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        >
+                          {visit.time}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-4 py-3">
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
                             style={{
-                              backgroundColor: COSMIC_PURPLE[50],
-                              color: COSMIC_PURPLE[600],
+                              background: statusCfg.bg,
+                              color: statusCfg.color,
                             }}
                           >
-                            {visit.parentName?.charAt(0)?.toUpperCase() || '?'}
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{visit.parentName}</p>
-                            {visit.parentPhone && (
-                              <p className="text-xs text-[var(--admin-text-subtle)] flex items-center gap-1">
-                                <Phone className="h-3 w-3" />
-                                {visit.parentPhone}
-                              </p>
+                            {statusCfg.icon}
+                            {statusCfg.label}
+                          </span>
+                        </td>
+
+                        {/* Assigned Staff */}
+                        <td className="px-4 py-3 text-xs">
+                          {visit.assignee ? (
+                            <span
+                              className="flex items-center gap-1.5"
+                              style={{ color: 'var(--admin-text)' }}
+                            >
+                              <UserCircle
+                                className="h-3.5 w-3.5"
+                                style={{ color: 'var(--admin-text-subtle)' }}
+                              />
+                              {visit.assignee.name}
+                            </span>
+                          ) : (
+                            <span style={{ color: 'var(--admin-text-subtle)' }}>
+                              Unassigned
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {isScheduled && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 text-xs gap-1"
+                                  style={{
+                                    color: 'var(--admin-success)',
+                                    borderColor: 'var(--admin-success)',
+                                  }}
+                                  onClick={() => handleMarkCompleted(visit.id)}
+                                >
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  Complete
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-xs gap-1"
+                                  style={{ color: 'var(--admin-error)' }}
+                                  onClick={() => handleCancel(visit.id)}
+                                >
+                                  <XCircle className="h-3 w-3" />
+                                  Cancel
+                                </Button>
+                              </>
+                            )}
+                            {visit.leadId && (
+                              <Link
+                                href={`/admin/admissions/leads/${visit.leadId}`}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-xs gap-1"
+                                  style={{ color: 'var(--admin-primary)' }}
+                                >
+                                  <Eye className="h-3 w-3" />
+                                  View Lead
+                                </Button>
+                              </Link>
                             )}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className="flex items-center gap-1.5">
-                          <Baby className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
-                          {visit.childName}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
-                          <span className={cn(
-                            isToday(visitDate) && 'text-amber-600 font-medium',
-                            isTomorrow(visitDate) && 'text-blue-600',
-                            isPastVisit && visit.status === 'SCHEDULED' && 'text-red-600 font-medium',
-                          )}>
-                            {isToday(visitDate) ? 'Today' : isTomorrow(visitDate) ? 'Tomorrow' : format(visitDate, 'dd MMM yyyy')}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
-                        {visit.time || '—'}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ backgroundColor: statusCfg.bg, color: statusCfg.color }}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: statusCfg.color }} />
-                          {statusCfg.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm text-[var(--admin-text-muted)]">
-                        {visit.assignedStaff ? (
-                          <div className="flex items-center gap-1">
-                            <UserCircle className="h-3.5 w-3.5 text-[var(--admin-text-subtle)]" />
-                            {visit.assignedStaff}
-                          </div>
-                        ) : (
-                          <span className="text-[var(--admin-text-subtle)]">Unassigned</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {visit.status === 'SCHEDULED' && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                onClick={() => handleMarkCompleted(visit.id)}
-                              >
-                                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                                Complete
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
-                                onClick={() => handleCancel(visit.id)}
-                              >
-                                Cancel
-                              </Button>
-                            </>
-                          )}
-                          {visit.leadId && (
-                            <Link href={`/admin/admissions/leads/${visit.leadId}`}>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs"
-                                style={{ color: COSMIC_PURPLE[600] }}
-                              >
-                                <Eye className="h-3.5 w-3.5 mr-1" />
-                                View Lead
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
-        </Card>
+        </PreOneCard>
 
         {/* ── Schedule Visit Dialog ── */}
         <ScheduleVisitDialog
           open={scheduleOpen}
           onOpenChange={setScheduleOpen}
           onVisitCreated={() => {
-            toast.success('Visit scheduled');
+            setLoading(true);
             fetchVisits();
           }}
         />

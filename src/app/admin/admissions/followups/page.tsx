@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { format, isToday, isTomorrow, isPast, isFuture } from 'date-fns';
+import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -13,15 +13,15 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
-  Filter,
   MessageSquare,
   Eye,
   FileText,
-  Check,
-  Circle,
+  ChevronRight,
+  PhoneCall,
+  AlertTriangle,
+  CalendarClock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Select,
@@ -30,44 +30,85 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CRM_COLORS, PORTAL_THEMES } from '@/lib/theme-tokens';
-import { cn } from '@/lib/utils';
+import { PreOneCard } from '@/components/ui/preone-card';
+import { CRM_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
-
-const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface LeadInfo {
   id: string;
   parentName: string;
   childName: string;
-  phone?: string;
   stage: string;
   nextFollowUp: string | null;
 }
 
 interface FollowUpItem {
   id: string;
-  leadId: string;
   type: string;
   dateTime: string;
   outcome: string;
-  nextFollowUp: string | null;
   notes: string;
   createdBy: string | null;
   completedAt: string | null;
-  createdAt: string;
   lead: LeadInfo;
 }
 
-const STAGE_CONFIG: Record<string, { label: string; color: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#9ca3af' },
-  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#3b82f6' },
-  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#8b5cf6' },
-  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f59e0b' },
-  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED?.hex ?? '#10b981' },
-  LOST: { label: 'Lost', color: CRM_COLORS.LOST?.hex ?? '#ef4444' },
+// ── Constants ──
+const STAGE_CONFIG: Record<string, { label: string; color: string; softVar: string; varColor: string }> = {
+  NEW: {
+    label: 'New',
+    color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
+    softVar: 'var(--admin-surface-2)',
+    varColor: 'var(--admin-text-muted)',
+  },
+  CONTACTED: {
+    label: 'Contacted',
+    color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
+    softVar: 'var(--admin-info-soft)',
+    varColor: 'var(--admin-info)',
+  },
+  VISITED: {
+    label: 'Visited',
+    color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
+    softVar: 'var(--admin-primary-soft)',
+    varColor: 'var(--admin-primary)',
+  },
+  APPLIED: {
+    label: 'Applied',
+    color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
+    softVar: 'var(--admin-warning-soft)',
+    varColor: 'var(--admin-warning)',
+  },
+  ENROLLED: {
+    label: 'Enrolled',
+    color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
+    softVar: 'var(--admin-success-soft)',
+    varColor: 'var(--admin-success)',
+  },
+  LOST: {
+    label: 'Lost',
+    color: CRM_COLORS.LOST?.hex ?? '#9ca3af',
+    softVar: 'rgba(239,68,68,0.1)',
+    varColor: 'var(--admin-error)',
+  },
 };
+
+const FILTER_PILLS = [
+  { key: 'all', label: 'All', color: 'var(--admin-primary)', bg: 'var(--admin-primary-soft)' },
+  { key: 'pending', label: 'Pending', color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
+  { key: 'overdue', label: 'Overdue', color: 'var(--admin-error)', bg: 'rgba(239,68,68,0.1)' },
+  { key: 'completed', label: 'Completed', color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+];
+
+const TYPE_OPTIONS = [
+  { value: 'ALL', label: 'All Types' },
+  { value: 'Call', label: 'Call' },
+  { value: 'WhatsApp', label: 'WhatsApp' },
+  { value: 'Email', label: 'Email' },
+  { value: 'Visit', label: 'Visit' },
+  { value: 'Note', label: 'Note' },
+];
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -75,35 +116,137 @@ function getToken(): string | null {
 }
 
 // ── Follow-up Type Icon ──
-function FollowUpTypeIcon({ type }: { type: string }) {
+function FollowUpTypeIcon({ type, className }: { type: string; className?: string }) {
   switch (type) {
-    case 'Call': return <Phone className="h-4 w-4 text-blue-500" />;
-    case 'WhatsApp': return <MessageSquare className="h-4 w-4 text-green-500" />;
-    case 'Email': return <Mail className="h-4 w-4 text-orange-500" />;
-    case 'Visit': return <Eye className="h-4 w-4 text-purple-500" />;
-    default: return <FileText className="h-4 w-4 text-[var(--admin-text-muted)]" />;
+    case 'Call':
+      return <Phone className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-info)' }} />;
+    case 'WhatsApp':
+      return <MessageSquare className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-success)' }} />;
+    case 'Email':
+      return <Mail className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-warning)' }} />;
+    case 'Visit':
+      return <Eye className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-primary)' }} />;
+    default:
+      return <FileText className={className ?? 'h-4 w-4'} style={{ color: 'var(--admin-text-muted)' }} />;
   }
 }
 
+// ── Filter Pill ──
+function FilterPill({
+  label,
+  count,
+  active,
+  activeColor,
+  activeBg,
+  onClick,
+}: {
+  label: string;
+  count?: number;
+  active: boolean;
+  activeColor: string;
+  activeBg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      style={
+        active
+          ? { background: activeBg, color: activeColor }
+          : {
+              background: 'var(--admin-surface-2)',
+              color: 'var(--admin-text-muted)',
+            }
+      }
+    >
+      {label}
+      {count != null && (
+        <span
+          className="rounded-full px-1.5 text-[10px] font-semibold"
+          style={
+            active
+              ? { background: activeColor, color: activeBg }
+              : { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)' }
+          }
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ── Stat Card ──
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  accentVar,
+  accentSoftVar,
+  sublabel,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ElementType;
+  accentVar: string;
+  accentSoftVar: string;
+  sublabel?: string;
+}) {
+  return (
+    <PreOneCard className="!rounded-xl">
+      <div className="p-4 flex items-center gap-4">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
+          style={{ background: `var(${accentSoftVar})` }}
+        >
+          <Icon className="h-5 w-5" style={{ color: `var(${accentVar})` }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div
+            className="text-xs font-medium"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
+            {label}
+          </div>
+          <div
+            className="text-xl font-bold tabular-nums"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            {value}
+          </div>
+          {sublabel && (
+            <div
+              className="text-[11px] mt-0.5"
+              style={{ color: 'var(--admin-text-subtle)' }}
+            >
+              {sublabel}
+            </div>
+          )}
+        </div>
+      </div>
+    </PreOneCard>
+  );
+}
+
 /**
- * CRM Follow-ups page — Shows all follow-ups across all leads with completion support.
+ * CRM Follow-ups page — Queue of scheduled follow-ups with quick complete action.
  */
 export default function CrmFollowupsPage() {
   const [followUps, setFollowUps] = useState<FollowUpItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'overdue' | 'completed'>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [completing, setCompleting] = useState<string | null>(null);
+  const [upcomingLeads, setUpcomingLeads] = useState<LeadInfo[]>([]);
 
   const fetchFollowUps = useCallback(async () => {
     try {
+      setLoading(true);
       const token = getToken();
       const params = new URLSearchParams();
-      if (filter === 'pending') params.set('status', 'pending');
-      else if (filter === 'completed') params.set('status', 'completed');
-      else if (filter === 'overdue') params.set('status', 'overdue');
+      if (filter !== 'all') params.set('status', filter);
       if (typeFilter) params.set('type', typeFilter);
-
       const res = await fetch(`/api/crm/followups?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -113,24 +256,11 @@ export default function CrmFollowupsPage() {
       }
     } catch (err) {
       console.error('Failed to fetch follow-ups:', err);
+      toast.error('Failed to load follow-ups');
     } finally {
       setLoading(false);
     }
   }, [filter, typeFilter]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchFollowUps();
-  }, [fetchFollowUps]);
-
-  // Also fetch leads with nextFollowUp for the upcoming sidebar
-  const [upcomingLeads, setUpcomingLeads] = useState<Array<{
-    id: string;
-    parentName: string;
-    childName: string;
-    stage: string;
-    nextFollowUp: string | null;
-  }>>([]);
 
   const fetchUpcomingLeads = useCallback(async () => {
     try {
@@ -140,30 +270,32 @@ export default function CrmFollowupsPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        const withFollowUp = (data.leads || [])
-          .filter((l: { nextFollowUp: string | null; stage: string }) => l.nextFollowUp && l.stage !== 'ENROLLED' && l.stage !== 'LOST')
-          .map((l: { id: string; parentName: string; childName: string; stage: string; nextFollowUp: string | null }) => ({
-            id: l.id,
-            parentName: l.parentName,
-            childName: l.childName,
-            stage: l.stage,
-            nextFollowUp: l.nextFollowUp,
-          }))
-          .sort((a: { nextFollowUp: string | null }, b: { nextFollowUp: string | null }) =>
-            new Date(a.nextFollowUp!).getTime() - new Date(b.nextFollowUp!).getTime()
-          );
-        setUpcomingLeads(withFollowUp);
+        const filtered = (data.leads || [])
+          .filter(
+            (l: LeadInfo) =>
+              l.nextFollowUp && l.stage !== 'ENROLLED' && l.stage !== 'LOST',
+          )
+          .sort(
+            (a: LeadInfo, b: LeadInfo) =>
+              new Date(a.nextFollowUp!).getTime() -
+              new Date(b.nextFollowUp!).getTime(),
+          )
+          .slice(0, 15);
+        setUpcomingLeads(filtered);
       }
     } catch (err) {
-      console.error('Failed to fetch leads:', err);
+      console.error('Failed to fetch upcoming leads:', err);
     }
   }, []);
+
+  useEffect(() => {
+    fetchFollowUps();
+  }, [fetchFollowUps]);
 
   useEffect(() => {
     fetchUpcomingLeads();
   }, [fetchUpcomingLeads]);
 
-  // Mark follow-up as completed
   const handleComplete = async (followUpId: string, outcome?: string) => {
     setCompleting(followUpId);
     try {
@@ -177,13 +309,14 @@ export default function CrmFollowupsPage() {
         body: JSON.stringify({ outcome: outcome || 'Completed' }),
       });
       if (res.ok) {
-        toast.success('Follow-up marked as completed');
+        toast.success('Follow-up marked complete');
         fetchFollowUps();
         fetchUpcomingLeads();
       } else {
         toast.error('Failed to complete follow-up');
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to complete follow-up:', err);
       toast.error('Failed to complete follow-up');
     } finally {
       setCompleting(null);
@@ -191,310 +324,486 @@ export default function CrmFollowupsPage() {
   };
 
   // Stats
-  const pendingCount = followUps.filter((f) => !f.completedAt && new Date(f.dateTime) >= new Date()).length;
-  const overdueCount = followUps.filter((f) => !f.completedAt && isPast(new Date(f.dateTime)) && !isToday(new Date(f.dateTime))).length;
-  const completedCount = followUps.filter((f) => f.completedAt).length;
-  const todayCount = upcomingLeads.filter((l) => l.nextFollowUp && isToday(new Date(l.nextFollowUp))).length;
+  const now = new Date();
+  const pendingCount = followUps.filter(
+    (fu) => !fu.completedAt && new Date(fu.dateTime) >= now,
+  ).length;
+  const overdueCount = followUps.filter(
+    (fu) =>
+      !fu.completedAt &&
+      isPast(new Date(fu.dateTime)) &&
+      !isToday(new Date(fu.dateTime)),
+  ).length;
+  const completedCount = followUps.filter((fu) => fu.completedAt).length;
+  const todayCount = upcomingLeads.filter(
+    (l) => l.nextFollowUp && isToday(new Date(l.nextFollowUp)),
+  ).length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+      {/* ── SECTION 1: HEADER ── */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Link href="/admin/admissions">
             <Button variant="ghost" size="sm" className="gap-1">
               <ArrowLeft className="h-4 w-4" />
-              Back to CRM
+              Back
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
-              <Phone className="h-6 w-6 text-portal-600" />
-              Follow-ups
-            </h1>
-            <p className="text-sm text-[var(--admin-text-muted)] mt-1">Track upcoming follow-ups and never miss a callback</p>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-success-soft)' }}
+            >
+              <PhoneCall
+                className="h-5 w-5"
+                style={{ color: 'var(--admin-success)' }}
+              />
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                Follow-up Queue
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                Track scheduled calls, messages, and visits
+              </p>
+            </div>
           </div>
         </div>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => { setLoading(true); fetchFollowUps(); fetchUpcomingLeads(); }}
-          className="gap-1"
+          className="gap-2"
+          onClick={() => {
+            fetchFollowUps();
+            fetchUpcomingLeads();
+            toast.success('Refreshed');
+          }}
         >
-          <RefreshCw className="h-3.5 w-3.5" />
-          Refresh
+          <RefreshCw className="h-4 w-4" />
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-3">
-        <Card className="p-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Calendar className="h-4 w-4 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-amber-600">{todayCount}</p>
-              <p className="text-xs text-[var(--admin-text-muted)]">Due Today</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Clock className="h-4 w-4 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-600">{pendingCount}</p>
-              <p className="text-xs text-[var(--admin-text-muted)]">Pending</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-red-50 flex items-center justify-center">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-              <p className="text-xs text-[var(--admin-text-muted)]">Overdue</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-600">{completedCount}</p>
-              <p className="text-xs text-[var(--admin-text-muted)]">Completed</p>
-            </div>
-          </div>
-        </Card>
+      {/* ── SECTION 2: STAT CARDS ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Due Today"
+          value={todayCount}
+          icon={Clock}
+          accentVar="--admin-warning"
+          accentSoftVar="--admin-warning-soft"
+        />
+        <StatCard
+          label="Pending"
+          value={pendingCount}
+          icon={PhoneCall}
+          accentVar="--admin-info"
+          accentSoftVar="--admin-info-soft"
+        />
+        <StatCard
+          label="Overdue"
+          value={overdueCount}
+          icon={AlertTriangle}
+          accentVar="--admin-error"
+          accentSoftVar="rgba(239,68,68,0.1)"
+        />
+        <StatCard
+          label="Completed"
+          value={completedCount}
+          icon={CheckCircle2}
+          accentVar="--admin-success"
+          accentSoftVar="--admin-success-soft"
+        />
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3">
-        {(['all', 'pending', 'overdue', 'completed'] as const).map((f) => (
-          <Button
-            key={f}
-            variant={filter === f ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter(f)}
-            className={cn('capitalize', filter === f && 'bg-brand-gradient text-white border-0')}
+      {/* ── SECTION 3: FILTER BAR ── */}
+      <PreOneCard className="!rounded-xl">
+        <div className="p-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {FILTER_PILLS.map((pill) => {
+              const count =
+                pill.key === 'all'
+                  ? followUps.length
+                  : pill.key === 'pending'
+                    ? pendingCount
+                    : pill.key === 'overdue'
+                      ? overdueCount
+                      : completedCount;
+              return (
+                <FilterPill
+                  key={pill.key}
+                  label={pill.label}
+                  count={count}
+                  active={filter === pill.key}
+                  activeColor={pill.color}
+                  activeBg={pill.bg}
+                  onClick={() => setFilter(pill.key as typeof filter)}
+                />
+              );
+            })}
+          </div>
+          <Select
+            value={typeFilter || 'ALL'}
+            onValueChange={(v) => setTypeFilter(v === 'ALL' ? '' : v)}
           >
-            {f === 'all' ? 'All' : f === 'pending' ? 'Pending' : f === 'overdue' ? 'Overdue' : 'Completed'}
-          </Button>
-        ))}
-
-        <div className="ml-auto">
-          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v === 'ALL' ? '' : v)}>
-            <SelectTrigger className="w-[130px] h-8 text-xs">
+            <SelectTrigger className="w-[140px] h-9 text-xs">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Types</SelectItem>
-              <SelectItem value="Call">Call</SelectItem>
-              <SelectItem value="WhatsApp">WhatsApp</SelectItem>
-              <SelectItem value="Email">Email</SelectItem>
-              <SelectItem value="Visit">Visit</SelectItem>
-              <SelectItem value="Note">Note</SelectItem>
+              {TYPE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </PreOneCard>
 
-      {/* Two Column Layout: Follow-ups + Upcoming */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main: Follow-up List */}
-        <div className="lg:col-span-2 space-y-3">
-          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">
-            {filter === 'all' ? 'All Follow-ups' : filter === 'pending' ? 'Pending Follow-ups' : filter === 'overdue' ? 'Overdue Follow-ups' : 'Completed Follow-ups'}
-          </h3>
+      {/* ── SECTION 4: TWO-COLUMN LAYOUT ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Main: Follow-up list */}
+        <PreOneCard className="lg:col-span-2 !rounded-xl overflow-hidden">
+          <div
+            className="border-b px-5 py-3 flex items-center justify-between"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            <h3
+              className="text-sm font-semibold"
+              style={{ color: 'var(--admin-text)' }}
+            >
+              Follow-ups ({followUps.length})
+            </h3>
+          </div>
 
           {loading ? (
-            <div className="flex items-center justify-center h-48 text-[var(--admin-text-subtle)]">
+            <div
+              className="flex items-center justify-center h-48 text-sm"
+              style={{ color: 'var(--admin-text-subtle)' }}
+            >
               <RefreshCw className="h-5 w-5 animate-spin mr-2" />
-              Loading...
+              Loading follow-ups...
             </div>
           ) : followUps.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Calendar className="h-12 w-12 text-[var(--admin-text-subtle)] mx-auto mb-3" />
-              <p className="text-[var(--admin-text-muted)] font-medium">No follow-ups found</p>
-              <p className="text-sm text-[var(--admin-text-subtle)] mt-1">
-                {filter === 'completed' ? 'No completed follow-ups yet' : 'Add follow-up dates to leads to see them here'}
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <PhoneCall
+                className="h-10 w-10 mb-3 opacity-40"
+                style={{ color: 'var(--admin-text-muted)' }}
+              />
+              <p
+                className="text-sm font-medium"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                No follow-ups in this view
               </p>
-            </Card>
+              <p
+                className="text-xs mt-1"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              >
+                Try a different filter or schedule a new follow-up from a lead.
+              </p>
+            </div>
           ) : (
-            followUps.map((fu) => {
-              const fuDate = new Date(fu.dateTime);
-              const isOverdue = !fu.completedAt && isPast(fuDate) && !isToday(fuDate);
-              const isTodayFU = !fu.completedAt && isToday(fuDate);
-              const isCompleted = !!fu.completedAt;
-              const stageCfg = STAGE_CONFIG[fu.lead?.stage] || STAGE_CONFIG.NEW;
+            <div
+              className="divide-y"
+              style={{ borderColor: 'var(--admin-border)' }}
+            >
+              {followUps.map((fu) => {
+                const fuDate = new Date(fu.dateTime);
+                const isCompleted = !!fu.completedAt;
+                const isOverdue =
+                  !isCompleted &&
+                  isPast(fuDate) &&
+                  !isToday(fuDate);
+                const isTodayFU = isToday(fuDate);
+                const isTomorrowFU = isTomorrow(fuDate);
 
-              return (
-                <Card
-                  key={fu.id}
-                  className={cn(
-                    'p-4 hover:shadow-md transition-all duration-200 border-l-4',
-                    isCompleted && 'border-l-green-500 bg-green-50/20 opacity-70',
-                    isOverdue && 'border-l-red-500 bg-red-50/30',
-                    isTodayFU && 'border-l-amber-500 bg-amber-50/30',
-                    !isOverdue && !isTodayFU && !isCompleted && 'border-l-blue-500',
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className={cn(
-                        'h-10 w-10 rounded-full flex items-center justify-center shrink-0',
-                        isCompleted ? 'bg-green-50' : 'bg-portal-50',
-                      )}>
-                        {isCompleted ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <FollowUpTypeIcon type={fu.type} />
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className={cn('font-medium', isCompleted && 'line-through text-[var(--admin-text-subtle)]')}>
-                            {fu.lead?.parentName || 'Unknown'}
-                          </p>
-                          <span
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium"
-                            style={{ backgroundColor: stageCfg.color + '15', color: stageCfg.color }}
-                          >
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: stageCfg.color }} />
-                            {stageCfg.label}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Child: {fu.lead?.childName || 'N/A'} &middot; {fu.type}
-                        </p>
-                        <p className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed">
-                          &quot;{fu.notes}&quot;
-                        </p>
-                        {fu.outcome && isCompleted && (
-                          <p className="text-xs text-green-600 mt-1 font-medium">
-                            Outcome: {fu.outcome}
-                          </p>
-                        )}
-                        {fu.createdBy && (
-                          <p className="text-[11px] text-[var(--admin-text-subtle)] mt-1">— {fu.createdBy}</p>
-                        )}
-                      </div>
-                    </div>
+                const borderColor = isCompleted
+                  ? 'var(--admin-success)'
+                  : isOverdue
+                    ? 'var(--admin-error)'
+                    : isTodayFU
+                      ? 'var(--admin-warning)'
+                      : 'var(--admin-info)';
 
-                    <div className="text-right shrink-0 ml-4">
-                      <div className={cn(
-                        'text-sm font-medium',
-                        isOverdue && 'text-red-600',
-                        isTodayFU && 'text-amber-600',
-                        isCompleted && 'text-green-600',
-                        !isOverdue && !isTodayFU && !isCompleted && isFuture(fuDate) && 'text-[var(--admin-text-muted)]',
-                      )}>
-                        {isTodayFU ? 'Today' : isTomorrow(fuDate) ? 'Tomorrow' : format(fuDate, 'dd MMM yyyy')}
-                      </div>
-                      <div className="text-xs text-[var(--admin-text-subtle)]">
-                        {format(fuDate, 'hh:mm a')}
-                      </div>
+                const stageCfg = STAGE_CONFIG[fu.lead.stage] || STAGE_CONFIG.NEW;
 
-                      <div className="flex items-center gap-1 mt-2 justify-end">
-                        {isOverdue && (
-                          <Badge variant="destructive" className="text-[10px] h-5">
-                            <AlertCircle className="h-3 w-3 mr-0.5" />
-                            Overdue
-                          </Badge>
-                        )}
-                        {isTodayFU && (
-                          <Badge className="text-[10px] h-5 bg-amber-100 text-amber-700 border-amber-200">
-                            <Clock className="h-3 w-3 mr-0.5" />
-                            Due Today
-                          </Badge>
-                        )}
-                      </div>
-
-                      {!isCompleted && (
-                        <Button
-                          size="sm"
-                          className={cn(
-                            'mt-2 h-7 text-xs gap-1',
-                            isOverdue ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover',
-                          )}
-                          disabled={completing === fu.id}
-                          onClick={() => handleComplete(fu.id)}
+                return (
+                  <div
+                    key={fu.id}
+                    className="flex items-start gap-3 px-5 py-3.5 border-l-4 transition-colors hover:bg-[var(--admin-surface-2)]"
+                    style={{ borderColor }}
+                  >
+                    {/* Icon */}
+                    <div className="flex-shrink-0 mt-0.5">
+                      {isCompleted ? (
+                        <div
+                          className="flex h-8 w-8 items-center justify-center rounded-lg"
+                          style={{
+                            background: 'var(--admin-success-soft)',
+                          }}
                         >
-                          {completing === fu.id ? (
-                            <RefreshCw className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Check className="h-3 w-3" />
-                          )}
-                          Complete
-                        </Button>
+                          <CheckCircle2
+                            className="h-4 w-4"
+                            style={{ color: 'var(--admin-success)' }}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="flex h-8 w-8 items-center justify-center rounded-lg"
+                          style={{ background: 'var(--admin-surface-2)' }}
+                        >
+                          <FollowUpTypeIcon type={fu.type} />
+                        </div>
                       )}
                     </div>
+
+                    {/* Body */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Link
+                          href={`/admin/admissions/leads/${fu.lead.id}`}
+                          className="text-sm font-medium hover:underline"
+                          style={{ color: 'var(--admin-text)' }}
+                        >
+                          {fu.lead.parentName}
+                        </Link>
+                        <span
+                          className="text-xs"
+                          style={{ color: 'var(--admin-text-subtle)' }}
+                        >
+                          · {fu.lead.childName}
+                        </span>
+                        <span
+                          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                          style={{
+                            background: stageCfg.softVar,
+                            color: stageCfg.varColor,
+                          }}
+                        >
+                          {stageCfg.label}
+                        </span>
+                        <Badge
+                          className="text-[10px] h-5 font-medium"
+                          style={{
+                            background: 'var(--admin-surface-2)',
+                            color: 'var(--admin-text-muted)',
+                            border: 'none',
+                          }}
+                        >
+                          {fu.type}
+                        </Badge>
+                      </div>
+
+                      {fu.notes && (
+                        <p
+                          className="text-xs mt-1 line-clamp-2"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        >
+                          {fu.notes}
+                        </p>
+                      )}
+
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span
+                          className="text-[11px] flex items-center gap-1 tabular-nums"
+                          style={{
+                            color: isOverdue
+                              ? 'var(--admin-error)'
+                              : isTodayFU
+                                ? 'var(--admin-warning)'
+                                : isTomorrowFU
+                                  ? 'var(--admin-info)'
+                                  : 'var(--admin-text-subtle)',
+                            fontWeight: isOverdue || isTodayFU ? 600 : 400,
+                          }}
+                        >
+                          <Calendar className="h-3 w-3" />
+                          {isTodayFU
+                            ? 'Today'
+                            : isTomorrowFU
+                              ? 'Tomorrow'
+                              : format(fuDate, 'dd MMM yyyy, hh:mm a')}
+                        </span>
+
+                        {isOverdue && !isCompleted && (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              background: 'rgba(239,68,68,0.1)',
+                              color: 'var(--admin-error)',
+                            }}
+                          >
+                            <AlertTriangle className="h-3 w-3" />
+                            Overdue
+                          </span>
+                        )}
+
+                        {isCompleted && fu.outcome && (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              background: 'var(--admin-success-soft)',
+                              color: 'var(--admin-success)',
+                            }}
+                          >
+                            <CheckCircle2 className="h-3 w-3" />
+                            {fu.outcome}
+                          </span>
+                        )}
+
+                        {fu.createdBy && (
+                          <span
+                            className="text-[11px]"
+                            style={{ color: 'var(--admin-text-subtle)' }}
+                          >
+                            by {fu.createdBy}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action */}
+                    {!isCompleted && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 flex-shrink-0"
+                        onClick={() => handleComplete(fu.id)}
+                        disabled={completing === fu.id}
+                      >
+                        {completing === fu.id ? (
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        )}
+                        Complete
+                      </Button>
+                    )}
                   </div>
-                </Card>
-              );
-            })
+                );
+              })}
+            </div>
           )}
-        </div>
+        </PreOneCard>
 
         {/* Sidebar: Upcoming Follow-ups */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-[var(--admin-text-muted)]">Upcoming Follow-ups</h3>
-          {upcomingLeads.length === 0 ? (
-            <Card className="p-6 text-center">
-              <Calendar className="h-8 w-8 text-[var(--admin-text-subtle)] mx-auto mb-2" />
-              <p className="text-xs text-[var(--admin-text-subtle)]">No upcoming follow-ups</p>
-            </Card>
-          ) : (
-            upcomingLeads.slice(0, 15).map((lead) => {
-              const followUpDate = new Date(lead.nextFollowUp!);
-              const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
-              const isOverdue = isPast(followUpDate) && !isToday(followUpDate);
+        <PreOneCard className="!rounded-xl overflow-hidden">
+          <div
+            className="border-b px-5 py-3 flex items-center gap-2"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            <CalendarClock
+              className="h-4 w-4"
+              style={{ color: 'var(--admin-text-muted)' }}
+            />
+            <h3
+              className="text-sm font-semibold"
+              style={{ color: 'var(--admin-text)' }}
+            >
+              Upcoming Follow-ups
+            </h3>
+          </div>
 
-              return (
-                <Card
-                  key={lead.id}
-                  className={cn(
-                    'p-3 hover:shadow-sm transition-all border-l-3',
-                    isOverdue && 'border-l-red-500',
-                    isToday(followUpDate) && 'border-l-amber-500',
-                    !isOverdue && !isToday(followUpDate) && 'border-l-blue-300',
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-[var(--admin-text)] truncate">{lead.parentName}</p>
-                      <p className="text-xs text-[var(--admin-text-muted)] truncate">{lead.childName}</p>
+          {upcomingLeads.length === 0 ? (
+            <div
+              className="flex flex-col items-center justify-center py-10 text-center"
+            >
+              <CalendarClock
+                className="h-8 w-8 mb-2 opacity-40"
+                style={{ color: 'var(--admin-text-muted)' }}
+              />
+              <p
+                className="text-sm font-medium"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                Nothing scheduled
+              </p>
+              <p
+                className="text-xs mt-1"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              >
+                Schedule follow-ups from lead detail pages.
+              </p>
+            </div>
+          ) : (
+            <div
+              className="divide-y"
+              style={{ borderColor: 'var(--admin-border)' }}
+            >
+              {upcomingLeads.map((lead) => {
+                const fuDate = new Date(lead.nextFollowUp!);
+                const isTodayFU = isToday(fuDate);
+                const isOverdue =
+                  isPast(fuDate) && !isTodayFU;
+                const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
+
+                return (
+                  <Link
+                    key={lead.id}
+                    href={`/admin/admissions/leads/${lead.id}`}
+                    className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--admin-surface-2)]"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className="truncate text-sm font-medium"
+                        style={{ color: 'var(--admin-text)' }}
+                      >
+                        {lead.parentName}
+                      </div>
+                      <div
+                        className="truncate text-xs flex items-center gap-1.5"
+                        style={{ color: 'var(--admin-text-subtle)' }}
+                      >
+                        <Calendar
+                          className="h-3 w-3"
+                          style={{
+                            color: isOverdue
+                              ? 'var(--admin-error)'
+                              : isTodayFU
+                                ? 'var(--admin-warning)'
+                                : 'var(--admin-text-subtle)',
+                          }}
+                        />
+                        <span
+                          className="tabular-nums"
+                          style={{
+                            color: isOverdue
+                              ? 'var(--admin-error)'
+                              : isTodayFU
+                                ? 'var(--admin-warning)'
+                                : 'var(--admin-text-subtle)',
+                            fontWeight: isOverdue || isTodayFU ? 600 : 400,
+                          }}
+                        >
+                          {isTodayFU
+                            ? 'Today'
+                            : isTomorrow(fuDate)
+                              ? 'Tomorrow'
+                              : format(fuDate, 'dd MMM')}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right shrink-0 ml-2">
-                      <p className={cn(
-                        'text-xs font-medium',
-                        isOverdue ? 'text-red-600' : isToday(followUpDate) ? 'text-amber-600' : 'text-[var(--admin-text-muted)]',
-                      )}>
-                        {isToday(followUpDate) ? 'Today' : isTomorrow(followUpDate) ? 'Tomorrow' : format(followUpDate, 'dd MMM')}
-                      </p>
-                      <p className="text-[10px] text-[var(--admin-text-subtle)]">{format(followUpDate, 'hh:mm a')}</p>
-                    </div>
-                  </div>
-                  <div className="mt-1">
                     <span
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium"
-                      style={{ backgroundColor: stageCfg.color + '15', color: stageCfg.color }}
+                      className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium flex-shrink-0"
+                      style={{ background: stageCfg.softVar, color: stageCfg.varColor }}
                     >
-                      <span className="h-1 w-1 rounded-full" style={{ backgroundColor: stageCfg.color }} />
                       {stageCfg.label}
                     </span>
-                  </div>
-                </Card>
-              );
-            })
+                    <ChevronRight
+                      className="h-3.5 w-3.5 flex-shrink-0"
+                      style={{ color: 'var(--admin-text-subtle)' }}
+                    />
+                  </Link>
+                );
+              })}
+            </div>
           )}
-        </div>
+        </PreOneCard>
       </div>
     </div>
   );

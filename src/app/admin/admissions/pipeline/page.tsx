@@ -3,19 +3,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { format, isTomorrow, isToday } from 'date-fns';
 import {
-  Megaphone,
+  ArrowLeft,
   Plus,
   LayoutGrid,
   List,
   Search,
   Filter,
   Phone,
-  Mail,
   Calendar,
-  Star,
   Tag,
   UserCircle,
-  ChevronDown,
   X,
   RefreshCw,
   BarChart3,
@@ -26,13 +23,13 @@ import {
   CheckCircle2,
   IndianRupee,
   GripVertical,
-  ArrowUpRight,
   CircleDot,
+  ArrowRightLeft,
+  Megaphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -49,13 +46,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { CRM_COLORS, PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
+import { CRM_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
 import { PageTransition } from '@/components/ui/page-transition';
-import { AnimatedCard } from '@/components/ui/animated-card';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { AddLeadDialog } from '@/components/add-lead-dialog';
 import { LeadDetailDrawer } from '@/components/lead-detail-drawer';
 import { CrmAnalytics } from '@/components/crm-analytics';
@@ -125,13 +121,65 @@ interface PipelineStage {
 }
 
 // ── Constants ──
-const STAGE_CONFIG: Record<string, { label: string; color: string; cardBg: string; textColor: string }> = {
-  NEW: { label: 'New', color: CRM_COLORS.NEW?.hex ?? '#3b82f6', cardBg: 'bg-white', textColor: 'text-[var(--admin-text-muted)]' },
-  CONTACTED: { label: 'Contacted', color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6', cardBg: 'bg-blue-50', textColor: 'text-blue-600' },
-  VISITED: { label: 'Visited', color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b', cardBg: 'bg-purple-50', textColor: 'text-purple-600' },
-  APPLIED: { label: 'Applied', color: CRM_COLORS.APPLICATION?.hex ?? '#f97316', cardBg: 'bg-yellow-50', textColor: 'text-yellow-600' },
-  ENROLLED: { label: 'Enrolled', color: CRM_COLORS.ENROLLED?.hex ?? '#10b981', cardBg: 'bg-green-50', textColor: 'text-green-600' },
-  LOST: { label: 'Lost', color: CRM_COLORS.LOST?.hex ?? '#9ca3af', cardBg: 'bg-red-50', textColor: 'text-red-600' },
+const STAGE_CONFIG: Record<
+  string,
+  {
+    label: string;
+    color: string;
+    cardBg: string;
+    textColor: string;
+    softVar: string;
+    varColor: string;
+  }
+> = {
+  NEW: {
+    label: 'New',
+    color: CRM_COLORS.NEW?.hex ?? '#3b82f6',
+    cardBg: 'bg-white',
+    textColor: 'text-[var(--admin-text-muted)]',
+    softVar: 'var(--admin-surface-2)',
+    varColor: 'var(--admin-text-muted)',
+  },
+  CONTACTED: {
+    label: 'Contacted',
+    color: CRM_COLORS.CONTACTED?.hex ?? '#8b5cf6',
+    cardBg: 'bg-blue-50',
+    textColor: 'text-blue-600',
+    softVar: 'var(--admin-info-soft)',
+    varColor: 'var(--admin-info)',
+  },
+  VISITED: {
+    label: 'Visited',
+    color: CRM_COLORS.TOUR_SCHEDULED?.hex ?? '#f59e0b',
+    cardBg: 'bg-purple-50',
+    textColor: 'text-purple-600',
+    softVar: 'var(--admin-primary-soft)',
+    varColor: 'var(--admin-primary)',
+  },
+  APPLIED: {
+    label: 'Applied',
+    color: CRM_COLORS.APPLICATION?.hex ?? '#f97316',
+    cardBg: 'bg-yellow-50',
+    textColor: 'text-yellow-600',
+    softVar: 'var(--admin-warning-soft)',
+    varColor: 'var(--admin-warning)',
+  },
+  ENROLLED: {
+    label: 'Enrolled',
+    color: CRM_COLORS.ENROLLED?.hex ?? '#10b981',
+    cardBg: 'bg-green-50',
+    textColor: 'text-green-600',
+    softVar: 'var(--admin-success-soft)',
+    varColor: 'var(--admin-success)',
+  },
+  LOST: {
+    label: 'Lost',
+    color: CRM_COLORS.LOST?.hex ?? '#9ca3af',
+    cardBg: 'bg-red-50',
+    textColor: 'text-red-600',
+    softVar: 'rgba(239,68,68,0.1)',
+    varColor: 'var(--admin-error)',
+  },
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -149,10 +197,25 @@ const SOURCE_LABELS: Record<string, string> = {
   OTHER: 'Other',
 };
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  HIGH: { label: 'High', color: 'text-red-600', bg: 'bg-red-50' },
-  NORMAL: { label: 'Medium', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  LOW: { label: 'Low', color: 'text-[var(--admin-text-muted)]', bg: 'bg-[var(--admin-surface-2)]' },
+const PRIORITY_CONFIG: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
+  HIGH: {
+    label: 'High',
+    color: 'var(--admin-error)',
+    bg: 'rgba(239,68,68,0.1)',
+  },
+  NORMAL: {
+    label: 'Medium',
+    color: 'var(--admin-warning)',
+    bg: 'var(--admin-warning-soft)',
+  },
+  LOW: {
+    label: 'Low',
+    color: 'var(--admin-text-muted)',
+    bg: 'var(--admin-surface-2)',
+  },
 };
 
 const STAGE_KEYS = ['NEW', 'CONTACTED', 'VISITED', 'APPLIED', 'ENROLLED', 'LOST'] as const;
@@ -168,7 +231,10 @@ function PipelineSkeleton() {
     <div className="flex gap-4 overflow-x-auto pb-4">
       {STAGE_KEYS.map((key) => (
         <div key={key} className="flex flex-col min-w-[280px] w-[280px]">
-          <div className="flex items-center justify-between p-3 rounded-t-xl bg-[var(--admin-surface-2)]">
+          <div
+            className="flex items-center justify-between p-3 rounded-t-xl"
+            style={{ background: 'var(--admin-surface-2)' }}
+          >
             <div className="flex items-center gap-2">
               <Skeleton className="h-3 w-3 rounded-full" />
               <Skeleton className="h-4 w-20" />
@@ -176,7 +242,10 @@ function PipelineSkeleton() {
             </div>
             <Skeleton className="h-3 w-16" />
           </div>
-          <div className="flex flex-col gap-2 p-2 bg-[var(--admin-surface-2)]/50 rounded-b-xl min-h-[200px] border border-t-0 border-[var(--admin-border)]">
+          <div
+            className="flex flex-col gap-2 p-2 rounded-b-xl min-h-[200px] border border-t-0"
+            style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)' }}
+          >
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-32 w-full rounded-lg" />
             ))}
@@ -190,7 +259,7 @@ function PipelineSkeleton() {
 // ── Loading Skeleton for List View ──
 function ListSkeleton() {
   return (
-    <Card className="overflow-hidden">
+    <PreOneCard className="overflow-hidden !rounded-xl">
       <div className="p-4 space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex items-center gap-4">
@@ -203,13 +272,26 @@ function ListSkeleton() {
           </div>
         ))}
       </div>
-    </Card>
+    </PreOneCard>
   );
 }
 
 // ── Lead Card (Sortable) ──
-function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+function LeadCard({
+  lead,
+  onClick,
+}: {
+  lead: Lead;
+  onClick: (lead: Lead) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: lead.id,
     data: { lead },
   });
@@ -223,67 +305,92 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
   const stageConfig = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
   const priorityConfig = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.NORMAL;
   const followUpDate = lead.nextFollowUp ? new Date(lead.nextFollowUp) : null;
-  const isFollowUpSoon = followUpDate && (isTomorrow(followUpDate) || isToday(followUpDate));
+  const isFollowUpSoon =
+    followUpDate && (isTomorrow(followUpDate) || isToday(followUpDate));
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card
+      <div
         className={cn(
-          'p-3 cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 group',
-          stageConfig.cardBg,
-          isDragging && 'shadow-lg rotate-2'
+          'p-3 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200 border-l-4 group',
+          isDragging && 'shadow-lg rotate-2',
         )}
-        style={{ borderLeftColor: stageConfig.color }}
+        style={{
+          background: 'var(--admin-surface)',
+          borderLeftColor: stageConfig.color,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}
         onClick={() => onClick(lead)}
       >
         <div className="space-y-2">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-sm flex-shrink-0">🧒</span>
-              <span className="font-semibold text-[var(--admin-text)] text-sm leading-tight truncate">
+              <GripVertical
+                className="h-3.5 w-3.5 flex-shrink-0 opacity-30"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              />
+              <span
+                className="font-semibold text-sm leading-tight truncate"
+                style={{ color: 'var(--admin-text)' }}
+              >
                 {lead.childName}
               </span>
             </div>
             <span
-              className={cn(
-                'text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0',
-                priorityConfig.bg,
-                priorityConfig.color
-              )}
+              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
+              style={{ background: priorityConfig.bg, color: priorityConfig.color }}
             >
               {priorityConfig.label}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
+          <div
+            className="flex items-center gap-1.5 text-xs"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
             <UserCircle className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{lead.parentName}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
+          <div
+            className="flex items-center gap-1.5 text-xs tabular-nums"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
             <Phone className="h-3 w-3 flex-shrink-0" />
             <span>{lead.parentPhone}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1 text-[var(--admin-text-muted)]">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span
+              className="flex items-center gap-1"
+              style={{ color: 'var(--admin-text-muted)' }}
+            >
               <Tag className="h-3 w-3 flex-shrink-0" />
               {SOURCE_LABELS[lead.source] || lead.source}
             </span>
           </div>
 
-          {lead.estimatedValue && (
-            <div className="text-xs font-medium text-[var(--admin-text-muted)]">
-              💰 Est: ₹{lead.estimatedValue.toLocaleString('en-IN')}
+          {lead.estimatedValue != null && (
+            <div
+              className="text-xs font-medium flex items-center gap-1 tabular-nums"
+              style={{ color: 'var(--admin-text)' }}
+            >
+              <IndianRupee className="h-3 w-3" />
+              {lead.estimatedValue.toLocaleString('en-IN')}
             </div>
           )}
 
           {followUpDate && (
             <div
               className={cn(
-                'text-[11px] flex items-center gap-1',
-                isFollowUpSoon ? 'text-orange-600 font-medium' : 'text-[var(--admin-text-muted)]'
+                'text-[11px] flex items-center gap-1 tabular-nums',
               )}
+              style={{
+                color: isFollowUpSoon
+                  ? 'var(--admin-warning)'
+                  : 'var(--admin-text-muted)',
+                fontWeight: isFollowUpSoon ? 600 : 400,
+              }}
             >
               <Calendar className="h-3 w-3 flex-shrink-0" />
               Follow-up:{' '}
@@ -299,7 +406,8 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 text-[11px] px-2 text-portal-600 hover:text-portal-700 hover:bg-portal-50"
+              className="h-6 text-[11px] px-2"
+              style={{ color: 'var(--admin-primary)' }}
               onClick={(e) => {
                 e.stopPropagation();
                 onClick(lead);
@@ -311,18 +419,20 @@ function LeadCard({ lead, onClick }: { lead: Lead; onClick: (lead: Lead) => void
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 text-[11px] px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="h-6 text-[11px] px-2"
+                style={{ color: 'var(--admin-success)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onClick(lead);
                 }}
               >
+                <ArrowRightLeft className="h-3 w-3 mr-1" />
                 Convert
               </Button>
             )}
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
@@ -333,38 +443,44 @@ function DragOverlayCard({ lead }: { lead: Lead }) {
   const priorityConfig = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.NORMAL;
 
   return (
-    <Card
-      className={cn(
-        'p-3 shadow-xl border-l-4 rotate-3 opacity-95 min-w-[260px]',
-        stageConfig.cardBg
-      )}
-      style={{ borderLeftColor: stageConfig.color }}
+    <div
+      className="p-3 shadow-xl border-l-4 rotate-3 opacity-95 min-w-[260px] rounded-lg"
+      style={{
+        background: 'var(--admin-surface)',
+        borderLeftColor: stageConfig.color,
+      }}
     >
       <div className="space-y-1.5">
         <div className="flex items-start justify-between">
-          <span className="font-semibold text-[var(--admin-text)] text-sm truncate">
-            🧒 {lead.childName}
+          <span
+            className="font-semibold text-sm truncate"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            {lead.childName}
           </span>
           <span
-            className={cn(
-              'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
-              priorityConfig.bg,
-              priorityConfig.color
-            )}
+            className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+            style={{ background: priorityConfig.bg, color: priorityConfig.color }}
           >
             {priorityConfig.label}
           </span>
         </div>
-        <div className="text-xs text-[var(--admin-text-muted)]">
+        <div
+          className="text-xs"
+          style={{ color: 'var(--admin-text-muted)' }}
+        >
           <UserCircle className="h-3 w-3 inline mr-1" />
           {lead.parentName}
         </div>
-        <div className="text-xs text-[var(--admin-text-muted)]">
+        <div
+          className="text-xs tabular-nums"
+          style={{ color: 'var(--admin-text-muted)' }}
+        >
           <Phone className="h-3 w-3 inline mr-1" />
           {lead.parentPhone}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -383,35 +499,63 @@ function KanbanColumn({
       {/* Column Header */}
       <div
         className="flex items-center justify-between p-3 rounded-t-xl"
-        style={{ backgroundColor: stage.color + '15' }}
+        style={{ background: stage.color + '15' }}
       >
         <div className="flex items-center gap-2">
           <div
             className="h-3 w-3 rounded-full ring-2 ring-white shadow-sm"
-            style={{ backgroundColor: stage.color }}
+            style={{ background: stage.color }}
           />
-          <span className="font-semibold text-sm text-[var(--admin-text)]">{stage.label}</span>
-          <span className="bg-[var(--admin-border)] text-[var(--admin-text-muted)] text-xs font-bold px-2 py-0.5 rounded-full">
+          <span
+            className="font-semibold text-sm"
+            style={{ color: 'var(--admin-text)' }}
+          >
+            {stage.label}
+          </span>
+          <span
+            className="text-xs font-bold px-2 py-0.5 rounded-full tabular-nums"
+            style={{
+              background: 'var(--admin-surface)',
+              color: 'var(--admin-text-muted)',
+              border: '1px solid var(--admin-border)',
+            }}
+          >
             {stage.count}
           </span>
         </div>
-        <span className="text-xs text-[var(--admin-text-muted)] font-medium">
+        <span
+          className="text-xs font-medium tabular-nums"
+          style={{ color: 'var(--admin-text-muted)' }}
+        >
           ₹{stage.totalValue.toLocaleString('en-IN')}
         </span>
       </div>
 
       {/* Cards Container */}
-      <SortableContext items={leads.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={leads.map((l) => l.id)}
+        strategy={verticalListSortingStrategy}
+      >
         <div
-          className="flex flex-col gap-2 p-2 bg-[var(--admin-surface-2)]/50 rounded-b-xl min-h-[200px] border border-t-0 border-[var(--admin-border)] max-h-[calc(100vh-340px)] overflow-y-auto"
-          style={{ borderTopColor: stage.color }}
+          className="flex flex-col gap-2 p-2 rounded-b-xl min-h-[200px] border border-t-0 max-h-[calc(100vh-340px)] overflow-y-auto"
+          style={{
+            background: 'var(--admin-surface-2)',
+            borderColor: 'var(--admin-border)',
+            borderTopColor: stage.color,
+          }}
         >
           {leads.map((lead) => (
             <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
           ))}
           {leads.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-24 text-xs text-[var(--admin-text-subtle)] gap-1">
-              <CircleDot className="h-5 w-5 text-[var(--admin-text-subtle)]" />
+            <div
+              className="flex flex-col items-center justify-center h-24 text-xs gap-1"
+              style={{ color: 'var(--admin-text-subtle)' }}
+            >
+              <CircleDot
+                className="h-5 w-5 opacity-40"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              />
               No leads in this stage
             </div>
           )}
@@ -441,67 +585,80 @@ function StatsBar({
       icon: Users,
       value: stats.totalLeads,
       label: 'Total Leads',
-      iconBg: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-      valueColor: 'text-[var(--admin-text)]',
+      accentVar: '--admin-primary',
+      accentSoftVar: '--admin-primary-soft',
     },
     {
       icon: TrendingUp,
       value: `${stats.conversionRate}%`,
       label: 'Conversion',
-      iconBg: 'bg-green-50',
-      iconColor: 'text-green-600',
-      valueColor: 'text-green-600',
+      accentVar: '--admin-success',
+      accentSoftVar: '--admin-success-soft',
     },
     {
-      icon: Star,
+      icon: Users,
       value: stats.newThisWeek,
       label: 'New This Week',
-      iconBg: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-      valueColor: 'text-blue-600',
+      accentVar: '--admin-info',
+      accentSoftVar: '--admin-info-soft',
     },
     {
       icon: Clock,
       value: stats.followUpsToday,
       label: 'Follow-ups Today',
-      iconBg: 'bg-amber-50',
-      iconColor: 'text-amber-600',
-      valueColor: 'text-amber-600',
+      accentVar: '--admin-warning',
+      accentSoftVar: '--admin-warning-soft',
     },
     {
       icon: AlertCircle,
       value: stats.overdueFollowUps,
       label: 'Overdue',
-      iconBg: 'bg-red-50',
-      iconColor: 'text-red-600',
-      valueColor: 'text-red-600',
+      accentVar: '--admin-error',
+      accentSoftVar: 'rgba(239,68,68,0.1)',
     },
     {
       icon: IndianRupee,
       value: `₹${(stats.estimatedRevenue / 1000).toFixed(0)}k`,
       label: 'Est. Revenue',
-      iconBg: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
-      valueColor: 'text-emerald-600',
+      accentVar: '--admin-success',
+      accentSoftVar: '--admin-success-soft',
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-      {statItems.map((stat, idx) => (
-        <AnimatedCard key={stat.label} delay={idx * 0.05} className="p-3">
-          <div className="flex items-center gap-2">
-            <div className={`h-8 w-8 rounded-lg ${stat.iconBg} flex items-center justify-center`}>
-              <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
+      {statItems.map((stat) => {
+        const Icon = stat.icon;
+        return (
+          <PreOneCard key={stat.label} className="!rounded-xl">
+            <div className="p-3 flex items-center gap-2.5">
+              <div
+                className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: `var(${stat.accentSoftVar})` }}
+              >
+                <Icon
+                  className="h-4 w-4"
+                  style={{ color: `var(${stat.accentVar})` }}
+                />
+              </div>
+              <div className="min-w-0">
+                <p
+                  className="text-lg font-bold tabular-nums leading-tight"
+                  style={{ color: 'var(--admin-text)' }}
+                >
+                  {stat.value}
+                </p>
+                <p
+                  className="text-[11px]"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  {stat.label}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className={`text-lg font-bold ${stat.valueColor}`}>{stat.value}</p>
-              <p className="text-[11px] text-[var(--admin-text-muted)]">{stat.label}</p>
-            </div>
-          </div>
-        </AnimatedCard>
-      ))}
+          </PreOneCard>
+        );
+      })}
     </div>
   );
 }
@@ -539,7 +696,7 @@ export default function PipelinePage() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   // ── Filtered pipeline data ──
@@ -550,7 +707,6 @@ export default function PipelinePage() {
 
     return pipeline.map((stage) => {
       const filteredLeads = stage.leads.filter((lead) => {
-        // Search filter
         if (searchQuery) {
           const q = searchQuery.toLowerCase();
           const matchesSearch =
@@ -560,16 +716,9 @@ export default function PipelinePage() {
             (lead.parentEmail && lead.parentEmail.toLowerCase().includes(q));
           if (!matchesSearch) return false;
         }
-
-        // Stage filter
         if (stageFilter && lead.stage !== stageFilter) return false;
-
-        // Source filter
         if (sourceFilter && lead.source !== sourceFilter) return false;
-
-        // Priority filter
         if (priorityFilter && lead.priority !== priorityFilter) return false;
-
         return true;
       });
 
@@ -577,7 +726,10 @@ export default function PipelinePage() {
         ...stage,
         leads: filteredLeads,
         count: filteredLeads.length,
-        totalValue: filteredLeads.reduce((sum, l) => sum + (l.estimatedValue || 0), 0),
+        totalValue: filteredLeads.reduce(
+          (sum, l) => sum + (l.estimatedValue || 0),
+          0,
+        ),
       };
     });
   }, [pipeline, searchQuery, stageFilter, sourceFilter, priorityFilter]);
@@ -587,7 +739,6 @@ export default function PipelinePage() {
     if (!searchQuery && !stageFilter && !sourceFilter && !priorityFilter) {
       return leads;
     }
-
     return leads.filter((lead) => {
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -598,11 +749,9 @@ export default function PipelinePage() {
           (lead.parentEmail && lead.parentEmail.toLowerCase().includes(q));
         if (!matchesSearch) return false;
       }
-
       if (stageFilter && lead.stage !== stageFilter) return false;
       if (sourceFilter && lead.source !== sourceFilter) return false;
       if (priorityFilter && lead.priority !== priorityFilter) return false;
-
       return true;
     });
   }, [leads, searchQuery, stageFilter, sourceFilter, priorityFilter]);
@@ -612,13 +761,19 @@ export default function PipelinePage() {
     try {
       const token = getToken();
       const [pipelineRes, statsRes] = await Promise.all([
-        fetch('/api/crm/pipeline', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/crm/stats', { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        fetch('/api/crm/pipeline', {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch('/api/crm/stats', {
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => null),
       ]);
       if (pipelineRes.ok) {
         const data = await pipelineRes.json();
         setPipeline(data.pipeline);
-        const allLeads = data.pipeline.flatMap((s: PipelineStage) => s.leads);
+        const allLeads = data.pipeline.flatMap(
+          (s: PipelineStage) => s.leads,
+        );
         setLeads(allLeads);
       }
       if (statsRes?.ok) {
@@ -659,12 +814,9 @@ export default function PipelinePage() {
 
     // Find the target column
     let targetStage: string | null = null;
-
-    // If over.id is a stage key, that's the target
     if (STAGE_KEYS.includes(over.id as (typeof STAGE_KEYS)[number])) {
       targetStage = over.id as string;
     } else {
-      // over.id is a lead card — find which column it's in
       for (const stage of pipeline) {
         if (stage.leads.some((l) => l.id === over.id)) {
           targetStage = stage.key;
@@ -696,22 +848,19 @@ export default function PipelinePage() {
           };
         }
         return stage;
-      })
+      }),
     );
 
-    // Also update the flat leads array
     setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, stage: targetStage! } : l))
+      prev.map((l) => (l.id === leadId ? { ...l, stage: targetStage! } : l)),
     );
 
-    // Show optimistic toast
     const targetLabel = STAGE_CONFIG[targetStage]?.label ?? targetStage;
     toast.success(`Moved to ${targetLabel}`, {
       description: `${leadData.childName} moved to ${targetLabel} stage`,
       duration: 2000,
     });
 
-    // API call to update stage
     try {
       const token = getToken();
       const res = await fetch(`/api/crm/leads/${leadId}`, {
@@ -722,16 +871,14 @@ export default function PipelinePage() {
         },
         body: JSON.stringify({ stage: targetStage }),
       });
-
       if (!res.ok) {
         throw new Error('Failed to update stage');
       }
     } catch (err) {
       console.error('Failed to update lead stage:', err);
-      // Revert on error
       setPipeline(previousPipeline);
       setLeads((prev) =>
-        prev.map((l) => (l.id === leadId ? { ...l, stage: leadData.stage } : l))
+        prev.map((l) => (l.id === leadId ? { ...l, stage: leadData.stage } : l)),
       );
       toast.error('Failed to move lead', {
         description: 'The change has been reverted. Please try again.',
@@ -739,33 +886,28 @@ export default function PipelinePage() {
     }
   };
 
-  // ── Lead click handler ──
   const handleLeadClick = (lead: Lead) => {
     setSelectedLead(lead);
     setDrawerOpen(true);
   };
 
-  // ── Refresh handler ──
   const handleRefresh = () => {
     setLoading(true);
     fetchPipeline();
     toast.success('Pipeline refreshed');
   };
 
-  // ── Lead created callback ──
   const handleLeadCreated = () => {
     setAddLeadOpen(false);
     handleRefresh();
     toast.success('Lead created successfully');
   };
 
-  // ── Lead updated callback (from drawer) ──
   const handleLeadUpdated = () => {
     handleRefresh();
     setDrawerOpen(false);
   };
 
-  // ── Clear filters ──
   const clearFilters = () => {
     setStageFilter('');
     setSourceFilter('');
@@ -774,49 +916,69 @@ export default function PipelinePage() {
     setSearchQuery('');
   };
 
-  const hasActiveFilters = searchQuery || stageFilter || sourceFilter || priorityFilter;
+  const hasActiveFilters =
+    searchQuery || stageFilter || sourceFilter || priorityFilter;
 
   return (
     <PageTransition>
-      <div className="space-y-6">
-        {/* ── Page Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
-              <Megaphone className="h-6 w-6 text-portal-600" />
-              Admission Pipeline
-            </h1>
-            <p className="text-sm text-[var(--admin-text-muted)] mt-1">
-              Drag & drop leads across stages to track your admission funnel
-            </p>
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+        {/* ── SECTION 1: HEADER ── */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-info-soft)' }}
+            >
+              <Megaphone
+                className="h-5 w-5"
+                style={{ color: 'var(--admin-info)' }}
+              />
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                Admission Pipeline
+              </h1>
+              <p
+                className="text-sm"
+                style={{ color: 'var(--admin-text-muted)' }}
+              >
+                Drag &amp; drop leads across stages to track your admission funnel
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
-              className="gap-1"
+              className="gap-2"
             >
-              <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
-              Refresh
+              <RefreshCw
+                className={cn('h-4 w-4', loading && 'animate-spin')}
+              />
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
             <Button
+              size="sm"
               onClick={() => setAddLeadOpen(true)}
-              className="gap-1 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
             >
               <Plus className="h-4 w-4" />
-              Add Lead
+              <span className="hidden sm:inline">Add Lead</span>
             </Button>
           </div>
         </div>
 
-        {/* ── CRM Stats Dashboard ── */}
+        {/* ── SECTION 2: CRM Stats Dashboard ── */}
         <StatsBar stats={stats} />
 
-        {/* ── Main Tabs: Pipeline / List / Analytics ── */}
+        {/* ── SECTION 3: MAIN TABS ── */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <TabsList className="bg-[var(--admin-surface-2)]">
+            <TabsList style={{ background: 'var(--admin-surface-2)' }}>
               <TabsTrigger value="pipeline" className="gap-1.5">
                 <LayoutGrid className="h-3.5 w-3.5" />
                 Pipeline
@@ -834,7 +996,10 @@ export default function PipelinePage() {
             {activeTab !== 'analytics' && (
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--admin-text-subtle)]" />
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                    style={{ color: 'var(--admin-text-subtle)' }}
+                  />
                   <Input
                     placeholder="Search leads..."
                     value={searchQuery}
@@ -844,7 +1009,8 @@ export default function PipelinePage() {
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-subtle)] hover:text-[var(--admin-text-muted)]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                      style={{ color: 'var(--admin-text-subtle)' }}
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -854,13 +1020,19 @@ export default function PipelinePage() {
                   variant={showFilters ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
-                  className="gap-1"
+                  className="gap-1.5"
                 >
                   <Filter className="h-3.5 w-3.5" />
                   Filters
                   {hasActiveFilters && (
-                    <span className="ml-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
-                      !
+                    <span
+                      className="ml-1 h-4 min-w-[16px] rounded-full px-1 text-[10px] flex items-center justify-center"
+                      style={{
+                        background: 'var(--admin-primary)',
+                        color: 'white',
+                      }}
+                    >
+                      {[stageFilter, sourceFilter, priorityFilter].filter(Boolean).length}
                     </span>
                   )}
                 </Button>
@@ -870,10 +1042,10 @@ export default function PipelinePage() {
 
           {/* ── Filters Row ── */}
           {showFilters && activeTab !== 'analytics' && (
-            <AnimatedCard delay={0} hover={false} className="mt-3 p-3">
-              <div className="flex items-center gap-3 flex-wrap">
+            <PreOneCard className="mt-3 !rounded-xl">
+              <div className="p-3 flex items-center gap-3 flex-wrap">
                 <Select
-                  value={stageFilter}
+                  value={stageFilter || 'ALL'}
                   onValueChange={(v) => setStageFilter(v === 'ALL' ? '' : v)}
                 >
                   <SelectTrigger className="w-[140px] h-8 text-xs">
@@ -886,7 +1058,7 @@ export default function PipelinePage() {
                         <span className="flex items-center gap-1.5">
                           <span
                             className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: cfg.color }}
+                            style={{ background: cfg.color }}
                           />
                           {cfg.label}
                         </span>
@@ -896,7 +1068,7 @@ export default function PipelinePage() {
                 </Select>
 
                 <Select
-                  value={sourceFilter}
+                  value={sourceFilter || 'ALL'}
                   onValueChange={(v) => setSourceFilter(v === 'ALL' ? '' : v)}
                 >
                   <SelectTrigger className="w-[140px] h-8 text-xs">
@@ -913,7 +1085,7 @@ export default function PipelinePage() {
                 </Select>
 
                 <Select
-                  value={priorityFilter}
+                  value={priorityFilter || 'ALL'}
                   onValueChange={(v) => setPriorityFilter(v === 'ALL' ? '' : v)}
                 >
                   <SelectTrigger className="w-[120px] h-8 text-xs">
@@ -932,14 +1104,15 @@ export default function PipelinePage() {
                     variant="ghost"
                     size="sm"
                     onClick={clearFilters}
-                    className="text-xs gap-1 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-muted)]"
+                    className="text-xs gap-1"
+                    style={{ color: 'var(--admin-error)' }}
                   >
                     <X className="h-3 w-3" />
                     Clear filters
                   </Button>
                 )}
               </div>
-            </AnimatedCard>
+            </PreOneCard>
           )}
 
           {/* ── Pipeline View ── */}
@@ -947,20 +1120,33 @@ export default function PipelinePage() {
             {loading ? (
               <PipelineSkeleton />
             ) : pipeline.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-[var(--admin-text-subtle)]">
-                <Megaphone className="h-12 w-12 mb-4 text-[var(--admin-text-subtle)]" />
-                <p className="text-lg font-medium text-[var(--admin-text-muted)]">No pipeline data</p>
-                <p className="text-sm mt-1">
-                  Click &quot;Add Lead&quot; to create your first lead.
-                </p>
-                <Button
-                  onClick={() => setAddLeadOpen(true)}
-                  className="mt-4 gap-1 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Lead
-                </Button>
-              </div>
+              <PreOneCard className="!rounded-xl">
+                <div className="flex flex-col items-center justify-center py-16">
+                  <Megaphone
+                    className="h-12 w-12 mb-4 opacity-40"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  />
+                  <p
+                    className="text-lg font-medium"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    No pipeline data
+                  </p>
+                  <p
+                    className="text-sm mt-1"
+                    style={{ color: 'var(--admin-text-subtle)' }}
+                  >
+                    Click &quot;Add Lead&quot; to create your first lead.
+                  </p>
+                  <Button
+                    onClick={() => setAddLeadOpen(true)}
+                    className="mt-4 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Lead
+                  </Button>
+                </div>
+              </PreOneCard>
             ) : (
               <DndContext
                 sensors={sensors}
@@ -991,7 +1177,7 @@ export default function PipelinePage() {
             {loading ? (
               <ListSkeleton />
             ) : (
-              <Card className="overflow-hidden">
+              <PreOneCard className="overflow-hidden !rounded-xl">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1012,7 +1198,8 @@ export default function PipelinePage() {
                       <TableRow>
                         <TableCell
                           colSpan={10}
-                          className="text-center py-8 text-[var(--admin-text-subtle)]"
+                          className="text-center py-8"
+                          style={{ color: 'var(--admin-text-subtle)' }}
                         >
                           {hasActiveFilters
                             ? 'No leads match your filters. Try adjusting them.'
@@ -1024,24 +1211,37 @@ export default function PipelinePage() {
                         const stageCfg =
                           STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW;
                         const priorityCfg =
-                          PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.NORMAL;
+                          PRIORITY_CONFIG[lead.priority] ||
+                          PRIORITY_CONFIG.NORMAL;
                         return (
                           <TableRow
                             key={lead.id}
                             className="cursor-pointer hover:bg-[var(--admin-surface-2)]/80 transition-colors"
                             onClick={() => handleLeadClick(lead)}
                           >
-                            <TableCell className="font-medium text-sm">
+                            <TableCell
+                              className="font-medium text-sm"
+                              style={{ color: 'var(--admin-text)' }}
+                            >
                               {lead.parentName}
                             </TableCell>
-                            <TableCell className="text-sm">
+                            <TableCell
+                              className="text-sm"
+                              style={{ color: 'var(--admin-text-muted)' }}
+                            >
                               {lead.childName}
                             </TableCell>
-                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
+                            <TableCell
+                              className="text-sm tabular-nums"
+                              style={{ color: 'var(--admin-text-muted)' }}
+                            >
                               {lead.parentPhone}
                             </TableCell>
                             <TableCell>
-                              <Badge variant="outline" className="text-[11px]">
+                              <Badge
+                                variant="outline"
+                                className="text-[11px]"
+                              >
                                 {SOURCE_LABELS[lead.source] || lead.source}
                               </Badge>
                             </TableCell>
@@ -1049,40 +1249,50 @@ export default function PipelinePage() {
                               <span
                                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
                                 style={{
-                                  backgroundColor: stageCfg.color + '15',
+                                  background: stageCfg.color + '15',
                                   color: stageCfg.color,
                                 }}
                               >
                                 <span
                                   className="h-1.5 w-1.5 rounded-full"
-                                  style={{ backgroundColor: stageCfg.color }}
+                                  style={{ background: stageCfg.color }}
                                 />
                                 {stageCfg.label}
                               </span>
                             </TableCell>
                             <TableCell>
                               <span
-                                className={cn(
-                                  'text-xs font-medium',
-                                  priorityCfg.color
-                                )}
+                                className="text-xs font-medium px-2 py-0.5 rounded-full"
+                                style={{
+                                  background: priorityCfg.bg,
+                                  color: priorityCfg.color,
+                                }}
                               >
                                 {priorityCfg.label}
                               </span>
                             </TableCell>
-                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
+                            <TableCell
+                              className="text-sm"
+                              style={{ color: 'var(--admin-text-muted)' }}
+                            >
                               {lead.programInterest || '—'}
                             </TableCell>
-                            <TableCell className="text-sm font-medium">
+                            <TableCell
+                              className="text-sm font-medium tabular-nums"
+                              style={{ color: 'var(--admin-text)' }}
+                            >
                               {lead.estimatedValue
                                 ? `₹${lead.estimatedValue.toLocaleString('en-IN')}`
                                 : '—'}
                             </TableCell>
-                            <TableCell className="text-sm text-[var(--admin-text-muted)]">
+                            <TableCell
+                              className="text-sm tabular-nums"
+                              style={{ color: 'var(--admin-text-muted)' }}
+                            >
                               {lead.nextFollowUp
                                 ? format(
                                     new Date(lead.nextFollowUp),
-                                    'dd MMM yyyy'
+                                    'dd MMM yyyy',
                                   )
                                 : '—'}
                             </TableCell>
@@ -1090,7 +1300,8 @@ export default function PipelinePage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 text-xs text-portal-600 hover:text-portal-700"
+                                className="h-7 text-xs"
+                                style={{ color: 'var(--admin-primary)' }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleLeadClick(lead);
@@ -1105,7 +1316,7 @@ export default function PipelinePage() {
                     )}
                   </TableBody>
                 </Table>
-              </Card>
+              </PreOneCard>
             )}
           </TabsContent>
 
