@@ -300,54 +300,54 @@
   --space-2xl: 3rem;       /* 48px */
   --space-3xl: 4rem;       /* 64px */
 
-  /* ── Semantic Colors — Warm Premium ── */
-  --background: #FBF7F2;             /* warm cream */
-  --foreground: #2A1F1A;             /* warm ink */
-  --card: #FFFFFF;                   /* warm surface */
-  --card-foreground: #2A1F1A;        /* warm ink */
-  --popover: #FFFFFF;                /* warm surface elevated */
-  --popover-foreground: #2A1F1A;     /* warm ink */
+  /* ── Semantic Colors ── */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
-  /* ── Primary: Terracotta (Warm Brand) ── */
-  --primary: #E07856;                /* warm terracotta */
+  /* ── Primary: Purple (Brand) ── */
+  --primary: #7C3AED;
   --primary-foreground: #FFFFFF;
 
-  /* ── Secondary: Warm soft tint ── */
-  --secondary: #FBE8DE;              /* warm primary soft */
-  --secondary-foreground: #8C3A1E;   /* warm primary ink */
+  /* ── Secondary: Sky Blue ── */
+  --secondary: #E0F2FE;
+  --secondary-foreground: #0369A1;
 
-  /* ── Muted — Warm ── */
-  --muted: #F5EFE6;                  /* warm bg soft */
-  --muted-foreground: #8B7A6E;       /* warm ink muted */
+  /* ── Muted ── */
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
 
-  /* ── Accent: Warm Honey ── */
-  --accent: #F4B860;                 /* warm honey */
-  --accent-foreground: #7A5320;      /* warm honey ink */
+  /* ── Accent: Sky Blue ── */
+  --accent: #0EA5E9;
+  --accent-foreground: #FFFFFF;
 
-  /* ── Destructive — Warm Rose ── */
-  --destructive: #E8A4A4;            /* warm rose */
+  /* ── Destructive ── */
+  --destructive: #EF4444;
 
-  /* ── Borders & Inputs — Warm ── */
-  --border: #F0E8DE;                 /* warm beige border */
-  --input: #F0E8DE;                  /* warm beige input */
-  --ring: #E07856;                   /* warm terracotta ring */
+  /* ── Borders & Inputs ── */
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #7C3AED;
 
-  /* ── Chart Colors (Warm Premium palette) ── */
-  --chart-1: #E07856;                /* terracotta */
-  --chart-2: #7BA05B;                /* sage */
-  --chart-3: #F4B860;                /* honey */
-  --chart-4: #7CB7E0;                /* sky */
-  --chart-5: #E8A4A4;                /* rose */
+  /* ── Chart Colors (Brand-inspired) ── */
+  --chart-1: #7C3AED;
+  --chart-2: #0EA5E9;
+  --chart-3: #22C55E;
+  --chart-4: #FACC15;
+  --chart-5: #EC4899;
 
-  /* ── Sidebar: Warm Cocoa → Terracotta ── */
-  --sidebar: #2A1F1A;                /* warm ink (deep cocoa) */
-  --sidebar-foreground: #F5EBE0;     /* warm cream text */
-  --sidebar-primary: #E07856;        /* warm terracotta */
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(224, 120, 86, 0.15);  /* warm primary soft */
-  --sidebar-accent-foreground: #E07856;
-  --sidebar-border: rgba(240, 232, 222, 0.10);  /* warm border */
-  --sidebar-ring: #E07856;           /* warm terracotta */
+  /* ── Sidebar: Purple → Blue Gradient ── */
+  --sidebar: #5B21B6;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #5B21B6;
+  --sidebar-accent: rgba(255,255,255,0.12);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-ring: #7C3AED;
 
   /* ── Login Page Tokens ── */
   --login-card: rgba(255, 255, 255, 0.55);
@@ -405,27 +405,27 @@
   --portal-800: #4C1D95;
   --portal-900: #3B0764;
 
-  /* ── Admin semantic tokens — Warm Premium ── */
-  --admin-primary: var(--warm-primary);
-  --admin-primary-soft: var(--warm-primary-soft);
-  --admin-success: var(--warm-sage);
-  --admin-success-soft: var(--warm-sage-soft);
-  --admin-warning: var(--warm-honey);
-  --admin-warning-soft: var(--warm-honey-soft);
-  --admin-info: var(--warm-sky);
-  --admin-info-soft: var(--warm-sky-soft);
-  --admin-error: var(--warm-rose);
-  --admin-orange: var(--warm-primary);
-  --admin-orange-soft: var(--warm-primary-soft);
-  --admin-pink: var(--warm-rose);
-  --admin-pink-soft: var(--warm-rose-soft);
-  --admin-text: var(--warm-ink);
-  --admin-text-muted: var(--warm-ink-muted);
-  --admin-text-subtle: var(--warm-ink-soft);
-  --admin-surface: var(--warm-surface);
-  --admin-surface-2: var(--warm-surface-tint);
-  --admin-border: var(--warm-border);
-  --admin-bg: var(--warm-bg);
+  /* ── Admin semantic tokens ── */
+  --admin-primary: #7C3AED;
+  --admin-primary-soft: #f5f3ff;
+  --admin-success: #16A34A;
+  --admin-success-soft: #dcfce7;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #fef3c7;
+  --admin-info: #0EA5E9;
+  --admin-info-soft: #e0f2fe;
+  --admin-error: #EF4444;
+  --admin-orange: #F97316;
+  --admin-orange-soft: #fff7ed;
+  --admin-pink: #EC4899;
+  --admin-pink-soft: #fce7f3;
+  --admin-text: #0F172A;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F8FAFC;
+  --admin-border: #E2E8F0;
+  --admin-bg: #F1F5F9;
 }
 
 /* ── Teacher Portal: Emerald / Teal ── */
@@ -443,33 +443,33 @@
   --portal-800: #065f46;
   --portal-900: #064e3b;
 
-  /* ── Teacher Portal Semantic Tokens (--teacher-*) — Warm Premium ── */
-  --teacher-bg: var(--warm-bg);
-  --teacher-surface: var(--warm-surface);
-  --teacher-surface-2: var(--warm-surface-tint);
-  --teacher-border: var(--warm-border);
-  --teacher-shadow-card: var(--warm-shadow-sm);
-  --teacher-text: var(--warm-ink);
-  --teacher-text-muted: var(--warm-ink-muted);
-  --teacher-text-subtle: var(--warm-ink-soft);
+  /* ── Teacher Portal Semantic Tokens (--teacher-*) ── */
+  --teacher-bg: #F8FAFC;
+  --teacher-surface: #FFFFFF;
+  --teacher-surface-2: #F1F5F9;
+  --teacher-border: #E2E8F0;
+  --teacher-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --teacher-text: #0F172A;
+  --teacher-text-muted: #64748B;
+  --teacher-text-subtle: #94A3B8;
   --teacher-primary: #10B981;
   --teacher-primary-soft: #D1FAE5;
   --teacher-primary-foreground: #FFFFFF;
-  --teacher-success: var(--warm-sage);
-  --teacher-success-soft: var(--warm-sage-soft);
-  --teacher-warning: var(--warm-honey);
-  --teacher-warning-soft: var(--warm-honey-soft);
-  --teacher-info: var(--warm-sky);
-  --teacher-info-soft: var(--warm-sky-soft);
-  --teacher-error: var(--warm-rose);
-  --teacher-error-soft: var(--warm-rose-soft);
+  --teacher-success: #10B981;
+  --teacher-success-soft: #D1FAE5;
+  --teacher-warning: #F59E0B;
+  --teacher-warning-soft: #FEF3C7;
+  --teacher-info: #6366F1;
+  --teacher-info-soft: #EEF2FF;
+  --teacher-error: #EF4444;
+  --teacher-error-soft: #FEE2E2;
   --teacher-accent: #10B981;
 
   /* ── Teacher Portal Extended Tokens ── */
-  --teacher-orange: var(--warm-primary);
-  --teacher-orange-soft: var(--warm-primary-soft);
-  --teacher-pink: var(--warm-rose);
-  --teacher-pink-soft: var(--warm-rose-soft);
+  --teacher-orange: #F97316;
+  --teacher-orange-soft: #FFF7ED;
+  --teacher-pink: #EC4899;
+  --teacher-pink-soft: #FCE7F3;
 }
 
 /* ── Parent Portal: Sky / Blue ── */
@@ -487,191 +487,188 @@
   --portal-800: #075985;
   --portal-900: #0c4a6e;
 
-  /* ── Parent Portal Semantic Tokens (--parent-*) — Warm Premium ── */
-  --parent-bg: var(--warm-bg);
-  --parent-surface: var(--warm-surface);
-  --parent-surface-2: var(--warm-surface-tint);
-  --parent-border: var(--warm-border);
-  --parent-shadow-card: var(--warm-shadow-sm);
-  --parent-text: var(--warm-ink);
-  --parent-text-muted: var(--warm-ink-muted);
-  --parent-text-subtle: var(--warm-ink-soft);
+  /* ── Parent Portal Semantic Tokens (--parent-*) ── */
+  --parent-bg: #F8FAFC;
+  --parent-surface: #FFFFFF;
+  --parent-surface-2: #F1F5F9;
+  --parent-border: #E2E8F0;
+  --parent-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --parent-text: #0F172A;
+  --parent-text-muted: #64748B;
+  --parent-text-subtle: #94A3B8;
   --parent-primary: #0EA5E9;
   --parent-primary-soft: #E0F2FE;
   --parent-primary-foreground: #FFFFFF;
-  --parent-success: var(--warm-sage);
-  --parent-success-soft: var(--warm-sage-soft);
-  --parent-warning: var(--warm-honey);
-  --parent-warning-soft: var(--warm-honey-soft);
-  --parent-info: var(--warm-sky);
-  --parent-info-soft: var(--warm-sky-soft);
-  --parent-error: var(--warm-rose);
-  --parent-error-soft: var(--warm-rose-soft);
+  --parent-success: #10B981;
+  --parent-success-soft: #D1FAE5;
+  --parent-warning: #F59E0B;
+  --parent-warning-soft: #FEF3C7;
+  --parent-info: #6366F1;
+  --parent-info-soft: #EEF2FF;
+  --parent-error: #EF4444;
+  --parent-error-soft: #FEE2E2;
   --parent-accent: #0EA5E9;
 
   /* ── Parent Portal Extended Tokens ── */
-  --parent-pink: var(--warm-rose);
-  --parent-pink-soft: var(--warm-rose-soft);
-  --parent-orange: var(--warm-primary);
-  --parent-orange-soft: var(--warm-primary-soft);
+  --parent-pink: #EC4899;
+  --parent-pink-soft: #FCE7F3;
+  --parent-orange: #F97316;
+  --parent-orange-soft: #FFF7ED;
 }
 
 /* ============================================================
-   DARK MODE — Warm Premium (Warm Cocoa, NOT cold slate)
+   DARK MODE — PreOne Brand
    ============================================================ */
 .dark {
-  /* Warm dark semantic tokens — inherit from warm dark palette */
-  --background: var(--warm-bg);           /* #1C1510 warm cocoa */
-  --foreground: var(--warm-ink);          /* #F5EBE0 warm cream */
-  --card: var(--warm-surface);            /* #2A2018 warm brown */
-  --card-foreground: var(--warm-ink);
-  --popover: var(--warm-surface-elevated); /* #3A2E24 */
-  --popover-foreground: var(--warm-ink);
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
 
-  --primary: var(--warm-primary);         /* #E8895E brighter terracotta */
-  --primary-foreground: #FFFFFF;
+  --primary: #A78BFA;
+  --primary-foreground: #0F172A;
 
-  --secondary: var(--warm-primary-soft);  /* rgba terracotta */
-  --secondary-foreground: var(--warm-primary-ink);
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
 
-  --muted: var(--warm-bg-soft);           /* #251C16 deeper cocoa */
-  --muted-foreground: var(--warm-ink-muted); /* #A89888 */
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
 
-  --accent: var(--warm-honey);            /* #F5C878 brighter honey */
-  --accent-foreground: var(--warm-honey-ink);
+  --accent: #38BDF8;
+  --accent-foreground: #0F172A;
 
-  --destructive: var(--warm-rose);        /* #ECB4B4 brighter rose */
+  --destructive: #FCA5A5;
 
-  --border: var(--warm-border);           /* rgba warm */
-  --input: var(--warm-border);
-  --ring: var(--warm-primary);            /* warm terracotta */
+  --border: rgba(255,255,255,0.1);
+  --input: rgba(255,255,255,0.15);
+  --ring: #A78BFA;
 
-  --chart-1: var(--warm-primary);         /* terracotta */
-  --chart-2: var(--warm-sage);            /* sage */
-  --chart-3: var(--warm-honey);           /* honey */
-  --chart-4: var(--warm-sky);             /* sky */
-  --chart-5: var(--warm-rose);            /* rose */
+  --chart-1: #A78BFA;
+  --chart-2: #38BDF8;
+  --chart-3: #4ADE80;
+  --chart-4: #FDE047;
+  --chart-5: #F472B6;
 
-  --sidebar: var(--warm-surface);         /* warm brown */
-  --sidebar-foreground: var(--warm-ink);  /* warm cream */
-  --sidebar-primary: var(--warm-primary); /* warm terracotta */
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: var(--warm-primary-soft);
-  --sidebar-accent-foreground: var(--warm-primary);
-  --sidebar-border: var(--warm-border);
-  --sidebar-ring: var(--warm-primary);
+  --sidebar: #1E1B4B;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #A78BFA;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: rgba(255,255,255,0.08);
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: rgba(255,255,255,0.08);
+  --sidebar-ring: #A78BFA;
 
-  --portal: var(--warm-primary);          /* warm terracotta */
-  --portal-foreground: #FFFFFF;
+  --portal: #A78BFA;
+  --portal-foreground: #0F172A;
 
-  /* ── Login Page Tokens (warm dark mode) ── */
-  --login-card: rgba(42, 32, 24, 0.75);           /* warm surface w/ opacity */
-  --login-card-border: rgba(232, 137, 94, 0.20);  /* warm terracotta tint */
-  --login-input: rgba(58, 46, 36, 0.60);           /* warm elevated */
-  --login-input-border: rgba(240, 232, 222, 0.15); /* warm border */
-  --login-text: #F5EBE0;                           /* warm cream */
-  --login-muted: #A89888;                          /* warm ink muted */
-  --login-subtle: #786858;                         /* warm ink faint */
-  --login-label: #D4C4B4;                          /* warm ink soft */
-  --login-link: #E8895E;                           /* warm terracotta */
-  --login-divider: rgba(240, 232, 222, 0.10);     /* warm divider */
-  --login-focus: #E8895E;                          /* warm terracotta */
-  --login-error: #ECB4B4;                          /* warm rose */
-  --login-tab-bg: rgba(58, 46, 36, 0.60);          /* warm elevated */
-  --login-tab-active: #E8895E;                     /* warm terracotta */
-  --login-icon: #E8895E;                           /* warm terracotta */
-  --login-icon-muted: #A89888;                     /* warm ink muted */
+  /* ── Login Page Tokens (dark mode) ── */
+  --login-card: rgba(26, 26, 62, 0.65);
+  --login-card-border: rgba(139, 92, 246, 0.15);
+  --login-input: rgba(34, 34, 68, 0.6);
+  --login-input-border: #33335A;
+  --login-text: #F0F0FF;
+  --login-muted: #A3A3C2;
+  --login-subtle: #8888AA;
+  --login-label: #C4C4E0;
+  --login-link: #818CF8;
+  --login-divider: #33335A;
+  --login-focus: #8B5CF6;
+  --login-error: #FB7185;
+  --login-tab-bg: #252548;
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #A3A3C2;
 }
 
 .dark [data-portal="admin"] {
-  /* Warm Premium dark theme — admin portal inherits global warm dark tokens */
-  --admin-primary: var(--warm-primary);
-  --admin-primary-soft: var(--warm-primary-soft);
-  --admin-success: var(--warm-sage);
-  --admin-success-soft: var(--warm-sage-soft);
-  --admin-warning: var(--warm-honey);
-  --admin-warning-soft: var(--warm-honey-soft);
-  --admin-info: var(--warm-sky);
-  --admin-info-soft: var(--warm-sky-soft);
-  --admin-error: var(--warm-rose);
-  --admin-error-soft: var(--warm-rose-soft);
-  --admin-orange: var(--warm-primary);
-  --admin-orange-soft: var(--warm-primary-soft);
-  --admin-pink: var(--warm-rose);
-  --admin-pink-soft: var(--warm-rose-soft);
-  --admin-text: var(--warm-ink);
-  --admin-text-muted: var(--warm-ink-muted);
-  --admin-text-subtle: var(--warm-ink-soft);
-  --admin-surface: var(--warm-surface);
-  --admin-surface-2: var(--warm-surface-tint);
-  --admin-border: var(--warm-border);
-  --admin-bg: var(--warm-bg);
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167,139,250,0.15);
+  --admin-success: #4ADE80;
+  --admin-success-soft: rgba(74,222,128,0.15);
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251,191,36,0.15);
+  --admin-info: #38BDF8;
+  --admin-info-soft: rgba(56,189,248,0.15);
+  --admin-error: #FCA5A5;
+  --admin-orange: #FB923C;
+  --admin-orange-soft: rgba(251,146,60,0.15);
+  --admin-pink: #F472B6;
+  --admin-pink-soft: rgba(244,114,182,0.15);
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #64748B;
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: rgba(255,255,255,0.1);
+  --admin-bg: #0F172A;
 }
 
 .dark [data-portal="teacher"] {
   --portal: #34D399;
-  --portal-foreground: var(--warm-bg);
+  --portal-foreground: #0F172A;
 
-  /* ── Dark Mode Teacher Semantic Tokens (Warm Premium) ── */
-  --teacher-bg: var(--warm-bg);
-  --teacher-surface: var(--warm-surface);
-  --teacher-surface-2: var(--warm-surface-tint);
-  --teacher-border: var(--warm-border);
-  --teacher-shadow-card: var(--warm-shadow-md);
-  --teacher-text: var(--warm-ink);
-  --teacher-text-muted: var(--warm-ink-muted);
-  --teacher-text-subtle: var(--warm-ink-soft);
+  /* ── Dark Mode Teacher Semantic Tokens ── */
+  --teacher-bg: #0F172A;
+  --teacher-surface: #1E293B;
+  --teacher-surface-2: #334155;
+  --teacher-border: rgba(255,255,255,0.1);
+  --teacher-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --teacher-text: #F8FAFC;
+  --teacher-text-muted: #94A3B8;
+  --teacher-text-subtle: #64748B;
   --teacher-primary: #34D399;
-  --teacher-primary-soft: rgba(52,211,153,0.18);
-  --teacher-primary-foreground: var(--warm-bg);
-  --teacher-success: var(--warm-sage);
-  --teacher-success-soft: var(--warm-sage-soft);
-  --teacher-warning: var(--warm-honey);
-  --teacher-warning-soft: var(--warm-honey-soft);
-  --teacher-info: var(--warm-sky);
-  --teacher-info-soft: var(--warm-sky-soft);
-  --teacher-error: var(--warm-rose);
-  --teacher-error-soft: var(--warm-rose-soft);
+  --teacher-primary-soft: rgba(52,211,153,0.15);
+  --teacher-primary-foreground: #0F172A;
+  --teacher-success: #34D399;
+  --teacher-success-soft: rgba(52,211,153,0.15);
+  --teacher-warning: #FBBF24;
+  --teacher-warning-soft: rgba(251,191,36,0.15);
+  --teacher-info: #818CF8;
+  --teacher-info-soft: rgba(129,140,248,0.15);
+  --teacher-error: #FCA5A5;
+  --teacher-error-soft: rgba(252,165,165,0.15);
   --teacher-accent: #34D399;
 
   /* ── Dark Mode Teacher Extended Tokens ── */
-  --teacher-orange: var(--warm-primary);
-  --teacher-orange-soft: var(--warm-primary-soft);
-  --teacher-pink: var(--warm-rose);
-  --teacher-pink-soft: var(--warm-rose-soft);
+  --teacher-orange: #FB923C;
+  --teacher-orange-soft: rgba(251,146,60,0.15);
+  --teacher-pink: #F472B6;
+  --teacher-pink-soft: rgba(244,114,182,0.15);
 }
 
 .dark [data-portal="parent"] {
   --portal: #38BDF8;
-  --portal-foreground: var(--warm-bg);
+  --portal-foreground: #0F172A;
 
-  /* ── Dark Mode Parent Semantic Tokens (Warm Premium) ── */
-  --parent-bg: var(--warm-bg);
-  --parent-surface: var(--warm-surface);
-  --parent-surface-2: var(--warm-surface-tint);
-  --parent-border: var(--warm-border);
-  --parent-shadow-card: var(--warm-shadow-md);
-  --parent-text: var(--warm-ink);
-  --parent-text-muted: var(--warm-ink-muted);
-  --parent-text-subtle: var(--warm-ink-soft);
+  /* ── Dark Mode Parent Semantic Tokens ── */
+  --parent-bg: #0F172A;
+  --parent-surface: #1E293B;
+  --parent-surface-2: #334155;
+  --parent-border: rgba(255,255,255,0.1);
+  --parent-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --parent-text: #F8FAFC;
+  --parent-text-muted: #94A3B8;
+  --parent-text-subtle: #64748B;
   --parent-primary: #38BDF8;
-  --parent-primary-soft: rgba(56,189,248,0.18);
-  --parent-primary-foreground: var(--warm-bg);
-  --parent-success: var(--warm-sage);
-  --parent-success-soft: var(--warm-sage-soft);
-  --parent-warning: var(--warm-honey);
-  --parent-warning-soft: var(--warm-honey-soft);
-  --parent-info: var(--warm-sky);
-  --parent-info-soft: var(--warm-sky-soft);
-  --parent-error: var(--warm-rose);
-  --parent-error-soft: var(--warm-rose-soft);
+  --parent-primary-soft: rgba(56,189,248,0.15);
+  --parent-primary-foreground: #0F172A;
+  --parent-success: #34D399;
+  --parent-success-soft: rgba(52,211,153,0.15);
+  --parent-warning: #FBBF24;
+  --parent-warning-soft: rgba(251,191,36,0.15);
+  --parent-info: #818CF8;
+  --parent-info-soft: rgba(129,140,248,0.15);
+  --parent-error: #FCA5A5;
+  --parent-error-soft: rgba(252,165,165,0.15);
   --parent-accent: #38BDF8;
 
   /* ── Dark Mode Parent Extended Tokens ── */
-  --parent-pink: var(--warm-rose);
-  --parent-pink-soft: var(--warm-rose-soft);
-  --parent-orange: var(--warm-primary);
-  --parent-orange-soft: var(--warm-primary-soft);
+  --parent-pink: #F472B6;
+  --parent-pink-soft: rgba(244,114,182,0.15);
+  --parent-orange: #FB923C;
+  --parent-orange-soft: rgba(251,146,60,0.15);
 }
 
 /* ============================================================
@@ -693,13 +690,13 @@
    PREONE BRAND UTILITIES
    ============================================================ */
 
-/* ── Main Brand Gradient (Warm Terracotta → Honey) ── */
+/* ── Main Brand Gradient (Purple → Sky Blue) ── */
 .bg-brand-gradient {
-  background: linear-gradient(135deg, var(--warm-primary) 0%, var(--warm-honey) 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
 }
 
 .bg-brand-gradient-hover {
-  background: linear-gradient(135deg, var(--warm-primary-hover) 0%, #D49A40 100%);
+  background: linear-gradient(135deg, #6D28D9 0%, #0284C7 100%);
 }
 
 /* ── Portal CTA Button Gradients (auto-scoped per portal) ── */
@@ -761,9 +758,9 @@
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 .dark .login-card-glass {
-  background: var(--warm-surface);
-  border-color: var(--warm-border);
-  box-shadow: var(--warm-shadow-xl);
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* ── Login Toggle Pill ── */
@@ -774,16 +771,16 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 :is(.dark) .login-toggle-pill {
-  background: rgba(58, 46, 36, 0.45);
-  border-color: var(--warm-border);
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 .login-toggle-pill-btn {
   color: #B0B0B0;
 }
 .login-toggle-pill-btn[data-active="true"] {
-  background: linear-gradient(135deg, var(--warm-primary) 0%, var(--warm-honey) 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(224, 120, 86, 0.35);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
 }
 
 /* ── Login Theme Transition ── */
@@ -816,15 +813,15 @@
 .text-login-error { color: var(--login-error); }
 
 /* ── Login Backgrounds ── */
-.bg-login-tab-bg { background: var(--warm-bg-soft); }
-.bg-login-tab-active { background: var(--warm-primary); }
-.bg-login-input { background: var(--warm-bg-soft); }
-.bg-login-divider { background: var(--warm-divider); }
+.bg-login-tab-bg { background: #F1F5F9; }
+.bg-login-tab-active { background: #6366F1; }
+.bg-login-input { background: #F8FAFC; }
+.bg-login-divider { background: #E5E7EB; }
 
-.dark .bg-login-tab-bg { background: var(--warm-surface-tint); }
-.dark .bg-login-tab-active { background: var(--warm-primary); }
-.dark .bg-login-input { background: var(--warm-surface-tint); }
-.dark .bg-login-divider { background: var(--warm-divider); }
+.dark .bg-login-tab-bg { background: #252548; }
+.dark .bg-login-tab-active { background: #818CF8; }
+.dark .bg-login-input { background: rgba(34, 34, 68, 0.6); }
+.dark .bg-login-divider { background: #33335A; }
 
 /* ── Login Borders ── */
 .border-login-input-border { border-color: var(--login-input-border); }
@@ -855,10 +852,10 @@
 
 /* ── Login Wallpaper Overlays ── */
 .login-wallpaper-overlay {
-  background: linear-gradient(135deg, rgba(224, 120, 86, 0.12) 0%, rgba(0,0,0,0.15) 100%);
+  background: linear-gradient(135deg, rgba(108,92,231,0.12) 0%, rgba(0,0,0,0.15) 100%);
 }
 .dark .login-wallpaper-overlay {
-  background: linear-gradient(135deg, rgba(232, 137, 94, 0.20) 0%, rgba(0,0,0,0.35) 100%);
+  background: linear-gradient(135deg, rgba(108,92,231,0.2) 0%, rgba(0,0,0,0.35) 100%);
 }
 .login-wallpaper-overlay-mobile {
   background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.25) 100%);
@@ -885,9 +882,9 @@
 .btn-launch:active:not(:disabled) { transform: scale(0.99); }
 .btn-launch:disabled { cursor: not-allowed; opacity: 0.85; }
 
-/* ── Login Brand Text Gradient (Warm) ── */
+/* ── Login Brand Text Gradient ── */
 .text-brand-gradient {
-  background: linear-gradient(135deg, var(--warm-primary) 0%, var(--warm-honey) 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1247,34 +1244,34 @@
   --font-display: var(--font-outfit), sans-serif;
 }
 
-/* ── Dark Warm Cosmic Mode (Warm Premium) ── */
+/* ── Dark Cosmic Mode (Living Universe) ── */
 .dark {
-  /* Warm Cocoa Backgrounds (replaces cold space) */
-  --bg-primary: var(--warm-bg);              /* #1C1510 warm cocoa */
-  --bg-secondary: var(--warm-bg-soft);       /* #251C16 deeper cocoa */
-  --bg-tertiary: var(--warm-surface);        /* #2A2018 warm brown */
-  --bg-glass: rgba(42, 32, 24, 0.70);        /* warm surface w/ opacity */
+  /* Deep Space Backgrounds */
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #121234;
+  --bg-tertiary: #1a1a3a;
+  --bg-glass: rgba(18, 18, 52, 0.7);
   
-  /* Warm Accents (replaces cold cosmic) */
-  --preone-primary: var(--warm-primary);     /* terracotta */
-  --preone-primary-light: #F09A70;           /* lighter terracotta */
-  --preone-blue: var(--warm-sky);            /* warm sky */
-  --preone-orange: var(--warm-honey);        /* warm honey */
-  --preone-pink: var(--warm-rose);           /* warm rose */
-  --preone-green: var(--warm-sage);          /* warm sage */
+  /* Cosmic Accents */
+  --preone-primary: #6c5ce7;
+  --preone-primary-light: #a29bfe;
+  --preone-blue: #00d2d3;
+  --preone-orange: #fdcb6e;
+  --preone-pink: #ff7675;
+  --preone-green: #55efc4;
   
-  /* Warm Glass Effects */
-  --glass-border: var(--warm-border);
-  --glass-shadow: var(--warm-shadow-lg);
+  /* Glass Effects */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --glass-blur: 20px;
   
-  /* Text overrides for warm dark */
-  --text-primary: var(--warm-ink);           /* warm cream */
-  --text-secondary: var(--warm-ink-soft);    /* #D4C4B4 */
-  --text-tertiary: var(--warm-ink-muted);    /* #A89888 */
-  --text-muted: var(--warm-ink-faint);       /* #786858 */
-  --border-default: var(--warm-border);
-  --border-light: var(--warm-divider);
+  /* Text overrides for dark */
+  --text-primary: #FFFFFF;
+  --text-secondary: #b2bec3;
+  --text-tertiary: #636e72;
+  --text-muted: #4a5568;
+  --border-default: #2d2d4a;
+  --border-light: #1a1a3a;
 }
 
 /* ============================================================
@@ -2452,15 +2449,13 @@ body, p, span, div {
 }
 
 /* ============================================================
-   WARM PREMIUM DESIGN SYSTEM — Global (All Portals, Light + Dark)
+   WARM PREMIUM DESIGN SYSTEM — Preschool-Optimized
    Style: Warm cream + terracotta + sage/honey + colored shadows
-   Scope: GLOBAL — applies to all portals (admin, teacher, parent, login)
-   Light: warm cream bg, terracotta primary, white cards, beige borders
-   Dark:  warm cocoa bg, terracotta primary, deep brown cards, soft borders
+   Opt-in: wrap any subtree in [data-warm="premium"] to activate.
+   Existing portal themes are NOT affected.
    ============================================================ */
 
-/* ── Warm Premium Light Theme (Global Default) ── */
-:root {
+[data-warm="premium"] {
   /* ── Warm Surface Palette ── */
   --warm-bg: #FBF7F2;             /* warm cream — main background */
   --warm-bg-soft: #F5EFE6;        /* slightly deeper cream — alternating sections */
@@ -2534,77 +2529,8 @@ body, p, span, div {
   --warm-font-numeric: var(--font-jakarta), 'SF Pro Display', system-ui, sans-serif;
 }
 
-/* ── Warm Premium Dark Theme (Global) ── */
-/* Warm cocoa/charcoal palette — NOT cold gray-black like default dark mode.
-   Preserves the warmth (terracotta primary, sage success, honey accent) while
-   inverting surfaces for dark mode comfort. */
-.dark {
-  /* ── Warm Surface Palette (Dark) ── */
-  --warm-bg: #1C1510;             /* warm cocoa — main background (NOT slate) */
-  --warm-bg-soft: #251C16;        /* deeper cocoa — alternating sections */
-  --warm-surface: #2A2018;        /* warm brown card — pops on cocoa */
-  --warm-surface-tint: #322820;   /* tinted dark card */
-  --warm-surface-elevated: #3A2E24; /* modals, popovers */
-
-  /* ── Warm Ink (text) — Dark ── */
-  --warm-ink: #F5EBE0;            /* warm cream text — high contrast on cocoa */
-  --warm-ink-soft: #D4C4B4;       /* secondary text */
-  --warm-ink-muted: #A89888;      /* tertiary / captions */
-  --warm-ink-faint: #786858;      /* placeholders */
-
-  /* ── Warm Borders — Dark ── */
-  --warm-border: rgba(240, 232, 222, 0.10);  /* soft warm border */
-  --warm-border-strong: rgba(240, 232, 222, 0.18); /* hover / focus */
-  --warm-divider: rgba(240, 232, 222, 0.06); /* subtle dividers */
-
-  /* ── Brand Accents — Dark (brighter for contrast on dark bg) ── */
-  --warm-primary: #E8895E;        /* brighter terracotta for dark mode */
-  --warm-primary-hover: #F09A70;  /* lighter on hover */
-  --warm-primary-soft: rgba(232, 137, 94, 0.15); /* tinted bg */
-  --warm-primary-ink: #F5C4A8;    /* text on dark tint */
-
-  --warm-sage: #8FBF6E;           /* brighter sage for dark mode */
-  --warm-sage-soft: rgba(143, 191, 110, 0.15);
-  --warm-sage-ink: #B8D89E;
-
-  --warm-honey: #F5C878;          /* brighter honey for dark mode */
-  --warm-honey-soft: rgba(245, 200, 120, 0.15);
-  --warm-honey-ink: #F5DCA8;
-
-  --warm-sky: #8FC5E8;            /* brighter sky for dark mode */
-  --warm-sky-soft: rgba(143, 197, 232, 0.15);
-  --warm-sky-ink: #B8DAEF;
-
-  --warm-lavender: #C4B8E0;       /* brighter lavender for dark mode */
-  --warm-lavender-soft: rgba(196, 184, 224, 0.15);
-  --warm-lavender-ink: #D8D0EC;
-
-  --warm-rose: #ECB4B4;           /* brighter rose for dark mode */
-  --warm-rose-soft: rgba(236, 180, 180, 0.15);
-  --warm-rose-ink: #F0CCCC;
-
-  /* ── Colored Shadows — Dark (deeper, more pronounced) ── */
-  --warm-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --warm-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
-  --warm-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-  --warm-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.35);
-  --warm-shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.4);
-  --warm-shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.55), 0 12px 24px rgba(0, 0, 0, 0.45);
-  --warm-shadow-primary: 0 12px 28px rgba(232, 137, 94, 0.25), 0 4px 8px rgba(232, 137, 94, 0.15);
-  --warm-shadow-sage: 0 12px 28px rgba(143, 191, 110, 0.25), 0 4px 8px rgba(143, 191, 110, 0.15);
-  --warm-shadow-honey: 0 12px 28px rgba(245, 200, 120, 0.28), 0 4px 8px rgba(245, 200, 120, 0.18);
-  --warm-shadow-sky: 0 12px 28px rgba(143, 197, 232, 0.25), 0 4px 8px rgba(143, 197, 232, 0.15);
-  --warm-shadow-lavender: 0 12px 28px rgba(196, 184, 224, 0.25), 0 4px 8px rgba(196, 184, 224, 0.15);
-  --warm-shadow-rose: 0 12px 28px rgba(236, 180, 180, 0.25), 0 4px 8px rgba(236, 180, 180, 0.15);
-  --warm-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.25);
-
-  /* Radius + fonts unchanged in dark — inherited from :root */
-}
-
-/* ── Admin → Warm token aliases (Global, Light + Dark) ── */
-/* These map legacy --admin-* vars to warm tokens so all existing
-   admin pages automatically pick up warm values in BOTH themes. */
-:root {
+/* ── Admin → Warm token aliases (so legacy --admin-* vars use warm values inside WarmPremium) ── */
+[data-warm="premium"] {
   --admin-text: var(--warm-ink);
   --admin-text-muted: var(--warm-ink-muted);
   --admin-text-subtle: var(--warm-ink-soft);
@@ -2631,10 +2557,7 @@ body, p, span, div {
   --admin-pink-soft: var(--warm-rose-soft);
 }
 
-/* ── Warm Premium Base — Global Application ── */
-/* Applied to <html data-warm="premium"> in root layout.
-   Also works with any [data-warm="premium"] wrapper for backward compat. */
-html[data-warm="premium"],
+/* ── Warm Premium Base — apply to wrapper ── */
 [data-warm="premium"] {
   background: var(--warm-bg);
   color: var(--warm-ink);
@@ -2647,7 +2570,7 @@ html[data-warm="premium"],
   border-color: var(--warm-border);
 }
 
-/* ── Warm Headings (Fraunces serif) — Global ── */
+/* ── Warm Headings (Fraunces serif) ── */
 [data-warm="premium"] .warm-heading,
 [data-warm="premium"] h1.warm,
 [data-warm="premium"] h2.warm,
@@ -2679,27 +2602,13 @@ html[data-warm="premium"],
   border-radius: var(--warm-radius-lg);
 }
 
-/* ── Warm pastel column backgrounds (for Kanban) — Light ── */
+/* ── Warm pastel column backgrounds (for Kanban) ── */
 [data-warm="premium"] .warm-col-rose { background: linear-gradient(180deg, #FBE0E0 0%, #FDFAF5 100%); }
 [data-warm="premium"] .warm-col-honey { background: linear-gradient(180deg, #FDEDD0 0%, #FDFAF5 100%); }
 [data-warm="premium"] .warm-col-sage { background: linear-gradient(180deg, #E8F0DD 0%, #FDFAF5 100%); }
 [data-warm="premium"] .warm-col-sky { background: linear-gradient(180deg, #DDEDF7 0%, #FDFAF5 100%); }
 [data-warm="premium"] .warm-col-lavender { background: linear-gradient(180deg, #EDE7F6 0%, #FDFAF5 100%); }
 [data-warm="premium"] .warm-col-primary { background: linear-gradient(180deg, #FBE8DE 0%, #FDFAF5 100%); }
-
-/* ── Warm pastel column backgrounds — Dark (deeper, muted) ── */
-.dark [data-warm="premium"] .warm-col-rose,
-.dark .warm-col-rose { background: linear-gradient(180deg, rgba(236, 180, 180, 0.10) 0%, var(--warm-bg-soft) 100%); }
-.dark [data-warm="premium"] .warm-col-honey,
-.dark .warm-col-honey { background: linear-gradient(180deg, rgba(245, 200, 120, 0.10) 0%, var(--warm-bg-soft) 100%); }
-.dark [data-warm="premium"] .warm-col-sage,
-.dark .warm-col-sage { background: linear-gradient(180deg, rgba(143, 191, 110, 0.10) 0%, var(--warm-bg-soft) 100%); }
-.dark [data-warm="premium"] .warm-col-sky,
-.dark .warm-col-sky { background: linear-gradient(180deg, rgba(143, 197, 232, 0.10) 0%, var(--warm-bg-soft) 100%); }
-.dark [data-warm="premium"] .warm-col-lavender,
-.dark .warm-col-lavender { background: linear-gradient(180deg, rgba(196, 184, 224, 0.10) 0%, var(--warm-bg-soft) 100%); }
-.dark [data-warm="premium"] .warm-col-primary,
-.dark .warm-col-primary { background: linear-gradient(180deg, rgba(232, 137, 94, 0.12) 0%, var(--warm-bg-soft) 100%); }
 
 /* ── Warm subtle hover lift ── */
 [data-warm="premium"] .warm-lift {
@@ -2719,7 +2628,7 @@ html[data-warm="premium"],
   animation: warm-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ── Warm primary gradient (for CTAs / hero buttons) — Light ── */
+/* ── Warm primary gradient (for CTAs / hero buttons) ── */
 [data-warm="premium"] .warm-primary-gradient {
   background: linear-gradient(135deg, var(--warm-primary) 0%, #D4634A 50%, #C5552E 100%);
   color: #FFFFFF;
@@ -2728,19 +2637,6 @@ html[data-warm="premium"],
 [data-warm="premium"] .warm-primary-gradient:hover {
   background: linear-gradient(135deg, var(--warm-primary-hover) 0%, #C5552E 50%, #B04826 100%);
   box-shadow: 0 16px 32px rgba(224, 120, 86, 0.22), 0 6px 12px rgba(224, 120, 86, 0.14);
-}
-
-/* ── Warm primary gradient — Dark (brighter for contrast) ── */
-.dark [data-warm="premium"] .warm-primary-gradient,
-.dark .warm-primary-gradient {
-  background: linear-gradient(135deg, var(--warm-primary) 0%, #D4634A 50%, #C5552E 100%);
-  color: #FFFFFF;
-  box-shadow: var(--warm-shadow-primary);
-}
-.dark [data-warm="premium"] .warm-primary-gradient:hover,
-.dark .warm-primary-gradient:hover {
-  background: linear-gradient(135deg, var(--warm-primary-hover) 0%, #C5552E 50%, #B04826 100%);
-  box-shadow: 0 16px 32px rgba(232, 137, 94, 0.30), 0 6px 12px rgba(232, 137, 94, 0.18);
 }
 
 /* ── Warm count-up shimmer (for stat cards before number loads) ── */
@@ -2776,10 +2672,6 @@ html[data-warm="premium"],
   outline: none;
   box-shadow: 0 0 0 3px rgba(224, 120, 86, 0.25);
   border-color: var(--warm-primary);
-}
-.dark [data-warm="premium"] *:focus-visible,
-.dark *:focus-visible.warm-premium-root {
-  box-shadow: 0 0 0 3px rgba(232, 137, 94, 0.35);
 }
 
 /* ── Warm utility classes (one-off helpers) ── */
@@ -2823,9 +2715,5 @@ html[data-warm="premium"],
   50% { box-shadow: 0 0 0 8px rgba(123, 160, 91, 0.15); }
 }
 [data-warm="premium"] .warm-glow-success {
-  animation: warm-glow-pulse 1.8s ease-in-out infinite;
-}
-.dark [data-warm="premium"] .warm-glow-success,
-.dark .warm-glow-success {
   animation: warm-glow-pulse 1.8s ease-in-out infinite;
 }
