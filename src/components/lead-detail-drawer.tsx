@@ -50,7 +50,6 @@ import {
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { PORTAL_THEMES, CRM_COLORS, PRIORITY_COLORS as THEME_PRIORITY_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
-import { warmConfetti } from '@/components/warm-premium/warm-confetti';
 
 const theme = PORTAL_THEMES.admin;
 import {
@@ -289,7 +288,6 @@ function ConvertToStudentDialog({
         throw new Error(data.error || 'Failed to convert lead');
       }
 
-      warmConfetti('celebrate');
       onOpenChange(false);
       onConverted();
     } catch (err) {

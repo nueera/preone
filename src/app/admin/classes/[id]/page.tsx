@@ -15,6 +15,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -22,20 +23,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 
 // ── Program CSS-var-based colors ──
 const PROGRAM_VARS: Record<string, { color: string; bg: string }> = {
@@ -189,12 +176,11 @@ export default function ClassDetailPage() {
 
   const programVars = PROGRAM_VARS[classData.program.name] || {
     color: 'var(--admin-text-muted)',
-    bg: 'var(--warm-surface-2)',
+    bg: 'var(--admin-surface-2)',
   };
   const occupancy = classData.capacity > 0 ? Math.round((classData._count.students / classData.capacity) * 100) : 0;
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
@@ -209,17 +195,17 @@ export default function ClassDetailPage() {
         </Button>
 
         {/* ── Class Info Header ── */}
-        <WarmCard variant="default" className="!rounded-xl">
-          <WarmCardContent>
+        <PreOneCard variant="default" className="!rounded-xl">
+          <PreOneCardContent>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               {/* Class Icon Badge */}
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-2xl"
-                style={{ background: 'var(--warm-primary-soft)' }}
+                style={{ background: 'var(--admin-primary-soft)' }}
               >
                 <GraduationCap
                   className="h-8 w-8"
-                  style={{ color: 'var(--warm-primary)' }}
+                  style={{ color: 'var(--admin-primary)' }}
                 />
               </div>
 
@@ -266,8 +252,8 @@ export default function ClassDetailPage() {
                 Edit
               </Button>
             </div>
-          </WarmCardContent>
-        </WarmCard>
+          </PreOneCardContent>
+        </PreOneCard>
 
         {/* ── Stat Cards ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -301,8 +287,8 @@ export default function ClassDetailPage() {
         </div>
 
         {/* ── Capacity Bar ── */}
-        <WarmCard className="!rounded-xl">
-          <WarmCardContent className="space-y-2">
+        <PreOneCard className="!rounded-xl">
+          <PreOneCardContent className="space-y-2">
             <div className="flex items-center justify-between">
               <span
                 className="text-sm font-medium"
@@ -318,8 +304,8 @@ export default function ClassDetailPage() {
               </span>
             </div>
             <Progress value={occupancy} className="h-2" />
-          </WarmCardContent>
-        </WarmCard>
+          </PreOneCardContent>
+        </PreOneCard>
 
         {/* ── Tabs ── */}
         <Tabs defaultValue="students" className="space-y-4">
@@ -364,15 +350,15 @@ export default function ClassDetailPage() {
                     {students.slice(0, 9).map((student) => (
                       <div
                         key={student.id}
-                        className="flex items-center gap-3 p-3 rounded-xl border hover:bg-[var(--warm-surface-2)] dark:hover:bg-[var(--warm-surface-2)] cursor-pointer transition-colors"
+                        className="flex items-center gap-3 p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] cursor-pointer transition-colors"
                         onClick={() => router.push(`/admin/students/${student.id}`)}
                       >
                         <Avatar className="h-9 w-9">
                           <AvatarFallback
                             className="text-xs font-semibold"
                             style={{
-                              background: 'var(--warm-primary-soft)',
-                              color: 'var(--warm-primary)',
+                              background: 'var(--admin-primary-soft)',
+                              color: 'var(--admin-primary)',
                             }}
                           >
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}
@@ -401,7 +387,7 @@ export default function ClassDetailPage() {
                                   color: 'var(--admin-success)',
                                 }
                               : {
-                                  background: 'var(--warm-surface-2)',
+                                  background: 'var(--admin-surface-2)',
                                   color: 'var(--admin-text-muted)',
                                 }
                           }
@@ -498,7 +484,7 @@ export default function ClassDetailPage() {
                     {activities.slice(0, 5).map((activity) => (
                       <div
                         key={activity.id}
-                        className="flex items-center justify-between p-3 rounded-xl border hover:bg-[var(--warm-surface-2)] dark:hover:bg-[var(--warm-surface-2)] transition-colors"
+                        className="flex items-center justify-between p-3 rounded-xl border hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)] transition-colors"
                       >
                         <div>
                           <p
@@ -528,7 +514,7 @@ export default function ClassDetailPage() {
                                     color: 'var(--admin-info)',
                                   }
                                 : {
-                                    background: 'var(--warm-surface-2)',
+                                    background: 'var(--admin-surface-2)',
                                     color: 'var(--admin-text-muted)',
                                   }
                           }
@@ -548,7 +534,7 @@ export default function ClassDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
+                  <Clock className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                   Weekly Schedule
                 </CardTitle>
               </CardHeader>
@@ -556,7 +542,7 @@ export default function ClassDetailPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b" style={{ borderColor: 'var(--warm-border)' }}>
+                      <tr className="border-b" style={{ borderColor: 'var(--admin-border)' }}>
                         <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>Day</th>
                         <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>9:00 AM</th>
                         <th className="py-2 px-3 text-left font-medium" style={{ color: 'var(--admin-text-muted)' }}>10:00 AM</th>
@@ -566,7 +552,7 @@ export default function ClassDetailPage() {
                     </thead>
                     <tbody>
                       {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
-                        <tr key={day} className="border-b last:border-0" style={{ borderColor: 'var(--warm-border)' }}>
+                        <tr key={day} className="border-b last:border-0" style={{ borderColor: 'var(--admin-border)' }}>
                           <td className="py-3 px-3 font-medium" style={{ color: 'var(--admin-text)' }}>{day}</td>
                           <td className="py-3 px-3">
                             <span className="rounded-lg px-2 py-1 text-xs font-medium" style={{ background: 'var(--admin-pink-soft)', color: 'var(--admin-pink)' }}>Circle Time</span>
@@ -591,6 +577,5 @@ export default function ClassDetailPage() {
         </Tabs>
       </div>
     </PageTransition>
-    </WarmPremium>
   );
 }

@@ -8,20 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 
 interface ReceiptData {
   id: string;
@@ -110,7 +96,6 @@ export default function ReceiptPage() {
   const primaryParent = receipt.invoice.student.parents?.find(p => p.isPrimary)?.parent;
 
   return (
-    <WarmPremium className="min-h-screen">
     <div className="max-w-lg mx-auto mt-4 space-y-4 print:mt-0">
       <div className="flex items-center justify-between print:hidden">
         <Button variant="ghost" className="gap-1 text-muted-foreground" onClick={() => router.push('/admin/fees')}>
@@ -121,7 +106,7 @@ export default function ReceiptPage() {
         </Button>
       </div>
 
-      <Card className="print:shadow-none print:border-[var(--warm-border)]">
+      <Card className="print:shadow-none print:border-[var(--admin-border)]">
         <CardContent className="p-8 space-y-6">
           {/* Header */}
           <div className="text-center">
@@ -192,13 +177,12 @@ export default function ReceiptPage() {
 
           {/* Signatory */}
           <div className="pt-8">
-            <div className="border-t border-[var(--warm-border)] pt-2 w-48 ml-auto text-center">
+            <div className="border-t border-[var(--admin-border)] pt-2 w-48 ml-auto text-center">
               <p className="text-xs text-muted-foreground">Authorized Signatory</p>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-    </WarmPremium>
   );
 }

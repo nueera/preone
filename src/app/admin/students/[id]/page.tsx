@@ -36,20 +36,6 @@ import {
 } from '@/components/ui/table';
 import { TransferStudentDialog } from '@/components/transfer-student-dialog';
 import { PORTAL_THEMES, CHART_PALETTE } from '@/lib/theme-tokens';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 const theme = PORTAL_THEMES.admin;
 import {
   RadarChart,
@@ -198,7 +184,7 @@ interface StudentData {
 // ── Status badge ──
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-[var(--admin-success-soft)] text-[var(--admin-success)] border-[var(--admin-success)]',
-  INACTIVE: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
+  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
   GRADUATED: 'bg-[var(--admin-info-soft)] text-[var(--admin-info)] border-[var(--admin-info)]',
   TRANSFERRED: 'bg-[var(--admin-warning-soft)] text-[var(--admin-warning)] border-[var(--admin-warning)]',
 };
@@ -208,7 +194,7 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
   PARTIAL: 'bg-[var(--admin-info-soft)] text-[var(--admin-info)] border-[var(--admin-info)]',
   PAID: 'bg-[var(--admin-success-soft)] text-[var(--admin-success)] border-[var(--admin-success)]',
   OVERDUE: 'bg-red-50 text-red-700 border-red-200',
-  CANCELLED: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
 };
 
 function getToken(): string | null {
@@ -349,7 +335,7 @@ export default function StudentDetailPage() {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = format(new Date(attendanceMonth.getFullYear(), attendanceMonth.getMonth(), d), 'yyyy-MM-dd');
       const record = monthAttendance.find((a) => format(new Date(a.date), 'yyyy-MM-dd') === dateStr);
-      let bgColor = 'bg-[var(--warm-surface-2)]';
+      let bgColor = 'bg-[var(--admin-surface-2)]';
       if (record) {
         if (record.status === 'PRESENT') bgColor = 'bg-[var(--admin-success-soft)] text-[var(--admin-success)]';
         else if (record.status === 'ABSENT') bgColor = 'bg-red-50 text-[var(--admin-error)]';
@@ -368,7 +354,6 @@ export default function StudentDetailPage() {
   };
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
     <StaggerContainer className="space-y-6 max-w-[1440px] mx-auto">
       {/* ── Back Button ── */}
@@ -384,10 +369,10 @@ export default function StudentDetailPage() {
       </StaggerItem>
 
       {/* ── Profile Header ── */}
-      <div className="rounded-xl border bg-[var(--warm-surface)] p-6 shadow-sm dark:bg-[var(--warm-surface)]">
+      <div className="rounded-xl border bg-[var(--admin-surface)] p-6 shadow-sm dark:bg-[var(--admin-surface)]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-[var(--warm-primary-soft)] text-[var(--warm-primary)] text-2xl font-bold">
+            <AvatarFallback className="bg-[var(--admin-primary-soft)] text-[var(--admin-primary)] text-2xl font-bold">
               {student.firstName.charAt(0)}{student.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -445,7 +430,7 @@ export default function StudentDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
+                  <User className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                   Personal Information
                 </CardTitle>
               </CardHeader>
@@ -506,7 +491,7 @@ export default function StudentDetailPage() {
               <CardContent className="space-y-4">
                 {father && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--warm-primary)' }}>Father</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--admin-primary)' }}>Father</p>
                     <p className="text-sm">{father.firstName} {father.lastName}</p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3" /> {father.phone}
@@ -523,7 +508,7 @@ export default function StudentDetailPage() {
                 )}
                 {mother && (
                   <div className="rounded-lg border p-3 space-y-1">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--warm-primary)' }}>Mother</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--admin-primary)' }}>Mother</p>
                     <p className="text-sm">{mother.firstName} {mother.lastName}</p>
                     {mother.phone && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -608,7 +593,7 @@ export default function StudentDetailPage() {
                     <div className="h-3 w-3 rounded" style={{ backgroundColor: 'var(--admin-warning-soft)' }} /> Late
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="h-3 w-3 rounded bg-[var(--warm-surface-2)]" /> No Data
+                    <div className="h-3 w-3 rounded bg-[var(--admin-surface-2)]" /> No Data
                   </div>
                 </div>
               </CardContent>
@@ -637,7 +622,7 @@ export default function StudentDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Attendance Rate</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--warm-primary)' }}>{attendanceRate}%</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--admin-primary)' }}>{attendanceRate}%</p>
                 </CardContent>
               </Card>
             </div>
@@ -856,7 +841,7 @@ export default function StudentDetailPage() {
                 <Card key={med.id}>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Shield className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
+                      <Shield className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
                       Medical Record
                     </CardTitle>
                   </CardHeader>
@@ -1046,6 +1031,5 @@ export default function StudentDetailPage() {
       />
     </StaggerContainer>
     </PageTransition>
-    </WarmPremium>
   );
 }

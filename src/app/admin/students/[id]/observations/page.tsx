@@ -3,26 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { PORTAL_THEMES, OBSERVATION_COLORS } from '@/lib/theme-tokens';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 import {
   Eye,
   Plus,
@@ -67,7 +54,7 @@ const CATEGORY_ICON: Record<string, React.ElementType> = {
 };
 
 const PRIORITY_BADGE: Record<string, string> = {
-  LOW: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]',
+  LOW: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
   NORMAL: 'bg-blue-50 text-blue-700',
   HIGH: 'bg-amber-50 text-amber-700',
   CONCERN: 'bg-red-50 text-red-700',
@@ -118,7 +105,6 @@ export default function StudentObservationsPage() {
   }, [observations]);
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         {/* Header */}
@@ -140,7 +126,7 @@ export default function StudentObservationsPage() {
         {/* Add Observation Form */}
         {showForm && (
           <StaggerItem>
-            <WarmCard variant="emotional" className="p-4">
+            <PreOneCard variant="emotional" className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-[var(--admin-text)]">New Observation</h3>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowForm(false)}>
@@ -171,7 +157,7 @@ export default function StudentObservationsPage() {
                   </Button>
                 </div>
               </div>
-            </WarmCard>
+            </PreOneCard>
           </StaggerItem>
         )}
 
@@ -182,11 +168,11 @@ export default function StudentObservationsPage() {
               const cfg = OBSERVATION_COLORS[key] || OBSERVATION_COLORS.COGNITIVE;
               const Icon = CATEGORY_ICON[key] || Brain;
               return (
-                <WarmCard key={key} variant="strip" className="p-3 text-center">
+                <PreOneCard key={key} variant="strip" className="p-3 text-center">
                   <Icon className={`w-5 h-5 mx-auto ${cfg.text}`} />
                   <p className="text-[10px] text-[var(--admin-text-muted)] mt-1 capitalize">{toTitle(key)}</p>
                   <p className="text-sm font-bold" style={{ color: cfg.hex }}>{categoryCounts[key] || 0}</p>
-                </WarmCard>
+                </PreOneCard>
               );
             })}
           </div>
@@ -194,8 +180,8 @@ export default function StudentObservationsPage() {
 
         {/* Timeline */}
         <StaggerItem>
-          <WarmCard variant="default">
-            <WarmCardContent>
+          <PreOneCard variant="default">
+            <PreOneCardContent>
               <h3 className="font-semibold text-[var(--admin-text)] mb-4">Observation Timeline</h3>
               {loading ? (
                 <div className="flex items-center justify-center py-12 text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading observations…</div>
@@ -205,7 +191,7 @@ export default function StudentObservationsPage() {
                 <div className="py-12 text-center text-[var(--admin-text-subtle)] text-sm">No observations recorded for this student yet.</div>
               ) : (
                 <ScrollArea className="max-h-[500px]">
-                  <div className="relative pl-6 border-l-2 border-[var(--warm-border)] space-y-6">
+                  <div className="relative pl-6 border-l-2 border-[var(--admin-border)] space-y-6">
                     {observations.map((obs) => {
                       const cfg = OBSERVATION_COLORS[obs.category] || OBSERVATION_COLORS.COGNITIVE;
                       const Icon = CATEGORY_ICON[obs.category] || Brain;
@@ -217,7 +203,7 @@ export default function StudentObservationsPage() {
                           <div className="ml-4 p-3 rounded-xl border hover:shadow-sm transition-shadow">
                             <div className="flex items-center justify-between mb-1">
                               <h4 className="text-sm font-medium text-[var(--admin-text)]">{toTitle(obs.category)}</h4>
-                              <Badge className={`${PRIORITY_BADGE[obs.priority] || 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{obs.priority}</Badge>
+                              <Badge className={`${PRIORITY_BADGE[obs.priority] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{obs.priority}</Badge>
                             </div>
                             <p className="text-sm text-[var(--admin-text-muted)] mb-2">{obs.content}</p>
                             <div className="flex items-center gap-3 text-xs text-[var(--admin-text-subtle)]">
@@ -232,11 +218,10 @@ export default function StudentObservationsPage() {
                   </div>
                 </ScrollArea>
               )}
-            </WarmCardContent>
-          </WarmCard>
+            </PreOneCardContent>
+          </PreOneCard>
         </StaggerItem>
       </StaggerContainer>
     </PageTransition>
-    </WarmPremium>
   );
 }

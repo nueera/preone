@@ -2529,34 +2529,6 @@ body, p, span, div {
   --warm-font-numeric: var(--font-jakarta), 'SF Pro Display', system-ui, sans-serif;
 }
 
-/* ── Admin → Warm token aliases (so legacy --admin-* vars use warm values inside WarmPremium) ── */
-[data-warm="premium"] {
-  --admin-text: var(--warm-ink);
-  --admin-text-muted: var(--warm-ink-muted);
-  --admin-text-subtle: var(--warm-ink-soft);
-  --admin-bg: var(--warm-bg);
-  --admin-bg-soft: var(--warm-bg-soft);
-  --admin-surface: var(--warm-surface);
-  --admin-surface-2: var(--warm-surface-tint);
-  --admin-border: var(--warm-border);
-  --admin-border-soft: var(--warm-divider);
-  --admin-primary: var(--warm-primary);
-  --admin-primary-soft: var(--warm-primary-soft);
-  --admin-primary-ink: var(--warm-primary-ink);
-  --admin-success: var(--warm-sage);
-  --admin-success-soft: var(--warm-sage-soft);
-  --admin-error: var(--warm-rose);
-  --admin-error-soft: var(--warm-rose-soft);
-  --admin-warning: var(--warm-honey);
-  --admin-warning-soft: var(--warm-honey-soft);
-  --admin-info: var(--warm-sky);
-  --admin-info-soft: var(--warm-sky-soft);
-  --admin-orange: var(--warm-primary);
-  --admin-orange-soft: var(--warm-primary-soft);
-  --admin-pink: var(--warm-rose);
-  --admin-pink-soft: var(--warm-rose-soft);
-}
-
 /* ── Warm Premium Base — apply to wrapper ── */
 [data-warm="premium"] {
   background: var(--warm-bg);
@@ -2626,17 +2598,6 @@ body, p, span, div {
 }
 [data-warm="premium"] .warm-fade-in {
   animation: warm-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* ── Warm primary gradient (for CTAs / hero buttons) ── */
-[data-warm="premium"] .warm-primary-gradient {
-  background: linear-gradient(135deg, var(--warm-primary) 0%, #D4634A 50%, #C5552E 100%);
-  color: #FFFFFF;
-  box-shadow: var(--warm-shadow-primary);
-}
-[data-warm="premium"] .warm-primary-gradient:hover {
-  background: linear-gradient(135deg, var(--warm-primary-hover) 0%, #C5552E 50%, #B04826 100%);
-  box-shadow: 0 16px 32px rgba(224, 120, 86, 0.22), 0 6px 12px rgba(224, 120, 86, 0.14);
 }
 
 /* ── Warm count-up shimmer (for stat cards before number loads) ── */

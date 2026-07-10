@@ -2,24 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { PORTAL_THEMES, FEE_COLORS } from '@/lib/theme-tokens';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 import {
   Table,
   TableBody,
@@ -131,7 +118,6 @@ export default function InvoicesPage() {
   const paidAmount = filteredInvoices.filter((i) => i.status === 'PAID').reduce((s, i) => s + i.amount, 0);
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         {/* Header */}
@@ -164,10 +150,10 @@ export default function InvoicesPage() {
               { label: 'Pending', value: `${filteredInvoices.filter((i) => i.status === 'PENDING').length}`, color: 'text-amber-700 bg-amber-50' },
               { label: 'Overdue', value: `${filteredInvoices.filter((i) => i.status === 'OVERDUE').length}`, color: 'text-red-700 bg-red-50' },
             ].map((stat) => (
-              <WarmCard key={stat.label} variant="strip" className="p-4">
+              <PreOneCard key={stat.label} variant="strip" className="p-4">
                 <p className="text-xs text-[var(--admin-text-muted)]">{stat.label}</p>
                 <p className={`text-lg font-bold mt-1 ${stat.color.split(' ')[0]}`}>{stat.value}</p>
-              </WarmCard>
+              </PreOneCard>
             ))}
           </div>
         </StaggerItem>
@@ -201,7 +187,7 @@ export default function InvoicesPage() {
 
         {/* Invoice Table */}
         <StaggerItem>
-          <WarmCard variant="default">
+          <PreOneCard variant="default">
             <div className="overflow-hidden">
               <Table>
                 <TableHeader>
@@ -266,10 +252,9 @@ export default function InvoicesPage() {
                 </TableBody>
               </Table>
             </div>
-          </WarmCard>
+          </PreOneCard>
         </StaggerItem>
       </StaggerContainer>
     </PageTransition>
-    </WarmPremium>
   );
 }

@@ -25,23 +25,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { AddStudentDialog } from '@/components/add-student-dialog';
 import { TransferStudentDialog } from '@/components/transfer-student-dialog';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 
 // ── Types ──
 type StudentStatus = 'ACTIVE' | 'INACTIVE' | 'GRADUATED' | 'TRANSFERRED';
@@ -100,7 +87,7 @@ const STATUS_CONFIG: Record<StudentStatus, { label: string; dotColor: string; ba
   INACTIVE: {
     label: 'Inactive',
     dotColor: 'var(--admin-text-muted)',
-    badgeBg: 'var(--warm-surface-2)',
+    badgeBg: 'var(--admin-surface-2)',
     badgeText: 'var(--admin-text-muted)',
   },
   GRADUATED: {
@@ -119,9 +106,9 @@ const STATUS_CONFIG: Record<StudentStatus, { label: string; dotColor: string; ba
 
 // ── Filter Pill Config ──
 const STATUS_PILLS: { label: string; value: 'All' | StudentStatus; activeColor: string; activeBg: string }[] = [
-  { label: 'All', value: 'All', activeColor: 'var(--warm-primary)', activeBg: 'var(--warm-primary-soft)' },
+  { label: 'All', value: 'All', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
   { label: 'Active', value: 'ACTIVE', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
-  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--warm-surface-2)' },
+  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
   { label: 'Graduated', value: 'GRADUATED', activeColor: 'var(--admin-info)', activeBg: 'var(--admin-info-soft)' },
   { label: 'Transferred', value: 'TRANSFERRED', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
 ];
@@ -193,7 +180,7 @@ function FilterPill({
       style={
         active
           ? { background: activeBg, color: activeColor }
-          : { background: 'var(--warm-surface-2)', color: 'var(--admin-text-muted)' }
+          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
       }
     >
       {label}
@@ -220,14 +207,14 @@ function KpiCard({
   loading?: boolean;
 }) {
   return (
-    <WarmCard variant="strip" hover className="p-4 relative overflow-hidden">
+    <PreOneCard variant="strip" hover className="p-4 relative overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium" style={{ color: 'var(--admin-text-muted)' }}>
             {label}
           </p>
           {loading ? (
-            <div className="mt-2 h-7 w-16 animate-pulse rounded-md" style={{ background: 'var(--warm-surface-2)' }} />
+            <div className="mt-2 h-7 w-16 animate-pulse rounded-md" style={{ background: 'var(--admin-surface-2)' }} />
           ) : (
             <p className="mt-1 text-2xl font-bold tracking-tight" style={{ color: 'var(--admin-text)' }}>
               {value}
@@ -250,40 +237,40 @@ function KpiCard({
         className="absolute bottom-0 left-0 h-0.5 w-full opacity-60"
         style={{ background: `linear-gradient(to right, ${accent}, transparent)` }}
       />
-    </WarmCard>
+    </PreOneCard>
   );
 }
 
 // ── Row Skeleton ──
 function RowSkeleton() {
   return (
-    <tr className="border-b" style={{ borderColor: 'var(--warm-border)' }}>
+    <tr className="border-b" style={{ borderColor: 'var(--admin-border)' }}>
       <td className="w-10 px-4 py-3">
-        <div className="h-4 w-4 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-4 w-4 rounded" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full" style={{ background: 'var(--warm-surface-2)' }} />
+          <div className="h-9 w-9 rounded-full" style={{ background: 'var(--admin-surface-2)' }} />
           <div className="space-y-1.5">
-            <div className="h-3 w-32 rounded" style={{ background: 'var(--warm-surface-2)' }} />
-            <div className="h-2.5 w-20 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+            <div className="h-3 w-32 rounded" style={{ background: 'var(--admin-surface-2)' }} />
+            <div className="h-2.5 w-20 rounded" style={{ background: 'var(--admin-surface-2)' }} />
           </div>
         </div>
       </td>
       <td className="px-4 py-3">
-        <div className="h-5 w-20 rounded-full" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-5 w-20 rounded-full" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
       <td className="px-4 py-3">
-        <div className="h-3 w-24 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-3 w-24 rounded" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
       <td className="px-4 py-3">
-        <div className="h-3 w-28 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-3 w-28 rounded" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
       <td className="px-4 py-3">
-        <div className="h-3 w-20 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-3 w-20 rounded" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
       <td className="w-12 px-4 py-3">
-        <div className="h-5 w-5 rounded" style={{ background: 'var(--warm-surface-2)' }} />
+        <div className="h-5 w-5 rounded" style={{ background: 'var(--admin-surface-2)' }} />
       </td>
     </tr>
   );
@@ -457,7 +444,6 @@ export default function StudentsListPage() {
   }, [totalPages, safePage]);
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── SECTION 1: HEADER ── */}
@@ -466,9 +452,9 @@ export default function StudentsListPage() {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: 'var(--warm-primary-soft)' }}
+                style={{ background: 'var(--admin-primary-soft)' }}
               >
-                <Users className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
+                <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
               </div>
               <div>
                 <h1
@@ -494,7 +480,7 @@ export default function StudentsListPage() {
               </Button>
               <Button
                 size="sm"
-                className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
+                className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
                 onClick={() => setAddDialogOpen(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -511,8 +497,8 @@ export default function StudentsListPage() {
               label="Total Students"
               value={total}
               icon={Users}
-              accent="var(--warm-primary)"
-              bg="var(--warm-primary-soft)"
+              accent="var(--admin-primary)"
+              bg="var(--admin-primary-soft)"
               loading={loading}
             />
             <KpiCard
@@ -529,7 +515,7 @@ export default function StudentsListPage() {
               value={kpi.inactive}
               icon={UserX}
               accent="var(--admin-text-muted)"
-              bg="var(--warm-surface-2)"
+              bg="var(--admin-surface-2)"
               hint="On this page"
               loading={loading}
             />
@@ -547,7 +533,7 @@ export default function StudentsListPage() {
         {/* ── SECTION 3: ERROR BANNER ── */}
         {error && (
           <StaggerItem>
-            <WarmCard variant="default" className="p-4 border" style={{ borderColor: 'var(--admin-error)' }}>
+            <PreOneCard variant="default" className="p-4 border" style={{ borderColor: 'var(--admin-error)' }}>
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 shrink-0" style={{ color: 'var(--admin-error)' }} />
                 <div className="flex-1 min-w-0">
@@ -568,13 +554,13 @@ export default function StudentsListPage() {
                   Retry
                 </Button>
               </div>
-            </WarmCard>
+            </PreOneCard>
           </StaggerItem>
         )}
 
         {/* ── SECTION 4: FILTER BAR ── */}
         <StaggerItem>
-          <WarmCard className="!rounded-xl">
+          <PreOneCard className="!rounded-xl">
             <div className="p-4 space-y-3">
               {/* Row 1: Search + Class Dropdown */}
               <div className="flex flex-wrap items-center gap-3">
@@ -590,16 +576,16 @@ export default function StudentsListPage() {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="h-10 w-full rounded-lg border px-3 pl-9 text-sm outline-none transition-colors"
                     style={{
-                      background: 'var(--warm-surface-2)',
-                      borderColor: 'var(--warm-border)',
+                      background: 'var(--admin-surface-2)',
+                      borderColor: 'var(--admin-border)',
                       color: 'var(--admin-text)',
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--warm-primary)';
-                      e.currentTarget.style.boxShadow = '0 0 0 2px var(--warm-primary-soft)';
+                      e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                      e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
                     }}
                     onBlur={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--warm-border)';
+                      e.currentTarget.style.borderColor = 'var(--admin-border)';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   />
@@ -609,8 +595,8 @@ export default function StudentsListPage() {
                   onChange={(e) => handleClassFilter(e.target.value)}
                   className="h-10 rounded-lg border px-3 text-sm outline-none"
                   style={{
-                    background: 'var(--warm-surface)',
-                    borderColor: 'var(--warm-border)',
+                    background: 'var(--admin-surface)',
+                    borderColor: 'var(--admin-border)',
                     color: 'var(--admin-text)',
                   }}
                 >
@@ -652,16 +638,16 @@ export default function StudentsListPage() {
                 )}
               </div>
             </div>
-          </WarmCard>
+          </PreOneCard>
         </StaggerItem>
 
         {/* ── SECTION 5: STATS BAR + DATA TABLE ── */}
         <StaggerItem>
-          <WarmCard className="!rounded-xl overflow-hidden">
+          <PreOneCard className="!rounded-xl overflow-hidden">
             {/* Stats Bar */}
             <div
               className="flex items-center justify-between border-b px-5 py-3"
-              style={{ borderColor: 'var(--warm-border)' }}
+              style={{ borderColor: 'var(--admin-border)' }}
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
@@ -670,8 +656,8 @@ export default function StudentsListPage() {
                 <span
                   className="rounded-md px-2 py-0.5 text-sm font-bold"
                   style={{
-                    background: 'var(--warm-primary-soft)',
-                    color: 'var(--warm-primary)',
+                    background: 'var(--admin-primary-soft)',
+                    color: 'var(--admin-primary)',
                   }}
                 >
                   {total}
@@ -689,13 +675,13 @@ export default function StudentsListPage() {
                 <thead>
                   <tr
                     className="border-b"
-                    style={{ borderColor: 'var(--warm-border)' }}
+                    style={{ borderColor: 'var(--admin-border)' }}
                   >
                     <th className="w-10 px-4 py-3">
                       <input
                         type="checkbox"
                         className="h-4 w-4 rounded"
-                        style={{ accentColor: 'var(--warm-primary)' }}
+                        style={{ accentColor: 'var(--admin-primary)' }}
                         checked={
                           students.length > 0 &&
                           selectedIds.size === students.length
@@ -745,7 +731,7 @@ export default function StudentsListPage() {
                         <div className="flex flex-col items-center gap-3">
                           <div
                             className="flex h-12 w-12 items-center justify-center rounded-2xl"
-                            style={{ background: 'var(--warm-surface-2)' }}
+                            style={{ background: 'var(--admin-surface-2)' }}
                           >
                             <Users className="h-5 w-5" style={{ color: 'var(--admin-text-subtle)' }} />
                           </div>
@@ -766,7 +752,7 @@ export default function StudentsListPage() {
                           ) : (
                             <Button
                               size="sm"
-                              className="gap-1.5 bg-warm-primary-gradient text-white border-0"
+                              className="gap-1.5 bg-brand-gradient text-white border-0"
                               onClick={() => setAddDialogOpen(true)}
                             >
                               <Plus className="h-3.5 w-3.5" /> Add Student
@@ -781,10 +767,10 @@ export default function StudentsListPage() {
                       return (
                         <tr
                           key={s.id}
-                          className="border-b transition-colors hover:bg-[var(--warm-surface-2)] cursor-pointer"
+                          className="border-b transition-colors hover:bg-[var(--admin-surface-2)] cursor-pointer"
                           style={{
-                            borderColor: 'var(--warm-border)',
-                            background: isSelected ? 'var(--warm-primary-soft)' : undefined,
+                            borderColor: 'var(--admin-border)',
+                            background: isSelected ? 'var(--admin-primary-soft)' : undefined,
                           }}
                           onClick={() => router.push(`/admin/students/${s.id}`)}
                         >
@@ -792,7 +778,7 @@ export default function StudentsListPage() {
                             <input
                               type="checkbox"
                               className="h-4 w-4 rounded"
-                              style={{ accentColor: 'var(--warm-primary)' }}
+                              style={{ accentColor: 'var(--admin-primary)' }}
                               checked={isSelected}
                               onChange={() => toggleSelectRow(s.id)}
                             />
@@ -803,8 +789,8 @@ export default function StudentsListPage() {
                                 <AvatarFallback
                                   className="text-xs font-semibold"
                                   style={{
-                                    background: 'var(--warm-primary-soft)',
-                                    color: 'var(--warm-primary)',
+                                    background: 'var(--admin-primary-soft)',
+                                    color: 'var(--admin-primary)',
                                   }}
                                 >
                                   {s.avatarInitials}
@@ -881,7 +867,7 @@ export default function StudentsListPage() {
             {!loading && students.length > 0 && (
               <div
                 className="flex flex-col gap-3 border-t px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
-                style={{ borderColor: 'var(--warm-border)' }}
+                style={{ borderColor: 'var(--admin-border)' }}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
@@ -932,7 +918,7 @@ export default function StudentsListPage() {
                 </div>
               </div>
             )}
-          </WarmCard>
+          </PreOneCard>
         </StaggerItem>
 
         {/* ── DIALOGS ── */}
@@ -959,6 +945,5 @@ export default function StudentsListPage() {
         )}
       </StaggerContainer>
     </PageTransition>
-    </WarmPremium>
   );
 }

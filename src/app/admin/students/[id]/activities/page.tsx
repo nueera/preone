@@ -3,25 +3,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
+import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { PORTAL_THEMES, ACTIVITY_COLORS } from '@/lib/theme-tokens';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  WarmPremium,
-  WarmCard,
-  WarmCardHeader,
-  WarmCardTitle,
-  WarmCardDescription,
-  WarmCardContent,
-  WarmCardFooter,
-  WarmSectionHeading,
-  WarmEmptyState,
-  WarmButton,
-  WarmStatCard,
-  WarmPill,
-} from '@/components/warm-premium';
 import {
   Palette,
   Search,
@@ -60,7 +47,7 @@ const STATUS_BADGE: Record<string, string> = {
   COMPLETED: 'bg-emerald-50 text-emerald-700',
   UPCOMING: 'bg-blue-50 text-blue-700',
   ONGOING: 'bg-amber-50 text-amber-700',
-  CANCELLED: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]',
+  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]',
 };
 
 export default function StudentActivitiesPage() {
@@ -122,7 +109,6 @@ export default function StudentActivitiesPage() {
   const ongoing = activities.filter((a) => a.status === 'ONGOING').length;
 
   return (
-    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         {/* Header */}
@@ -144,22 +130,22 @@ export default function StudentActivitiesPage() {
         {/* Stats */}
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <WarmCard variant="strip" className="p-4">
+            <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-[var(--admin-text-muted)]">Total Activities</p>
               <p className="text-lg font-bold text-purple-700">{activities.length}</p>
-            </WarmCard>
-            <WarmCard variant="strip" className="p-4">
+            </PreOneCard>
+            <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-[var(--admin-text-muted)]">Completed</p>
               <p className="text-lg font-bold text-emerald-700">{completed}</p>
-            </WarmCard>
-            <WarmCard variant="strip" className="p-4">
+            </PreOneCard>
+            <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-[var(--admin-text-muted)]">Upcoming</p>
               <p className="text-lg font-bold text-blue-700">{upcoming}</p>
-            </WarmCard>
-            <WarmCard variant="strip" className="p-4">
+            </PreOneCard>
+            <PreOneCard variant="strip" className="p-4">
               <p className="text-xs text-[var(--admin-text-muted)]">Ongoing</p>
               <p className="text-lg font-bold text-amber-700">{ongoing}</p>
-            </WarmCard>
+            </PreOneCard>
           </div>
         </StaggerItem>
 
@@ -183,8 +169,8 @@ export default function StudentActivitiesPage() {
 
         {/* Activity Timeline */}
         <StaggerItem>
-          <WarmCard variant="default">
-            <WarmCardContent>
+          <PreOneCard variant="default">
+            <PreOneCardContent>
               <h3 className="font-semibold text-[var(--admin-text)] mb-4">Participation History</h3>
               {loading ? (
                 <div className="flex items-center justify-center py-12 text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading activities…</div>
@@ -196,16 +182,16 @@ export default function StudentActivitiesPage() {
                 <ScrollArea className="max-h-96">
                   <div className="space-y-3">
                     {filteredActivities.map((a) => {
-                      const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER || { bg: 'bg-[var(--warm-surface-2)]', icon: '🎯' };
+                      const typeCfg = ACTIVITY_COLORS[a.type] || ACTIVITY_COLORS.OTHER || { bg: 'bg-[var(--admin-surface-2)]', icon: '🎯' };
                       return (
-                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--warm-surface-2)] transition-colors">
+                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--admin-surface-2)] transition-colors">
                           <div className={`w-10 h-10 rounded-xl ${typeCfg.bg} flex items-center justify-center shrink-0`}>
                             <span className="text-lg">{typeCfg.icon}</span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-medium text-[var(--admin-text)]">{a.name}</p>
-                              <Badge className={`${STATUS_BADGE[a.status] || 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{a.status}</Badge>
+                              <Badge className={`${STATUS_BADGE[a.status] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{a.status}</Badge>
                             </div>
                             <div className="flex items-center gap-3 mt-1 text-xs text-[var(--admin-text-muted)]">
                               <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(a.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
@@ -222,11 +208,10 @@ export default function StudentActivitiesPage() {
                   </div>
                 </ScrollArea>
               )}
-            </WarmCardContent>
-          </WarmCard>
+            </PreOneCardContent>
+          </PreOneCard>
         </StaggerItem>
       </StaggerContainer>
     </PageTransition>
-    </WarmPremium>
   );
 }
