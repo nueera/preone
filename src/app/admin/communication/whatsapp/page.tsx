@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
@@ -43,21 +43,10 @@ interface BroadcastList {
   lastSent?: string;
 }
 
-const MOCK_TEMPLATES: WhatsAppTemplate[] = [
-  { id: '1', name: 'Fee Reminder', category: 'Fee', body: 'Dear Parent, the fee of ₹{amount} for {student_name} is due by {due_date}. Please pay at the earliest. — PreOne School', variables: ['amount', 'student_name', 'due_date'], usageCount: 156 },
-  { id: '2', name: 'Attendance Alert', category: 'Attendance', body: 'Your child {student_name} was marked {status} today. — PreOne School', variables: ['student_name', 'status'], usageCount: 89 },
-  { id: '3', name: 'Event Invite', category: 'Event', body: 'You are invited to {event_name} on {event_date} at {event_time}. We look forward to seeing you! — PreOne School', variables: ['event_name', 'event_date', 'event_time'], usageCount: 42 },
-  { id: '4', name: 'Daily Update', category: 'General', body: 'Today {student_name} had a great day! 🌟 Activities: {activities}. Meals: {meal_status}. Mood: {mood}. — PreOne School', variables: ['student_name', 'activities', 'meal_status', 'mood'], usageCount: 234 },
-  { id: '5', name: 'Holiday Notice', category: 'General', body: 'School will be closed on {date} for {holiday_name}. Classes resume on {resume_date}. — PreOne School', variables: ['date', 'holiday_name', 'resume_date'], usageCount: 28 },
-];
-
-const MOCK_BROADCASTS: BroadcastList[] = [
-  { id: '1', name: 'All Parents', recipients: 186, lastSent: '2026-06-10' },
-  { id: '2', name: 'Nursery Parents', recipients: 64, lastSent: '2026-06-09' },
-  { id: '3', name: 'LKG Parents', recipients: 62, lastSent: '2026-06-08' },
-  { id: '4', name: 'UKG Parents', recipients: 60, lastSent: '2026-06-05' },
-  { id: '5', name: 'Fee Defaulters', recipients: 12, lastSent: '2026-06-12' },
-];
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('preone_token');
+}
 
 const RECENT_MESSAGES = [
   { id: '1', to: 'All Parents', message: 'Summer camp registration is now open!', time: '2h ago', status: 'DELIVERED', count: 186 },
@@ -74,6 +63,44 @@ const STATUS_BADGE: Record<string, string> = {
 export default function WhatsAppPage() {
   const [isConnected] = useState(true);
   const [message, setMessage] = useState('');
+  const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
+  const [broadcasts, setBroadcasts] = useState<BroadcastList[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = getToken();
+      const headers = { Authorization: `Bearer ${token}` };
+      const [templatesRes, broadcastsRes] = await Promise.all([
+        fetch('/api/templates?channel=WhatsApp', { headers }),
+        fetch('/api/whatsapp/broadcasts', { headers }),
+      ]);
+      if (templatesRes.ok) {
+        const data = await templatesRes.json();
+        setTemplates((data.templates || []) as WhatsAppTemplate[]);
+      }
+      if (broadcastsRes.ok) {
+        const data = await broadcastsRes.json();
+        setBroadcasts(
+          (data.broadcastLists || []).map((b: { id: string; name: string; recipientCount: number; lastSentAt?: string }) => ({
+            id: b.id,
+            name: b.name,
+            recipients: b.recipientCount,
+            lastSent: b.lastSentAt,
+          }))
+        );
+      }
+    } catch (err) {
+      console.error('Failed to fetch WhatsApp data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return (
     <PageTransition>
@@ -106,8 +133,8 @@ export default function WhatsAppPage() {
                   <p className="text-sm text-[var(--admin-text-muted)]">Phone: +91 98765 43210 • Business: PreOne Preschool</p>
                   <div className="flex items-center gap-4 mt-1 text-xs text-[var(--admin-text-subtle)]">
                     <span>Messages Today: 24</span>
-                    <span>Templates: {MOCK_TEMPLATES.length}</span>
-                    <span>Lists: {MOCK_BROADCASTS.length}</span>
+                    <span>Templates: {templates.length}</span>
+                    <span>Lists: {broadcasts.length}</span>
                   </div>
                 </div>
               </div>
@@ -127,9 +154,12 @@ export default function WhatsAppPage() {
                   <h3 className="font-semibold text-[var(--admin-text)]">Message Templates</h3>
                   <Button variant="outline" size="sm"><Plus className="w-3 h-3 mr-1" /> New Template</Button>
                 </div>
+                {loading ? (
+                  <div className="text-center py-8 text-[var(--admin-text-subtle)] text-sm">Loading templates...</div>
+                ) : (
                 <ScrollArea className="max-h-64">
                   <div className="space-y-2">
-                    {MOCK_TEMPLATES.map((t) => (
+                    {templates.map((t) => (
                       <div key={t.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow">
                         <div className="flex items-center justify-between mb-1">
                           <h4 className="text-sm font-medium text-[var(--admin-text)]">{t.name}</h4>
@@ -151,6 +181,7 @@ export default function WhatsAppPage() {
                     ))}
                   </div>
                 </ScrollArea>
+                )}
               </PreOneCardContent>
             </PreOneCard>
           </StaggerItem>
@@ -165,7 +196,7 @@ export default function WhatsAppPage() {
                 </div>
                 <ScrollArea className="max-h-64">
                   <div className="space-y-2">
-                    {MOCK_BROADCASTS.map((b) => (
+                    {broadcasts.map((b) => (
                       <div key={b.id} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-[var(--admin-surface-2)]">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
