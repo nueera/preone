@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import {
   Plug,
@@ -20,6 +21,8 @@ import {
   XCircle,
   AlertTriangle,
   RefreshCw,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -28,19 +31,19 @@ interface Integration {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
   status: 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
   apiKey?: string;
   webhookUrl?: string;
   lastSync?: string;
 }
 
-const MOCK_INTEGRATIONS: Integration[] = [
-  { id: '1', name: 'WhatsApp Business API', description: 'Send messages, templates, and broadcasts via WhatsApp', icon: MessageSquare, status: 'CONNECTED', apiKey: 'sk-whatsapp-****-****-abcd', lastSync: '5m ago' },
-  { id: '2', name: 'Razorpay Payments', description: 'Process fee payments and manage subscriptions', icon: Globe, status: 'CONNECTED', apiKey: 'rzp_live_****-****-efgh', lastSync: '1h ago' },
-  { id: '3', name: 'Google Workspace', description: 'Sync calendars and manage email', icon: Globe, status: 'DISCONNECTED' },
-  { id: '4', name: 'Webhook Service', description: 'Send real-time event notifications', icon: Webhook, status: 'ERROR', webhookUrl: 'https://api.example.com/webhook', lastSync: '2d ago' },
-];
+// ponytail: icons aren't serializable, so map by name instead of storing them in the API payload.
+const ICON_BY_NAME: Record<string, React.ElementType> = {
+  'WhatsApp Business API': MessageSquare,
+  'Razorpay Payments': Globe,
+  'Google Workspace': Globe,
+  'Webhook Service': Webhook,
+};
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: React.ElementType }> = {
   CONNECTED: { color: 'text-emerald-700', bg: 'bg-emerald-50', icon: CheckCircle2 },
@@ -48,13 +51,122 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: React.Ele
   ERROR: { color: 'text-red-700', bg: 'bg-red-50', icon: AlertTriangle },
 };
 
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('preone_token');
+}
+
 export default function IntegrationsSettingsPage() {
   const [showKey, setShowKey] = useState<Record<string, boolean>>({});
-  const [integrations] = useState<Integration[]>(MOCK_INTEGRATIONS);
+  const [integrations, setIntegrations] = useState<Integration[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchIntegrations = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/integrations', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to load integrations');
+      }
+      const json = await res.json();
+      setIntegrations(json.integrations);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchIntegrations();
+  }, [fetchIntegrations]);
 
   const toggleShowKey = (id: string) => {
     setShowKey((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const handleSave = async () => {
+    if (!integrations) return;
+    setSaving(true);
+    setError('');
+    try {
+      const token = getToken();
+      const res = await fetch('/api/settings/integrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ integrations }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Failed to save integrations');
+      }
+      const json = await res.json();
+      setIntegrations(json.integrations);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-xl" />
+              <div>
+                <Skeleton className="h-6 w-56" />
+                <Skeleton className="h-4 w-72 mt-1" />
+              </div>
+            </div>
+          </StaggerItem>
+          <StaggerItem>
+            <Skeleton className="h-40 w-full rounded-3xl" />
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (error && !integrations) {
+    return (
+      <PageTransition>
+        <StaggerContainer className="space-y-6">
+          <StaggerItem>
+            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)] flex items-center gap-2">
+              <Plug className="w-6 h-6" style={{ color: theme.primary }} />
+              Integrations
+            </h1>
+          </StaggerItem>
+          <StaggerItem>
+            <PreOneCard variant="default">
+              <PreOneCardContent>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-rose-400 mb-4" />
+                  <p className="text-[var(--admin-text)] font-medium mb-1">Failed to load integrations</p>
+                  <p className="text-sm text-[var(--admin-text-muted)] mb-4">{error}</p>
+                  <Button onClick={fetchIntegrations} variant="outline" className="rounded-xl">
+                    <RefreshCw className="w-4 h-4 mr-2" /> Retry
+                  </Button>
+                </div>
+              </PreOneCardContent>
+            </PreOneCard>
+          </StaggerItem>
+        </StaggerContainer>
+      </PageTransition>
+    );
+  }
+
+  if (!integrations) return null;
 
   return (
     <PageTransition>
@@ -68,17 +180,19 @@ export default function IntegrationsSettingsPage() {
               </h1>
               <p className="text-sm text-[var(--admin-text-muted)] mt-1">API keys, webhooks, and connected services</p>
             </div>
-            <Button className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
-              <Save className="w-4 h-4 mr-2" /> Save All
+            <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-md">
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              Save All
             </Button>
           </div>
+          {error && <p className="text-sm text-rose-500 mt-2">{error}</p>}
         </StaggerItem>
 
         {/* Integration Cards */}
         {integrations.map((integration) => {
           const statusCfg = STATUS_CONFIG[integration.status];
           const StatusIcon = statusCfg.icon;
-          const Icon = integration.icon;
+          const Icon = ICON_BY_NAME[integration.name] || Globe;
           return (
             <StaggerItem key={integration.id}>
               <PreOneCard variant="default">
