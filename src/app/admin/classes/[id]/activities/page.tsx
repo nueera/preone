@@ -15,12 +15,25 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ACTIVITY_COLORS } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface ClassInfo {
@@ -61,7 +74,7 @@ const ACTIVITY_STATUS_COLORS: Record<string, string> = {
   UPCOMING: 'bg-sky-50 text-sky-700 border-sky-200',
   IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
   CANCELLED: 'bg-red-50 text-red-700 border-red-200',
-  DRAFT: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+  DRAFT: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
 };
 
 // ── Calendar day type ──
@@ -172,6 +185,7 @@ export default function ClassActivitiesPage() {
   const isToday = (date: Date) => format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
@@ -190,9 +204,9 @@ export default function ClassActivitiesPage() {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
+              style={{ background: 'var(--warm-primary-soft)' }}
             >
-              <Calendar className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+              <Calendar className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
             </div>
             <div>
               <h1
@@ -208,7 +222,7 @@ export default function ClassActivitiesPage() {
           </div>
           <Button
             size="sm"
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
             onClick={() => {/* TODO: Add activity dialog */}}
           >
             <Plus className="h-4 w-4" />
@@ -287,10 +301,10 @@ export default function ClassActivitiesPage() {
                       key={i}
                       className={`min-h-[72px] rounded-lg border p-1 text-xs transition-colors ${
                         !day.isCurrentMonth
-                          ? 'bg-[var(--admin-surface-2)]/50 text-muted-foreground/50'
+                          ? 'bg-[var(--warm-surface-2)]/50 text-muted-foreground/50'
                           : isToday(day.date)
                             ? 'bg-portal-50 border-portal-200'
-                            : 'hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)]'
+                            : 'hover:bg-[var(--warm-surface-2)] dark:hover:bg-[var(--warm-surface-2)]'
                       }`}
                     >
                       <div className={`text-right text-[11px] font-medium mb-0.5 ${
@@ -345,8 +359,8 @@ export default function ClassActivitiesPage() {
                     const statusColor = ACTIVITY_STATUS_COLORS[activity.status] || ACTIVITY_STATUS_COLORS.DRAFT;
                     const typeIcon = ACTIVITY_ICONS[activity.type] || <Calendar className="h-4 w-4" />;
                     return (
-                      <PreOneCard key={activity.id} variant="default" hover className="cursor-pointer">
-                        <PreOneCardContent className="p-3 space-y-2">
+                      <WarmCard key={activity.id} variant="default" hover className="cursor-pointer">
+                        <WarmCardContent className="p-3 space-y-2">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${typeColor.bg} ${typeColor.text}`}>
@@ -376,8 +390,8 @@ export default function ClassActivitiesPage() {
                               </span>
                             )}
                           </div>
-                        </PreOneCardContent>
-                      </PreOneCard>
+                        </WarmCardContent>
+                      </WarmCard>
                     );
                   })}
                 </div>
@@ -387,5 +401,6 @@ export default function ClassActivitiesPage() {
         </div>
       </div>
     </PageTransition>
+    </WarmPremium>
   );
 }

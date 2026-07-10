@@ -2,11 +2,24 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 import {
   Table,
   TableBody,
@@ -124,6 +137,7 @@ export default function PaymentsPage() {
   const pendingAmount = payments.filter((p) => p.status === 'PENDING').reduce((s, p) => s + p.amount, 0);
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         {/* Header */}
@@ -150,7 +164,7 @@ export default function PaymentsPage() {
         {/* Stats Cards */}
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <PreOneCard variant="strip" className="p-4">
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -160,8 +174,8 @@ export default function PaymentsPage() {
                   <p className="text-lg font-bold text-emerald-700">₹{(totalCollected / 1000).toFixed(1)}K</p>
                 </div>
               </div>
-            </PreOneCard>
-            <PreOneCard variant="strip" className="p-4">
+            </WarmCard>
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
                   <Clock className="w-5 h-5 text-amber-600" />
@@ -171,8 +185,8 @@ export default function PaymentsPage() {
                   <p className="text-lg font-bold text-amber-700">₹{(pendingAmount / 1000).toFixed(1)}K</p>
                 </div>
               </div>
-            </PreOneCard>
-            <PreOneCard variant="strip" className="p-4">
+            </WarmCard>
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-purple-600" />
@@ -182,8 +196,8 @@ export default function PaymentsPage() {
                   <p className="text-lg font-bold text-purple-700">{payments.length}</p>
                 </div>
               </div>
-            </PreOneCard>
-            <PreOneCard variant="strip" className="p-4">
+            </WarmCard>
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                   <CreditCard className="w-5 h-5 text-red-600" />
@@ -193,7 +207,7 @@ export default function PaymentsPage() {
                   <p className="text-lg font-bold text-red-700">{payments.filter((p) => p.status === 'FAILED').length}</p>
                 </div>
               </div>
-            </PreOneCard>
+            </WarmCard>
           </div>
         </StaggerItem>
 
@@ -226,7 +240,7 @@ export default function PaymentsPage() {
 
         {/* Payment Table */}
         <StaggerItem>
-          <PreOneCard variant="default">
+          <WarmCard variant="default">
             <div className="overflow-hidden">
               <Table>
                 <TableHeader>
@@ -281,9 +295,10 @@ export default function PaymentsPage() {
                 </TableBody>
               </Table>
             </div>
-          </PreOneCard>
+          </WarmCard>
         </StaggerItem>
       </StaggerContainer>
     </PageTransition>
+    </WarmPremium>
   );
 }

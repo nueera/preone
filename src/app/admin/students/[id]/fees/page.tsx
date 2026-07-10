@@ -3,11 +3,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import { Progress } from '@/components/ui/progress';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 import {
   Table,
   TableBody,
@@ -121,6 +134,7 @@ export default function StudentFeesPage() {
   const outstanding = totalInvoiced - totalPaid;
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         <StaggerItem>
@@ -139,51 +153,51 @@ export default function StudentFeesPage() {
         </StaggerItem>
 
         {loading ? (
-          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading fees…</PreOneCard></StaggerItem>
+          <StaggerItem><WarmCard variant="default" className="p-12 text-center text-[var(--admin-text-subtle)]"><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Loading fees…</WarmCard></StaggerItem>
         ) : error ? (
-          <StaggerItem><PreOneCard variant="default" className="p-12 text-center text-red-500 text-sm">{error}</PreOneCard></StaggerItem>
+          <StaggerItem><WarmCard variant="default" className="p-12 text-center text-red-500 text-sm">{error}</WarmCard></StaggerItem>
         ) : (
           <>
             {/* Stats */}
             <StaggerItem>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <PreOneCard variant="strip" className="p-4">
+                <WarmCard variant="strip" className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center"><FileText className="w-5 h-5 text-purple-600" /></div>
                     <div><p className="text-xs text-[var(--admin-text-muted)]">Total Invoiced</p><p className="text-lg font-bold text-purple-700">₹{totalInvoiced.toLocaleString('en-IN')}</p></div>
                   </div>
-                </PreOneCard>
-                <PreOneCard variant="strip" className="p-4">
+                </WarmCard>
+                <WarmCard variant="strip" className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-emerald-600" /></div>
                     <div><p className="text-xs text-[var(--admin-text-muted)]">Total Paid</p><p className="text-lg font-bold text-emerald-700">₹{totalPaid.toLocaleString('en-IN')}</p></div>
                   </div>
-                </PreOneCard>
-                <PreOneCard variant="strip" className="p-4">
+                </WarmCard>
+                <WarmCard variant="strip" className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center"><TrendingDown className="w-5 h-5 text-red-600" /></div>
                     <div><p className="text-xs text-[var(--admin-text-muted)]">Outstanding</p><p className="text-lg font-bold text-red-700">₹{outstanding.toLocaleString('en-IN')}</p></div>
                   </div>
-                </PreOneCard>
+                </WarmCard>
               </div>
             </StaggerItem>
 
             {outstanding > 0 && totalInvoiced > 0 && (
               <StaggerItem>
-                <PreOneCard variant="emotional" className="p-4">
+                <WarmCard variant="emotional" className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-[var(--admin-text-muted)]">Payment Progress</span>
                     <span className="text-sm font-bold" style={{ color: theme.primary }}>{Math.round((totalPaid / totalInvoiced) * 100)}% paid</span>
                   </div>
                   <Progress value={(totalPaid / totalInvoiced) * 100} className="h-2" />
-                </PreOneCard>
+                </WarmCard>
               </StaggerItem>
             )}
 
             {/* Invoice List */}
             <StaggerItem>
-              <PreOneCard variant="default">
-                <PreOneCardContent>
+              <WarmCard variant="default">
+                <WarmCardContent>
                   <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><Receipt className="w-4 h-4 text-[var(--admin-text-muted)]" /> Invoice History</h3>
                   {invoices.length === 0 ? (
                     <p className="text-sm text-[var(--admin-text-subtle)] py-6 text-center">No invoices for this student.</p>
@@ -204,7 +218,7 @@ export default function StudentFeesPage() {
                               <TableCell className="text-sm font-medium">₹{inv.amount.toLocaleString('en-IN')}</TableCell>
                               <TableCell className="text-sm text-emerald-600">₹{inv.paid.toLocaleString('en-IN')}</TableCell>
                               <TableCell className="text-sm text-[var(--admin-text-muted)]">{new Date(inv.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</TableCell>
-                              <TableCell><Badge className={`${STATUS_BADGE[inv.status] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[10px]`}>{inv.status}</Badge></TableCell>
+                              <TableCell><Badge className={`${STATUS_BADGE[inv.status] || 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]'} text-[10px]`}>{inv.status}</Badge></TableCell>
                               <TableCell><Button variant="ghost" size="sm" className="h-7 text-xs"><Send className="w-3 h-3 mr-1" /> Remind</Button></TableCell>
                             </TableRow>
                           ))}
@@ -212,21 +226,21 @@ export default function StudentFeesPage() {
                       </Table>
                     </div>
                   )}
-                </PreOneCardContent>
-              </PreOneCard>
+                </WarmCardContent>
+              </WarmCard>
             </StaggerItem>
 
             {/* Payment History */}
             <StaggerItem>
-              <PreOneCard variant="default">
-                <PreOneCardContent>
+              <WarmCard variant="default">
+                <WarmCardContent>
                   <h3 className="font-semibold text-[var(--admin-text)] mb-4 flex items-center gap-2"><Clock className="w-4 h-4 text-[var(--admin-text-muted)]" /> Payment History</h3>
                   {payments.length === 0 ? (
                     <p className="text-sm text-[var(--admin-text-subtle)] py-6 text-center">No payments recorded.</p>
                   ) : (
                     <div className="space-y-3">
                       {payments.map((p) => (
-                        <div key={p.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-[var(--admin-surface-2)]">
+                        <div key={p.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-[var(--warm-surface-2)]">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-emerald-600" /></div>
                             <div><p className="text-sm font-medium">{p.receiptNo}</p><p className="text-xs text-[var(--admin-text-subtle)]">{p.invoiceNo} • {p.method}</p></div>
@@ -239,12 +253,13 @@ export default function StudentFeesPage() {
                       ))}
                     </div>
                   )}
-                </PreOneCardContent>
-              </PreOneCard>
+                </WarmCardContent>
+              </WarmCard>
             </StaggerItem>
           </>
         )}
       </StaggerContainer>
     </PageTransition>
+    </WarmPremium>
   );
 }

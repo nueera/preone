@@ -22,3 +22,4 @@ export {
   WarmSparkle,
   WarmScribble,
 } from './warm-illustrations';
+export { warmConfetti } from './warm-confetti';

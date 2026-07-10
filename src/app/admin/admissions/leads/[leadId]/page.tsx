@@ -61,6 +61,7 @@ import { PreOneCard } from '@/components/ui/preone-card';
 import { cn } from '@/lib/utils';
 import { CRM_COLORS, PRIORITY_COLORS } from '@/lib/theme-tokens';
 import { toast } from 'sonner';
+import { warmConfetti } from '@/components/warm-premium/warm-confetti';
 import {
   WarmPremium,
   WarmCard,
@@ -418,6 +419,7 @@ function ConvertToStudentDialog({
       }
 
       toast.success('Lead converted to student successfully');
+      warmConfetti('celebrate');
       onOpenChange(false);
       onConverted();
     } catch (err) {

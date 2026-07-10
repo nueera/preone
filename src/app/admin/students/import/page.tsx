@@ -26,9 +26,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 
 const theme = PORTAL_THEMES.admin;
 
@@ -87,14 +100,14 @@ function ImportStatCard({
   loading?: boolean;
 }) {
   return (
-    <PreOneCard variant="strip" className="p-4 relative overflow-hidden">
+    <WarmCard variant="strip" className="p-4 relative overflow-hidden">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium" style={{ color: 'var(--admin-text-muted)' }}>
             {label}
           </p>
           {loading ? (
-            <div className="mt-2 h-7 w-12 animate-pulse rounded-md" style={{ background: 'var(--admin-surface-2)' }} />
+            <div className="mt-2 h-7 w-12 animate-pulse rounded-md" style={{ background: 'var(--warm-surface-2)' }} />
           ) : (
             <p className="mt-1 text-2xl font-bold tracking-tight" style={{ color: accent }}>
               {value}
@@ -112,7 +125,7 @@ function ImportStatCard({
         className="absolute bottom-0 left-0 h-0.5 w-full opacity-60"
         style={{ background: `linear-gradient(to right, ${accent}, transparent)` }}
       />
-    </PreOneCard>
+    </WarmCard>
   );
 }
 
@@ -269,6 +282,7 @@ export default function ImportStudentsPage() {
   const errorRows = parsedData.filter((r) => r._errors.length > 0);
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
@@ -290,9 +304,9 @@ export default function ImportStudentsPage() {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ background: 'var(--admin-primary-soft)' }}
+                style={{ background: 'var(--warm-primary-soft)' }}
               >
-                <Upload className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+                <Upload className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--admin-text)' }}>
@@ -323,9 +337,9 @@ export default function ImportStudentsPage() {
                 label="Total Rows"
                 value={parsedData.length}
                 icon={FileUp}
-                accent="var(--admin-primary)"
-                bg="var(--admin-primary-soft)"
-                ring="var(--admin-primary)"
+                accent="var(--warm-primary)"
+                bg="var(--warm-primary-soft)"
+                ring="var(--warm-primary)"
               />
               <ImportStatCard
                 label="Valid"
@@ -350,8 +364,8 @@ export default function ImportStudentsPage() {
         {/* ── Upload Area ── */}
         {!importResult && (
           <StaggerItem>
-            <PreOneCard variant="default">
-              <PreOneCardContent className="space-y-4">
+            <WarmCard variant="default">
+              <WarmCardContent className="space-y-4">
                 <div className="flex items-center gap-2">
                   <FileSpreadsheet className="h-4 w-4" style={{ color: theme.primary }} />
                   <h3 className="font-semibold" style={{ color: 'var(--admin-text)' }}>
@@ -368,13 +382,13 @@ export default function ImportStudentsPage() {
                   onDrop={handleDrop}
                   className="rounded-2xl border-2 border-dashed p-10 sm:p-14 text-center transition-all"
                   style={{
-                    borderColor: dragOver ? 'var(--admin-primary)' : 'var(--admin-border)',
-                    background: dragOver ? 'var(--admin-primary-soft)' : 'var(--admin-surface-2)',
+                    borderColor: dragOver ? 'var(--warm-primary)' : 'var(--warm-border)',
+                    background: dragOver ? 'var(--warm-primary-soft)' : 'var(--warm-surface-2)',
                   }}
                 >
                   <div
                     className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-                    style={{ background: 'var(--admin-surface)' }}
+                    style={{ background: 'var(--warm-surface)' }}
                   >
                     {parsing ? (
                       <Loader2 className="h-6 w-6 animate-spin" style={{ color: theme.primary }} />
@@ -412,16 +426,16 @@ export default function ImportStudentsPage() {
                     </p>
                   )}
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
         )}
 
         {/* ── Preview Table ── */}
         {parsedData.length > 0 && !importResult && (
           <StaggerItem>
-            <PreOneCard variant="default">
-              <PreOneCardContent>
+            <WarmCard variant="default">
+              <WarmCardContent>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold flex items-center gap-2" style={{ color: 'var(--admin-text)' }}>
                     <FileSpreadsheet className="h-4 w-4" style={{ color: theme.primary }} />
@@ -442,10 +456,10 @@ export default function ImportStudentsPage() {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--admin-border)' }}>
+                <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border" style={{ borderColor: 'var(--warm-border)' }}>
                   <Table>
                     <TableHeader>
-                      <TableRow style={{ background: 'var(--admin-surface-2)' }}>
+                      <TableRow style={{ background: 'var(--warm-surface-2)' }}>
                         <TableHead className="w-8">#</TableHead>
                         <TableHead>First Name</TableHead>
                         <TableHead>Last Name</TableHead>
@@ -491,7 +505,7 @@ export default function ImportStudentsPage() {
                   <Button
                     onClick={handleImport}
                     disabled={importing || validRows.length === 0}
-                    className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                    className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                   >
                     {importing ? (
                       <>
@@ -506,16 +520,16 @@ export default function ImportStudentsPage() {
                     )}
                   </Button>
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
         )}
 
         {/* ── Result Summary ── */}
         {importResult && (
           <StaggerItem>
-            <PreOneCard variant="default">
-              <PreOneCardContent>
+            <WarmCard variant="default">
+              <WarmCardContent>
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="h-4 w-4" style={{ color: 'var(--admin-success)' }} />
                   <h3 className="font-semibold" style={{ color: 'var(--admin-text)' }}>Import Results</h3>
@@ -579,16 +593,17 @@ export default function ImportStudentsPage() {
                   </Button>
                   <Button
                     onClick={() => router.push('/admin/students')}
-                    className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                    className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                   >
                     View Students
                   </Button>
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
         )}
       </StaggerContainer>
     </PageTransition>
+    </WarmPremium>
   );
 }
