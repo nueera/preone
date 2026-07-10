@@ -18,12 +18,9 @@ import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ACTIVITY_COLORS } from '@/lib/theme-tokens';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ClassInfo {
@@ -176,28 +173,41 @@ export default function ClassActivitiesPage() {
 
   return (
     <PageTransition>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
         <Button
           variant="ghost"
-          className="gap-1 text-muted-foreground"
+          className="w-fit gap-1"
+          style={{ color: 'var(--admin-text-muted)' }}
           onClick={() => router.push(`/admin/classes/${classId}`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Back to {className || 'Class'}
         </Button>
 
-        {/* ── Header ── */}
+        {/* ── HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-              {className} — Activities
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Manage class activities and events
-            </p>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-primary-soft)' }}
+            >
+              <Calendar className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                {className} — Activities
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                Manage class activities and events
+              </p>
+            </div>
           </div>
           <Button
+            size="sm"
             className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
             onClick={() => {/* TODO: Add activity dialog */}}
           >
@@ -357,9 +367,9 @@ export default function ClassActivitiesPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className={`text-[10px] ${typeColor.bg} ${typeColor.text} border-0`}>
+                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${typeColor.bg} ${typeColor.text}`}>
                               {activity.type}
-                            </Badge>
+                            </span>
                             {activity.teacher && (
                               <span className="text-[11px] text-muted-foreground">
                                 by {activity.teacher.firstName} {activity.teacher.lastName}

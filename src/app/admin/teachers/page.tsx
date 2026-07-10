@@ -14,12 +14,14 @@ import {
   UserX,
   ChevronLeft,
   ChevronRight,
-  Filter,
+  SlidersHorizontal,
+  Columns3,
+  ArrowUpDown,
   Phone,
+  GraduationCap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -40,15 +42,12 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { PreOneCard } from '@/components/ui/preone-card';
 import { AddTeacherDialog } from '@/components/add-teacher-dialog';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface BranchInfo {
@@ -85,18 +84,37 @@ interface Teacher {
   };
 }
 
-// ── Status badge colors ──
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  ON_LEAVE: 'bg-amber-50 text-amber-700 border-amber-200',
-  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+// ── Status config (CSS-var based for theme consistency) ──
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; dotColor: string; badgeBg: string; badgeText: string }
+> = {
+  ACTIVE: {
+    label: 'Active',
+    dotColor: 'var(--admin-success)',
+    badgeBg: 'var(--admin-success-soft)',
+    badgeText: 'var(--admin-success)',
+  },
+  ON_LEAVE: {
+    label: 'On Leave',
+    dotColor: 'var(--admin-orange)',
+    badgeBg: 'var(--admin-orange-soft)',
+    badgeText: 'var(--admin-orange)',
+  },
+  INACTIVE: {
+    label: 'Inactive',
+    dotColor: 'var(--admin-text-muted)',
+    badgeBg: 'var(--admin-surface-2)',
+    badgeText: 'var(--admin-text-muted)',
+  },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Active',
-  ON_LEAVE: 'On Leave',
-  INACTIVE: 'Inactive',
-};
+const STATUS_PILLS = [
+  { label: 'All', value: '', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
+  { label: 'Active', value: 'ACTIVE', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
+  { label: 'On Leave', value: 'ON_LEAVE', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
+  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
+];
 
 const QUALIFICATIONS = ['B.Ed', 'D.Ed', 'M.Ed', 'B.El.Ed', 'Other'];
 
@@ -104,6 +122,76 @@ const QUALIFICATIONS = ['B.Ed', 'D.Ed', 'M.Ed', 'B.El.Ed', 'Other'];
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('preone_token');
+}
+
+// ── Sub-components ──
+function StatusBadge({ status }: { status: Teacher['status'] }) {
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.INACTIVE;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+      style={{ background: config.badgeBg, color: config.badgeText }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: config.dotColor }} />
+      {config.label}
+    </span>
+  );
+}
+
+function QualificationPill({ value }: { value: string }) {
+  return (
+    <span
+      className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
+      style={{
+        background: 'var(--admin-info-soft)',
+        color: 'var(--admin-info)',
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
+function ClassPill({ value }: { value: string }) {
+  return (
+    <span
+      className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
+      style={{
+        background: 'var(--admin-primary-soft)',
+        color: 'var(--admin-primary)',
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
+function FilterPill({
+  label,
+  active,
+  activeColor,
+  activeBg,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  activeColor: string;
+  activeBg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      style={
+        active
+          ? { background: activeBg, color: activeColor }
+          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
+      }
+    >
+      {label}
+    </button>
+  );
 }
 
 export default function TeachersListPage() {
@@ -121,8 +209,8 @@ export default function TeachersListPage() {
   const [branchFilter, setBranchFilterVal] = useState('');
   const [branches, setBranches] = useState<BranchInfo[]>([]);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [sortField, setSortField] = useState<string>('createdAt');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<string>('firstName');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const limit = 25;
 
@@ -134,25 +222,6 @@ export default function TeachersListPage() {
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
-
-  // ── Fetch branches for filter ──
-  useEffect(() => {
-    async function fetchBranches() {
-      try {
-        const token = getToken();
-        const res = await fetch('/api/dashboard/stats', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Use school data if available
-        }
-      } catch (err) {
-        console.error('Failed to fetch branches:', err);
-      }
-    }
-    // For now, we'll get branches from the teachers data
-  }, []);
 
   // ── Fetch teachers ──
   const fetchTeachers = useCallback(async () => {
@@ -227,7 +296,7 @@ export default function TeachersListPage() {
     }
   };
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.max(1, Math.ceil(total / limit));
 
   // ── Sort teachers client-side ──
   const sortedTeachers = [...teachers].sort((a, b) => {
@@ -271,174 +340,304 @@ export default function TeachersListPage() {
   const getInitials = (first: string, last: string) =>
     `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
 
-  const hasActiveFilters = debouncedSearch || statusFilter || qualificationFilter || branchFilter;
+  const hasActiveFilters =
+    debouncedSearch || statusFilter || qualificationFilter || branchFilter;
+
+  const startRow = total === 0 ? 0 : (page - 1) * limit + 1;
+  const endRow = Math.min(page * limit, total);
+
+  // ── Page numbers with ellipsis ──
+  const pageNumbers = React.useMemo(() => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 6) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push('...');
+      const start = Math.max(2, page - 1);
+      const end = Math.min(totalPages - 1, page + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (page < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  }, [totalPages, page]);
+
+  const SortIndicator = ({ field }: { field: string }) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return (
+      <span
+        className="text-[10px]"
+        style={{ color: 'var(--admin-primary)' }}
+      >
+        {sortDir === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
 
   return (
-    <div className="space-y-6">
-      {/* ── Top Bar ── */}
+    <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+      {/* ── SECTION 1: HEADER ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-            Teachers & Staff
-          </h1>
-          <p className="text-sm text-muted-foreground">Manage teachers and staff members</p>
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-xl"
+            style={{ background: 'var(--admin-primary-soft)' }}
+          >
+            <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+          </div>
+          <div>
+            <h1
+              className="text-2xl font-bold tracking-tight"
+              style={{ color: 'var(--admin-text)' }}
+            >
+              Teachers &amp; Staff
+            </h1>
+            <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+              Manage teachers and staff members
+            </p>
+          </div>
         </div>
-        <Button
-          className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-          onClick={() => setAddDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Add Teacher
-        </Button>
+
+        <div className="flex items-center gap-3">
+          <Button
+            size="sm"
+            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            onClick={() => setAddDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Add Teacher
+          </Button>
+        </div>
       </div>
 
-      {/* ── Filters Row ── */}
-      <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Filter className="h-4 w-4" />
-          Filters
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search by name, qualification, specialization..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex flex-wrap gap-1.5">
-            {Object.entries(STATUS_LABELS).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setStatusFilter(statusFilter === key ? '' : key);
-                  setPage(1);
+      {/* ── SECTION 2: FILTER BAR ── */}
+      <PreOneCard className="!rounded-xl">
+        <div className="p-4 space-y-3">
+          {/* Row 1: Search + Dropdowns */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                style={{ color: 'var(--admin-text-subtle)' }}
+              />
+              <input
+                type="text"
+                placeholder="Search by name, qualification, specialization..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 w-full rounded-lg border px-3 pl-9 pr-9 text-sm outline-none transition-colors"
+                style={{
+                  background: 'var(--admin-surface-2)',
+                  borderColor: 'var(--admin-border)',
+                  color: 'var(--admin-text)',
                 }}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                  statusFilter === key
-                    ? STATUS_COLORS[key]
-                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--admin-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
 
-          {/* Qualification Filter */}
-          <Select
-            value={qualificationFilter}
-            onValueChange={(v) => {
-              setQualificationFilter(v === 'ALL' ? '' : v);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Qualification" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Qualifications</SelectItem>
-              {QUALIFICATIONS.map((q) => (
-                <SelectItem key={q} value={q}>{q}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Branch Filter */}
-          {branches.length > 0 && (
             <Select
-              value={branchFilter}
+              value={qualificationFilter || 'ALL'}
               onValueChange={(v) => {
-                setBranchFilterVal(v === 'ALL' ? '' : v);
+                setQualificationFilter(v === 'ALL' ? '' : v);
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="All Branches" />
+              <SelectTrigger className="w-[170px] h-10">
+                <SelectValue placeholder="Qualification" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Branches</SelectItem>
-                {branches.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                <SelectItem value="ALL">All Qualifications</SelectItem>
+                {QUALIFICATIONS.map((q) => (
+                  <SelectItem key={q} value={q}>{q}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          )}
 
-          {/* Clear Filters */}
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={clearFilters}>
-              <X className="h-3 w-3" />
-              Clear
+            {branches.length > 0 && (
+              <Select
+                value={branchFilter || 'ALL'}
+                onValueChange={(v) => {
+                  setBranchFilterVal(v === 'ALL' ? '' : v);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[180px] h-10">
+                  <SelectValue placeholder="All Branches" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Branches</SelectItem>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {/* Row 2: Status Pills + More/Clear */}
+          <div className="flex flex-wrap items-center gap-2">
+            {STATUS_PILLS.map((pill) => (
+              <FilterPill
+                key={pill.label}
+                label={pill.label}
+                active={statusFilter === pill.value}
+                activeColor={pill.activeColor}
+                activeBg={pill.activeBg}
+                onClick={() => {
+                  setStatusFilter(statusFilter === pill.value ? '' : pill.value);
+                  setPage(1);
+                }}
+              />
+            ))}
+
+            <Button variant="ghost" size="sm" className="ml-auto gap-1.5">
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              More Filters
             </Button>
-          )}
-        </div>
-      </div>
 
-      {/* ── Teachers Table ── */}
-      <div className="rounded-xl border bg-[var(--admin-surface)] shadow-sm dark:bg-[var(--admin-surface)]">
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                style={{ color: 'var(--admin-error)' }}
+                onClick={clearFilters}
+              >
+                <X className="h-3.5 w-3.5" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </div>
+      </PreOneCard>
+
+      {/* ── SECTION 3: STATS BAR + DATA TABLE ── */}
+      <PreOneCard className="!rounded-xl overflow-hidden">
+        {/* Stats Bar */}
+        <div
+          className="flex items-center justify-between border-b px-5 py-3"
+          style={{ borderColor: 'var(--admin-border)' }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+              Total Teachers
+            </span>
+            <span
+              className="rounded-md px-2 py-0.5 text-sm font-bold"
+              style={{
+                background: 'var(--admin-primary-soft)',
+                color: 'var(--admin-primary)',
+              }}
+            >
+              {total}
+            </span>
+          </div>
+          <Button variant="ghost" size="sm" className="gap-1.5">
+            <Columns3 className="h-3.5 w-3.5" />
+            Columns
+          </Button>
+        </div>
+
+        {/* Table */}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">Photo</TableHead>
+              <TableRow style={{ borderColor: 'var(--admin-border)' }}>
                 <TableHead
-                  className="cursor-pointer select-none"
+                  className="w-12 text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  Photo
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none min-w-[180px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('firstName')}
                 >
-                  Name {sortField === 'firstName' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Name <SortIndicator field="firstName" />
+                  </span>
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[150px]"
+                  className="cursor-pointer select-none w-[140px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('qualification')}
                 >
-                  Qualification {sortField === 'qualification' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Qualification <SortIndicator field="qualification" />
+                  </span>
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[150px]"
+                  className="cursor-pointer select-none w-[150px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('specialization')}
                 >
-                  Specialization {sortField === 'specialization' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Specialization <SortIndicator field="specialization" />
+                  </span>
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[120px]"
+                  className="cursor-pointer select-none w-[130px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('assignedClass')}
                 >
-                  Assigned Class {sortField === 'assignedClass' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Class <SortIndicator field="assignedClass" />
+                  </span>
                 </TableHead>
-                <TableHead className="w-[120px]">Phone</TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[80px]"
+                  className="w-[140px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  Phone
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none w-[80px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('experience')}
                 >
-                  Exp. {sortField === 'experience' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Exp. <SortIndicator field="experience" />
+                  </span>
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none w-[100px]"
+                  className="cursor-pointer select-none w-[110px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
                   onClick={() => handleSort('status')}
                 >
-                  Status {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
+                  <span className="inline-flex items-center gap-1">
+                    Status <SortIndicator field="status" />
+                  </span>
                 </TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead
+                  className="w-[80px] text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} style={{ borderColor: 'var(--admin-border)' }}>
                     <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
@@ -451,16 +650,28 @@ export default function TeachersListPage() {
                   </TableRow>
                 ))
               ) : sortedTeachers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="h-48 text-center">
+                <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                  <TableCell colSpan={9} className="py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <Users className="h-12 w-12 text-muted-foreground/30" />
-                      <p className="text-muted-foreground">No teachers found</p>
+                      <Search
+                        className="h-10 w-10 opacity-40"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      />
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
+                        No teachers found
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                        Try adjusting your search or filters.
+                      </p>
                       <Button
-                        className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                        size="sm"
+                        className="mt-2 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
                         onClick={() => setAddDialogOpen(true)}
                       >
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4" />
                         Add Teacher
                       </Button>
                     </div>
@@ -471,99 +682,130 @@ export default function TeachersListPage() {
                   <TableRow
                     key={teacher.id}
                     className="cursor-pointer table-row-preone"
+                    style={{ borderColor: 'var(--admin-border)' }}
                     onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
                   >
                     <TableCell>
                       <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
+                        <AvatarFallback
+                          className="text-xs font-semibold"
+                          style={{
+                            background: 'var(--admin-primary-soft)',
+                            color: 'var(--admin-primary)',
+                          }}
+                        >
                           {getInitials(teacher.firstName, teacher.lastName)}
                         </AvatarFallback>
                       </Avatar>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-[var(--admin-text)]">
+                      <div
+                        className="font-medium"
+                        style={{ color: 'var(--admin-text)' }}
+                      >
                         {teacher.firstName} {teacher.lastName}
                       </div>
-                      <div className="text-xs text-muted-foreground">{teacher.email}</div>
+                      <div
+                        className="text-xs"
+                        style={{ color: 'var(--admin-text-subtle)' }}
+                      >
+                        {teacher.email}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {teacher.qualification ? (
-                        <Badge variant="secondary" className="text-xs">
-                          {teacher.qualification}
-                        </Badge>
+                        <QualificationPill value={teacher.qualification} />
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span
+                          className="text-xs"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        >
+                          —
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">
+                      <span
+                        className="text-sm"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
                         {teacher.specialization || '—'}
                       </span>
                     </TableCell>
                     <TableCell>
                       {teacher.assignedClass ? (
-                        <Badge variant="secondary" className="text-xs">
-                          {teacher.assignedClass.name}
-                        </Badge>
+                        <ClassPill value={teacher.assignedClass.name} />
                       ) : (
-                        <span className="text-xs text-muted-foreground">Unassigned</span>
+                        <span
+                          className="text-xs"
+                          style={{ color: 'var(--admin-text-subtle)' }}
+                        >
+                          Unassigned
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
                       {teacher.phone ? (
                         <a
                           href={`tel:${teacher.phone}`}
-                          className="text-sm text-portal-600 hover:underline inline-flex items-center gap-1"
+                          className="text-xs tabular-nums inline-flex items-center gap-1"
+                          style={{ color: 'var(--admin-text-muted)' }}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Phone className="h-3 w-3" />
                           {teacher.phone}
                         </a>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span
+                          className="text-xs"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        >
+                          —
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">
+                      <span
+                        className="text-sm"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
                         {teacher.experience} yrs
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${STATUS_COLORS[teacher.status]}`}>
-                        {STATUS_LABELS[teacher.status]}
-                      </span>
+                      <StatusBadge status={teacher.status} />
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+                            style={{ color: 'var(--admin-text-muted)' }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'var(--admin-surface-2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/admin/teachers/${teacher.id}`);
-                            }}
+                            onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
                           >
                             <Eye className="mr-2 h-4 w-4" />
                             View
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/admin/teachers/${teacher.id}`);
-                            }}
+                            onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
                           >
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/admin/teachers/${teacher.id}?tab=salary`);
-                            }}
+                            onClick={() => router.push(`/admin/teachers/${teacher.id}?tab=salary`)}
                           >
                             <IndianRupee className="mr-2 h-4 w-4" />
                             Manage Salary
@@ -571,10 +813,7 @@ export default function TeachersListPage() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeactivate(teacher);
-                            }}
+                            onClick={() => handleDeactivate(teacher)}
                           >
                             <UserX className="mr-2 h-4 w-4" />
                             Deactivate
@@ -589,36 +828,74 @@ export default function TeachersListPage() {
           </Table>
         </div>
 
-        {/* ── Pagination ── */}
+        {/* ── SECTION 4: PAGINATION ── */}
         {!loading && total > 0 && (
-          <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total} teachers
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
+          <div
+            className="flex flex-col gap-3 border-t px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            <div className="flex items-center gap-4">
+              <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
+                Showing {startRow} to {endRow} of {total} teachers
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+                style={{
+                  color: 'var(--admin-text-muted)',
+                  opacity: page <= 1 ? 0.4 : 1,
+                }}
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
               >
                 <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium">
-                {page} / {totalPages || 1}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
+              </button>
+
+              {pageNumbers.map((p, idx) =>
+                p === '...' ? (
+                  <span
+                    key={`ellipsis-${idx}`}
+                    className="flex h-8 w-8 items-center justify-center text-xs"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    className="flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors"
+                    style={
+                      page === p
+                        ? {
+                            background: 'var(--admin-primary-soft)',
+                            color: 'var(--admin-primary)',
+                          }
+                        : { color: 'var(--admin-text-muted)' }
+                    }
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+                style={{
+                  color: 'var(--admin-text-muted)',
+                  opacity: page >= totalPages ? 0.4 : 1,
+                }}
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
               >
                 <ChevronRight className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
           </div>
         )}
-      </div>
+      </PreOneCard>
 
       {/* ── Add Teacher Dialog ── */}
       <AddTeacherDialog

@@ -8,14 +8,12 @@ import {
   X,
   Users,
   GraduationCap,
-  Filter,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -26,8 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
 interface ClassInfo {
@@ -47,25 +43,91 @@ interface StudentInfo {
   attendanceRate?: number;
 }
 
-// ── Status badge colors ──
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
-  GRADUATED: 'bg-sky-50 text-sky-700 border-sky-200',
-  TRANSFERRED: 'bg-amber-50 text-amber-700 border-amber-200',
+// ── Status config (CSS-var based for theme consistency) ──
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; dotColor: string; badgeBg: string; badgeText: string }
+> = {
+  ACTIVE: {
+    label: 'Active',
+    dotColor: 'var(--admin-success)',
+    badgeBg: 'var(--admin-success-soft)',
+    badgeText: 'var(--admin-success)',
+  },
+  INACTIVE: {
+    label: 'Inactive',
+    dotColor: 'var(--admin-text-muted)',
+    badgeBg: 'var(--admin-surface-2)',
+    badgeText: 'var(--admin-text-muted)',
+  },
+  GRADUATED: {
+    label: 'Graduated',
+    dotColor: 'var(--admin-info)',
+    badgeBg: 'var(--admin-info-soft)',
+    badgeText: 'var(--admin-info)',
+  },
+  TRANSFERRED: {
+    label: 'Transferred',
+    dotColor: 'var(--admin-orange)',
+    badgeBg: 'var(--admin-orange-soft)',
+    badgeText: 'var(--admin-orange)',
+  },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
-  GRADUATED: 'Graduated',
-  TRANSFERRED: 'Transferred',
-};
+const STATUS_PILLS = [
+  { label: 'All', value: '', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
+  { label: 'Active', value: 'ACTIVE', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
+  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
+  { label: 'Graduated', value: 'GRADUATED', activeColor: 'var(--admin-info)', activeBg: 'var(--admin-info-soft)' },
+  { label: 'Transferred', value: 'TRANSFERRED', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
+];
 
 // ── Auth helper ──
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('preone_token');
+}
+
+// ── Sub-components ──
+function StatusBadge({ status }: { status: StudentInfo['status'] }) {
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.INACTIVE;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+      style={{ background: config.badgeBg, color: config.badgeText }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: config.dotColor }} />
+      {config.label}
+    </span>
+  );
+}
+
+function FilterPill({
+  label,
+  active,
+  activeColor,
+  activeBg,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  activeColor: string;
+  activeBg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      style={
+        active
+          ? { background: activeBg, color: activeColor }
+          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
+      }
+    >
+      {label}
+    </button>
+  );
 }
 
 export default function ClassStudentsPage() {
@@ -136,26 +198,38 @@ export default function ClassStudentsPage() {
 
   return (
     <PageTransition>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
         <Button
           variant="ghost"
-          className="gap-1 text-muted-foreground"
+          className="w-fit gap-1"
+          style={{ color: 'var(--admin-text-muted)' }}
           onClick={() => router.push(`/admin/classes/${classId}`)}
         >
           <ArrowLeft className="h-4 w-4" />
           Back to {className || 'Class'}
         </Button>
 
-        {/* ── Header ── */}
+        {/* ── HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-              {className} — Students
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {activeCount} active student{activeCount !== 1 ? 's' : ''} enrolled
-            </p>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-primary-soft)' }}
+            >
+              <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                {className} — Students
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                {activeCount} active student{activeCount !== 1 ? 's' : ''} enrolled
+              </p>
+            </div>
           </div>
         </div>
 
@@ -181,67 +255,160 @@ export default function ClassStudentsPage() {
           />
         </div>
 
-        {/* ── Filters ── */}
-        <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Filter className="h-4 w-4" />
-            Filters
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or roll number..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        {/* ── FILTER BAR ── */}
+        <PreOneCard className="!rounded-xl">
+          <div className="p-4 space-y-3">
+            {/* Row 1: Search + More Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px] max-w-md">
+                <Search
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                  style={{ color: 'var(--admin-text-subtle)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search by name or roll number..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-10 w-full rounded-lg border px-3 pl-9 pr-9 text-sm outline-none transition-colors"
+                  style={{
+                    background: 'var(--admin-surface-2)',
+                    borderColor: 'var(--admin-border)',
+                    color: 'var(--admin-text)',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--admin-border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <Button variant="ghost" size="sm" className="ml-auto gap-1.5">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                More Filters
+              </Button>
+
+              {(search || statusFilter) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5"
+                  style={{ color: 'var(--admin-error)' }}
+                  onClick={() => {
+                    setSearch('');
+                    setStatusFilter('');
+                  }}
                 >
-                  <X className="h-4 w-4" />
-                </button>
+                  <X className="h-3.5 w-3.5" />
+                  Clear Filters
+                </Button>
               )}
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {Object.entries(STATUS_LABELS).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setStatusFilter(statusFilter === key ? '' : key)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                    statusFilter === key
-                      ? STATUS_COLORS[key]
-                      : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                  }`}
-                >
-                  {label}
-                </button>
+
+            {/* Row 2: Status Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              {STATUS_PILLS.map((pill) => (
+                <FilterPill
+                  key={pill.label}
+                  label={pill.label}
+                  active={statusFilter === pill.value}
+                  activeColor={pill.activeColor}
+                  activeBg={pill.activeBg}
+                  onClick={() => setStatusFilter(pill.value)}
+                />
               ))}
             </div>
           </div>
-        </div>
+        </PreOneCard>
 
-        {/* ── Students Table ── */}
-        <div className="rounded-xl border bg-[var(--admin-surface)] shadow-sm dark:bg-[var(--admin-surface)]">
+        {/* ── STUDENTS TABLE ── */}
+        <PreOneCard className="!rounded-xl overflow-hidden">
+          {/* Stats Bar */}
+          <div
+            className="flex items-center justify-between border-b px-5 py-3"
+            style={{ borderColor: 'var(--admin-border)' }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                Total Students
+              </span>
+              <span
+                className="rounded-md px-2 py-0.5 text-sm font-bold"
+                style={{
+                  background: 'var(--admin-primary-soft)',
+                  color: 'var(--admin-primary)',
+                }}
+              >
+                {filteredStudents.length}
+              </span>
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Photo</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="w-[100px]">Roll No.</TableHead>
-                  <TableHead className="w-[100px]">Gender</TableHead>
-                  <TableHead className="w-[120px]">Attendance</TableHead>
-                  <TableHead className="w-[100px]">Status</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
+                <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                  <TableHead
+                    className="w-12 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Photo
+                  </TableHead>
+                  <TableHead
+                    className="min-w-[180px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Name
+                  </TableHead>
+                  <TableHead
+                    className="w-[100px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Roll No.
+                  </TableHead>
+                  <TableHead
+                    className="w-[100px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Gender
+                  </TableHead>
+                  <TableHead
+                    className="w-[120px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Attendance
+                  </TableHead>
+                  <TableHead
+                    className="w-[110px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Status
+                  </TableHead>
+                  <TableHead
+                    className="w-[80px] text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   Array.from({ length: 6 }).map((_, i) => (
-                    <TableRow key={i}>
+                    <TableRow key={i} style={{ borderColor: 'var(--admin-border)' }}>
                       <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-12" /></TableCell>
@@ -252,11 +419,22 @@ export default function ClassStudentsPage() {
                     </TableRow>
                   ))
                 ) : filteredStudents.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-48 text-center">
+                  <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                    <TableCell colSpan={7} className="py-16 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <GraduationCap className="h-12 w-12 text-muted-foreground/30" />
-                        <p className="text-muted-foreground">No students found</p>
+                        <Search
+                          className="h-10 w-10 opacity-40"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        />
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: 'var(--admin-text-muted)' }}
+                        >
+                          No students found
+                        </p>
+                        <p className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                          Try adjusting your search or filters.
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -265,48 +443,69 @@ export default function ClassStudentsPage() {
                     <TableRow
                       key={student.id}
                       className="cursor-pointer table-row-preone"
+                      style={{ borderColor: 'var(--admin-border)' }}
                       onClick={() => router.push(`/admin/students/${student.id}`)}
                     >
                       <TableCell>
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
+                          <AvatarFallback
+                            className="text-xs font-semibold"
+                            style={{
+                              background: 'var(--admin-primary-soft)',
+                              color: 'var(--admin-primary)',
+                            }}
+                          >
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-[var(--admin-text)]">
+                        <div
+                          className="font-medium"
+                          style={{ color: 'var(--admin-text)' }}
+                        >
                           {student.firstName} {student.lastName}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell
+                        className="text-sm"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
                         {student.rollNumber || '—'}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell
+                        className="text-sm"
+                        style={{ color: 'var(--admin-text-muted)' }}
+                      >
                         {student.gender}
                       </TableCell>
                       <TableCell className="text-sm">
-                        <span className={`font-medium ${
-                          (student.attendanceRate ?? 0) >= 90 ? 'text-emerald-600' :
-                          (student.attendanceRate ?? 0) >= 75 ? 'text-amber-600' : 'text-red-600'
-                        }`}>
-                          {student.attendanceRate != null ? `${student.attendanceRate}%` : '—'}
+                        <span
+                          className="font-medium"
+                          style={{
+                            color:
+                              (student.attendanceRate ?? 0) >= 90
+                                ? 'var(--admin-success)'
+                                : (student.attendanceRate ?? 0) >= 75
+                                  ? 'var(--admin-orange)'
+                                  : 'var(--admin-error)',
+                          }}
+                        >
+                          {student.attendanceRate != null
+                            ? `${student.attendanceRate}%`
+                            : '—'}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border ${STATUS_COLORS[student.status]}`}>
-                          {STATUS_LABELS[student.status]}
-                        </span>
+                        <StatusBadge status={student.status} />
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-portal-600"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/admin/students/${student.id}`);
-                          }}
+                          className="h-7 text-xs"
+                          style={{ color: 'var(--admin-primary)' }}
+                          onClick={() => router.push(`/admin/students/${student.id}`)}
                         >
                           View
                         </Button>
@@ -317,7 +516,7 @@ export default function ClassStudentsPage() {
               </TableBody>
             </Table>
           </div>
-        </div>
+        </PreOneCard>
       </div>
     </PageTransition>
   );

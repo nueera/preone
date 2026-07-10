@@ -10,19 +10,30 @@ import {
   Users,
   MapPin,
   Clock,
-  Filter,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
-import { PORTAL_THEMES } from '@/lib/theme-tokens';
-const theme = PORTAL_THEMES.admin;
+
+// ── Program CSS-var-based colors (consistent with admin design system) ──
+const PROGRAM_VARS: Record<string, { color: string; bg: string }> = {
+  Playgroup: { color: 'var(--admin-pink)', bg: 'var(--admin-pink-soft)' },
+  Nursery:   { color: 'var(--admin-orange)', bg: 'var(--admin-orange-soft)' },
+  LKG:       { color: 'var(--admin-info)', bg: 'var(--admin-info-soft)' },
+  UKG:       { color: 'var(--admin-success)', bg: 'var(--admin-success-soft)' },
+};
+
+const PROGRAM_ICONS: Record<string, string> = {
+  Playgroup: '🧒',
+  Nursery: '🌱',
+  LKG: '📖',
+  UKG: '🎓',
+};
 
 // ── Types ──
 interface TeacherInfo {
@@ -48,21 +59,6 @@ interface ProgramGroup {
   name: string;
   classes: ClassItem[];
 }
-
-// ── Program badge colors ──
-const PROGRAM_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Playgroup: { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200' },
-  Nursery:   { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  LKG:       { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
-  UKG:       { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-};
-
-const PROGRAM_ICONS: Record<string, string> = {
-  Playgroup: '🧒',
-  Nursery: '🌱',
-  LKG: '📖',
-  UKG: '🎓',
-};
 
 // ── Auth helper ──
 function getToken(): string | null {
@@ -129,18 +125,31 @@ export default function ClassesListPage() {
 
   return (
     <PageTransition>
-      <div className="space-y-6">
-        {/* ── Top Bar ── */}
+      <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
+        {/* ── SECTION 1: HEADER ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-[var(--admin-text)]">
-              Classes
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Manage classes and sections across programs
-            </p>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: 'var(--admin-primary-soft)' }}
+            >
+              <GraduationCap className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+            </div>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{ color: 'var(--admin-text)' }}
+              >
+                Classes
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
+                Manage classes and sections across programs
+              </p>
+            </div>
           </div>
+
           <Button
+            size="sm"
             className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
             onClick={() => {/* TODO: Add class dialog */}}
           >
@@ -149,7 +158,7 @@ export default function ClassesListPage() {
           </Button>
         </div>
 
-        {/* ── Stat Cards ── */}
+        {/* ── SECTION 2: STAT CARDS ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <CosmicStatCard
             label="Total Classes"
@@ -160,14 +169,12 @@ export default function ClassesListPage() {
           <CosmicStatCard
             label="Total Students"
             value={totalStudents}
-            suffix=""
             icon={<Users className="h-5 w-5" />}
             color="bg-sky-500"
           />
           <CosmicStatCard
             label="Total Capacity"
             value={totalCapacity}
-            suffix=""
             icon={<Users className="h-5 w-5" />}
             color="bg-emerald-500"
           />
@@ -179,77 +186,116 @@ export default function ClassesListPage() {
           />
         </div>
 
-        {/* ── Filters ── */}
-        <div className="rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm dark:bg-[var(--admin-surface)] space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Filter className="h-4 w-4" />
-            Filters
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {/* Search */}
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search by class name, teacher, room..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        {/* ── SECTION 3: FILTER BAR ── */}
+        <PreOneCard className="!rounded-xl">
+          <div className="p-4 space-y-3">
+            {/* Row 1: Search */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px] max-w-md">
+                <Search
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                  style={{ color: 'var(--admin-text-subtle)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search by class name, teacher, room..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-10 w-full rounded-lg border px-3 pl-9 pr-9 text-sm outline-none transition-colors"
+                  style={{
+                    background: 'var(--admin-surface-2)',
+                    borderColor: 'var(--admin-border)',
+                    color: 'var(--admin-text)',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--admin-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--admin-border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{ color: 'var(--admin-text-muted)' }}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <Button variant="ghost" size="sm" className="ml-auto gap-1.5">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                More Filters
+              </Button>
+
+              {(search || programFilter) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5"
+                  style={{ color: 'var(--admin-error)' }}
+                  onClick={() => { setSearch(''); setProgramFilter(''); }}
                 >
-                  <X className="h-4 w-4" />
-                </button>
+                  <X className="h-3.5 w-3.5" />
+                  Clear Filters
+                </Button>
               )}
             </div>
 
-            {/* Program Filter Chips */}
-            <div className="flex flex-wrap gap-1.5">
+            {/* Row 2: Program Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setProgramFilter('')}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
+                className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                style={
                   !programFilter
-                    ? 'bg-portal-50 text-portal-700 border-portal-200'
-                    : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                }`}
+                    ? {
+                        background: 'var(--admin-primary-soft)',
+                        color: 'var(--admin-primary)',
+                      }
+                    : {
+                        background: 'var(--admin-surface-2)',
+                        color: 'var(--admin-text-muted)',
+                      }
+                }
               >
                 All Programs
               </button>
               {programNames.map((name) => {
-                const colors = PROGRAM_COLORS[name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
+                const vars = PROGRAM_VARS[name] || {
+                  color: 'var(--admin-text-muted)',
+                  bg: 'var(--admin-surface-2)',
+                };
+                const active = programFilter === name;
                 return (
                   <button
                     key={name}
-                    onClick={() => setProgramFilter(programFilter === name ? '' : name)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                      programFilter === name
-                        ? `${colors.bg} ${colors.text} ${colors.border}`
-                        : 'bg-[var(--admin-surface)] text-[var(--admin-text-subtle)] border-[var(--admin-border)] hover:border-[var(--admin-border)]'
-                    }`}
+                    onClick={() =>
+                      setProgramFilter(programFilter === name ? '' : name)
+                    }
+                    className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                    style={
+                      active
+                        ? { background: vars.bg, color: vars.color }
+                        : {
+                            background: 'var(--admin-surface-2)',
+                            color: 'var(--admin-text-muted)',
+                          }
+                    }
                   >
                     {PROGRAM_ICONS[name] || '📚'} {name}
                   </button>
                 );
               })}
             </div>
-
-            {(search || programFilter) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1 text-muted-foreground"
-                onClick={() => { setSearch(''); setProgramFilter(''); }}
-              >
-                <X className="h-3 w-3" />
-                Clear
-              </Button>
-            )}
           </div>
-        </div>
+        </PreOneCard>
 
-        {/* ── Class Cards Grouped by Program ── */}
+        {/* ── SECTION 4: CLASS CARDS GROUPED BY PROGRAM ── */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -264,66 +310,105 @@ export default function ClassesListPage() {
             ))}
           </div>
         ) : filteredPrograms.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-4">
-            <GraduationCap className="h-16 w-16 text-muted-foreground/30" />
-            <p className="text-lg text-muted-foreground">No classes found</p>
-            <p className="text-sm text-muted-foreground">
-              {search || programFilter
-                ? 'Try adjusting your search or filters'
-                : 'Create your first class to get started'}
-            </p>
-            <Button
-              className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
-              onClick={() => {/* TODO: Add class dialog */}}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Class
-            </Button>
-          </div>
+          <PreOneCard className="!rounded-xl">
+            <PreOneCardContent className="py-16">
+              <div className="flex flex-col items-center justify-center gap-3">
+                <Search
+                  className="h-10 w-10 opacity-40"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                />
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: 'var(--admin-text-muted)' }}
+                >
+                  No classes found
+                </p>
+                <p className="text-xs" style={{ color: 'var(--admin-text-subtle)' }}>
+                  {search || programFilter
+                    ? 'Try adjusting your search or filters.'
+                    : 'Create your first class to get started.'}
+                </p>
+                <Button
+                  size="sm"
+                  className="mt-2 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  onClick={() => {/* TODO: Add class dialog */}}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Class
+                </Button>
+              </div>
+            </PreOneCardContent>
+          </PreOneCard>
         ) : (
           filteredPrograms.map((program) => {
-            const colors = PROGRAM_COLORS[program.name] || { bg: 'bg-[var(--admin-surface-2)]', text: 'text-[var(--admin-text-muted)]', border: 'border-[var(--admin-border)]' };
+            const vars = PROGRAM_VARS[program.name] || {
+              color: 'var(--admin-text-muted)',
+              bg: 'var(--admin-surface-2)',
+            };
             return (
               <div key={program.id} className="space-y-4">
                 {/* Program Header */}
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{PROGRAM_ICONS[program.name] || '📚'}</span>
-                  <h2 className="text-lg font-semibold text-[var(--admin-text)]">
+                  <h2
+                    className="text-lg font-semibold"
+                    style={{ color: 'var(--admin-text)' }}
+                  >
                     {program.name}
                   </h2>
-                  <Badge variant="secondary" className="text-xs">
-                    {program.classes.length} {program.classes.length === 1 ? 'class' : 'classes'}
-                  </Badge>
+                  <span
+                    className="rounded-md px-2 py-0.5 text-xs font-medium"
+                    style={{ background: vars.bg, color: vars.color }}
+                  >
+                    {program.classes.length}{' '}
+                    {program.classes.length === 1 ? 'class' : 'classes'}
+                  </span>
                 </div>
 
                 {/* Class Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {program.classes.map((cls) => {
-                    const occupancy = cls.capacity > 0 ? Math.round((cls._count.students / cls.capacity) * 100) : 0;
+                    const occupancy =
+                      cls.capacity > 0
+                        ? Math.round((cls._count.students / cls.capacity) * 100)
+                        : 0;
                     const isFull = occupancy >= 100;
                     return (
                       <PreOneCard
                         key={cls.id}
                         variant="default"
                         hover
-                        className="cursor-pointer"
+                        className="cursor-pointer !rounded-xl"
                         onClick={() => router.push(`/admin/classes/${cls.id}`)}
                       >
                         <PreOneCardContent className="space-y-3">
                           {/* Card Header */}
                           <div className="flex items-start justify-between">
                             <div>
-                              <h3 className="font-semibold text-[var(--admin-text)]">
+                              <h3
+                                className="font-semibold"
+                                style={{ color: 'var(--admin-text)' }}
+                              >
                                 {cls.name}
                               </h3>
-                              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border mt-1 ${colors.bg} ${colors.text} ${colors.border}`}>
+                              <span
+                                className="mt-1 inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium"
+                                style={{ background: vars.bg, color: vars.color }}
+                              >
                                 {program.name}
                               </span>
                             </div>
                             {cls.teacher && (
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-portal-50 text-portal-700 text-xs font-semibold">
-                                  {cls.teacher.firstName.charAt(0)}{cls.teacher.lastName.charAt(0)}
+                                <AvatarFallback
+                                  className="text-xs font-semibold"
+                                  style={{
+                                    background: 'var(--admin-primary-soft)',
+                                    color: 'var(--admin-primary)',
+                                  }}
+                                >
+                                  {cls.teacher.firstName.charAt(0)}
+                                  {cls.teacher.lastName.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
                             )}
@@ -331,19 +416,30 @@ export default function ClassesListPage() {
 
                           {/* Teacher */}
                           {cls.teacher ? (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <div
+                              className="flex items-center gap-2 text-sm"
+                              style={{ color: 'var(--admin-text-muted)' }}
+                            >
                               <GraduationCap className="h-3.5 w-3.5" />
-                              <span>{cls.teacher.firstName} {cls.teacher.lastName}</span>
+                              <span>
+                                {cls.teacher.firstName} {cls.teacher.lastName}
+                              </span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2 text-sm text-amber-600">
+                            <div
+                              className="flex items-center gap-2 text-sm"
+                              style={{ color: 'var(--admin-orange)' }}
+                            >
                               <GraduationCap className="h-3.5 w-3.5" />
                               <span>No teacher assigned</span>
                             </div>
                           )}
 
                           {/* Room & Schedule */}
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div
+                            className="flex items-center gap-4 text-xs"
+                            style={{ color: 'var(--admin-text-muted)' }}
+                          >
                             {cls.roomNo && (
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
@@ -359,18 +455,24 @@ export default function ClassesListPage() {
                           {/* Capacity Bar */}
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">
+                              <span style={{ color: 'var(--admin-text-muted)' }}>
                                 <Users className="h-3 w-3 inline mr-1" />
                                 {cls._count.students} / {cls.capacity} students
                               </span>
-                              <span className={`font-medium ${isFull ? 'text-red-600' : occupancy >= 80 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                              <span
+                                className="font-medium"
+                                style={{
+                                  color: isFull
+                                    ? 'var(--admin-error)'
+                                    : occupancy >= 80
+                                      ? 'var(--admin-orange)'
+                                      : 'var(--admin-success)',
+                                }}
+                              >
                                 {occupancy}%
                               </span>
                             </div>
-                            <Progress
-                              value={occupancy}
-                              className="h-1.5"
-                            />
+                            <Progress value={occupancy} className="h-1.5" />
                           </div>
                         </PreOneCardContent>
                       </PreOneCard>
