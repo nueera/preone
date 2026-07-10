@@ -3,9 +3,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { PORTAL_THEMES, ATTENDANCE_COLORS } from '@/lib/theme-tokens';
 import { Progress } from '@/components/ui/progress';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 import {
   CalendarDays,
   CheckCircle2,
@@ -105,6 +118,7 @@ export default function StudentAttendancePage() {
   if (error) return <div className="flex items-center justify-center py-24 text-red-500 text-sm">{error}</div>;
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         <StaggerItem>
@@ -127,31 +141,31 @@ export default function StudentAttendancePage() {
             ].map((s) => {
               const Icon = s.icon;
               return (
-                <PreOneCard key={s.label} variant="strip" className="p-3">
+                <WarmCard key={s.label} variant="strip" className="p-3">
                   <div className="flex items-center gap-2">
                     <div className={`w-8 h-8 rounded-lg ${s.color.split(' ')[1]} flex items-center justify-center`}><Icon className={`w-4 h-4 ${s.color.split(' ')[0]}`} /></div>
                     <div><p className="text-[10px] text-[var(--admin-text-subtle)]">{s.label}</p><p className={`text-sm font-bold ${s.color.split(' ')[0]}`}>{s.value}</p></div>
                   </div>
-                </PreOneCard>
+                </WarmCard>
               );
             })}
           </div>
         </StaggerItem>
 
         <StaggerItem>
-          <PreOneCard variant="default" className="p-4">
+          <WarmCard variant="default" className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-[var(--admin-text-muted)]">Attendance Rate ({MONTHS[month]})</span>
               <span className="text-lg font-bold" style={{ color: theme.primary }}>{stats.percentage}%</span>
             </div>
             <Progress value={stats.percentage} className="h-2" />
-          </PreOneCard>
+          </WarmCard>
         </StaggerItem>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <StaggerItem className="lg:col-span-2">
-            <PreOneCard variant="default">
-              <PreOneCardContent>
+            <WarmCard variant="default">
+              <WarmCardContent>
                 <div className="flex items-center justify-center mb-4">
                   <h2 className="text-lg font-semibold text-[var(--admin-text)]">{MONTHS[month]} {year}</h2>
                 </div>
@@ -167,20 +181,20 @@ export default function StudentAttendancePage() {
                     const status = dayStatus[day] || null;
                     const colorCfg = status ? ATTENDANCE_COLORS[status] : null;
                     return (
-                      <div key={`day-${day}`} className={`h-14 p-1.5 rounded-lg border text-sm transition-colors ${colorCfg ? `${colorCfg.bg} border-transparent` : 'border-transparent hover:bg-[var(--admin-surface-2)]'}`}>
+                      <div key={`day-${day}`} className={`h-14 p-1.5 rounded-lg border text-sm transition-colors ${colorCfg ? `${colorCfg.bg} border-transparent` : 'border-transparent hover:bg-[var(--warm-surface-2)]'}`}>
                         <span className="text-xs font-medium text-[var(--admin-text-muted)]">{day}</span>
                         {status && <div className={`w-2 h-2 rounded-full ${STATUS_DOT[status] || 'bg-[var(--admin-text-subtle)]'} mt-1`} />}
                       </div>
                     );
                   })}
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
 
           <StaggerItem>
-            <PreOneCard variant="default">
-              <PreOneCardContent>
+            <WarmCard variant="default">
+              <WarmCardContent>
                 <div className="flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-[var(--admin-text-muted)]" /><h3 className="font-semibold text-[var(--admin-text)]">Monthly Trend</h3></div>
                 <div className="space-y-3">
                   {monthlyTrend.map((m, idx) => (
@@ -193,11 +207,12 @@ export default function StudentAttendancePage() {
                     </div>
                   ))}
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
         </div>
       </StaggerContainer>
     </PageTransition>
+    </WarmPremium>
   );
 }

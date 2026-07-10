@@ -67,6 +67,20 @@ import { Calendar } from '@/components/ui/calendar';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { cn } from '@/lib/utils';
 import { PORTAL_THEMES, FEE_COLORS, CHART_PALETTE } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
@@ -119,7 +133,7 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
   PARTIAL: `${FEE_COLORS.PARTIAL.bg} ${FEE_COLORS.PARTIAL.text} border-yellow-200`,
   PAID: `${FEE_COLORS.PAID.bg} ${FEE_COLORS.PAID.text} border-emerald-200`,
   OVERDUE: `${FEE_COLORS.OVERDUE.bg} ${FEE_COLORS.OVERDUE.text} border-red-200`,
-  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+  CANCELLED: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
 };
 
 const FEE_TYPE_LABELS: Record<string, string> = {
@@ -438,6 +452,7 @@ export default function FeesPage() {
   const totalPages = Math.ceil(invoiceTotal / limit);
 
   return (
+    <WarmPremium className="min-h-screen">
     <div className="space-y-6">
       {/* ── Top Bar ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -449,7 +464,7 @@ export default function FeesPage() {
             <Bell className="h-4 w-4" /> Reminders
           </Button>
           <Button
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
             onClick={() => setGenerateDialogOpen(true)}
           >
             <Plus className="h-4 w-4" /> Generate Invoice
@@ -738,14 +753,14 @@ export default function FeesPage() {
               <button
                 onClick={() => setGenerateMode('single')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'single' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)]')}
+                  generateMode === 'single' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--warm-surface)] text-[var(--admin-text-muted)] border-[var(--warm-border)]')}
               >
                 Single Invoice
               </button>
               <button
                 onClick={() => setGenerateMode('bulk')}
                 className={cn('rounded-lg px-4 py-2 text-sm font-medium border transition-colors',
-                  generateMode === 'bulk' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)]')}
+                  generateMode === 'bulk' ? 'bg-portal-50 text-portal-700 border-portal-200' : 'bg-[var(--warm-surface)] text-[var(--admin-text-muted)] border-[var(--warm-border)]')}
               >
                 Bulk Invoice
               </button>
@@ -865,7 +880,7 @@ export default function FeesPage() {
 
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setGenerateDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleGenerateInvoice}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleGenerateInvoice}>
               Generate
             </Button>
           </div>
@@ -880,7 +895,7 @@ export default function FeesPage() {
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-4">
-              <div className="rounded-lg bg-[var(--admin-surface-2)] p-3 space-y-1">
+              <div className="rounded-lg bg-[var(--warm-surface-2)] p-3 space-y-1">
                 <p className="text-sm font-medium">{selectedInvoice.student.firstName} {selectedInvoice.student.lastName}</p>
                 <p className="text-xs text-muted-foreground">Invoice: {selectedInvoice.invoiceNo}</p>
                 <p className="text-xs text-muted-foreground">
@@ -948,7 +963,7 @@ export default function FeesPage() {
           )}
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleCollectPayment}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleCollectPayment}>
               Record Payment
             </Button>
           </div>
@@ -987,7 +1002,7 @@ export default function FeesPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setReminderDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleSendReminders}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleSendReminders}>
               Send Now
             </Button>
           </div>
@@ -1051,7 +1066,7 @@ export default function FeesPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleRefund}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleRefund}>
               Process Refund
             </Button>
           </div>
@@ -1123,12 +1138,13 @@ export default function FeesPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setAddStructureDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleAddStructure}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleAddStructure}>
               Create Structure
             </Button>
           </div>
         </DialogContent>
       </Dialog>
     </div>
+    </WarmPremium>
   );
 }

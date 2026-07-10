@@ -2,12 +2,25 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 import {
   Table,
   TableBody,
@@ -164,6 +177,7 @@ export default function RemindersPage() {
   const totalOverdue = overdue.reduce((s, o) => s + o.amount, 0);
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <StaggerContainer className="space-y-6">
         {/* Header */}
@@ -185,7 +199,7 @@ export default function RemindersPage() {
         {/* Stats */}
         <StaggerItem>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <PreOneCard variant="strip" className="p-4">
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                   <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -195,8 +209,8 @@ export default function RemindersPage() {
                   <p className="text-lg font-bold text-red-700">{overdue.length}</p>
                 </div>
               </div>
-            </PreOneCard>
-            <PreOneCard variant="strip" className="p-4">
+            </WarmCard>
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
                   <IndianRupee className="w-5 h-5 text-amber-600" />
@@ -206,8 +220,8 @@ export default function RemindersPage() {
                   <p className="text-lg font-bold text-amber-700">₹{(totalOverdue / 1000).toFixed(1)}K</p>
                 </div>
               </div>
-            </PreOneCard>
-            <PreOneCard variant="strip" className="p-4">
+            </WarmCard>
+            <WarmCard variant="strip" className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
                   <History className="w-5 h-5 text-purple-600" />
@@ -217,15 +231,15 @@ export default function RemindersPage() {
                   <p className="text-lg font-bold text-purple-700">{history.length}</p>
                 </div>
               </div>
-            </PreOneCard>
+            </WarmCard>
           </div>
         </StaggerItem>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Overdue List */}
           <StaggerItem className="lg:col-span-2">
-            <PreOneCard variant="default">
-              <PreOneCardContent>
+            <WarmCard variant="default">
+              <WarmCardContent>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-[var(--admin-text)]">Overdue Payments</h3>
                   <div className="relative w-56">
@@ -291,16 +305,16 @@ export default function RemindersPage() {
                     </TableBody>
                   </Table>
                 </div>
-              </PreOneCardContent>
-            </PreOneCard>
+              </WarmCardContent>
+            </WarmCard>
           </StaggerItem>
 
           {/* Right Sidebar */}
           <div className="space-y-6">
             {/* Templates (built-in presets) */}
             <StaggerItem>
-              <PreOneCard variant="default">
-                <PreOneCardContent>
+              <WarmCard variant="default">
+                <WarmCardContent>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-[var(--admin-text)]">Templates</h3>
                     <Button variant="outline" size="sm" className="h-7 text-xs">
@@ -315,7 +329,7 @@ export default function RemindersPage() {
                           <div
                             key={t.id}
                             className={`p-3 rounded-xl border cursor-pointer transition-colors ${
-                              selectedTemplate?.id === t.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-[var(--admin-surface-2)]'
+                              selectedTemplate?.id === t.id ? 'border-purple-400 bg-purple-50/50' : 'hover:bg-[var(--warm-surface-2)]'
                             }`}
                             onClick={() => setSelectedTemplate(t)}
                           >
@@ -331,14 +345,14 @@ export default function RemindersPage() {
                       })}
                     </div>
                   </ScrollArea>
-                </PreOneCardContent>
-              </PreOneCard>
+                </WarmCardContent>
+              </WarmCard>
             </StaggerItem>
 
             {/* Reminder History */}
             <StaggerItem>
-              <PreOneCard variant="default">
-                <PreOneCardContent>
+              <WarmCard variant="default">
+                <WarmCardContent>
                   <h3 className="font-semibold text-[var(--admin-text)] mb-3">Recent History</h3>
                   <ScrollArea className="max-h-48">
                     {loading ? (
@@ -352,28 +366,29 @@ export default function RemindersPage() {
                         {history.map((h) => {
                           const Icon = CHANNEL_ICON[h.channel] || Mail;
                           return (
-                            <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--admin-surface-2)]">
-                              <div className="w-7 h-7 rounded-full bg-[var(--admin-surface-2)] flex items-center justify-center shrink-0">
+                            <div key={h.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--warm-surface-2)]">
+                              <div className="w-7 h-7 rounded-full bg-[var(--warm-surface-2)] flex items-center justify-center shrink-0">
                                 <Icon className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-medium text-[var(--admin-text)]">{h.student}</p>
                                 <p className="text-[10px] text-[var(--admin-text-subtle)]">{h.template} • {h.sentAt}</p>
                               </div>
-                              <Badge className={`${STATUS_BADGE[h.status] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{h.status}</Badge>
+                              <Badge className={`${STATUS_BADGE[h.status] || 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]'} text-[9px]`}>{h.status}</Badge>
                             </div>
                           );
                         })}
                       </div>
                     )}
                   </ScrollArea>
-                </PreOneCardContent>
-              </PreOneCard>
+                </WarmCardContent>
+              </WarmCard>
             </StaggerItem>
           </div>
         </div>
       </StaggerContainer>
     </PageTransition>
+    </WarmPremium>
   );
 }
 

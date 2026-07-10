@@ -64,6 +64,20 @@ import {
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { PORTAL_THEMES } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 const theme = PORTAL_THEMES.admin;
 
 // ── Types ──
@@ -125,7 +139,7 @@ const STATUS_CONFIG: Record<
   INACTIVE: {
     label: 'Inactive',
     dotColor: 'var(--admin-text-muted)',
-    badgeBg: 'var(--admin-surface-2)',
+    badgeBg: 'var(--warm-surface-2)',
     badgeText: 'var(--admin-text-muted)',
   },
 };
@@ -134,7 +148,7 @@ const STATUS_CONFIG: Record<
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   ON_LEAVE: 'bg-amber-50 text-amber-700 border-amber-200',
-  INACTIVE: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+  INACTIVE: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -146,14 +160,14 @@ const STATUS_LABELS: Record<string, string> = {
 const SALARY_STATUS_COLORS: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+  CANCELLED: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
 };
 
 const LEAVE_STATUS_COLORS: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   REJECTED: 'bg-red-50 text-red-700 border-red-200',
-  CANCELLED: 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)] border-[var(--admin-border)]',
+  CANCELLED: 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)] border-[var(--warm-border)]',
 };
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -475,7 +489,7 @@ export default function TeacherDetailPage() {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = format(new Date(attendanceMonth.getFullYear(), attendanceMonth.getMonth(), d), 'yyyy-MM-dd');
       const record = monthAttendance.find((a) => format(new Date(a.date), 'yyyy-MM-dd') === dateStr);
-      let bgColor = 'bg-[var(--admin-surface-2)]';
+      let bgColor = 'bg-[var(--warm-surface-2)]';
       if (record) {
         if (record.status === 'PRESENT') bgColor = 'bg-emerald-100 text-emerald-700';
         else if (record.status === 'ABSENT') bgColor = 'bg-red-100 text-red-700';
@@ -515,6 +529,7 @@ export default function TeacherDetailPage() {
   const calculatedNetPay = salaryForm.basicSalary + salaryForm.hra + salaryForm.da - salaryForm.pfDeduction - salaryForm.taxDeduction - salaryForm.otherDeductions + salaryForm.bonus;
 
   return (
+    <WarmPremium className="min-h-screen">
     <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
       {/* ── Back Button ── */}
       <Button
@@ -531,8 +546,8 @@ export default function TeacherDetailPage() {
       <div
         className="rounded-xl border p-6 shadow-sm"
         style={{
-          background: 'var(--admin-surface)',
-          borderColor: 'var(--admin-border)',
+          background: 'var(--warm-surface)',
+          borderColor: 'var(--warm-border)',
         }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -540,8 +555,8 @@ export default function TeacherDetailPage() {
             <AvatarFallback
               className="text-2xl font-bold"
               style={{
-                background: 'var(--admin-primary-soft)',
-                color: 'var(--admin-primary)',
+                background: 'var(--warm-primary-soft)',
+                color: 'var(--warm-primary)',
               }}
             >
               {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
@@ -570,7 +585,7 @@ export default function TeacherDetailPage() {
               <span
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
                 style={{
-                  background: STATUS_CONFIG[teacher.status]?.badgeBg ?? 'var(--admin-surface-2)',
+                  background: STATUS_CONFIG[teacher.status]?.badgeBg ?? 'var(--warm-surface-2)',
                   color: STATUS_CONFIG[teacher.status]?.badgeText ?? 'var(--admin-text-muted)',
                 }}
               >
@@ -758,7 +773,7 @@ export default function TeacherDetailPage() {
                               {schedule?.subject ? (
                                 <div className={cn(
                                   'rounded-lg px-2 py-1.5 text-xs font-medium',
-                                  SUBJECT_COLORS[schedule.subject] || 'bg-[var(--admin-surface-2)] text-[var(--admin-text-muted)]'
+                                  SUBJECT_COLORS[schedule.subject] || 'bg-[var(--warm-surface-2)] text-[var(--admin-text-muted)]'
                                 )}>
                                   {schedule.subject}
                                 </div>
@@ -820,7 +835,7 @@ export default function TeacherDetailPage() {
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-emerald-100" /> Present</div>
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-red-100" /> Absent</div>
                   <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-amber-100" /> Late</div>
-                  <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-[var(--admin-surface-2)]" /> No Data</div>
+                  <div className="flex items-center gap-1"><div className="h-3 w-3 rounded bg-[var(--warm-surface-2)]" /> No Data</div>
                 </div>
               </CardContent>
             </Card>
@@ -870,7 +885,7 @@ export default function TeacherDetailPage() {
               </Card>
               <Card className="flex items-center justify-center">
                 <Button
-                  className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                   onClick={() => setSalaryDialogOpen(true)}
                 >
                   <IndianRupee className="h-4 w-4" />
@@ -978,7 +993,7 @@ export default function TeacherDetailPage() {
             {/* Apply Leave Button */}
             <div className="flex justify-end">
               <Button
-                className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                 onClick={() => setLeaveDialogOpen(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -1085,7 +1100,7 @@ export default function TeacherDetailPage() {
               </Card>
               <Card className="flex items-center justify-center">
                 <Button
-                  className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                  className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                   onClick={() => setReviewDialogOpen(true)}
                 >
                   <Plus className="h-4 w-4" />
@@ -1317,7 +1332,7 @@ export default function TeacherDetailPage() {
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setSalaryDialogOpen(false)}>Cancel</Button>
             <Button
-              className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
               onClick={handleProcessSalary}
             >
               Process Salary
@@ -1387,7 +1402,7 @@ export default function TeacherDetailPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setLeaveDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleApplyLeave}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleApplyLeave}>
               Apply Leave
             </Button>
           </div>
@@ -1455,7 +1470,7 @@ export default function TeacherDetailPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleAddReview}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleAddReview}>
               Add Review
             </Button>
           </div>
@@ -1510,12 +1525,13 @@ export default function TeacherDetailPage() {
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
             <Button variant="outline" onClick={() => setIncrementDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover" onClick={handleIncrement}>
+            <Button className="bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover" onClick={handleIncrement}>
               Apply Increment
             </Button>
           </div>
         </DialogContent>
       </Dialog>
     </div>
+    </WarmPremium>
   );
 }

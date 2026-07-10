@@ -36,6 +36,20 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 
 interface TeacherInfo {
   id: string;
@@ -75,25 +89,25 @@ const PROGRAM_ACCENTS: Record<
     accent: 'pink',
     icon: Star,
     imageTone:
-      'from-[var(--admin-pink-soft)] via-[var(--admin-surface)] to-[var(--admin-pink-soft)]',
+      'from-[var(--admin-pink-soft)] via-[var(--warm-surface)] to-[var(--admin-pink-soft)]',
   },
   Nursery: {
     accent: 'success',
     icon: Sprout,
     imageTone:
-      'from-[var(--admin-success-soft)] via-[var(--admin-surface)] to-[var(--admin-success-soft)]',
+      'from-[var(--admin-success-soft)] via-[var(--warm-surface)] to-[var(--admin-success-soft)]',
   },
   LKG: {
     accent: 'info',
     icon: BookOpen,
     imageTone:
-      'from-[var(--admin-info-soft)] via-[var(--admin-surface)] to-[var(--admin-info-soft)]',
+      'from-[var(--admin-info-soft)] via-[var(--warm-surface)] to-[var(--admin-info-soft)]',
   },
   UKG: {
     accent: 'orange',
     icon: Star,
     imageTone:
-      'from-[var(--admin-orange-soft)] via-[var(--admin-surface)] to-[var(--admin-orange-soft)]',
+      'from-[var(--admin-orange-soft)] via-[var(--warm-surface)] to-[var(--admin-orange-soft)]',
   },
 };
 
@@ -109,12 +123,12 @@ const ACCENT_CLASSES: Record<
   }
 > = {
   primary: {
-    text: 'text-[var(--admin-primary)]',
-    soft: 'bg-[var(--admin-primary-soft)]',
-    border: 'border-[var(--admin-primary)]/20',
-    bar: 'bg-[var(--admin-primary)]',
-    ring: 'ring-[var(--admin-primary)]/20',
-    cardTint: 'from-[var(--admin-primary-soft)]/55',
+    text: 'text-[var(--warm-primary)]',
+    soft: 'bg-[var(--warm-primary-soft)]',
+    border: 'border-[var(--warm-primary)]/20',
+    bar: 'bg-[var(--warm-primary)]',
+    ring: 'ring-[var(--warm-primary)]/20',
+    cardTint: 'from-[var(--warm-primary-soft)]/55',
   },
   pink: {
     text: 'text-[var(--admin-pink)]',
@@ -161,7 +175,7 @@ function programMeta(name: string) {
       accent: 'primary' as ProgramAccent,
       icon: GraduationCap,
       imageTone:
-        'from-[var(--admin-primary-soft)] via-[var(--admin-surface)] to-[var(--admin-primary-soft)]',
+        'from-[var(--warm-primary-soft)] via-[var(--warm-surface)] to-[var(--warm-primary-soft)]',
     }
   );
 }
@@ -226,7 +240,7 @@ function StatCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border bg-[var(--admin-surface)] p-5 shadow-sm',
+        'relative overflow-hidden rounded-xl border bg-[var(--warm-surface)] p-5 shadow-sm',
         styles.border
       )}
     >
@@ -261,7 +275,7 @@ function CapacityBar({
 }) {
   const styles = ACCENT_CLASSES[accent];
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--admin-surface-2)]">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--warm-surface-2)]">
       <div
         className={cn('h-full rounded-full transition-all', styles.bar)}
         style={{ width: `${value}%` }}
@@ -290,14 +304,14 @@ function ClassArtwork({
         compact ? 'h-24 w-36' : 'h-28 w-[17.5rem]'
       )}
     >
-      <div className="absolute inset-x-4 bottom-0 h-14 rounded-t-full bg-[var(--admin-surface)]/75 blur-sm" />
+      <div className="absolute inset-x-4 bottom-0 h-14 rounded-t-full bg-[var(--warm-surface)]/75 blur-sm" />
       <div className="absolute left-5 top-4 grid grid-cols-3 gap-1.5 opacity-80">
         {Array.from({ length: 6 }).map((_, index) => (
           <span
             key={index}
             className={cn(
               'block h-3 w-3 rounded-sm',
-              index % 2 ? styles.soft : 'bg-[var(--admin-surface)]'
+              index % 2 ? styles.soft : 'bg-[var(--warm-surface)]'
             )}
           />
         ))}
@@ -308,10 +322,10 @@ function ClassArtwork({
           compact && 'right-4'
         )}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--admin-surface)] shadow-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--warm-surface)] shadow-sm">
           <UserRound className={cn('h-7 w-7', styles.text)} />
         </div>
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--admin-surface)] shadow-sm">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--warm-surface)] shadow-sm">
           <Icon className={cn('h-8 w-8', styles.text)} />
         </div>
       </div>
@@ -344,8 +358,8 @@ function ProgramPill({
       className={cn(
         'inline-flex h-10 items-center gap-2 rounded-full border px-5 text-sm font-semibold shadow-sm transition',
         active
-          ? 'border-transparent bg-[var(--admin-primary)] text-white shadow-md'
-          : 'border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] hover:border-[var(--admin-primary)]/30 hover:text-[var(--admin-primary)]'
+          ? 'border-transparent bg-[var(--warm-primary)] text-white shadow-md'
+          : 'border-[var(--warm-border)] bg-[var(--warm-surface)] text-[var(--admin-text)] hover:border-[var(--warm-primary)]/30 hover:text-[var(--warm-primary)]'
       )}
     >
       <Icon className={cn('h-4 w-4', active ? 'text-white' : styles.text)} />
@@ -375,14 +389,14 @@ function ClassCard({
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl border bg-[var(--admin-surface)] p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
+        'group relative overflow-hidden rounded-xl border bg-[var(--warm-surface)] p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
         styles.border
       )}
     >
       <button
         type="button"
         aria-label={`More options for ${cls.name}`}
-        className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] shadow-sm transition hover:text-[var(--admin-primary)]"
+        className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--warm-border)] bg-[var(--warm-surface)] text-[var(--admin-text)] shadow-sm transition hover:text-[var(--warm-primary)]"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
@@ -444,7 +458,7 @@ function ClassCard({
         <Button
           type="button"
           variant="outline"
-          className="h-9 min-w-20 rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)]"
+          className="h-9 min-w-20 rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)]"
           onClick={onView}
         >
           View
@@ -453,7 +467,7 @@ function ClassCard({
           type="button"
           variant="outline"
           className={cn(
-            'h-9 min-w-20 rounded-lg border bg-[var(--admin-primary-soft)]',
+            'h-9 min-w-20 rounded-lg border bg-[var(--warm-primary-soft)]',
             styles.border,
             styles.text
           )}
@@ -484,7 +498,7 @@ function ProgramSection({
   return (
     <section
       className={cn(
-        'rounded-xl border bg-gradient-to-br to-[var(--admin-surface)] p-4 shadow-sm',
+        'rounded-xl border bg-gradient-to-br to-[var(--warm-surface)] p-4 shadow-sm',
         styles.cardTint,
         styles.border,
         className
@@ -503,7 +517,7 @@ function ProgramSection({
         </div>
         <button
           type="button"
-          className="inline-flex items-center gap-1 text-sm font-bold text-[var(--admin-primary)]"
+          className="inline-flex items-center gap-1 text-sm font-bold text-[var(--warm-primary)]"
         >
           View all
           <ChevronRight className="h-4 w-4" />
@@ -641,6 +655,7 @@ export default function ClassesListPage() {
   };
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -659,14 +674,14 @@ export default function ClassesListPage() {
             <Button
               type="button"
               variant="outline"
-              className="h-11 rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 font-bold text-[var(--admin-text)]"
+              className="h-11 rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)] px-5 font-bold text-[var(--admin-text)]"
             >
               <Download className="h-4 w-4" />
               Import CSV
             </Button>
             <Button
               type="button"
-              className="h-11 rounded-lg bg-[var(--admin-primary)] px-5 font-bold text-white shadow-sm hover:bg-[var(--admin-primary)]/90"
+              className="h-11 rounded-lg bg-[var(--warm-primary)] px-5 font-bold text-white shadow-sm hover:bg-[var(--warm-primary)]/90"
             >
               <Plus className="h-4 w-4" />
               Add Class
@@ -674,7 +689,7 @@ export default function ClassesListPage() {
             <Button
               type="button"
               variant="outline"
-              className="h-11 rounded-lg border-[var(--admin-primary)]/15 bg-[var(--admin-primary-soft)] px-5 font-bold text-[var(--admin-primary)]"
+              className="h-11 rounded-lg border-[var(--warm-primary)]/15 bg-[var(--warm-primary-soft)] px-5 font-bold text-[var(--warm-primary)]"
             >
               <Plus className="h-4 w-4" />
               Add Section
@@ -713,7 +728,7 @@ export default function ClassesListPage() {
           />
         </div>
 
-        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 shadow-sm">
+        <div className="rounded-xl border border-[var(--warm-border)] bg-[var(--warm-surface)] p-4 shadow-sm">
           <div className="grid gap-3 lg:grid-cols-[minmax(280px,1fr)_220px_220px_220px_auto]">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-muted)]" />
@@ -721,7 +736,7 @@ export default function ClassesListPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search by class name, teacher, room..."
-                className="h-11 rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)] pl-11 pr-10 text-sm"
+                className="h-11 rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)] pl-11 pr-10 text-sm"
               />
               {search ? (
                 <button
@@ -736,7 +751,7 @@ export default function ClassesListPage() {
             </div>
 
             <Select value={programFilter} onValueChange={setProgramFilter}>
-              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)] font-semibold">
+              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)] font-semibold">
                 <SelectValue placeholder="All Programs" />
               </SelectTrigger>
               <SelectContent>
@@ -750,7 +765,7 @@ export default function ClassesListPage() {
             </Select>
 
             <Select value={teacherFilter} onValueChange={setTeacherFilter}>
-              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)] font-semibold">
+              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)] font-semibold">
                 <SelectValue placeholder="All Teachers" />
               </SelectTrigger>
               <SelectContent>
@@ -764,7 +779,7 @@ export default function ClassesListPage() {
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--admin-border)] bg-[var(--admin-surface)] font-semibold">
+              <SelectTrigger className="h-11 w-full rounded-lg border-[var(--warm-border)] bg-[var(--warm-surface)] font-semibold">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -780,7 +795,7 @@ export default function ClassesListPage() {
               type="button"
               variant="outline"
               onClick={resetFilters}
-              className="h-11 rounded-lg border-[var(--admin-primary)]/20 bg-[var(--admin-surface)] px-7 font-bold text-[var(--admin-primary)]"
+              className="h-11 rounded-lg border-[var(--warm-primary)]/20 bg-[var(--warm-surface)] px-7 font-bold text-[var(--warm-primary)]"
             >
               <Filter className="h-4 w-4" />
               Filters
@@ -810,7 +825,7 @@ export default function ClassesListPage() {
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
+                className="rounded-xl border border-[var(--warm-border)] bg-[var(--warm-surface)] p-4"
               >
                 <Skeleton className="mb-4 h-6 w-44" />
                 <div className="grid gap-4 md:grid-cols-2">
@@ -832,7 +847,7 @@ export default function ClassesListPage() {
             ))}
           </div>
         ) : (
-          <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-8 text-center">
+          <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--warm-border)] bg-[var(--warm-surface)] p-8 text-center">
             <IconTile icon={GraduationCap} accent="primary" />
             <h2 className="mt-4 text-lg font-bold text-[var(--admin-text)]">
               No classes found
@@ -843,7 +858,7 @@ export default function ClassesListPage() {
           </div>
         )}
 
-        <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5 shadow-sm">
+        <section className="rounded-xl border border-[var(--warm-border)] bg-[var(--warm-surface)] p-5 shadow-sm">
           <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
             <div className="flex items-center gap-5">
               <IconTile icon={BarChart3} accent="primary" />
@@ -893,5 +908,6 @@ export default function ClassesListPage() {
         </section>
       </div>
     </PageTransition>
+    </WarmPremium>
   );
 }

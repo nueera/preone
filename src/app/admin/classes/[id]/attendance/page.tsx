@@ -16,12 +16,25 @@ import {
   Users,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ATTENDANCE_COLORS } from '@/lib/theme-tokens';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface ClassInfo {
@@ -219,6 +232,7 @@ export default function ClassAttendancePage() {
   );
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
@@ -237,9 +251,9 @@ export default function ClassAttendancePage() {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
+              style={{ background: 'var(--warm-primary-soft)' }}
             >
-              <Calendar className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+              <Calendar className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
             </div>
             <div>
               <h1
@@ -260,14 +274,14 @@ export default function ClassAttendancePage() {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="h-9 rounded-lg border px-3 text-sm outline-none"
               style={{
-                background: 'var(--admin-surface)',
-                borderColor: 'var(--admin-border)',
+                background: 'var(--warm-surface)',
+                borderColor: 'var(--warm-border)',
                 color: 'var(--admin-text)',
               }}
             />
             <Button
               size="sm"
-              className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+              className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
               onClick={handleSave}
               disabled={saving}
             >
@@ -307,16 +321,16 @@ export default function ClassAttendancePage() {
         </div>
 
         {/* ── Today's Attendance Grid ── */}
-        <PreOneCard className="!rounded-xl overflow-hidden">
+        <WarmCard className="!rounded-xl overflow-hidden">
           {/* Stats Bar */}
           <div
             className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-3"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <div className="flex items-center gap-3">
               <UserCheck
                 className="h-4 w-4"
-                style={{ color: 'var(--admin-primary)' }}
+                style={{ color: 'var(--warm-primary)' }}
               />
               <span
                 className="text-sm font-medium"
@@ -327,8 +341,8 @@ export default function ClassAttendancePage() {
               <span
                 className="rounded-md px-2 py-0.5 text-xs font-bold"
                 style={{
-                  background: 'var(--admin-primary-soft)',
-                  color: 'var(--admin-primary)',
+                  background: 'var(--warm-primary-soft)',
+                  color: 'var(--warm-primary)',
                 }}
               >
                 {students.length} students
@@ -378,16 +392,16 @@ export default function ClassAttendancePage() {
                   return (
                     <div
                       key={student.id}
-                      className="flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-[var(--admin-surface-2)] dark:hover:bg-[var(--admin-surface-2)]"
-                      style={{ borderColor: 'var(--admin-border)' }}
+                      className="flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-[var(--warm-surface-2)] dark:hover:bg-[var(--warm-surface-2)]"
+                      style={{ borderColor: 'var(--warm-border)' }}
                     >
                       {/* Student Info */}
                       <Avatar className="h-9 w-9">
                         <AvatarFallback
                           className="text-xs font-semibold"
                           style={{
-                            background: 'var(--admin-primary-soft)',
-                            color: 'var(--admin-primary)',
+                            background: 'var(--warm-primary-soft)',
+                            color: 'var(--warm-primary)',
                           }}
                         >
                           {student.firstName.charAt(0)}
@@ -435,7 +449,7 @@ export default function ClassAttendancePage() {
                               className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs transition-all ${
                                 isSelected
                                   ? opt.color
-                                  : 'bg-[var(--admin-surface-2)] text-[var(--admin-text-subtle)] hover:bg-[var(--admin-border)] dark:bg-[var(--admin-surface)] dark:hover:bg-[var(--admin-surface-2)]'
+                                  : 'bg-[var(--warm-surface-2)] text-[var(--admin-text-subtle)] hover:bg-[var(--warm-border)] dark:bg-[var(--warm-surface)] dark:hover:bg-[var(--warm-surface-2)]'
                               }`}
                               title={opt.label}
                             >
@@ -450,15 +464,15 @@ export default function ClassAttendancePage() {
               </div>
             )}
           </div>
-        </PreOneCard>
+        </WarmCard>
 
         {/* ── Weekly Trend ── */}
-        <PreOneCard className="!rounded-xl">
-          <PreOneCardContent className="space-y-4">
+        <WarmCard className="!rounded-xl">
+          <WarmCardContent className="space-y-4">
             <div className="flex items-center gap-2">
               <BarChart3
                 className="h-4 w-4"
-                style={{ color: 'var(--admin-primary)' }}
+                style={{ color: 'var(--warm-primary)' }}
               />
               <h3
                 className="text-sm font-semibold"
@@ -526,9 +540,10 @@ export default function ClassAttendancePage() {
                 <div className="h-3 w-3 rounded bg-red-400" /> Absent
               </div>
             </div>
-          </PreOneCardContent>
-        </PreOneCard>
+          </WarmCardContent>
+        </WarmCard>
       </div>
     </PageTransition>
+    </WarmPremium>
   );
 }

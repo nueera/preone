@@ -11,11 +11,24 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/page-transition';
-import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { CosmicStatCard } from '@/components/ui/cosmic-stat-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 import {
   Table,
   TableBody,
@@ -57,7 +70,7 @@ const STATUS_CONFIG: Record<
   INACTIVE: {
     label: 'Inactive',
     dotColor: 'var(--admin-text-muted)',
-    badgeBg: 'var(--admin-surface-2)',
+    badgeBg: 'var(--warm-surface-2)',
     badgeText: 'var(--admin-text-muted)',
   },
   GRADUATED: {
@@ -75,9 +88,9 @@ const STATUS_CONFIG: Record<
 };
 
 const STATUS_PILLS = [
-  { label: 'All', value: '', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
+  { label: 'All', value: '', activeColor: 'var(--warm-primary)', activeBg: 'var(--warm-primary-soft)' },
   { label: 'Active', value: 'ACTIVE', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
-  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
+  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--warm-surface-2)' },
   { label: 'Graduated', value: 'GRADUATED', activeColor: 'var(--admin-info)', activeBg: 'var(--admin-info-soft)' },
   { label: 'Transferred', value: 'TRANSFERRED', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
 ];
@@ -122,7 +135,7 @@ function FilterPill({
       style={
         active
           ? { background: activeBg, color: activeColor }
-          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
+          : { background: 'var(--warm-surface-2)', color: 'var(--admin-text-muted)' }
       }
     >
       {label}
@@ -197,6 +210,7 @@ export default function ClassStudentsPage() {
   const activeCount = students.filter((s) => s.status === 'ACTIVE').length;
 
   return (
+    <WarmPremium className="min-h-screen">
     <PageTransition>
       <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
         {/* ── Back Button ── */}
@@ -215,9 +229,9 @@ export default function ClassStudentsPage() {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{ background: 'var(--admin-primary-soft)' }}
+              style={{ background: 'var(--warm-primary-soft)' }}
             >
-              <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+              <Users className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
             </div>
             <div>
               <h1
@@ -256,7 +270,7 @@ export default function ClassStudentsPage() {
         </div>
 
         {/* ── FILTER BAR ── */}
-        <PreOneCard className="!rounded-xl">
+        <WarmCard className="!rounded-xl">
           <div className="p-4 space-y-3">
             {/* Row 1: Search + More Filters */}
             <div className="flex flex-wrap items-center gap-3">
@@ -272,16 +286,16 @@ export default function ClassStudentsPage() {
                   onChange={(e) => setSearch(e.target.value)}
                   className="h-10 w-full rounded-lg border px-3 pl-9 pr-9 text-sm outline-none transition-colors"
                   style={{
-                    background: 'var(--admin-surface-2)',
-                    borderColor: 'var(--admin-border)',
+                    background: 'var(--warm-surface-2)',
+                    borderColor: 'var(--warm-border)',
                     color: 'var(--admin-text)',
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--admin-primary)';
-                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                    e.currentTarget.style.borderColor = 'var(--warm-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--warm-primary-soft)';
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--admin-border)';
+                    e.currentTarget.style.borderColor = 'var(--warm-border)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 />
@@ -332,14 +346,14 @@ export default function ClassStudentsPage() {
               ))}
             </div>
           </div>
-        </PreOneCard>
+        </WarmCard>
 
         {/* ── STUDENTS TABLE ── */}
-        <PreOneCard className="!rounded-xl overflow-hidden">
+        <WarmCard className="!rounded-xl overflow-hidden">
           {/* Stats Bar */}
           <div
             className="flex items-center justify-between border-b px-5 py-3"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <div className="flex items-center gap-2">
               <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
@@ -348,8 +362,8 @@ export default function ClassStudentsPage() {
               <span
                 className="rounded-md px-2 py-0.5 text-sm font-bold"
                 style={{
-                  background: 'var(--admin-primary-soft)',
-                  color: 'var(--admin-primary)',
+                  background: 'var(--warm-primary-soft)',
+                  color: 'var(--warm-primary)',
                 }}
               >
                 {filteredStudents.length}
@@ -360,7 +374,7 @@ export default function ClassStudentsPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                <TableRow style={{ borderColor: 'var(--warm-border)' }}>
                   <TableHead
                     className="w-12 text-xs font-semibold uppercase tracking-wider"
                     style={{ color: 'var(--admin-text-muted)' }}
@@ -408,7 +422,7 @@ export default function ClassStudentsPage() {
               <TableBody>
                 {loading ? (
                   Array.from({ length: 6 }).map((_, i) => (
-                    <TableRow key={i} style={{ borderColor: 'var(--admin-border)' }}>
+                    <TableRow key={i} style={{ borderColor: 'var(--warm-border)' }}>
                       <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-12" /></TableCell>
@@ -419,7 +433,7 @@ export default function ClassStudentsPage() {
                     </TableRow>
                   ))
                 ) : filteredStudents.length === 0 ? (
-                  <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                  <TableRow style={{ borderColor: 'var(--warm-border)' }}>
                     <TableCell colSpan={7} className="py-16 text-center">
                       <div className="flex flex-col items-center gap-3">
                         <Search
@@ -443,7 +457,7 @@ export default function ClassStudentsPage() {
                     <TableRow
                       key={student.id}
                       className="cursor-pointer table-row-preone"
-                      style={{ borderColor: 'var(--admin-border)' }}
+                      style={{ borderColor: 'var(--warm-border)' }}
                       onClick={() => router.push(`/admin/students/${student.id}`)}
                     >
                       <TableCell>
@@ -451,8 +465,8 @@ export default function ClassStudentsPage() {
                           <AvatarFallback
                             className="text-xs font-semibold"
                             style={{
-                              background: 'var(--admin-primary-soft)',
-                              color: 'var(--admin-primary)',
+                              background: 'var(--warm-primary-soft)',
+                              color: 'var(--warm-primary)',
                             }}
                           >
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}
@@ -504,7 +518,7 @@ export default function ClassStudentsPage() {
                           variant="ghost"
                           size="sm"
                           className="h-7 text-xs"
-                          style={{ color: 'var(--admin-primary)' }}
+                          style={{ color: 'var(--warm-primary)' }}
                           onClick={() => router.push(`/admin/students/${student.id}`)}
                         >
                           View
@@ -516,8 +530,9 @@ export default function ClassStudentsPage() {
               </TableBody>
             </Table>
           </div>
-        </PreOneCard>
+        </WarmCard>
       </div>
     </PageTransition>
+    </WarmPremium>
   );
 }

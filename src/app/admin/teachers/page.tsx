@@ -46,8 +46,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PreOneCard } from '@/components/ui/preone-card';
 import { AddTeacherDialog } from '@/components/add-teacher-dialog';
+import {
+  WarmPremium,
+  WarmCard,
+  WarmCardHeader,
+  WarmCardTitle,
+  WarmCardDescription,
+  WarmCardContent,
+  WarmCardFooter,
+  WarmSectionHeading,
+  WarmEmptyState,
+  WarmButton,
+  WarmStatCard,
+  WarmPill,
+} from '@/components/warm-premium';
 
 // ── Types ──
 interface BranchInfo {
@@ -104,16 +117,16 @@ const STATUS_CONFIG: Record<
   INACTIVE: {
     label: 'Inactive',
     dotColor: 'var(--admin-text-muted)',
-    badgeBg: 'var(--admin-surface-2)',
+    badgeBg: 'var(--warm-surface-2)',
     badgeText: 'var(--admin-text-muted)',
   },
 };
 
 const STATUS_PILLS = [
-  { label: 'All', value: '', activeColor: 'var(--admin-primary)', activeBg: 'var(--admin-primary-soft)' },
+  { label: 'All', value: '', activeColor: 'var(--warm-primary)', activeBg: 'var(--warm-primary-soft)' },
   { label: 'Active', value: 'ACTIVE', activeColor: 'var(--admin-success)', activeBg: 'var(--admin-success-soft)' },
   { label: 'On Leave', value: 'ON_LEAVE', activeColor: 'var(--admin-orange)', activeBg: 'var(--admin-orange-soft)' },
-  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--admin-surface-2)' },
+  { label: 'Inactive', value: 'INACTIVE', activeColor: 'var(--admin-text-muted)', activeBg: 'var(--warm-surface-2)' },
 ];
 
 const QUALIFICATIONS = ['B.Ed', 'D.Ed', 'M.Ed', 'B.El.Ed', 'Other'];
@@ -157,8 +170,8 @@ function ClassPill({ value }: { value: string }) {
     <span
       className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
       style={{
-        background: 'var(--admin-primary-soft)',
-        color: 'var(--admin-primary)',
+        background: 'var(--warm-primary-soft)',
+        color: 'var(--warm-primary)',
       }}
     >
       {value}
@@ -186,7 +199,7 @@ function FilterPill({
       style={
         active
           ? { background: activeBg, color: activeColor }
-          : { background: 'var(--admin-surface-2)', color: 'var(--admin-text-muted)' }
+          : { background: 'var(--warm-surface-2)', color: 'var(--admin-text-muted)' }
       }
     >
       {label}
@@ -368,7 +381,7 @@ export default function TeachersListPage() {
     return (
       <span
         className="text-[10px]"
-        style={{ color: 'var(--admin-primary)' }}
+        style={{ color: 'var(--warm-primary)' }}
       >
         {sortDir === 'asc' ? '↑' : '↓'}
       </span>
@@ -376,15 +389,16 @@ export default function TeachersListPage() {
   };
 
   return (
+    <WarmPremium className="min-h-screen">
     <div className="flex flex-col gap-6 max-w-[1440px] mx-auto">
       {/* ── SECTION 1: HEADER ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-xl"
-            style={{ background: 'var(--admin-primary-soft)' }}
+            style={{ background: 'var(--warm-primary-soft)' }}
           >
-            <Users className="h-5 w-5" style={{ color: 'var(--admin-primary)' }} />
+            <Users className="h-5 w-5" style={{ color: 'var(--warm-primary)' }} />
           </div>
           <div>
             <h1
@@ -402,7 +416,7 @@ export default function TeachersListPage() {
         <div className="flex items-center gap-3">
           <Button
             size="sm"
-            className="gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+            className="gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
             onClick={() => setAddDialogOpen(true)}
           >
             <Plus className="h-4 w-4" />
@@ -412,7 +426,7 @@ export default function TeachersListPage() {
       </div>
 
       {/* ── SECTION 2: FILTER BAR ── */}
-      <PreOneCard className="!rounded-xl">
+      <WarmCard className="!rounded-xl">
         <div className="p-4 space-y-3">
           {/* Row 1: Search + Dropdowns */}
           <div className="flex flex-wrap items-center gap-3">
@@ -428,16 +442,16 @@ export default function TeachersListPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="h-10 w-full rounded-lg border px-3 pl-9 pr-9 text-sm outline-none transition-colors"
                 style={{
-                  background: 'var(--admin-surface-2)',
-                  borderColor: 'var(--admin-border)',
+                  background: 'var(--warm-surface-2)',
+                  borderColor: 'var(--warm-border)',
                   color: 'var(--admin-text)',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-primary)';
-                  e.currentTarget.style.boxShadow = '0 0 0 2px var(--admin-primary-soft)';
+                  e.currentTarget.style.borderColor = 'var(--warm-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px var(--warm-primary-soft)';
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--admin-border)';
+                  e.currentTarget.style.borderColor = 'var(--warm-border)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               />
@@ -526,14 +540,14 @@ export default function TeachersListPage() {
             )}
           </div>
         </div>
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── SECTION 3: STATS BAR + DATA TABLE ── */}
-      <PreOneCard className="!rounded-xl overflow-hidden">
+      <WarmCard className="!rounded-xl overflow-hidden">
         {/* Stats Bar */}
         <div
           className="flex items-center justify-between border-b px-5 py-3"
-          style={{ borderColor: 'var(--admin-border)' }}
+          style={{ borderColor: 'var(--warm-border)' }}
         >
           <div className="flex items-center gap-2">
             <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>
@@ -542,8 +556,8 @@ export default function TeachersListPage() {
             <span
               className="rounded-md px-2 py-0.5 text-sm font-bold"
               style={{
-                background: 'var(--admin-primary-soft)',
-                color: 'var(--admin-primary)',
+                background: 'var(--warm-primary-soft)',
+                color: 'var(--warm-primary)',
               }}
             >
               {total}
@@ -559,7 +573,7 @@ export default function TeachersListPage() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+              <TableRow style={{ borderColor: 'var(--warm-border)' }}>
                 <TableHead
                   className="w-12 text-xs font-semibold uppercase tracking-wider"
                   style={{ color: 'var(--admin-text-muted)' }}
@@ -637,7 +651,7 @@ export default function TeachersListPage() {
             <TableBody>
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <TableRow key={i} style={{ borderColor: 'var(--admin-border)' }}>
+                  <TableRow key={i} style={{ borderColor: 'var(--warm-border)' }}>
                     <TableCell><Skeleton className="h-9 w-9 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
@@ -650,7 +664,7 @@ export default function TeachersListPage() {
                   </TableRow>
                 ))
               ) : sortedTeachers.length === 0 ? (
-                <TableRow style={{ borderColor: 'var(--admin-border)' }}>
+                <TableRow style={{ borderColor: 'var(--warm-border)' }}>
                   <TableCell colSpan={9} className="py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <Search
@@ -668,7 +682,7 @@ export default function TeachersListPage() {
                       </p>
                       <Button
                         size="sm"
-                        className="mt-2 gap-2 bg-brand-gradient text-white border-0 hover:bg-brand-gradient-hover"
+                        className="mt-2 gap-2 bg-warm-primary-gradient text-white border-0 hover:bg-warm-primary-gradient-hover"
                         onClick={() => setAddDialogOpen(true)}
                       >
                         <Plus className="h-4 w-4" />
@@ -682,7 +696,7 @@ export default function TeachersListPage() {
                   <TableRow
                     key={teacher.id}
                     className="cursor-pointer table-row-preone"
-                    style={{ borderColor: 'var(--admin-border)' }}
+                    style={{ borderColor: 'var(--warm-border)' }}
                     onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
                   >
                     <TableCell>
@@ -690,8 +704,8 @@ export default function TeachersListPage() {
                         <AvatarFallback
                           className="text-xs font-semibold"
                           style={{
-                            background: 'var(--admin-primary-soft)',
-                            color: 'var(--admin-primary)',
+                            background: 'var(--warm-primary-soft)',
+                            color: 'var(--warm-primary)',
                           }}
                         >
                           {getInitials(teacher.firstName, teacher.lastName)}
@@ -782,7 +796,7 @@ export default function TeachersListPage() {
                             className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
                             style={{ color: 'var(--admin-text-muted)' }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'var(--admin-surface-2)';
+                              e.currentTarget.style.background = 'var(--warm-surface-2)';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
@@ -832,7 +846,7 @@ export default function TeachersListPage() {
         {!loading && total > 0 && (
           <div
             className="flex flex-col gap-3 border-t px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
-            style={{ borderColor: 'var(--admin-border)' }}
+            style={{ borderColor: 'var(--warm-border)' }}
           >
             <div className="flex items-center gap-4">
               <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
@@ -869,8 +883,8 @@ export default function TeachersListPage() {
                     style={
                       page === p
                         ? {
-                            background: 'var(--admin-primary-soft)',
-                            color: 'var(--admin-primary)',
+                            background: 'var(--warm-primary-soft)',
+                            color: 'var(--warm-primary)',
                           }
                         : { color: 'var(--admin-text-muted)' }
                     }
@@ -895,7 +909,7 @@ export default function TeachersListPage() {
             </div>
           </div>
         )}
-      </PreOneCard>
+      </WarmCard>
 
       {/* ── Add Teacher Dialog ── */}
       <AddTeacherDialog
@@ -904,5 +918,6 @@ export default function TeachersListPage() {
         onTeacherCreated={fetchTeachers}
       />
     </div>
+    </WarmPremium>
   );
 }
