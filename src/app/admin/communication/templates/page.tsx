@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/page-transition';
 import { PreOneCard, PreOneCardContent } from '@/components/ui/preone-card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,6 @@ import {
   MessageSquare,
   X,
   Send,
-  Preview,
 } from 'lucide-react';
 
 const theme = PORTAL_THEMES.admin;
@@ -41,16 +40,10 @@ interface MessageTemplate {
   isDefault: boolean;
 }
 
-const MOCK_TEMPLATES: MessageTemplate[] = [
-  { id: '1', name: 'Fee Reminder — Gentle', category: 'Fee Reminder', channel: 'WhatsApp', subject: 'Fee Reminder', body: 'Dear Parent, this is a gentle reminder that the fee of ₹{amount} for {student_name} is due by {due_date}. Please pay at the earliest to avoid late fees. Thank you! — PreOne Preschool', variables: ['amount', 'student_name', 'due_date'], usageCount: 156, lastUsed: '2026-06-10', isDefault: true },
-  { id: '2', name: 'Fee Reminder — Overdue', category: 'Fee Reminder', channel: 'SMS', subject: 'OVERDUE: Fee Payment', body: 'URGENT: Fee of ₹{amount} for {student_name} is overdue by {days_overdue} days. Please clear dues immediately. — PreOne Preschool', variables: ['amount', 'student_name', 'days_overdue'], usageCount: 45, lastUsed: '2026-06-09', isDefault: false },
-  { id: '3', name: 'Absent Notification', category: 'Attendance', channel: 'WhatsApp', subject: 'Attendance Alert', body: 'Your child {student_name} was marked absent today ({date}). If this is an error, please contact the school office. — PreOne Preschool', variables: ['student_name', 'date'], usageCount: 89, lastUsed: '2026-06-12', isDefault: true },
-  { id: '4', name: 'Late Arrival Notice', category: 'Attendance', channel: 'WhatsApp', subject: 'Late Arrival', body: 'Your child {student_name} arrived late at {arrival_time} today. Regular attendance ensures your child doesn\'t miss important activities. — PreOne Preschool', variables: ['student_name', 'arrival_time'], usageCount: 34, lastUsed: '2026-06-11', isDefault: false },
-  { id: '5', name: 'Event Invitation', category: 'Event', channel: 'WhatsApp', subject: 'You\'re Invited!', body: '🎉 You are invited to {event_name} on {event_date} at {event_time}! Venue: {venue}. Please RSVP by {rsvp_date}. We look forward to seeing you! — PreOne Preschool', variables: ['event_name', 'event_date', 'event_time', 'venue', 'rsvp_date'], usageCount: 42, lastUsed: '2026-06-08', isDefault: true },
-  { id: '6', name: 'Holiday Notice', category: 'General', channel: 'Email', subject: 'Holiday Notice — {holiday_name}', body: 'Dear Parents,\n\nSchool will be closed on {date} for {holiday_name}. Classes will resume on {resume_date}.\n\nWishing you a wonderful time with your family!\n\nPreOne Preschool', variables: ['date', 'holiday_name', 'resume_date'], usageCount: 28, lastUsed: '2026-05-25', isDefault: true },
-  { id: '7', name: 'Parent-Teacher Meeting', category: 'Event', channel: 'WhatsApp', subject: 'PTM Scheduled', body: '📋 Parent-Teacher Meeting scheduled for {date} from {start_time} to {end_time}. Your slot: {slot_time}. Please arrive 5 minutes early. — PreOne Preschool', variables: ['date', 'start_time', 'end_time', 'slot_time'], usageCount: 67, lastUsed: '2026-06-01', isDefault: false },
-  { id: '8', name: 'General Announcement', category: 'General', channel: 'WhatsApp', subject: 'School Announcement', body: '{announcement_text}\n\n— PreOne Preschool', variables: ['announcement_text'], usageCount: 12, isDefault: true },
-];
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('preone_token');
+}
 
 const CATEGORY_ICON: Record<string, React.ElementType> = {
   'Fee Reminder': IndianRupee,
@@ -67,17 +60,57 @@ const CATEGORY_COLOR: Record<string, { bg: string; text: string }> = {
 };
 
 export default function TemplatesPage() {
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [previewTemplate, setPreviewTemplate] = useState<MessageTemplate | null>(null);
 
+  const fetchTemplates = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = getToken();
+      const res = await fetch('/api/templates', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTemplates((data.templates || []) as MessageTemplate[]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch templates:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    try {
+      const token = getToken();
+      const res = await fetch(`/api/templates/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setTemplates((prev) => prev.filter((t) => t.id !== id));
+        setPreviewTemplate((prev) => (prev?.id === id ? null : prev));
+      }
+    } catch (err) {
+      console.error('Failed to delete template:', err);
+    }
+  }, []);
+
   const filtered = useMemo(() => {
-    return MOCK_TEMPLATES.filter((t) => {
+    return templates.filter((t) => {
       const matchSearch = !searchQuery || t.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchCategory = categoryFilter === 'all' || t.category === categoryFilter;
       return matchSearch && matchCategory;
     });
-  }, [searchQuery, categoryFilter]);
+  }, [templates, searchQuery, categoryFilter]);
 
   return (
     <PageTransition>
@@ -123,6 +156,9 @@ export default function TemplatesPage() {
             <PreOneCard variant="default">
               <PreOneCardContent>
                 <h3 className="font-semibold text-[var(--admin-text)] mb-4">Templates ({filtered.length})</h3>
+                {loading ? (
+                  <div className="text-center py-12 text-[var(--admin-text-subtle)] text-sm">Loading templates...</div>
+                ) : (
                 <ScrollArea className="max-h-[500px]">
                   <div className="space-y-3">
                     {filtered.map((t) => {
@@ -143,7 +179,7 @@ export default function TemplatesPage() {
                                 <Eye className="w-3 h-3" />
                               </Button>
                               <Button variant="ghost" size="sm" className="h-7 text-xs"><Pencil className="w-3 h-3" /></Button>
-                              <Button variant="ghost" size="sm" className="h-7 text-xs text-red-600"><Trash2 className="w-3 h-3" /></Button>
+                              <Button variant="ghost" size="sm" className="h-7 text-xs text-red-600" onClick={() => handleDelete(t.id)}><Trash2 className="w-3 h-3" /></Button>
                             </div>
                           </div>
                           <p className="text-xs text-[var(--admin-text-muted)] line-clamp-2 mb-2">{t.body}</p>
@@ -163,6 +199,7 @@ export default function TemplatesPage() {
                     })}
                   </div>
                 </ScrollArea>
+                )}
               </PreOneCardContent>
             </PreOneCard>
           </StaggerItem>
