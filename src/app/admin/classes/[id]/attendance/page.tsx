@@ -24,12 +24,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ATTENDANCE_COLORS } from '@/lib/theme-tokens';
 
 // ── Types ──
-interface ClassInfo {
-  id: string;
-  name: string;
-  program: { id: string; name: string };
-}
-
 interface StudentAttendance {
   id: string;
   firstName: string;
@@ -91,13 +85,12 @@ export default function ClassAttendancePage() {
     async function fetchClassName() {
       try {
         const token = getToken();
-        const res = await fetch('/api/classes', {
+        const res = await fetch(`/api/classes/${classId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
-          const found = (data.classes || []).find((c: ClassInfo) => c.id === classId);
-          if (found) setClassName(found.name);
+          if (data.class) setClassName(data.class.name);
         }
       } catch (err) {
         console.error('Failed to fetch class:', err);
@@ -111,7 +104,7 @@ export default function ClassAttendancePage() {
     setLoading(true);
     try {
       const token = getToken();
-      const studentsRes = await fetch(`/api/students?classId=${classId}&limit=100&status=ACTIVE`, {
+      const studentsRes = await fetch(`/api/classes/${classId}/students?status=ACTIVE`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (studentsRes.ok) {
@@ -128,7 +121,7 @@ export default function ClassAttendancePage() {
       }
 
       // Fetch attendance stats for weekly history
-      const statsRes = await fetch(`/api/attendance/stats?classId=${classId}`, {
+      const statsRes = await fetch(`/api/classes/${classId}/attendance`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (statsRes.ok) {

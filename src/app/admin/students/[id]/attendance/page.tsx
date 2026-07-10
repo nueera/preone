@@ -41,11 +41,10 @@ export default function StudentAttendancePage() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`/api/students/${studentId}`);
+        const res = await fetch(`/api/students/${studentId}/attendance`);
         if (!res.ok) throw new Error('Failed to load attendance');
         const data = await res.json();
-        const s = data.student || {};
-        setRecords((s.attendance || []).map((a: { date: string; status: string }) => ({ date: a.date, status: a.status })));
+        setRecords((data.attendance || []).map((a: { date: string; status: string }) => ({ date: a.date, status: a.status })));
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load attendance');
       } finally {

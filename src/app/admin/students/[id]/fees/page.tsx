@@ -80,11 +80,10 @@ export default function StudentFeesPage() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`/api/students/${studentId}`);
+        const res = await fetch(`/api/students/${studentId}/fees`);
         if (!res.ok) throw new Error('Failed to load student fees');
         const data = await res.json();
-        const s = data.student || {};
-        const apiInvoices: ApiInvoice[] = s.invoices || [];
+        const apiInvoices: ApiInvoice[] = data.invoices || [];
         const invoiceNoById: Record<string, string> = {};
         const mappedInvoices: StudentInvoice[] = apiInvoices.map((inv) => {
           invoiceNoById[inv.id] = inv.invoiceNo;
@@ -98,7 +97,7 @@ export default function StudentFeesPage() {
             status: inv.status,
           };
         });
-        const mappedPayments: PaymentRecord[] = (s.payments || []).map((p: ApiPayment) => ({
+        const mappedPayments: PaymentRecord[] = (data.payments || []).map((p: ApiPayment) => ({
           id: p.id,
           receiptNo: p.transactionRef || `PMT-${p.id.slice(-6).toUpperCase()}`,
           date: p.paymentDate,

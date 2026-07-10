@@ -26,12 +26,6 @@ import {
 } from '@/components/ui/table';
 
 // ── Types ──
-interface ClassInfo {
-  id: string;
-  name: string;
-  program: { id: string; name: string };
-}
-
 interface StudentInfo {
   id: string;
   firstName: string;
@@ -146,10 +140,9 @@ export default function ClassStudentsPage() {
     setLoading(true);
     try {
       const token = getToken();
-      const params = new URLSearchParams({ classId, limit: '100' });
-      if (statusFilter) params.set('status', statusFilter);
+      const qs = statusFilter ? `?status=${statusFilter}` : '';
 
-      const res = await fetch(`/api/students?${params}`, {
+      const res = await fetch(`/api/classes/${classId}/students${qs}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -168,13 +161,12 @@ export default function ClassStudentsPage() {
     async function fetchClassName() {
       try {
         const token = getToken();
-        const res = await fetch('/api/classes', {
+        const res = await fetch(`/api/classes/${classId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
-          const found = (data.classes || []).find((c: ClassInfo) => c.id === classId);
-          if (found) setClassName(found.name);
+          if (data.class) setClassName(data.class.name);
         }
       } catch (err) {
         console.error('Failed to fetch class:', err);

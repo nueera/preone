@@ -65,16 +65,8 @@ export default function StudentActivitiesPage() {
       setLoading(true);
       setError('');
       try {
-        // Activities are scoped to the student's class
-        const sRes = await fetch(`/api/students/${studentId}`);
-        if (!sRes.ok) throw new Error('Failed to load student');
-        const sData = await sRes.json();
-        const classId: string | undefined = sData.student?.class?.id;
-        if (!classId) {
-          setActivities([]);
-          return;
-        }
-        const aRes = await fetch(`/api/activities?classId=${classId}&limit=100`);
+        // Activities scoped server-side to the student's class
+        const aRes = await fetch(`/api/students/${studentId}/activities`);
         if (!aRes.ok) throw new Error('Failed to load activities');
         const aData = await aRes.json();
         const apiActivities: ApiActivity[] = aData.activities || [];
