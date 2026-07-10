@@ -78,10 +78,10 @@ export default function StudentObservationsPage() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`/api/students/${studentId}`);
+        const res = await fetch(`/api/students/${studentId}/observations`);
         if (!res.ok) throw new Error('Failed to load observations');
         const data = await res.json();
-        const obs: ApiObservation[] = data.student?.observations || [];
+        const obs: ApiObservation[] = data.observations || [];
         setObservations(obs.map((o) => ({
           id: o.id,
           category: o.category,

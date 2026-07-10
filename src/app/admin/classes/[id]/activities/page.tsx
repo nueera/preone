@@ -23,12 +23,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ACTIVITY_COLORS } from '@/lib/theme-tokens';
 
 // ── Types ──
-interface ClassInfo {
-  id: string;
-  name: string;
-  program: { id: string; name: string };
-}
-
 interface ActivityItem {
   id: string;
   title: string;
@@ -92,13 +86,12 @@ export default function ClassActivitiesPage() {
     async function fetchClassName() {
       try {
         const token = getToken();
-        const res = await fetch('/api/classes', {
+        const res = await fetch(`/api/classes/${classId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
-          const found = (data.classes || []).find((c: ClassInfo) => c.id === classId);
-          if (found) setClassName(found.name);
+          if (data.class) setClassName(data.class.name);
         }
       } catch (err) {
         console.error('Failed to fetch class:', err);
@@ -112,7 +105,7 @@ export default function ClassActivitiesPage() {
     setLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`/api/activities?classId=${classId}&limit=50`, {
+      const res = await fetch(`/api/classes/${classId}/activities`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
