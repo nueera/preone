@@ -12,6 +12,11 @@ node_modules
 
 # testing
 /coverage
+/test-results/
+
+# uploads & downloads
+/upload/
+/download/
 
 # next.js
 /.next/
@@ -47,7 +52,6 @@ yarn-error.log*
 
 # vercel
 .vercel
-
 
 # typescript
 *.tsbuildinfo
