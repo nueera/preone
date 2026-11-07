@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build artifacts
+.next
+out
+
+# Environment files
+.env
+.env*.local
+.env.production
+
+# Database
+db/
+*.db
+*.db-journal
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs & meta
+README.md
+LICENSE
+CONTRIBUTING.md
+agent-ctx/
+download/
+examples/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Uploads (mounted as volume in production)
+upload/
+
+# Misc
+*.log
+husky/
+commitlint.config.js

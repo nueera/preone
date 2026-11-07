@@ -1,0 +1,428 @@
+// ============================================================
+// PreOne — Auth Utility
+// JWT-based authentication with HMAC-SHA256 signing
+// Uses bcryptjs for password hashing
+// ============================================================
+
+import { createHmac, timingSafeEqual } from 'crypto';
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/db';
+
+// ============================================================
+// ROLE SYSTEM — 4 Core Roles (Uppercase, matching Prisma enum)
+// ============================================================
+
+export enum Role {
+  ADMIN = 'ADMIN',
+  TEACHER = 'TEACHER',
+  PARENT = 'PARENT',
+  TASK_MASTER = 'TASK_MASTER',
+}
+
+export const ALL_ROLES = [Role.ADMIN, Role.TEACHER, Role.PARENT, Role.TASK_MASTER] as const;
+
+// Permission tiers: Admin > Task_Master > Teacher > Parent
+export const ROLE_HIERARCHY: Record<Role, number> = {
+  [Role.ADMIN]: 100,
+  [Role.TASK_MASTER]: 80,
+  [Role.TEACHER]: 50,
+  [Role.PARENT]: 30,
+};
+
+// Route prefixes mapped to required roles
+// TASK_MASTER uses /admin routes (same layout, CRM-only access filtered by sidebar + middleware)
+export const ROLE_ROUTE_MAP: Record<string, Role> = {
+  '/admin': Role.ADMIN,
+  '/teacher': Role.TEACHER,
+  '/parent': Role.PARENT,
+};
+
+// ============================================================
+// Password Hashing (using bcryptjs)
+// ============================================================
+
+const SALT_ROUNDS = 10;
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+export function hashPasswordSync(password: string): string {
+  return bcrypt.hashSync(password, SALT_ROUNDS);
+}
+
+export async function comparePassword(password: string, hash: string): Promise<boolean> {
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch {
+    return false;
+  }
+}
+
+// Legacy alias for backward compatibility
+export const verifyPassword = comparePassword;
+
+// ============================================================
+// Token Payload — Strongly Typed
+// ============================================================
+
+export interface TokenPayload {
+  userId: string;
+  email: string;
+  name: string;
+  role: Role;
+  branchId?: string | null;
+  schoolId?: string | null;
+}
+
+// Secret key for signing tokens — JWT_SECRET takes priority
+const JWT_SECRET = process.env.JWT_SECRET || process.env.TOKEN_SECRET || 'preone-demo-secret-key-2024';
+
+function sign(data: string): string {
+  return createHmac('sha256', JWT_SECRET).update(data).digest('hex');
+}
+
+export function generateToken(payload: { userId: string; role: string; schoolId?: string | null; email?: string; name?: string; branchId?: string | null }): string {
+  const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  const fullPayload: TokenPayload & { expiresAt: number } = {
+    userId: payload.userId,
+    email: payload.email || '',
+    name: payload.name || '',
+    role: payload.role as Role,
+    branchId: payload.branchId ?? null,
+    schoolId: payload.schoolId ?? null,
+    expiresAt,
+  };
+
+  const payloadData = JSON.stringify(fullPayload);
+  const payloadB64 = Buffer.from(payloadData).toString('base64url');
+  const signature = sign(payloadB64);
+  return `${payloadB64}.${signature}`;
+}
+
+export function verifyToken(token: string): TokenPayload | null {
+  try {
+    const [payloadB64, signature] = token.split('.');
+    if (!payloadB64 || !signature) return null;
+
+    // Verify signature
+    const expectedSig = sign(payloadB64);
+    if (!timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expectedSig, 'hex'))) {
+      return null;
+    }
+
+    // Decode payload
+    const payloadData = Buffer.from(payloadB64, 'base64url').toString('utf8');
+    const payload = JSON.parse(payloadData);
+
+    // Check expiry
+    if (Date.now() > payload.expiresAt) return null;
+
+    // Validate role is a known role
+    const role = payload.role as string;
+    if (!ALL_ROLES.includes(role as Role)) return null;
+
+    return {
+      userId: payload.userId,
+      email: payload.email || '',
+      name: payload.name || '',
+      role: role as Role,
+      branchId: payload.branchId,
+      schoolId: payload.schoolId,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================
+// Auth Helpers for API Routes
+// ============================================================
+
+// Read a cookie value from either a NextRequest (.cookies) or a plain Request
+// (parses the Cookie header). Lets cookie-based auth work in every handler.
+function getCookieValue(request: NextRequest | Request, name: string): string | undefined {
+  const anyReq = request as unknown as { cookies?: { get?: (n: string) => { value?: string } | undefined } };
+  if (anyReq.cookies?.get) {
+    return anyReq.cookies.get(name)?.value;
+  }
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+  const match = header.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
+}
+
+// ============================================================
+// OTP Utilities
+// ============================================================
+
+export async function createOTP(email: string, purpose: string) {
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  await prisma.otp.updateMany({
+    where: { email, purpose, isUsed: false },
+    data: { isUsed: true },
+  });
+
+  const otp = await prisma.otp.create({
+    data: { email, code, purpose, expiresAt },
+  });
+
+  return otp;
+}
+
+export async function verifyOTP(email: string, code: string, purpose: string): Promise<boolean> {
+  const otp = await prisma.otp.findFirst({
+    where: {
+      email,
+      code,
+      purpose,
+      isUsed: false,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!otp) return false;
+
+  await prisma.otp.update({
+    where: { id: otp.id },
+    data: { isUsed: true },
+  });
+
+  return true;
+}
+
+// ============================================================
+// Rate Limiting (in-memory)
+// ============================================================
+
+const loginAttempts = new Map<string, { count: number; lastAttempt: number }>();
+
+export function checkRateLimit(
+  identifier: string,
+  maxAttempts: number = 5,
+  windowMs: number = 15 * 60 * 1000
+): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = loginAttempts.get(identifier);
+
+  if (!record || now - record.lastAttempt > windowMs) {
+    loginAttempts.set(identifier, { count: 1, lastAttempt: now });
+    return { allowed: true, remaining: maxAttempts - 1 };
+  }
+
+  if (record.count >= maxAttempts) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  record.count++;
+  record.lastAttempt = now;
+  return { allowed: true, remaining: maxAttempts - record.count };
+}
+
+// Cleanup old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of loginAttempts.entries()) {
+    if (now - record.lastAttempt > 30 * 60 * 1000) {
+      loginAttempts.delete(key);
+    }
+  }
+}, 30 * 60 * 1000);
+
+// ============================================================
+// withAuth — API Route Wrapper
+// ============================================================
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  schoolId: string | null;
+  branchId: string | null;
+}
+
+interface AuthenticatedRequest extends NextRequest {
+  user: AuthUser;
+}
+
+type AuthenticatedHandler = (
+  req: AuthenticatedRequest,
+  user: AuthUser,
+  ctx: { params: Promise<Record<string, string>> }
+) => Promise<NextResponse>;
+
+interface WithAuthOptions {
+  roles?: string[];
+}
+
+export function withAuth(
+  handler: AuthenticatedHandler,
+  options: WithAuthOptions = {}
+) {
+  return async (req: NextRequest, ctx: { params: Promise<Record<string, string>> }) => {
+    const payload = getAuthUser(req);
+
+    if (!payload) {
+      return NextResponse.json(
+        { error: true, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    if (options.roles && !options.roles.includes(payload.role)) {
+      return NextResponse.json(
+        { error: true, message: 'You do not have permission to access this resource' },
+        { status: 403 }
+      );
+    }
+
+    const user: AuthUser = {
+      id: payload.userId,
+      email: payload.email,
+      name: payload.name,
+      role: payload.role,
+      schoolId: payload.schoolId ?? null,
+      branchId: payload.branchId ?? null,
+    };
+
+    const authenticatedReq = Object.assign(req, { user }) as AuthenticatedRequest;
+
+    return handler(authenticatedReq, user, ctx);
+  };
+}
+
+// ============================================================
+// School Isolation
+// ============================================================
+
+export async function requireSchoolAccess(userSchoolId: string, resourceSchoolId: string) {
+  if (userSchoolId !== resourceSchoolId) {
+    throw new Error('Access denied. Resource belongs to a different school.');
+  }
+}
+
+// ============================================================
+// API Token Generation
+// ============================================================
+
+export function generateApiToken(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 64; i++) {
+    token += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return token;
+}
+
+export function getAuthUser(request: NextRequest | Request): TokenPayload | null {
+  // Bearer header first (localStorage-token clients); fall back to the
+  // preone_token cookie (same-origin page requests, e.g. the admin portal).
+  const authHeader = request.headers.get('authorization');
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.substring(7)
+    : getCookieValue(request, 'preone_token');
+  if (!token) return null;
+  return verifyToken(token);
+}
+
+export function requireAuth(request: NextRequest): TokenPayload | null {
+  return getAuthUser(request);
+}
+
+// ============================================================
+// Role-Based Access Control (RBAC)
+// ============================================================
+
+export function hasRole(user: TokenPayload, ...allowedRoles: Role[]): boolean {
+  return allowedRoles.includes(user.role);
+}
+
+export function isAdmin(user: TokenPayload): boolean {
+  return user.role === Role.ADMIN;
+}
+
+export function isTeacher(user: TokenPayload): boolean {
+  return user.role === Role.TEACHER;
+}
+
+export function isParent(user: TokenPayload): boolean {
+  return user.role === Role.PARENT;
+}
+
+export function isTaskMaster(user: TokenPayload): boolean {
+  return user.role === Role.TASK_MASTER;
+}
+
+export function unauthorized(message = 'Authentication required'): NextResponse {
+  return NextResponse.json({ error: true, message }, { status: 401 });
+}
+
+export function forbidden(message = 'You do not have permission to access this resource'): NextResponse {
+  return NextResponse.json({ error: true, message }, { status: 403 });
+}
+
+/**
+ * Require auth + specific roles. Returns user if authorized, or NextResponse if not.
+ */
+export function requireRole(request: NextRequest, ...allowedRoles: Role[]): TokenPayload | NextResponse {
+  const user = getAuthUser(request);
+  if (!user) return unauthorized();
+  if (!hasRole(user, ...allowedRoles)) return forbidden();
+  return user;
+}
+
+export function requireAdmin(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.ADMIN);
+}
+
+export function requireTeacher(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.TEACHER);
+}
+
+export function requireParent(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.PARENT);
+}
+
+export function requireTaskMaster(request: NextRequest): TokenPayload | NextResponse {
+  return requireRole(request, Role.TASK_MASTER);
+}
+
+// ============================================================
+// Branch Isolation Helper
+// ============================================================
+
+export function branchFilter(user: TokenPayload): Record<string, unknown> {
+  if (user.branchId) {
+    return { branchId: user.branchId };
+  }
+  return {};
+}
+
+export function getBranchScope(user: TokenPayload): string | undefined {
+  return user.branchId || undefined;
+}
+
+// ============================================================
+// Role-based redirect helper
+// ============================================================
+
+export function getDashboardPath(role: Role): string {
+  switch (role) {
+    case Role.ADMIN:
+      return '/admin/dashboard';
+    case Role.TASK_MASTER:
+      return '/admin/crm';  // TASK_MASTER lands on CRM page within Admin portal
+    case Role.TEACHER:
+      return '/teacher';
+    case Role.PARENT:
+      return '/parent';
+    default:
+      return '/login';
+  }
+}

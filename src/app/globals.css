@@ -1,0 +1,2680 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   PREONE DESIGN SYSTEM — Global Tokens
+   Brand: Purple (#7C3AED) → Sky Blue (#0EA5E9) Gradient
+   Style: Modern SaaS + Space Exploration + Preschool Education
+   ============================================================ */
+
+@theme inline {
+  /* ── Color Mappings (for Tailwind utility classes) ── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* ── Portal-scoped color mappings ── */
+  --color-portal: var(--portal);
+  --color-portal-foreground: var(--portal-foreground);
+  --color-portal-50: var(--portal-50);
+  --color-portal-100: var(--portal-100);
+  --color-portal-200: var(--portal-200);
+  --color-portal-300: var(--portal-300);
+  --color-portal-400: var(--portal-400);
+  --color-portal-500: var(--portal-500);
+  --color-portal-600: var(--portal-600);
+  --color-portal-700: var(--portal-700);
+  --color-portal-800: var(--portal-800);
+  --color-portal-900: var(--portal-900);
+
+  /* ── Border Radius (Brand: Everything Rounded) ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
+  --radius-4xl: 32px;
+
+  /* ── Brand Color Palette ── */
+  --color-primary-50: #F0F9FF;
+  --color-primary-100: #E0F2FE;
+  --color-primary-200: #BAE6FD;
+  --color-primary-300: #7DD3FC;
+  --color-primary-400: #38BDF8;
+  --color-primary-500: #0EA5E9;
+  --color-primary-600: #0284C7;
+  --color-primary-700: #0369A1;
+
+  --color-secondary-50: #F5F3FF;
+  --color-secondary-100: #EDE9FE;
+  --color-secondary-200: #DDD6FE;
+  --color-secondary-300: #C4B5FD;
+  --color-secondary-400: #A78BFA;
+  --color-secondary-500: #7C3AED;
+  --color-secondary-600: #6D28D9;
+  --color-secondary-700: #5B21B6;
+
+  --color-accent-yellow: #FACC15;
+  --color-accent-pink: #EC4899;
+  --color-accent-green: #22C55E;
+
+  /* ── Status Colors ── */
+  --color-status-present: #22C55E;
+  --color-status-absent: #EF4444;
+  --color-status-pending: #F59E0B;
+  --color-status-paid: #10B981;
+
+  /* ── Neutral Palette ── */
+  --color-slate-50: #F8FAFC;
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-300: #CBD5E1;
+  --color-slate-400: #94A3B8;
+  --color-slate-500: #64748B;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1E293B;
+  --color-slate-900: #0F172A;
+
+  /* ── Legacy color overrides (for Tailwind compat) ── */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-200: #fed7aa;
+  --color-orange-300: #fdba74;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #7C3AED;
+  --color-violet-600: #6D28D9;
+  --color-violet-700: #5B21B6;
+  --color-violet-800: #4C1D95;
+  --color-violet-900: #3B0764;
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #e0f2fe;
+  --color-sky-200: #bae6fd;
+  --color-sky-300: #7dd3fc;
+  --color-sky-400: #38bdf8;
+  --color-sky-500: #0ea5e9;
+  --color-sky-600: #0284c7;
+  --color-sky-700: #0369a1;
+  --color-sky-800: #075985;
+  --color-sky-900: #0c4a6e;
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+
+  /* ── Pink palette ── */
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-200: #fbcfe8;
+  --color-pink-300: #f9a8d4;
+  --color-pink-400: #f472b6;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+
+  /* ── Blue palette ── */
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+
+  /* ── Teal palette ── */
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  /* ── Green palette ── */
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+
+  /* ── Red palette ── */
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  /* ── Yellow palette ── */
+  --color-yellow-50: #fefce8;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-200: #fef08a;
+  --color-yellow-300: #fde047;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+
+  /* ── Gray palette ── */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* ── Login color mappings ── */
+  --color-login-card: var(--login-card);
+  --color-login-card-border: var(--login-card-border);
+  --color-login-input: var(--login-input);
+  --color-login-input-border: var(--login-input-border);
+  --color-login-text: var(--login-text);
+  --color-login-muted: var(--login-muted);
+  --color-login-subtle: var(--login-subtle);
+  --color-login-label: var(--login-label);
+  --color-login-link: var(--login-link);
+  --color-login-divider: var(--login-divider);
+  --color-login-focus: var(--login-focus);
+  --color-login-error: var(--login-error);
+  --color-login-tab-bg: var(--login-tab-bg);
+  --color-login-tab-active: var(--login-tab-active);
+  --color-login-icon: var(--login-icon);
+  --color-login-icon-muted: var(--login-icon-muted);
+}
+
+/* ============================================================
+   LIGHT MODE — PreOne Brand
+   ============================================================ */
+:root {
+  /* ── Core Radius ── */
+  --radius: 1rem;
+
+  /* ── Unified Radius Scale ── */
+  --radius-xs: 0.25rem;    /* 4px — badges, small elements */
+  --radius-sm: 0.5rem;     /* 8px — buttons, inputs */
+  --radius-md: 0.75rem;    /* 12px — cards, dropdowns */
+  --radius-lg: 1rem;       /* 16px — large cards */
+  --radius-xl: 1.25rem;    /* 20px — containers */
+  --radius-2xl: 1.5rem;    /* 24px — hero cards */
+  --radius-3xl: 2rem;      /* 32px — stat cards */
+  --radius-full: 9999px;   /* full round — avatars, pills */
+
+  /* ── Unified Shadow Scale ── */
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);             /* subtle lift */
+  --shadow-sm: 0 2px 4px rgba(15,23,42,0.06);             /* card default */
+  --shadow-md: 0 4px 8px rgba(15,23,42,0.08);             /* card hover */
+  --shadow-lg: 0 8px 16px rgba(15,23,42,0.10);            /* floating */
+  --shadow-xl: 0 16px 32px rgba(15,23,42,0.12);           /* modal/drawer */
+  --shadow-2xl: 0 24px 48px rgba(15,23,42,0.16);          /* hero element */
+  --shadow-inner: inset 0 2px 4px rgba(15,23,42,0.05);    /* pressed state */
+  --shadow-glow: 0 0 20px rgba(99,102,241,0.15);          /* portal glow */
+  --shadow-glow-dark: 0 0 20px rgba(167,139,250,0.25);    /* dark mode glow */
+
+  /* ── Unified Spacing Scale ── */
+  --space-xs: 0.25rem;     /* 4px */
+  --space-sm: 0.5rem;      /* 8px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 3rem;       /* 48px */
+  --space-3xl: 4rem;       /* 64px */
+
+  /* ── Semantic Colors ── */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+
+  /* ── Primary: Purple (Brand) ── */
+  --primary: #7C3AED;
+  --primary-foreground: #FFFFFF;
+
+  /* ── Secondary: Sky Blue ── */
+  --secondary: #E0F2FE;
+  --secondary-foreground: #0369A1;
+
+  /* ── Muted ── */
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+
+  /* ── Accent: Sky Blue ── */
+  --accent: #0EA5E9;
+  --accent-foreground: #FFFFFF;
+
+  /* ── Destructive ── */
+  --destructive: #EF4444;
+
+  /* ── Borders & Inputs ── */
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #7C3AED;
+
+  /* ── Chart Colors (Brand-inspired) ── */
+  --chart-1: #7C3AED;
+  --chart-2: #0EA5E9;
+  --chart-3: #22C55E;
+  --chart-4: #FACC15;
+  --chart-5: #EC4899;
+
+  /* ── Sidebar: Purple → Blue Gradient ── */
+  --sidebar: #5B21B6;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #5B21B6;
+  --sidebar-accent: rgba(255,255,255,0.12);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-ring: #7C3AED;
+
+  /* ── Login Page Tokens ── */
+  --login-card: rgba(255, 255, 255, 0.55);
+  --login-card-border: rgba(255, 255, 255, 0.6);
+  --login-input: rgba(255, 255, 255, 0.7);
+  --login-input-border: #E5E7EB;
+  --login-text: #1F2937;
+  --login-muted: #6B7280;
+  --login-subtle: #9CA3AF;
+  --login-label: #374151;
+  --login-link: #7C3AED;
+  --login-divider: #E5E7EB;
+  --login-focus: #6366F1;
+  --login-error: #EF4444;
+  --login-tab-bg: rgba(255, 255, 255, 0.5);
+  --login-tab-active: #6366F1;
+  --login-icon: #6366F1;
+  --login-icon-muted: #6B7280;
+
+  /* ── Portal-scoped defaults (Admin = Purple/Violet) ── */
+  --portal: #7C3AED;
+  --portal-foreground: #FFFFFF;
+  --portal-50: #f5f3ff;
+  --portal-100: #ede9fe;
+  --portal-200: #ddd6fe;
+  --portal-300: #c4b5fd;
+  --portal-400: #a78bfa;
+  --portal-500: #7C3AED;
+  --portal-600: #6D28D9;
+  --portal-700: #5B21B6;
+  --portal-800: #4C1D95;
+  --portal-900: #3B0764;
+}
+
+/* ============================================================
+   PORTAL THEME SCOPES
+   Each portal overrides --portal-* variables for its children.
+   Layouts apply data-portal="admin|teacher|parent" on their main wrapper.
+   ============================================================ */
+
+/* ── Admin Portal: Purple / Violet ── */
+[data-portal="admin"][data-role="admin"],
+[data-portal="admin"][data-role="taskmaster"],
+[data-portal="admin"] {
+  --portal: #7C3AED;
+  --portal-foreground: #FFFFFF;
+  --portal-50: #f5f3ff;
+  --portal-100: #ede9fe;
+  --portal-200: #ddd6fe;
+  --portal-300: #c4b5fd;
+  --portal-400: #a78bfa;
+  --portal-500: #7C3AED;
+  --portal-600: #6D28D9;
+  --portal-700: #5B21B6;
+  --portal-800: #4C1D95;
+  --portal-900: #3B0764;
+
+  /* ── Admin semantic tokens ── */
+  --admin-primary: #7C3AED;
+  --admin-primary-soft: #f5f3ff;
+  --admin-success: #16A34A;
+  --admin-success-soft: #dcfce7;
+  --admin-warning: #F59E0B;
+  --admin-warning-soft: #fef3c7;
+  --admin-info: #0EA5E9;
+  --admin-info-soft: #e0f2fe;
+  --admin-error: #EF4444;
+  --admin-orange: #F97316;
+  --admin-orange-soft: #fff7ed;
+  --admin-pink: #EC4899;
+  --admin-pink-soft: #fce7f3;
+  --admin-text: #0F172A;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+  --admin-surface: #FFFFFF;
+  --admin-surface-2: #F8FAFC;
+  --admin-border: #E2E8F0;
+  --admin-bg: #F1F5F9;
+}
+
+/* ── Teacher Portal: Emerald / Teal ── */
+[data-portal="teacher"] {
+  --portal: #059669;
+  --portal-foreground: #FFFFFF;
+  --portal-50: #ecfdf5;
+  --portal-100: #d1fae5;
+  --portal-200: #a7f3d0;
+  --portal-300: #6ee7b7;
+  --portal-400: #34d399;
+  --portal-500: #10b981;
+  --portal-600: #059669;
+  --portal-700: #047857;
+  --portal-800: #065f46;
+  --portal-900: #064e3b;
+
+  /* ── Teacher Portal Semantic Tokens (--teacher-*) ── */
+  --teacher-bg: #F8FAFC;
+  --teacher-surface: #FFFFFF;
+  --teacher-surface-2: #F1F5F9;
+  --teacher-border: #E2E8F0;
+  --teacher-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --teacher-text: #0F172A;
+  --teacher-text-muted: #64748B;
+  --teacher-text-subtle: #94A3B8;
+  --teacher-primary: #10B981;
+  --teacher-primary-soft: #D1FAE5;
+  --teacher-primary-foreground: #FFFFFF;
+  --teacher-success: #10B981;
+  --teacher-success-soft: #D1FAE5;
+  --teacher-warning: #F59E0B;
+  --teacher-warning-soft: #FEF3C7;
+  --teacher-info: #6366F1;
+  --teacher-info-soft: #EEF2FF;
+  --teacher-error: #EF4444;
+  --teacher-error-soft: #FEE2E2;
+  --teacher-accent: #10B981;
+
+  /* ── Teacher Portal Extended Tokens ── */
+  --teacher-orange: #F97316;
+  --teacher-orange-soft: #FFF7ED;
+  --teacher-pink: #EC4899;
+  --teacher-pink-soft: #FCE7F3;
+}
+
+/* ── Parent Portal: Sky / Blue ── */
+[data-portal="parent"] {
+  --portal: #0ea5e9;
+  --portal-foreground: #FFFFFF;
+  --portal-50: #f0f9ff;
+  --portal-100: #e0f2fe;
+  --portal-200: #bae6fd;
+  --portal-300: #7dd3fc;
+  --portal-400: #38bdf8;
+  --portal-500: #0ea5e9;
+  --portal-600: #0284c7;
+  --portal-700: #0369a1;
+  --portal-800: #075985;
+  --portal-900: #0c4a6e;
+
+  /* ── Parent Portal Semantic Tokens (--parent-*) ── */
+  --parent-bg: #F8FAFC;
+  --parent-surface: #FFFFFF;
+  --parent-surface-2: #F1F5F9;
+  --parent-border: #E2E8F0;
+  --parent-shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+  --parent-text: #0F172A;
+  --parent-text-muted: #64748B;
+  --parent-text-subtle: #94A3B8;
+  --parent-primary: #0EA5E9;
+  --parent-primary-soft: #E0F2FE;
+  --parent-primary-foreground: #FFFFFF;
+  --parent-success: #10B981;
+  --parent-success-soft: #D1FAE5;
+  --parent-warning: #F59E0B;
+  --parent-warning-soft: #FEF3C7;
+  --parent-info: #6366F1;
+  --parent-info-soft: #EEF2FF;
+  --parent-error: #EF4444;
+  --parent-error-soft: #FEE2E2;
+  --parent-accent: #0EA5E9;
+
+  /* ── Parent Portal Extended Tokens ── */
+  --parent-pink: #EC4899;
+  --parent-pink-soft: #FCE7F3;
+  --parent-orange: #F97316;
+  --parent-orange-soft: #FFF7ED;
+}
+
+/* ============================================================
+   DARK MODE — PreOne Brand
+   ============================================================ */
+.dark {
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
+
+  --primary: #A78BFA;
+  --primary-foreground: #0F172A;
+
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
+
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+
+  --accent: #38BDF8;
+  --accent-foreground: #0F172A;
+
+  --destructive: #FCA5A5;
+
+  --border: rgba(255,255,255,0.1);
+  --input: rgba(255,255,255,0.15);
+  --ring: #A78BFA;
+
+  --chart-1: #A78BFA;
+  --chart-2: #38BDF8;
+  --chart-3: #4ADE80;
+  --chart-4: #FDE047;
+  --chart-5: #F472B6;
+
+  --sidebar: #1E1B4B;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #A78BFA;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: rgba(255,255,255,0.08);
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: rgba(255,255,255,0.08);
+  --sidebar-ring: #A78BFA;
+
+  --portal: #A78BFA;
+  --portal-foreground: #0F172A;
+
+  /* ── Login Page Tokens (dark mode) ── */
+  --login-card: rgba(26, 26, 62, 0.65);
+  --login-card-border: rgba(139, 92, 246, 0.15);
+  --login-input: rgba(34, 34, 68, 0.6);
+  --login-input-border: #33335A;
+  --login-text: #F0F0FF;
+  --login-muted: #A3A3C2;
+  --login-subtle: #8888AA;
+  --login-label: #C4C4E0;
+  --login-link: #818CF8;
+  --login-divider: #33335A;
+  --login-focus: #8B5CF6;
+  --login-error: #FB7185;
+  --login-tab-bg: #252548;
+  --login-tab-active: #818CF8;
+  --login-icon: #818CF8;
+  --login-icon-muted: #A3A3C2;
+}
+
+.dark [data-portal="admin"] {
+  --admin-primary: #A78BFA;
+  --admin-primary-soft: rgba(167,139,250,0.15);
+  --admin-success: #4ADE80;
+  --admin-success-soft: rgba(74,222,128,0.15);
+  --admin-warning: #FBBF24;
+  --admin-warning-soft: rgba(251,191,36,0.15);
+  --admin-info: #38BDF8;
+  --admin-info-soft: rgba(56,189,248,0.15);
+  --admin-error: #FCA5A5;
+  --admin-orange: #FB923C;
+  --admin-orange-soft: rgba(251,146,60,0.15);
+  --admin-pink: #F472B6;
+  --admin-pink-soft: rgba(244,114,182,0.15);
+  --admin-text: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-text-subtle: #64748B;
+  --admin-surface: #1E293B;
+  --admin-surface-2: #334155;
+  --admin-border: rgba(255,255,255,0.1);
+  --admin-bg: #0F172A;
+}
+
+.dark [data-portal="teacher"] {
+  --portal: #34D399;
+  --portal-foreground: #0F172A;
+
+  /* ── Dark Mode Teacher Semantic Tokens ── */
+  --teacher-bg: #0F172A;
+  --teacher-surface: #1E293B;
+  --teacher-surface-2: #334155;
+  --teacher-border: rgba(255,255,255,0.1);
+  --teacher-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --teacher-text: #F8FAFC;
+  --teacher-text-muted: #94A3B8;
+  --teacher-text-subtle: #64748B;
+  --teacher-primary: #34D399;
+  --teacher-primary-soft: rgba(52,211,153,0.15);
+  --teacher-primary-foreground: #0F172A;
+  --teacher-success: #34D399;
+  --teacher-success-soft: rgba(52,211,153,0.15);
+  --teacher-warning: #FBBF24;
+  --teacher-warning-soft: rgba(251,191,36,0.15);
+  --teacher-info: #818CF8;
+  --teacher-info-soft: rgba(129,140,248,0.15);
+  --teacher-error: #FCA5A5;
+  --teacher-error-soft: rgba(252,165,165,0.15);
+  --teacher-accent: #34D399;
+
+  /* ── Dark Mode Teacher Extended Tokens ── */
+  --teacher-orange: #FB923C;
+  --teacher-orange-soft: rgba(251,146,60,0.15);
+  --teacher-pink: #F472B6;
+  --teacher-pink-soft: rgba(244,114,182,0.15);
+}
+
+.dark [data-portal="parent"] {
+  --portal: #38BDF8;
+  --portal-foreground: #0F172A;
+
+  /* ── Dark Mode Parent Semantic Tokens ── */
+  --parent-bg: #0F172A;
+  --parent-surface: #1E293B;
+  --parent-surface-2: #334155;
+  --parent-border: rgba(255,255,255,0.1);
+  --parent-shadow-card: 0 4px 6px rgba(0,0,0,0.3);
+  --parent-text: #F8FAFC;
+  --parent-text-muted: #94A3B8;
+  --parent-text-subtle: #64748B;
+  --parent-primary: #38BDF8;
+  --parent-primary-soft: rgba(56,189,248,0.15);
+  --parent-primary-foreground: #0F172A;
+  --parent-success: #34D399;
+  --parent-success-soft: rgba(52,211,153,0.15);
+  --parent-warning: #FBBF24;
+  --parent-warning-soft: rgba(251,191,36,0.15);
+  --parent-info: #818CF8;
+  --parent-info-soft: rgba(129,140,248,0.15);
+  --parent-error: #FCA5A5;
+  --parent-error-soft: rgba(252,165,165,0.15);
+  --parent-accent: #38BDF8;
+
+  /* ── Dark Mode Parent Extended Tokens ── */
+  --parent-pink: #F472B6;
+  --parent-pink-soft: rgba(244,114,182,0.15);
+  --parent-orange: #FB923C;
+  --parent-orange-soft: rgba(251,146,60,0.15);
+}
+
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================================
+   PREONE BRAND UTILITIES
+   ============================================================ */
+
+/* ── Main Brand Gradient (Purple → Sky Blue) ── */
+.bg-brand-gradient {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+}
+
+.bg-brand-gradient-hover {
+  background: linear-gradient(135deg, #6D28D9 0%, #0284C7 100%);
+}
+
+/* ── Portal CTA Button Gradients (auto-scoped per portal) ── */
+.bg-portal-gradient {
+  background: linear-gradient(135deg, var(--portal-600) 0%, var(--portal-400) 100%);
+}
+
+.bg-portal-gradient-hover {
+  background: linear-gradient(135deg, var(--portal-700) 0%, var(--portal-500) 100%);
+}
+
+/* ── Portal Sidebar Gradient ── */
+.bg-portal-sidebar {
+  background: linear-gradient(180deg, var(--portal-700) 0%, var(--portal-500) 100%);
+}
+
+/* ── Portal Card Gradient ── */
+.bg-portal-card {
+  background: linear-gradient(135deg, var(--portal-50) 0%, var(--portal-100) 100%);
+}
+
+/* ── Portal Text Gradient ── */
+.text-portal-gradient {
+  background: linear-gradient(135deg, var(--portal-600) 0%, var(--portal-400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Success Gradient ── */
+.bg-success-gradient {
+  background: linear-gradient(135deg, #22C55E, #84CC16);
+}
+
+/* ── Pink Gradient ── */
+.bg-pink-gradient {
+  background: linear-gradient(135deg, #EC4899, #F472B6);
+}
+
+/* ── Yellow Gradient ── */
+.bg-yellow-gradient {
+  background: linear-gradient(135deg, #FACC15, #FB923C);
+}
+
+/* ── Sidebar Gradient ── */
+.bg-sidebar-gradient {
+  background: linear-gradient(180deg, #5B21B6 0%, #1D4ED8 50%, #0369A1 100%);
+}
+
+/* ── Login Background Gradient ── */
+.bg-login-gradient {
+  background: linear-gradient(135deg, #EDE9FE 0%, #E0F2FE 50%, #F0FDF4 100%);
+}
+
+/* ── Login Page Glass Card ── */
+.login-card-glass {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+.dark .login-card-glass {
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ── Login Toggle Pill ── */
+.login-toggle-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+:is(.dark) .login-toggle-pill {
+  background: rgba(20, 20, 36, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.login-toggle-pill-btn {
+  color: #B0B0B0;
+}
+.login-toggle-pill-btn[data-active="true"] {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* ── Login Theme Transition ── */
+.login-theme-transition,
+.login-theme-transition * {
+  transition: background var(--transition-theme, 300ms ease),
+              border-color var(--transition-theme, 300ms ease),
+              color var(--transition-theme, 300ms ease),
+              box-shadow var(--transition-theme, 300ms ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-theme-transition,
+  .login-theme-transition * { transition: none; }
+}
+
+/* ── Login Page Shell ── */
+.login-page-shell {
+  min-height: 100dvh;
+}
+@media (max-width: 767px) {
+  .login-page-shell { overflow-y: auto; overflow-x: hidden; }
+}
+
+/* ── Login Text Colors ── */
+.text-login-text { color: var(--login-text); }
+.text-login-muted { color: var(--login-muted); }
+.text-login-subtle { color: var(--login-subtle); }
+.text-login-label { color: var(--login-label); }
+.text-login-link { color: var(--login-link); }
+.text-login-error { color: var(--login-error); }
+
+/* ── Login Backgrounds ── */
+.bg-login-tab-bg { background: #F1F5F9; }
+.bg-login-tab-active { background: #6366F1; }
+.bg-login-input { background: #F8FAFC; }
+.bg-login-divider { background: #E5E7EB; }
+
+.dark .bg-login-tab-bg { background: #252548; }
+.dark .bg-login-tab-active { background: #818CF8; }
+.dark .bg-login-input { background: rgba(34, 34, 68, 0.6); }
+.dark .bg-login-divider { background: #33335A; }
+
+/* ── Login Borders ── */
+.border-login-input-border { border-color: var(--login-input-border); }
+
+/* ── Login Icons ── */
+.text-login-icon { color: var(--login-icon); }
+.text-login-icon-muted { color: var(--login-icon-muted); }
+
+/* ── Login Input Focus ── */
+.login-input-focus:focus-within {
+  border-color: var(--login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-focus) 18%, transparent);
+}
+
+/* ── Login Checkbox Checked ── */
+.login-checkbox-checked {
+  background: var(--login-focus) !important;
+  border-color: var(--login-focus) !important;
+}
+
+/* ── Login Demo Cell ── */
+.login-demo-cell {
+  border-radius: 12px;
+}
+@media (max-width: 767px) {
+  .login-demo-cell { min-height: 56px; }
+}
+
+/* ── Login Wallpaper Overlays ── */
+.login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(108,92,231,0.12) 0%, rgba(0,0,0,0.15) 100%);
+}
+.dark .login-wallpaper-overlay {
+  background: linear-gradient(135deg, rgba(108,92,231,0.2) 0%, rgba(0,0,0,0.35) 100%);
+}
+.login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.25) 100%);
+}
+:is(.dark) .login-wallpaper-overlay-mobile {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.45) 100%);
+}
+
+/* ── Login Brand Wordmark ── */
+.login-brand-wordmark { color: #FFFFFF; }
+:is(.light) .login-brand-wordmark { color: #FFFFFF; }
+
+/* ── Login Launch Button ── */
+.btn-launch {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+}
+.btn-launch:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+}
+.btn-launch:active:not(:disabled) { transform: scale(0.99); }
+.btn-launch:disabled { cursor: not-allowed; opacity: 0.85; }
+
+/* ── Login Brand Text Gradient ── */
+.text-brand-gradient {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card Hover Effects ── */
+.card-preone {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0px 8px 24px rgba(15,23,42,0.06);
+  transition: all 300ms ease;
+}
+
+.card-preone:hover {
+  box-shadow: 0px 20px 40px rgba(15,23,42,0.08);
+  transform: translateY(-4px);
+}
+
+/* ── Button: Primary Gradient ── */
+.btn-brand {
+  background: linear-gradient(135deg, #7C3AED 0%, #0EA5E9 100%);
+  color: white;
+  border-radius: 16px;
+  font-weight: 600;
+  transition: all 200ms ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-brand:hover {
+  background: linear-gradient(135deg, #6D28D9 0%, #0284C7 100%);
+  box-shadow: 0px 8px 24px rgba(124,58,237,0.3);
+  transform: translateY(-2px);
+}
+
+.btn-brand:active {
+  transform: translateY(0px);
+}
+
+/* ── Button: Portal Gradient (auto-scoped per portal) ── */
+.btn-portal {
+  background: linear-gradient(135deg, var(--portal-600) 0%, var(--portal-400) 100%);
+  color: white;
+  border-radius: 16px;
+  font-weight: 600;
+  transition: all 200ms ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-portal:hover {
+  background: linear-gradient(135deg, var(--portal-700) 0%, var(--portal-500) 100%);
+  box-shadow: 0px 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.btn-portal:active {
+  transform: translateY(0px);
+}
+
+/* ── Button: Ghost Hover ── */
+.btn-ghost-preone {
+  transition: all 200ms ease;
+}
+
+.btn-ghost-preone:hover {
+  background: #F1F5F9;
+}
+
+/* ── Floating Action Element ── */
+.floating-shadow {
+  box-shadow: 0px 30px 60px rgba(15,23,42,0.10);
+}
+
+/* ── Stat Card Gradient Backgrounds ── */
+.stat-card-violet {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border: 1px solid #DDD6FE;
+}
+
+.stat-card-sky {
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  border: 1px solid #BAE6FD;
+}
+
+.stat-card-emerald {
+  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+  border: 1px solid #A7F3D0;
+}
+
+.stat-card-rose {
+  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+  border: 1px solid #FECDD3;
+}
+
+.stat-card-amber {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid #FDE68A;
+}
+
+.stat-card-indigo {
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  border: 1px solid #C7D2FE;
+}
+
+/* ── Portal-scoped stat card ── */
+.stat-card-portal {
+  background: linear-gradient(135deg, var(--portal-50) 0%, var(--portal-100) 100%);
+  border: 1px solid var(--portal-200);
+}
+
+/* ── Space-themed Decorative Elements ── */
+.space-dots {
+  background-image: radial-gradient(circle, rgba(124,58,237,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Active Navigation Pill ── */
+.nav-active-pill {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+/* ── Status Badges ── */
+.badge-present {
+  background: #DCFCE7;
+  color: #166534;
+  border-radius: 12px;
+}
+
+.badge-absent {
+  background: #FEE2E2;
+  color: #991B1B;
+  border-radius: 12px;
+}
+
+.badge-pending {
+  background: #FEF3C7;
+  color: #92400E;
+  border-radius: 12px;
+}
+
+.badge-paid {
+  background: #D1FAE5;
+  color: #065F46;
+  border-radius: 12px;
+}
+
+/* ── Animated Star (Space Theme) ── */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+}
+
+.animate-orbit {
+  animation: orbit 8s linear infinite;
+}
+
+/* ── Custom Scrollbar (Brand-styled) ── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ── Table Row Hover ── */
+.table-row-preone {
+  transition: all 200ms ease;
+}
+.table-row-preone:hover {
+  background: #F8FAFC;
+}
+
+/* ── Focus Ring ── */
+.focus-ring-preone:focus-visible {
+  outline: 2px solid #7C3AED;
+  outline-offset: 2px;
+}
+
+/* ── Focus Ring (Portal-scoped) ── */
+.focus-ring-portal:focus-visible {
+  outline: 2px solid var(--portal-500);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES — PreOne
+   ============================================================ */
+
+/* ── Mobile-first touch targets (min 44px for accessibility) ── */
+@media (max-width: 767px) {
+  /* Ensure buttons have adequate touch targets on mobile */
+  button, [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Smaller stat card text on mobile */
+  .stat-card-mobile {
+    padding: 12px;
+  }
+
+  .stat-card-mobile p:last-child {
+    font-size: 11px;
+  }
+
+  /* Reduce card border radius on mobile for more content space */
+  .card-mobile-sm {
+    border-radius: 16px;
+  }
+
+  /* Full-width inputs on mobile */
+  .input-mobile-full {
+    width: 100%;
+  }
+
+  /* Login card mobile overrides */
+  .login-card-glass { padding: 16px !important; border-radius: 16px !important; }
+  .login-card-glass .btn-launch { height: 44px !important; }
+  .login-card-glass input[type="text"],
+  .login-card-glass input[type="email"],
+  .login-card-glass input[type="password"],
+  .login-card-glass input[type="tel"],
+  .login-card-glass input:not([type]) { font-size: 16px !important; }
+
+  /* Reduce heading sizes on mobile */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+
+  /* Prevent horizontal overflow */
+  .overflow-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Tablet adjustments (768px–1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Comfortable spacing for tablets */
+  .tablet-spacing {
+    padding: 20px;
+  }
+}
+
+/* ── Prevent layout shift when sidebar opens/closes ── */
+.sidebar-transition {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Mobile sheet overlay adjustments ── */
+@media (max-width: 767px) {
+  /* Make dialogs full-screen on mobile */
+  [role="dialog"] {
+    max-height: 90vh;
+    margin: auto 0;
+  }
+}
+
+/* ── Responsive chart containers ── */
+.responsive-chart {
+  width: 100%;
+  min-height: 200px;
+}
+
+@media (max-width: 767px) {
+  .responsive-chart {
+    min-height: 180px;
+  }
+}
+
+/* ── Safe area insets for notched devices ── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ============================================================
+   PREONE LIVING UNIVERSE — Refined Design System
+   Brand Primary: Indigo-Purple (#6366F1)
+   Dark Mode: Cosmic Deep Space (#0a0a1a)
+   ============================================================ */
+
+:root {
+  /* ── Living Universe Brand Tokens ── */
+  --preone-primary: #6366F1;
+  --preone-primary-dark: #4F46E5;
+  --preone-primary-light: #818CF8;
+  --preone-primary-50: #EEF2FF;
+  --preone-primary-100: #E0E7FF;
+  
+  --preone-blue: #0096C7;
+  --preone-orange: #FFB700;
+  --preone-pink: #FF4D6D;
+  --preone-green: #34D399;
+  --preone-coral: #FB7185;
+  
+  /* ── Warm-tinted Neutrals ── */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border-default: #E5E7EB;
+  --border-light: #F3F4F6;
+  
+  /* ── Typography Scale ── */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.5rem;
+  
+  /* ── Font Families ── */
+  --font-primary: var(--font-poppins), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: var(--font-outfit), sans-serif;
+}
+
+/* ── Dark Cosmic Mode (Living Universe) ── */
+.dark {
+  /* Deep Space Backgrounds */
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #121234;
+  --bg-tertiary: #1a1a3a;
+  --bg-glass: rgba(18, 18, 52, 0.7);
+  
+  /* Cosmic Accents */
+  --preone-primary: #6c5ce7;
+  --preone-primary-light: #a29bfe;
+  --preone-blue: #00d2d3;
+  --preone-orange: #fdcb6e;
+  --preone-pink: #ff7675;
+  --preone-green: #55efc4;
+  
+  /* Glass Effects */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-blur: 20px;
+  
+  /* Text overrides for dark */
+  --text-primary: #FFFFFF;
+  --text-secondary: #b2bec3;
+  --text-tertiary: #636e72;
+  --text-muted: #4a5568;
+  --border-default: #2d2d4a;
+  --border-light: #1a1a3a;
+}
+
+/* ============================================================
+   PREONE CARD SYSTEM — Living Universe
+   ============================================================ */
+
+.preone-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.preone-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.dark .preone-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark .preone-card:hover {
+  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.15);
+  border-color: rgba(108, 92, 231, 0.3);
+}
+
+/* Hero Card — Gradient background with planet decoration */
+.preone-hero-card {
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--preone-primary), var(--preone-primary-light));
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.preone-hero-card::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.05);
+}
+
+/* Achievement Card — Golden border */
+.preone-achievement-card {
+  position: relative;
+  border: 1px solid rgba(252, 211, 77, 0.3);
+  background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.dark .preone-achievement-card {
+  background: linear-gradient(135deg, rgba(253, 203, 110, 0.1), rgba(253, 203, 110, 0.05));
+  border-color: rgba(253, 203, 110, 0.2);
+}
+
+/* Glass Card — Dark mode glass morphism */
+.preone-glass-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(0px);
+}
+
+.dark .preone-glass-card {
+  background: var(--bg-glass);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ============================================================
+   PREONE BUTTON SYSTEM — Living Universe
+   ============================================================ */
+
+.preone-btn-primary {
+  background: linear-gradient(135deg, var(--preone-primary), var(--preone-primary-light));
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: var(--font-primary);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  border: none;
+  cursor: pointer;
+}
+
+.preone-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.preone-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.preone-btn-secondary {
+  background: transparent;
+  color: var(--preone-primary);
+  border: 1px solid var(--preone-primary);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preone-btn-secondary:hover {
+  background: var(--preone-primary-50);
+}
+
+.preone-btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preone-btn-icon:hover {
+  background: var(--preone-primary-50);
+  color: var(--preone-primary);
+}
+
+/* ============================================================
+   AURORA BACKGROUND — Dark Mode Only
+   ============================================================ */
+
+.dark body {
+  background: #0a0a1a;
+  position: relative;
+}
+
+.dark .aurora-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 210, 211, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(255, 118, 117, 0.06) 0%, transparent 50%);
+  animation: aurora-shift 25s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-shift {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.7; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.dark .aurora-bg main,
+.dark .aurora-bg header,
+.dark .aurora-bg aside,
+.dark .aurora-bg nav {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   TYPOGRAPHY — Living Universe
+   Poppins for headings, Inter for body
+   ============================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+}
+
+body, p, span, div {
+  font-family: var(--font-secondary);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.text-hero {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  font-family: var(--font-primary);
+  line-height: 1.2;
+}
+
+.text-page-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  font-family: var(--font-primary);
+}
+
+.text-section-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  font-family: var(--font-primary);
+}
+
+.text-card-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-family: var(--font-primary);
+}
+
+.text-body {
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.text-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.text-badge {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   EMOTIONAL TIMELINE — Story Circles
+   ============================================================ */
+
+.story-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(to top right, #6c5ce7, #ff7675, #fdcb6e);
+}
+
+.story-circle-viewed {
+  background: #d1d5db;
+}
+
+.dark .story-circle-viewed {
+  background: #4a5568;
+}
+
+.story-circle-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.dark .story-circle-inner {
+  border-color: #121234;
+}
+
+/* ============================================================
+   SIDEBAR — Living Universe Refined
+   ============================================================ */
+
+.preone-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.preone-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.preone-sidebar-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+}
+
+.dark .preone-sidebar-item {
+  color: var(--text-secondary);
+}
+
+.dark .preone-sidebar-item:hover {
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--preone-primary);
+}
+
+.dark .preone-sidebar-item.active {
+  background: rgba(108, 92, 231, 0.15);
+  color: var(--preone-primary);
+}
+
+/* ============================================================
+   GPU-OPTIMIZED ANIMATION PRESETS
+   All animations use transform/opacity only for 60fps performance
+   ============================================================ */
+
+/* ── Keyframe Definitions ── */
+@keyframes animate-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes animate-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes animate-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-down {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes animate-slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes animate-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes animate-bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes animate-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes animate-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes animate-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes animate-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes animate-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes animate-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ── Animation Utility Classes ── */
+.animate-fade-in { animation: animate-fade-in 0.2s ease-out forwards; }
+.animate-fade-out { animation: animate-fade-out 0.15s ease-in forwards; }
+.animate-slide-up { animation: animate-slide-up 0.25s ease-out forwards; }
+.animate-slide-down { animation: animate-slide-down 0.25s ease-out forwards; }
+.animate-slide-left { animation: animate-slide-left 0.25s ease-out forwards; }
+.animate-slide-right { animation: animate-slide-right 0.25s ease-out forwards; }
+.animate-scale-in { animation: animate-scale-in 0.2s ease-out forwards; }
+.animate-scale-out { animation: animate-scale-out 0.15s ease-in forwards; }
+.animate-bounce-in { animation: animate-bounce-in 0.4s ease-out forwards; }
+.animate-pulse-slow { animation: animate-pulse 2s ease-in-out infinite; }
+.animate-spin-slow { animation: animate-spin 2s linear infinite; }
+.animate-float-slow { animation: animate-float 3s ease-in-out infinite; }
+.animate-shake { animation: animate-shake 0.5s ease-in-out; }
+.animate-wobble { animation: animate-wobble 0.5s ease-in-out; }
+.animate-glow { animation: animate-glow 2s ease-in-out infinite; }
+
+/* ── Stagger Animation for Lists ── */
+.animate-stagger > * {
+  opacity: 0;
+  animation: animate-slide-up 0.25s ease-out forwards;
+}
+
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+.animate-stagger > *:nth-child(9) { animation-delay: 400ms; }
+.animate-stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+/* ── Hover Interactions (GPU-accelerated) ── */
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.hover-scale { transition: transform 0.2s ease; }
+.hover-scale:hover { transform: scale(1.02); }
+
+.hover-glow { transition: box-shadow 0.2s ease; }
+.hover-glow:hover { box-shadow: var(--shadow-glow); }
+
+.hover-brightness { transition: filter 0.2s ease; }
+.hover-brightness:hover { filter: brightness(1.05); }
+
+/* ── Pressed State ── */
+.press-down:active { transform: scale(0.98); }
+.press-shadow:active { box-shadow: var(--shadow-inner); }
+
+/* ── Skeleton Shimmer (Portal-aware) ── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 0%,
+    var(--portal-surface, var(--surface, #FFFFFF)) 50%,
+    var(--portal-surface-2, var(--surface-2, #F1F5F9)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Portal-aware Skeleton Colors ── */
+[data-portal="admin"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--admin-surface-2) 0%, var(--admin-surface) 50%, var(--admin-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="teacher"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--teacher-surface-2) 0%, var(--teacher-surface) 50%, var(--teacher-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+[data-portal="parent"] .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--parent-surface-2) 0%, var(--parent-surface) 50%, var(--parent-surface-2) 100%);
+  background-size: 200% 100%;
+}
+
+/* ============================================================
+   PORTAL AURORA ANIMATIONS
+   GPU-optimized: transform + opacity only
+   ============================================================ */
+@keyframes portal-aurora-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes portal-aurora-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-30px, 25px) scale(1.08); }
+  66% { transform: translate(25px, -15px) scale(0.93); }
+}
+
+@keyframes portal-aurora-float-3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  33% { transform: translate(calc(-50% + 20px), calc(-50% - 20px)) scale(1.1); }
+  66% { transform: translate(calc(-50% - 15px), calc(-50% + 15px)) scale(0.9); }
+}
+
+/* ============================================================
+   ANIMATED GRADIENT BORDER
+   Uses CSS @property for smooth gradient rotation
+   ============================================================ */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-gradient-border-bg {
+  animation: gradient-rotate var(--animation-duration, 4s) linear infinite;
+}
+
+@keyframes gradient-rotate {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+/* ── Gradient Border Portal Colors ── */
+[data-portal="admin"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #7C3AED, #8B5CF6, #A78BFA, #6D28D9, #7C3AED
+  );
+}
+
+.dark [data-portal="admin"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #A78BFA, #C4B5FD, #8B5CF6, #9333EA, #A78BFA
+  );
+}
+
+[data-portal="teacher"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #10B981, #34D399, #6EE7B7, #059669, #10B981
+  );
+}
+
+.dark [data-portal="teacher"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #34D399, #6EE7B7, #10B981, #047857, #34D399
+  );
+}
+
+[data-portal="parent"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #0EA5E9, #38BDF8, #7DD3FC, #0284C7, #0EA5E9
+  );
+}
+
+.dark [data-portal="parent"] .animated-gradient-border-bg {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #38BDF8, #7DD3FC, #0EA5E9, #0369A1, #38BDF8
+  );
+}
+
+/* ============================================================
+   PORTAL SPINNER ANIMATIONS
+   All variants: ring, dots, pulse, orbit, gradient
+   ============================================================ */
+
+/* ── Ring Spinner - Rotation ── */
+.portal-spinner-ring {
+  border-radius: 50%;
+  animation: portal-spinner-rotate linear infinite;
+}
+
+@keyframes portal-spinner-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Dots Spinner - Bounce ── */
+.portal-spinner-dots {
+  display: flex;
+  align-items: center;
+}
+
+.portal-spinner-dot {
+  border-radius: 50%;
+  animation: portal-spinner-bounce ease-in-out infinite;
+}
+
+@keyframes portal-spinner-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-8px); opacity: 0.7; }
+}
+
+/* ── Pulse Spinner - Expanding rings ── */
+.portal-spinner-pulse-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.portal-spinner-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+  animation: portal-spinner-pulse-expand ease-out infinite;
+  width: 100%;
+  height: 100%;
+}
+
+.portal-spinner-pulse-dot {
+  border-radius: 50%;
+  animation: portal-spinner-pulse-dot ease-in-out 1s infinite;
+}
+
+@keyframes portal-spinner-pulse-expand {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes portal-spinner-pulse-dot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ── Orbit Spinner - Circular orbit ── */
+.portal-spinner-orbit-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.portal-spinner-orbit-path {
+  position: absolute;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border-style: solid;
+  opacity: 0.3;
+}
+
+.portal-spinner-orbit-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: portal-spinner-orbit linear infinite;
+}
+
+.portal-spinner-orbit-center {
+  border-radius: 50%;
+}
+
+@keyframes portal-spinner-orbit {
+  from {
+    transform: rotate(0deg) translateX(calc(50% - 4px)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(calc(50% - 4px)) rotate(-360deg);
+  }
+}
+
+/* ── Gradient Spinner - Conic rotation ── */
+.portal-spinner-gradient {
+  border-radius: 50%;
+  animation: portal-spinner-gradient-rotate linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-spinner-gradient-inner {
+  border-radius: 50%;
+  background: white;
+}
+
+.dark .portal-spinner-gradient-inner {
+  background: rgb(15, 23, 42);
+}
+
+@keyframes portal-spinner-gradient-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Spinner Portal Colors ── */
+[data-portal="admin"] .portal-spinner-ring {
+  border-color: rgba(124, 58, 237, 0.1);
+  border-top-color: #7C3AED;
+  border-right-color: #8B5CF6;
+}
+
+.dark [data-portal="admin"] .portal-spinner-ring {
+  border-color: rgba(167, 139, 250, 0.15);
+  border-top-color: #A78BFA;
+  border-right-color: #C4B5FD;
+}
+
+[data-portal="teacher"] .portal-spinner-ring {
+  border-color: rgba(16, 185, 129, 0.1);
+  border-top-color: #10B981;
+  border-right-color: #34D399;
+}
+
+.dark [data-portal="teacher"] .portal-spinner-ring {
+  border-color: rgba(52, 211, 153, 0.15);
+  border-top-color: #34D399;
+  border-right-color: #6EE7B7;
+}
+
+[data-portal="parent"] .portal-spinner-ring {
+  border-color: rgba(14, 165, 233, 0.1);
+  border-top-color: #0EA5E9;
+  border-right-color: #38BDF8;
+}
+
+.dark [data-portal="parent"] .portal-spinner-ring {
+  border-color: rgba(56, 189, 248, 0.15);
+  border-top-color: #38BDF8;
+  border-right-color: #7DD3FC;
+}
+
+/* ============================================================
+   SUCCESS CELEBRATION ANIMATIONS
+   GPU-optimized: transform + opacity only
+   ============================================================ */
+
+/* ── Confetti Animation ── */
+.celebration-confetti-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.celebration-confetti-particle {
+  position: absolute;
+  border-radius: 2px;
+  animation: celebration-confetti-fall 2s ease-out forwards;
+}
+
+@keyframes celebration-confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ── Success Icon Pop ── */
+.celebration-success-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: celebration-icon-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes celebration-icon-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.celebration-check-path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: celebration-check-draw 0.5s ease-out forwards 0.3s;
+}
+
+@keyframes celebration-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.celebration-message {
+  opacity: 0;
+  animation: celebration-message-appear 0.3s ease-out forwards 0.5s;
+}
+
+@keyframes celebration-message-appear {
+  to { opacity: 1; }
+}
+
+/* ── Pop Animation ── */
+.celebration-pop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: celebration-pop-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes celebration-pop-bounce {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.3) rotate(5deg); }
+  70% { transform: scale(0.9) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.celebration-pop-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-pop-pulse 1s ease-in-out infinite 0.6s;
+}
+
+@keyframes celebration-pop-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+}
+
+/* ── Sparkle Animation ── */
+.celebration-sparkle-container {
+  position: absolute;
+  inset: -10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.celebration-sparkle {
+  animation: celebration-sparkle 1s ease-in-out infinite;
+  opacity: 0;
+  font-size: 12px;
+}
+
+@keyframes celebration-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Trophy Animation ── */
+.celebration-trophy-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-trophy-rise 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.celebration-trophy-glow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: celebration-glow-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes celebration-trophy-rise {
+  0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes celebration-glow-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+.celebration-trophy-icon {
+  animation: celebration-trophy-shine 0.5s ease-out forwards 0.3s;
+}
+
+@keyframes celebration-trophy-shine {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { filter: brightness(1); }
+}
+
+/* ── Wave Animation ── */
+.celebration-wave-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebration-wave-appear 0.5s ease-out forwards;
+}
+
+.celebration-wave-hand {
+  animation: celebration-wave-wave 1s ease-in-out infinite 0.5s;
+  transform-origin: bottom center;
+}
+
+@keyframes celebration-wave-appear {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes celebration-wave-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+/* ── Quick Success Animation ── */
+@keyframes quick-success-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.quick-success-icon {
+  animation: quick-success-pop 0.3s ease-out forwards;
+}
+
+/* ============================================================
+   CSS CONTAINMENT UTILITIES
+   Performance optimization for rendering isolation
+   ============================================================ */
+
+/**
+ * CSS Containment isolates elements from the rest of the page,
+ * preventing expensive layout recalculations when content changes.
+ * 
+ * Usage levels:
+ * - content: Isolate element's contents from ancestors (safe for most cases)
+ * - layout: Element's layout doesn't affect ancestors (use for fixed-size containers)
+ * - style: Element's styles don't affect ancestors (use for styled containers)
+ * - paint: Element's painting doesn't affect ancestors (use for offscreen content)
+ * - strict: content + layout + style + paint (maximum isolation, use for virtual lists)
+ */
+
+/* ── Containment Levels ── */
+.contain-content {
+  contain: content;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.contain-style {
+  contain: style;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+.contain-none {
+  contain: none;
+}
+
+/* ── Combined Containment ── */
+.contain-layout-style {
+  contain: layout style;
+}
+
+.contain-content-layout {
+  contain: content layout;
+}
+
+.contain-layout-paint {
+  contain: layout paint;
+}
+
+/* ── Content Visibility (Lazy Rendering) ── */
+/**
+ * content-visibility: auto - Browser skips rendering content until needed
+ * Use for offscreen content to reduce initial render time
+ */
+.content-visible {
+  content-visibility: visible;
+}
+
+.content-hidden {
+  content-visibility: hidden;
+}
+
+.content-auto {
+  content-visibility: auto;
+}
+
+/* ── Performance Container ── */
+/**
+ * Virtual container for scrollable lists with many items.
+ * Combines containment with overflow handling.
+ */
+.virtual-container {
+  contain: strict content;
+  overflow: auto;
+  will-change: transform;
+}
+
+/* ── List Performance ── */
+/**
+ * Optimized list container with CSS containment.
+ * Prevents layout recalculations when items change.
+ */
+.list-container {
+  contain: content layout;
+}
+
+.list-item {
+  contain: content;
+  isolation: isolate;
+}
+
+/* ── Card Containment ── */
+/**
+ * Card container with style isolation.
+ * Prevents card styles affecting siblings.
+ */
+.card-container {
+  contain: content style;
+}
+
+/* ── Modal/Dropdown Containment ── */
+/**
+ * Modal and dropdown containers with paint isolation.
+ * Offscreen content doesn't affect main page.
+ */
+.modal-container {
+  contain: layout style paint;
+}
+
+.dropdown-container {
+  contain: layout style;
+}
+
+/* ── Table Containment ── */
+/**
+ * Table row containment for efficient updates.
+ * Row changes don't affect other rows.
+ */
+.table-container {
+  contain: content layout;
+}
+
+.table-row {
+  contain: content;
+  isolation: isolate;
+}
+
+.table-cell {
+  contain: style;
+}
+
+/* ── Image Containment ── */
+/**
+ * Image container with paint isolation.
+ * Prevents image loading from affecting layout.
+ */
+.image-container {
+  contain: layout paint;
+}
+
+.lazy-image {
+  contain: strict;
+  content-visibility: auto;
+}
+
+/* ── Animation Performance ── */
+/**
+ * Animation container with will-change optimization.
+ * GPU-optimized for smooth animations.
+ */
+.animate-container {
+  contain: layout style;
+  will-change: transform, opacity;
+}
+
+/* ── Scroll Performance ── */
+/**
+ * Scroll container with containment for smooth scrolling.
+ * Prevents scroll from triggering expensive recalculations.
+ */
+.scroll-container {
+  contain: strict;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ── Portal-Aware Containment ── */
+[data-portal="admin"] .portal-container {
+  contain: content layout;
+}
+
+[data-portal="teacher"] .portal-container {
+  contain: content layout;
+}
+
+[data-portal="parent"] .portal-container {
+  contain: content layout;
+}
+
+/* ── Size Reservation (Prevent Layout Shift) ── */
+.reserve-100 {
+  min-height: 100px;
+}
+
+.reserve-200 {
+  min-height: 200px;
+}
+
+.reserve-300 {
+  min-height: 300px;
+}
+
+.reserve-400 {
+  min-height: 400px;
+}
+
+.reserve-500 {
+  min-height: 500px;
+}
+
+.reserve-square {
+  aspect-ratio: 1;
+}
+
+.reserve-video {
+  aspect-ratio: 16 / 9;
+}
+
+.reserve-card {
+  aspect-ratio: 4 / 3;
+}
+
+/* ── Will-Change Optimization ── */
+/**
+ * Will-change hints for GPU optimization.
+ * Use sparingly - only on elements that will animate.
+ */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-scroll {
+  will-change: scroll-position;
+}
+
+/* ── GPU Layer Promotion ── */
+/**
+ * Promote element to GPU layer for smooth animations.
+ * Use transform hack to create compositing layer.
+ */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.gpu-layer-2d {
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Isolation Context ── */
+/**
+ * Create stacking context isolation.
+ * Prevents z-index leaks and style inheritance.
+ */
+.isolate {
+  isolation: isolate;
+}
+
+.isolate-auto {
+  isolation: auto;
+}
+
+/* ============================================================
+   WARM PREMIUM DESIGN SYSTEM — Preschool-Optimized
+   Style: Warm cream + terracotta + sage/honey + colored shadows
+   Opt-in: wrap any subtree in [data-warm="premium"] to activate.
+   Existing portal themes are NOT affected.
+   ============================================================ */
+
+[data-warm="premium"] {
+  /* ── Warm Surface Palette ── */
+  --warm-bg: #FBF7F2;             /* warm cream — main background */
+  --warm-bg-soft: #F5EFE6;        /* slightly deeper cream — alternating sections */
+  --warm-surface: #FFFFFF;        /* pure white card — pops on cream */
+  --warm-surface-tint: #FDFAF5;   /* tinted card — softer alternative */
+  --warm-surface-elevated: #FFFFFF; /* modals, popovers */
+
+  /* ── Warm Ink (text) ── */
+  --warm-ink: #2A1F1A;            /* deep warm brown-black, NOT pure black */
+  --warm-ink-soft: #5C4A3F;       /* secondary text */
+  --warm-ink-muted: #8B7A6E;      /* tertiary / captions */
+  --warm-ink-faint: #B8A99B;      /* placeholders */
+
+  /* ── Warm Borders ── */
+  --warm-border: #F0E8DE;         /* beige border, not gray */
+  --warm-border-strong: #E5D9C7;  /* hover / focus border */
+  --warm-divider: #F5EEE3;        /* subtle dividers */
+
+  /* ── Brand Accents ── */
+  --warm-primary: #E07856;        /* terracotta — main CTA, brand */
+  --warm-primary-hover: #D16644;  /* darker on hover */
+  --warm-primary-soft: #FBE8DE;   /* tinted bg */
+  --warm-primary-ink: #8C3A1E;    /* text on light tint */
+
+  --warm-sage: #7BA05B;           /* organic green — success/growth */
+  --warm-sage-soft: #E8F0DD;
+  --warm-sage-ink: #3F5530;
+
+  --warm-honey: #F4B860;          /* warm amber — warning/attention */
+  --warm-honey-soft: #FDEDD0;
+  --warm-honey-ink: #7A5320;
+
+  --warm-sky: #7CB7E0;            /* soft sky — info */
+  --warm-sky-soft: #DDEDF7;
+  --warm-sky-ink: #2C557A;
+
+  --warm-lavender: #B5A8D3;       /* gentle lavender — secondary accent */
+  --warm-lavender-soft: #EDE7F6;
+  --warm-lavender-ink: #4A3D6E;
+
+  --warm-rose: #E8A4A4;           /* soft rose — gentle danger */
+  --warm-rose-soft: #FBE0E0;
+  --warm-rose-ink: #7A2E2E;
+
+  /* ── Colored Shadows (the premium signal) ── */
+  --warm-shadow-xs: 0 1px 2px rgba(160, 120, 90, 0.05);
+  --warm-shadow-sm: 0 2px 6px rgba(160, 120, 90, 0.07), 0 1px 2px rgba(160, 120, 90, 0.04);
+  --warm-shadow-md: 0 6px 16px rgba(160, 120, 90, 0.08), 0 2px 4px rgba(160, 120, 90, 0.05);
+  --warm-shadow-lg: 0 12px 28px rgba(160, 120, 90, 0.10), 0 4px 8px rgba(160, 120, 90, 0.06);
+  --warm-shadow-xl: 0 20px 48px rgba(160, 120, 90, 0.12), 0 8px 16px rgba(160, 120, 90, 0.08);
+  --warm-shadow-2xl: 0 32px 64px rgba(160, 120, 90, 0.16), 0 12px 24px rgba(160, 120, 90, 0.10);
+  --warm-shadow-primary: 0 12px 28px rgba(224, 120, 86, 0.18), 0 4px 8px rgba(224, 120, 86, 0.10);
+  --warm-shadow-sage: 0 12px 28px rgba(123, 160, 91, 0.18), 0 4px 8px rgba(123, 160, 91, 0.10);
+  --warm-shadow-honey: 0 12px 28px rgba(244, 184, 96, 0.22), 0 4px 8px rgba(244, 184, 96, 0.12);
+  --warm-shadow-sky: 0 12px 28px rgba(124, 183, 224, 0.18), 0 4px 8px rgba(124, 183, 224, 0.10);
+  --warm-shadow-lavender: 0 12px 28px rgba(181, 168, 211, 0.20), 0 4px 8px rgba(181, 168, 211, 0.12);
+  --warm-shadow-rose: 0 12px 28px rgba(232, 164, 164, 0.20), 0 4px 8px rgba(232, 164, 164, 0.12);
+  --warm-shadow-inner: inset 0 2px 4px rgba(160, 120, 90, 0.06);
+
+  /* ── Warm Radius (slightly rounder for friendliness) ── */
+  --warm-radius-sm: 10px;
+  --warm-radius-md: 14px;
+  --warm-radius-lg: 18px;
+  --warm-radius-xl: 24px;
+  --warm-radius-2xl: 32px;
+  --warm-radius-pill: 9999px;
+
+  /* ── Fonts ── */
+  --warm-font-heading: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --warm-font-body: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  --warm-font-numeric: var(--font-jakarta), 'SF Pro Display', system-ui, sans-serif;
+}
+
+/* ── Warm Premium Base — apply to wrapper ── */
+[data-warm="premium"] {
+  background: var(--warm-bg);
+  color: var(--warm-ink);
+  font-family: var(--warm-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-warm="premium"] * {
+  border-color: var(--warm-border);
+}
+
+/* ── Warm Headings (Fraunces serif) ── */
+[data-warm="premium"] .warm-heading,
+[data-warm="premium"] h1.warm,
+[data-warm="premium"] h2.warm,
+[data-warm="premium"] h3.warm {
+  font-family: var(--warm-font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--warm-ink);
+}
+
+/* ── Warm numeric (tabular figures for stats) ── */
+[data-warm="premium"] .warm-numeric {
+  font-family: var(--warm-font-numeric);
+  font-feature-settings: 'tnum' 1, 'ss01' 1;
+  letter-spacing: -0.025em;
+}
+
+/* ── Warm card surfaces ── */
+[data-warm="premium"] .warm-surface {
+  background: var(--warm-surface);
+  border: 1px solid var(--warm-border);
+  box-shadow: var(--warm-shadow-sm);
+  border-radius: var(--warm-radius-lg);
+}
+
+[data-warm="premium"] .warm-surface-tint {
+  background: var(--warm-surface-tint);
+  border: 1px solid var(--warm-border);
+  border-radius: var(--warm-radius-lg);
+}
+
+/* ── Warm pastel column backgrounds (for Kanban) ── */
+[data-warm="premium"] .warm-col-rose { background: linear-gradient(180deg, #FBE0E0 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-honey { background: linear-gradient(180deg, #FDEDD0 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-sage { background: linear-gradient(180deg, #E8F0DD 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-sky { background: linear-gradient(180deg, #DDEDF7 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-lavender { background: linear-gradient(180deg, #EDE7F6 0%, #FDFAF5 100%); }
+[data-warm="premium"] .warm-col-primary { background: linear-gradient(180deg, #FBE8DE 0%, #FDFAF5 100%); }
+
+/* ── Warm subtle hover lift ── */
+[data-warm="premium"] .warm-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-warm="premium"] .warm-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--warm-shadow-lg);
+}
+
+/* ── Warm fade-in on mount ── */
+@keyframes warm-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+[data-warm="premium"] .warm-fade-in {
+  animation: warm-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Warm count-up shimmer (for stat cards before number loads) ── */
+@keyframes warm-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+[data-warm="premium"] .warm-shimmer {
+  background: linear-gradient(90deg, var(--warm-bg-soft) 25%, var(--warm-border) 50%, var(--warm-bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: warm-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Warm scrollbar (subtle, themed) ── */
+[data-warm="premium"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-warm="premium"] ::-webkit-scrollbar-track {
+  background: var(--warm-bg-soft);
+}
+[data-warm="premium"] ::-webkit-scrollbar-thumb {
+  background: var(--warm-border-strong);
+  border-radius: var(--warm-radius-pill);
+  border: 2px solid var(--warm-bg-soft);
+}
+[data-warm="premium"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--warm-ink-faint);
+}
+
+/* ── Warm focus ring ── */
+[data-warm="premium"] *:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(224, 120, 86, 0.25);
+  border-color: var(--warm-primary);
+}
+
+/* ── Warm utility classes (one-off helpers) ── */
+[data-warm="premium"] .warm-divider {
+  height: 1px;
+  background: var(--warm-divider);
+  border: 0;
+}
+
+[data-warm="premium"] .warm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--warm-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-warm="premium"] .warm-pill-primary { background: var(--warm-primary-soft); color: var(--warm-primary-ink); }
+[data-warm="premium"] .warm-pill-sage { background: var(--warm-sage-soft); color: var(--warm-sage-ink); }
+[data-warm="premium"] .warm-pill-honey { background: var(--warm-honey-soft); color: var(--warm-honey-ink); }
+[data-warm="premium"] .warm-pill-sky { background: var(--warm-sky-soft); color: var(--warm-sky-ink); }
+[data-warm="premium"] .warm-pill-lavender { background: var(--warm-lavender-soft); color: var(--warm-lavender-ink); }
+[data-warm="premium"] .warm-pill-rose { background: var(--warm-rose-soft); color: var(--warm-rose-ink); }
+[data-warm="premium"] .warm-pill-neutral { background: var(--warm-bg-soft); color: var(--warm-ink-soft); }
+
+/* ── Warm text gradient (for hero numbers) ── */
+[data-warm="premium"] .warm-text-gradient {
+  background: linear-gradient(135deg, var(--warm-primary) 0%, var(--warm-honey) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Warm "soft glow" — for celebratory moments (lead converted!) ── */
+@keyframes warm-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(123, 160, 91, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(123, 160, 91, 0.15); }
+}
+[data-warm="premium"] .warm-glow-success {
+  animation: warm-glow-pulse 1.8s ease-in-out infinite;
+}

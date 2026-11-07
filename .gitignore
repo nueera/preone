@@ -1,0 +1,80 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+/test-results/
+
+# uploads & downloads
+/upload/
+/download/
+
+# next.js
+/.next/
+/out/
+
+# database
+*.db
+*.db-journal
+/db/
+
+# production
+/build
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env
+.env.local
+.env.production.local
+.env.*.local
+# Keep templates
+!.env.example
+!.env.production
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+local-*
+.claude
+.z-ai-config
+*.log
+dev.log
+dev.out.log
+test
+prompt
+
+server.log
+
+# IDE
+.vscode/
+.idea/
+
+# Skills directory
+/skills/
+
+# Keep the vitest setup file tracked — the broad `test` rule above would
+# otherwise ignore the entire src/test/ directory (vitest setupFiles).
+!src/test/
+!src/test/**

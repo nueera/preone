@@ -1,0 +1,29 @@
+import { createServer } from 'http';
+import { parse } from 'url';
+import next from 'next';
+import { getSocketServer } from './src/lib/socket';
+
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  const server = createServer((req, res) => {
+    const parsedUrl = parse(req.url!, true);
+    handle(req, res, parsedUrl);
+  });
+
+  // Initialize Socket.io
+  try {
+    getSocketServer(server);
+  } catch (e: any) {
+    console.warn('> Socket.io: Could not load socket module, running without WebSocket support');
+    console.warn('> Error:', e.message);
+  }
+
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    console.log(`> PreOne ready on http://localhost:${PORT}`);
+    console.log(`> Socket.io ready on /api/socketio`);
+  });
+});
